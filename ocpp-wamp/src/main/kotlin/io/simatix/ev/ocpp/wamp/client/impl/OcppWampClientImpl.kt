@@ -47,6 +47,7 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
                                             " message id ${pending.msg.msgId} - discarding $msgString")
                                 }
                                 else -> {
+                                    logger.info("[$ocppId] <= $msgString")
                                     pending.response = msg
                                     pending.latch.countDown()
                                 }
@@ -104,7 +105,9 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
             throw IllegalStateException("can't send a call when another one is pending")
         }
         lastResponse = FutureResponse(message)
-        ws?.send(WsMessage(message.toJson()))
+        val msgString = message.toJson()
+        logger.info("[$ocppId] => $msgString")
+        ws?.send(WsMessage(msgString))
         lastResponse?.latch?.await(timeoutInMs, TimeUnit.MILLISECONDS)
         val response = lastResponse?.response
         if (response != null) {
@@ -112,7 +115,7 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
             return response
         } else {
             lastResponse = null
-            throw IllegalStateException("timeout calling server with ${message.toJson()}")
+            throw IllegalStateException("timeout calling server with $msgString")
         }
     }
 

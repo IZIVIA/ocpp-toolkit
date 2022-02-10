@@ -18,8 +18,10 @@ import java.util.concurrent.TimeUnit
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)->OcppWampServerHandler,
                         val timeoutInMs:Long) {
+    companion object {
+        private val logger = LoggerFactory.getLogger("io.simatix.ev.ocpp.wamp.server")
+    }
     private val connections:MutableMap<String, ChargingStationConnection?> = mutableMapOf()
-    private val logger = LoggerFactory.getLogger("io.simatix.ev.ocpp.wamp.server")
 
     private fun newConnection(ws: Websocket) {
         val wsConnectionId = UUID.randomUUID().toString()
@@ -39,24 +41,24 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
             return
         }
 
-        val chargingStationConnection = ChargingStationConnection(chargingStationOcppId, ws, timeoutInMs)
+        val chargingStationConnection = ChargingStationConnection(wsConnectionId, chargingStationOcppId, ws, timeoutInMs)
         connections[chargingStationOcppId] = chargingStationConnection
         ws.onClose {
             logger.info("""[$chargingStationOcppId] [$wsConnectionId] disconnected """)
-            if (connections[chargingStationOcppId]?.ws == ws) {
+            if (connections[chargingStationOcppId]?.wsConnectionId == wsConnectionId) {
                 connections[chargingStationOcppId] = null
             } else {
-                logger.info("warn: do not clear ws on close - not current ws in map")
+                logger.info("warn: do not clear ws on close - not current connection in map")
             }
         }
 
         logger.info("""[$chargingStationOcppId] [$wsConnectionId] connected """)
         ws.onMessage {
-            logger.info("""[$chargingStationOcppId] [$wsConnectionId] -> ${it.bodyString()}""")
             val msgString = it.bodyString()
             WampMessage.parse(msgString)?.also { msg ->
                 when {
                     msg.msgType == WampMessageType.CALL -> {
+                        logger.info("""[$chargingStationOcppId] [$wsConnectionId] -> ${it.bodyString()}""")
                         val resp = handler.onAction(WampMessageMeta(ocppVersion, chargingStationOcppId), msg)
                             ?: WampMessage.CallError(msg.msgId, "{}").also { logger.warn("no action handler found for $msg") }
 
@@ -74,6 +76,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                                         " message id ${pending.msg.msgId} - discarding $msgString")
                             }
                             else -> {
+                                logger.info("""[$chargingStationOcppId] [$wsConnectionId] => $msgString""")
                                 pending.response = msg
                                 pending.latch.countDown()
                             }
@@ -104,13 +107,15 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
 
     fun newRoutingHandler() = websockets(OcppWsEndpoint.uriTemplate.toString() bind ::newConnection)
 
-    private data class ChargingStationConnection(val ocppId:CSOcppId, val ws: Websocket,
+    private data class ChargingStationConnection(val wsConnectionId:String,
+                                                 val ocppId:CSOcppId, val ws: Websocket,
                                                  val timeoutInMs:Long, var lastResponse: FutureResponse? = null) {
         fun sendBlocking(message: WampMessage): WampMessage {
             if (lastResponse != null) {
                 throw IllegalStateException("can't send a call when another one is pending")
             }
             lastResponse = FutureResponse(message)
+            logger.info("""[$ocppId] [$wsConnectionId] <= ${message.toJson()}""")
             ws.send(WsMessage(message.toJson()))
             lastResponse?.latch?.await(timeoutInMs, TimeUnit.MILLISECONDS)
             val response = lastResponse?.response
