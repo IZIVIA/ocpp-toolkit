@@ -11,6 +11,6 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:_")
 
-    implementation("org.slf4j:slf4j-api:1.7.36")
-    runtimeOnly("ch.qos.logback:logback-classic:1.2.10")
+    implementation("org.slf4j:slf4j-api:_")
+    runtimeOnly("ch.qos.logback:logback-classic:_")
 }
