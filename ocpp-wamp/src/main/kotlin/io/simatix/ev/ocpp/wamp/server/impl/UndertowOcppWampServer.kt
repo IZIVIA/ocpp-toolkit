@@ -11,34 +11,42 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 
-class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>) : OcppWampServer {
+class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, val timeoutInMs:Long = 30_000) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
     private val selectedHandler = mutableMapOf<CSOcppId, OcppWampServerHandler>()
     private var server: Http4kServer? = null
+    private var wsApp: OcppWampServerApp? = null
 
     override fun start() {
-        server = OcppWampServerApp(ocppVersions, { id -> selectedHandler[id]?:throw IllegalStateException()})
-            .asServer(Undertow(
-                port = port,
-                enableHttp2 = true,
-                acceptWebSocketPredicate = { exch ->
-                    // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-                    OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)
-                        ?.let { handlers.find { h-> h.accept(it) }?.let { h -> it to h } }
-                        ?.also { selectedHandler[it.first] = it.second } != null },
-                wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
-            )).start()
+        wsApp = OcppWampServerApp(
+            ocppVersions = ocppVersions,
+            handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
+            timeoutInMs = timeoutInMs
+        )
+            .also {
+                server = it.newRoutingHandler().asServer(Undertow(
+                    port = port,
+                    enableHttp2 = true,
+                    acceptWebSocketPredicate = { exch ->
+                        // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
+                        OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)
+                            ?.let { handlers.find { h-> h.accept(it) }?.let { h -> it to h } }
+                            ?.also { selectedHandler[it.first] = it.second } != null },
+                    wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
+                )).start()
+            }
         logger.info("starting ocpp wamp server on port $port")
     }
 
     override fun stop() {
         server?.stop()
         server = null
+        wsApp = null
     }
 
-    override fun sendBlocking(ocppId: CSOcppId, message: WampMessage): WampMessage {
-        TODO()
-    }
+    override fun sendBlocking(ocppId: CSOcppId, message: WampMessage): WampMessage =
+        (wsApp?:throw IllegalStateException("server not started"))
+            .sendBlocking(ocppId, message)?:WampMessage.CallError(message.msgId, "{}")
 
     override fun register(handler: OcppWampServerHandler) {
         handlers.add(handler)

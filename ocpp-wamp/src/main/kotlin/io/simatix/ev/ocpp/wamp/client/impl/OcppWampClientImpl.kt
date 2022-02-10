@@ -3,7 +3,9 @@ package io.simatix.ev.ocpp.wamp.client.impl
 import io.simatix.ev.ocpp.CSOcppId
 import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.client.OcppWampClient
+import io.simatix.ev.ocpp.wamp.client.WampOnActionHandler
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import org.http4k.asString
 import org.http4k.core.Uri
@@ -17,8 +19,9 @@ import java.util.concurrent.TimeUnit
 class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVersion, val timeoutInMs:Long = 30_000) : OcppWampClient {
     val serverUri = target.path("${target.path.removeSuffix("/")}/$ocppId")
 
-    var ws: Websocket? = null
-    var lastResponse:FutureResponse? = null
+    private var ws: Websocket? = null
+    private var lastResponse:FutureResponse? = null
+    private val handlers = mutableListOf<WampOnActionHandler>()
 
     override fun connect() {
         logger.info("connecting to $serverUri with ocpp version $ocppVersion")
@@ -49,8 +52,22 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
                                 }
                             }
                         }
+
+                        msg.msgType == WampMessageType.CALL -> {
+                            logger.info("[$ocppId] <- ${msg.action} - $msgString")
+                            val r = handlers.asSequence()
+                                // use sequence to avoid greedy mapping, to find the first handler with non null result
+
+                                .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
+                                .filterNotNull()
+                                .firstOrNull()
+                                ?: WampMessage.CallError(msg.msgId, "{}")
+                            logger.info("[$ocppId] -> ${r.toJson()}")
+                            ws?.send(WsMessage(r.toJson()))
+                        }
+
                         else -> {
-                            TODO("call from server not implemented yet")
+                            logger.warn("unsupported wamp message type: ${msg.msgType} - message = $msgString")
                         }
                     }
                 }
@@ -99,6 +116,10 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
         }
     }
 
+    override fun onAction(handler: WampOnActionHandler) {
+        handlers.add(handler)
+    }
+
     private fun checkConnected() {
         if (ws == null) {
             logger.error("not connected to $serverUri")
@@ -109,9 +130,10 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
     companion object {
         private val logger = LoggerFactory.getLogger(OcppWampClientImpl::class.java)
     }
+
+    private data class FutureResponse(val msg:WampMessage, val latch:CountDownLatch = CountDownLatch(1), var response:WampMessage? = null)
 }
 
-data class FutureResponse(val msg:WampMessage, val latch:CountDownLatch = CountDownLatch(1), var response:WampMessage? = null)
 
 fun main() {
     val client = OcppWampClientImpl(Uri.of("ws://localhost:5000/ws"), "TEST1", OcppVersion.OCPP_1_6)

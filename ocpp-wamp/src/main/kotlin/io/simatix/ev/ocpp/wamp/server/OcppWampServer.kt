@@ -1,7 +1,6 @@
 package io.simatix.ev.ocpp.wamp.server
 
 import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 
@@ -23,7 +22,7 @@ interface OcppWampServer {
      *
      * @throws IllegalStateException if no such ChargingStation is currently connected to this server
      */
-    fun sendBlocking(ocppId:CSOcppId, message:WampMessage):WampMessage
+    fun sendBlocking(ocppId:CSOcppId, message:WampMessage): WampMessage
 
     /**
      * registers a wamp server handler on this server.

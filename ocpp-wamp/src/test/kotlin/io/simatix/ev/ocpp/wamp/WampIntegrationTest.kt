@@ -58,6 +58,106 @@ class WampIntegrationTest {
     }
 
     @Test
+    fun `should timeout when calling server`() {
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? {
+                Thread.sleep(500)
+                return null
+            }
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1",
+                OcppVersion.OCPP_1_6, timeoutInMs = 200)
+            client.connect()
+
+            expectCatching {
+                client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+            }.isFailure()
+
+            client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `should call from server to charging station`() {
+        val heartbeatResponsePayload = """{"currentTime":"${Clock.System.now()}"}"""
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            client.onAction { meta: WampMessageMeta, msg: WampMessage ->
+                when (msg.action?.lowercase()) {
+                    "remotebeat" ->
+                        WampMessage.CallResult(msg.msgId, heartbeatResponsePayload)
+                    else -> {
+                        println("unhandled action for message: ${msg.toJson()}")
+                        WampMessage.CallError(msg.msgId, "{}")
+                    }
+                }
+            }
+            client.connect()
+
+            val r = server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+
+            expectThat(r) {
+                get { msgId }.isEqualTo("1")
+                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+                get { payload }.isEqualTo(heartbeatResponsePayload)
+            }
+
+            client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `should call from server to charging station timeout`() {
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0), 200)
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            client.onAction { meta: WampMessageMeta, msg: WampMessage ->
+                Thread.sleep(500)
+                null
+            }
+            client.connect()
+
+            expectCatching {
+                server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+            }.isFailure()
+
+            client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+
+    @Test
     fun `should 404 on unknown ocpp id`() {
         val port = 12345
 
