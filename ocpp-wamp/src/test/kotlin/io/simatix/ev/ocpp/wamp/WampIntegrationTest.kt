@@ -58,6 +58,32 @@ class WampIntegrationTest {
     }
 
     @Test
+    fun `should 404 on unknown ocpp id`() {
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST2", OcppVersion.OCPP_1_6,
+                timeoutInMs = 600)
+            val time = measureTimeMillis {
+                expectCatching { client.connect() }.isFailure()
+            }
+            expectThat(time)
+                .describedAs("connection failure time ($time ms) for 404 should be fast")
+                .isLessThan(500)
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
     fun `should disconnect on server close`() {
         val port = 12345
 

@@ -6,11 +6,11 @@ import io.simatix.ev.ocpp.wamp.client.OcppWampClient
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import org.http4k.asString
-import org.http4k.client.WebsocketClient
 import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.slf4j.LoggerFactory
+import java.time.Duration
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -22,52 +22,51 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
 
     override fun connect() {
         logger.info("connecting to $serverUri with ocpp version $ocppVersion")
-        val latch = CountDownLatch(1)
-        val websocket = WebsocketClient.nonBlocking(
-            serverUri, headers = listOf("Sec-WebSocket-Protocol" to ocppVersion.subprotocol)) {
+        val websocket = Http4kWebSocketClient.connnectWebsocket(
+            uri = serverUri,
+            headers = listOf("Sec-WebSocket-Protocol" to ocppVersion.subprotocol),
+            timeout = Duration.ofMillis(timeoutInMs),
+            onMessage = {
+                val msgString = it.body.payload.asString()
+                val msg = WampMessage.parse(msgString)
+                if (msg == null) {
+                    logger.warn("can't parse wamp message from server: $msgString")
+                } else {
+                    when {
+                        msg.msgType == WampMessageType.CALL_RESULT || msg.msgType == WampMessageType.CALL_ERROR -> {
+                            val pending = lastResponse
+                            when {
+                                pending == null -> {
+                                    logger.warn("got a call result/error with no pending call - discarding $msgString")
+                                }
+                                pending.msg.msgId != msg.msgId -> {
+                                    logger.warn("got a call result/error not corresponding to pending call" +
+                                            " message id ${pending.msg.msgId} - discarding $msgString")
+                                }
+                                else -> {
+                                    pending.response = msg
+                                    pending.latch.countDown()
+                                }
+                            }
+                        }
+                        else -> {
+                            TODO("call from server not implemented yet")
+                        }
+                    }
+                }
+            },
+            onError = {
+                logger.warn("error with web socket connection to $serverUri: $it", it)
+            },
+            onClose = {
+                if (ws != null) {
+                    logger.info("connection lost to $serverUri")
+                    // TODO: auto reconnect strategy
+                }
+            }
+        ) {
             logger.info("connected to $serverUri")
             ws = it
-            latch.countDown()
-        }
-        websocket.onError {
-            logger.warn("error with web socket connection to $serverUri: $it", it)
-            latch.countDown()
-        }
-        websocket.onClose {
-            if (ws != null) {
-                logger.info("connection lost to $serverUri")
-                // TODO: auto reconnect strategy
-            }
-        }
-        websocket.onMessage {
-            val msgString = it.body.payload.asString()
-            val msg = WampMessage.parse(msgString)
-            if (msg == null) {
-                logger.warn("can't parse wamp message from server: $msgString")
-                return@onMessage
-            }
-            when {
-                msg.msgType == WampMessageType.CALL_RESULT || msg.msgType == WampMessageType.CALL_ERROR -> {
-                    val pending = lastResponse
-                    if (pending == null) {
-                        logger.warn("got a call result/error with no pending call - discarding $msgString")
-                        return@onMessage
-                    }
-                    if (pending.msg.msgId != msg.msgId) {
-                        logger.warn("got a call result/error not corresponding to pending call message id ${pending.msg.msgId} - discarding $msgString")
-                        return@onMessage
-                    }
-                    pending.response = msg
-                    pending.latch.countDown()
-                }
-                else -> {
-                    TODO("call from server not implemented yet")
-                }
-            }
-        }
-        latch.await(timeoutInMs, TimeUnit.MILLISECONDS)
-        if (ws == null) {
-            throw IllegalStateException("timeout connecting to $serverUri")
         }
     }
 
