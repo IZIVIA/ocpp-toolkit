@@ -1,0 +1,96 @@
+package io.simatix.ev.ocpp.wamp
+
+import io.simatix.ev.ocpp.CSOcppId
+import io.simatix.ev.ocpp.OcppVersion
+import io.simatix.ev.ocpp.wamp.client.impl.OcppWampClientImpl
+import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
+import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import io.simatix.ev.ocpp.wamp.server.impl.UndertowOcppWampServer
+import kotlinx.datetime.Clock
+import org.http4k.core.Uri
+import org.junit.jupiter.api.Test
+import strikt.api.expectCatching
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
+import strikt.assertions.isFailure
+import strikt.assertions.isLessThan
+import kotlin.system.measureTimeMillis
+
+class WampIntegrationTest {
+    @Test
+    fun `should heartbeat`() {
+        val heartbeatResponsePayload = """{"currentTime":"${Clock.System.now()}"}"""
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
+                when (msg.action?.lowercase()) {
+                    "heartbeat" ->
+                        WampMessage.CallResult(msg.msgId, heartbeatResponsePayload)
+                    else -> {
+                        println("unhandled action for message: ${msg.toJson()}")
+                        WampMessage.CallError(msg.msgId, "{}")
+                    }
+                }
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            client.connect()
+
+            val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+            expectThat(r) {
+                get { msgId }.isEqualTo("1")
+                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+                get { payload }.isEqualTo(heartbeatResponsePayload)
+            }
+
+            client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `should disconnect on server close`() {
+        val port = 12345
+
+        val server = UndertowOcppWampServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            client.connect()
+            server.stop()
+
+            expectCatching { client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }.isFailure()
+
+            client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `should timeout on server not available`() {
+        val port = 12346
+
+        val client = OcppWampClientImpl(
+            Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6,
+            timeoutInMs = 50)
+        val time = measureTimeMillis {
+            expectCatching { client.connect() }.isFailure()
+        }
+        expectThat(time).isLessThan(100) // 50ms timeout + 50ms tolerance
+    }
+}

@@ -2,8 +2,9 @@ plugins {
     kotlin("jvm")
 }
 
+coreProject()
+
 dependencies {
-    implementation("org.http4k:http4k-bom:_")
     implementation("org.http4k:http4k-core:_")
     implementation("org.http4k:http4k-client-websocket:_")
     implementation("org.http4k:http4k-server-undertow:_")
