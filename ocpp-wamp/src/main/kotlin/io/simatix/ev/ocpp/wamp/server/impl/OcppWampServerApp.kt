@@ -20,7 +20,7 @@ fun OcppWampServerApp(ocppVersions:Set<OcppVersion>, handlers: (CSOcppId)->OcppW
 
     fun newConnection(ws: Websocket) {
         val wsConnectionId = UUID.randomUUID().toString()
-        val chargingStationOcppId = Ocpp.extractChargingStationOcppId(ws.upgradeRequest.uri.path)
+        val chargingStationOcppId = OcppWsEndpoint.extractChargingStationOcppId(ws.upgradeRequest.uri.path)
             ?.takeUnless { it.isEmpty() }
             ?:throw IllegalArgumentException("malformed request - no chargingStationOcppId - ${ws.upgradeRequest}")
         val ocppVersion = ws.upgradeRequest.header("Sec-WebSocket-Protocol")
@@ -63,5 +63,5 @@ fun OcppWampServerApp(ocppVersions:Set<OcppVersion>, handlers: (CSOcppId)->OcppW
         }
     }
 
-    return websockets(Ocpp.uriTemplate.toString() bind ::newConnection)
+    return websockets(OcppWsEndpoint.uriTemplate.toString() bind ::newConnection)
 }

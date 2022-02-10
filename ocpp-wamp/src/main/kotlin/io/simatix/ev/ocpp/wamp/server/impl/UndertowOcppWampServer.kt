@@ -23,7 +23,7 @@ class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>) : 
                 enableHttp2 = true,
                 acceptWebSocketPredicate = { exch ->
                     // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-                    Ocpp.extractChargingStationOcppId(exch.requestURI)
+                    OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)
                         ?.let { handlers.find { h-> h.accept(it) }?.let { h -> it to h } }
                         ?.also { selectedHandler[it.first] = it.second } != null },
                 wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
