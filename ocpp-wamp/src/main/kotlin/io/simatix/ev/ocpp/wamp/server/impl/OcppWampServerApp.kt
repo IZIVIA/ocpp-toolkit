@@ -2,6 +2,7 @@ package io.simatix.ev.ocpp.wamp.server.impl
 
 import io.simatix.ev.ocpp.CSOcppId
 import io.simatix.ev.ocpp.OcppVersion
+import io.simatix.ev.ocpp.wamp.core.WampCallManager
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
@@ -12,8 +13,6 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.slf4j.LoggerFactory
 import java.util.*
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)->OcppWampServerHandler,
@@ -66,21 +65,8 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         ws.send(WsMessage(resp.toJson()))
                     }
                     msg.msgType == WampMessageType.CALL_RESULT || msg.msgType == WampMessageType.CALL_ERROR -> {
-                        val pending = chargingStationConnection.lastResponse
-                        when {
-                            pending == null -> {
-                                logger.warn("got a call result/error with no pending call - discarding $msgString")
-                            }
-                            pending.msg.msgId != msg.msgId -> {
-                                logger.warn("got a call result/error not corresponding to pending call" +
-                                        " message id ${pending.msg.msgId} - discarding $msgString")
-                            }
-                            else -> {
-                                logger.info("""[$chargingStationOcppId] [$wsConnectionId] => $msgString""")
-                                pending.response = msg
-                                pending.latch.countDown()
-                            }
-                        }
+                        chargingStationConnection.callManager.handleResult(
+                            "[$chargingStationOcppId] [$wsConnectionId]", msg)
                     }
                     else ->
                         logger.warn("unsupported wamp message type: ${msg.msgType} - message = $msgString")
@@ -109,25 +95,10 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
 
     private data class ChargingStationConnection(val wsConnectionId:String,
                                                  val ocppId:CSOcppId, val ws: Websocket,
-                                                 val timeoutInMs:Long, var lastResponse: FutureResponse? = null) {
-        fun sendBlocking(message: WampMessage): WampMessage {
-            if (lastResponse != null) {
-                throw IllegalStateException("can't send a call when another one is pending")
-            }
-            lastResponse = FutureResponse(message)
-            logger.info("""[$ocppId] [$wsConnectionId] <= ${message.toJson()}""")
-            ws.send(WsMessage(message.toJson()))
-            lastResponse?.latch?.await(timeoutInMs, TimeUnit.MILLISECONDS)
-            val response = lastResponse?.response
-            if (response != null) {
-                lastResponse = null
-                return response
-            } else {
-                lastResponse = null
-                throw IllegalStateException("timeout calling server with ${message.toJson()}")
-            }
-        }
+                                                 val timeoutInMs:Long) {
+        val callManager:WampCallManager = WampCallManager(logger, ws, timeoutInMs)
 
+        fun sendBlocking(message: WampMessage): WampMessage =
+            callManager.callBlocking("[$ocppId] [$wsConnectionId]", message)
     }
-    private data class FutureResponse(val msg:WampMessage, val latch: CountDownLatch = CountDownLatch(1), var response:WampMessage? = null)
 }
