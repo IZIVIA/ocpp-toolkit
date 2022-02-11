@@ -1,8 +1,10 @@
 package io.simatix.ev.ocpp.wamp.server
 
 import io.simatix.ev.ocpp.CSOcppId
+import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
+import io.simatix.ev.ocpp.wamp.server.impl.UndertowOcppWampServer
 
 interface OcppWampServer {
     /**
@@ -37,6 +39,11 @@ interface OcppWampServer {
      * Note that an handler cannot be unregistered.
      */
     fun register(handler: OcppWampServerHandler)
+
+    companion object {
+        fun newServer(port:Int, ocppVersions:Set<OcppVersion> = OcppVersion.values().toSet(), timeoutInMs:Long = 30_000)
+            = UndertowOcppWampServer(port, ocppVersions, timeoutInMs)
+    }
 }
 
 interface OcppWampServerHandler {
