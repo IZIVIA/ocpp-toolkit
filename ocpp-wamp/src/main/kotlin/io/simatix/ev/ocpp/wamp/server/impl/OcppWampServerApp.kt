@@ -13,6 +13,7 @@ import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.slf4j.LoggerFactory
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)->OcppWampServerHandler,
@@ -21,8 +22,14 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
         private val logger = LoggerFactory.getLogger("io.simatix.ev.ocpp.wamp.server")
     }
     private val connections:MutableMap<String, ChargingStationConnection?> = mutableMapOf()
+    private val shutdown = AtomicBoolean(false)
 
     private fun newConnection(ws: Websocket) {
+        if (shutdown.get()) {
+            logger.warn("shutting down - rejecting connection")
+            ws.close()
+            return
+        }
         val wsConnectionId = UUID.randomUUID().toString()
         val chargingStationOcppId = OcppWsEndpoint.extractChargingStationOcppId(ws.upgradeRequest.uri.path)
             ?.takeUnless { it.isEmpty() }
@@ -40,7 +47,8 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
             return
         }
 
-        val chargingStationConnection = ChargingStationConnection(wsConnectionId, chargingStationOcppId, ws, timeoutInMs)
+        val chargingStationConnection = ChargingStationConnection(
+            wsConnectionId, chargingStationOcppId, ws, timeoutInMs, shutdown)
         connections[chargingStationOcppId] = chargingStationConnection
         ws.onClose {
             logger.info("""[$chargingStationOcppId] [$wsConnectionId] disconnected """)
@@ -57,6 +65,12 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
             WampMessage.parse(msgString)?.also { msg ->
                 when {
                     msg.msgType == WampMessageType.CALL -> {
+                        if (shutdown.get()) {
+                            logger.info("""[$chargingStationOcppId] [$wsConnectionId] - rejected call - shutting down - $msgString""")
+                            ws.send(WsMessage(WampMessage.CallError(msg.msgId, "{}").toJson()))
+                            return@onMessage
+                        }
+
                         logger.info("""[$chargingStationOcppId] [$wsConnectionId] -> ${it.bodyString()}""")
                         val resp = handler.onAction(WampMessageMeta(ocppVersion, chargingStationOcppId), msg)
                             ?: WampMessage.CallError(msg.msgId, "{}").also { logger.warn("no action handler found for $msg") }
@@ -71,6 +85,17 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                     else ->
                         logger.warn("unsupported wamp message type: ${msg.msgType} - message = $msgString")
                 }
+            }
+        }
+    }
+
+    fun shutdown() {
+        shutdown.set(true)
+        connections.values.toList().forEach { c ->
+            c?.let {
+                it.callManager.await()
+                it.close()
+                connections[it.ocppId] = null
             }
         }
     }
@@ -93,12 +118,18 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
 
     fun newRoutingHandler() = websockets(OcppWsEndpoint.uriTemplate.toString() bind ::newConnection)
 
-    private data class ChargingStationConnection(val wsConnectionId:String,
+    private class ChargingStationConnection(val wsConnectionId:String,
                                                  val ocppId:CSOcppId, val ws: Websocket,
-                                                 val timeoutInMs:Long) {
-        val callManager:WampCallManager = WampCallManager(logger, ws, timeoutInMs)
+                                                 timeoutInMs:Long, shutdown: AtomicBoolean
+    ) {
+        val callManager:WampCallManager = WampCallManager(logger, ws, timeoutInMs, shutdown)
 
         fun sendBlocking(message: WampMessage): WampMessage =
             callManager.callBlocking("[$ocppId] [$wsConnectionId]", message)
+
+        fun close() {
+            logger.info("[$ocppId] [$wsConnectionId] - closing")
+            ws.close()
+        }
     }
 }

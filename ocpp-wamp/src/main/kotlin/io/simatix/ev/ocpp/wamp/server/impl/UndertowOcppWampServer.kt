@@ -10,10 +10,11 @@ import kotlinx.datetime.Clock
 import org.http4k.server.Http4kServer
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
 
 class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, val timeoutInMs:Long = 30_000) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
-    private val selectedHandler = mutableMapOf<CSOcppId, OcppWampServerHandler>()
+    private val selectedHandler = ConcurrentHashMap<CSOcppId, OcppWampServerHandler>()
     private var server: Http4kServer? = null
     private var wsApp: OcppWampServerApp? = null
 
@@ -36,6 +37,11 @@ class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, va
                 )).start()
             }
         logger.info("starting ocpp wamp server on port $port")
+    }
+
+    override fun shutdown() {
+        wsApp?.shutdown()
+        stop()
     }
 
     override fun stop() {

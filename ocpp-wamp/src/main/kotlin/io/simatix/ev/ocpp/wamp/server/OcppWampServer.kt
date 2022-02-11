@@ -13,6 +13,14 @@ interface OcppWampServer {
     fun start()
 
     /**
+     * attempt a graceful shutdown of the server:
+     * - do not accept connection any more
+     * - do not accept new calls any more
+     * - close opened connections when pending calls are done
+     */
+    fun shutdown()
+
+    /**
      * Stops the server.
      * This will close all opened web sockets.
      * A stopped server cannot be reused.

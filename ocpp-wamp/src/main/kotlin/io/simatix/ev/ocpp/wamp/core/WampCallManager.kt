@@ -1,28 +1,38 @@
 package io.simatix.ev.ocpp.wamp.core
 
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import kotlinx.datetime.Clock
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.slf4j.Logger
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class WampCallManager(
     private val logger:Logger,
     private val ws:Websocket,
-    val timeoutInMs:Long) {
+    val timeoutInMs:Long,
+    private val shutdown: AtomicBoolean = AtomicBoolean(false)
+) {
 
     private var currentCall:WampCall? = null
 
     fun callBlocking(logContext:String, message:WampMessage): WampMessage {
-        if (currentCall != null) {
-            throw IllegalStateException("$logContext can't send a call when another one is pending")
+        val now = Clock.System.now()
+        synchronized(this) {
+            while (currentCall != null && (Clock.System.now() - now).inWholeMilliseconds < timeoutInMs) {
+                Thread.sleep(10)
+            }
+            if (currentCall != null) {
+                throw IllegalStateException("$logContext can't send a call when another one is pending")
+            }
+            currentCall = WampCall(logContext, message)
         }
-        currentCall = WampCall(logContext, message)
         val msgString = message.toJson()
         logger.info("$logContext => $msgString")
         ws?.send(WsMessage(msgString))
-        currentCall?.latch?.await(timeoutInMs, TimeUnit.MILLISECONDS)
+        currentCall?.latch?.await(timeoutInMs - ((Clock.System.now() - now).inWholeMilliseconds), TimeUnit.MILLISECONDS)
         val response = currentCall?.response
         if (response != null) {
             currentCall = null
@@ -55,6 +65,20 @@ class WampCallManager(
     fun close() {
         if (currentCall != null) {
             logger.warn("closing connection while a pending call is in progress")
+        }
+    }
+
+    fun await() {
+        val now = Clock.System.now()
+        synchronized(this) {
+            while (currentCall != null && (Clock.System.now() - now).inWholeMilliseconds < timeoutInMs) {
+                Thread.sleep(10)
+            }
+            val call = currentCall
+
+            if (call != null) {
+                logger.warn("${call.logContext} current call not released within timeout")
+            }
         }
     }
 
