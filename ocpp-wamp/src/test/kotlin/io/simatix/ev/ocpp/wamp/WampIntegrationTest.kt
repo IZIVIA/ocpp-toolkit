@@ -2,7 +2,7 @@ package io.simatix.ev.ocpp.wamp
 
 import io.simatix.ev.ocpp.CSOcppId
 import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.client.impl.OcppWampClientImpl
+import io.simatix.ev.ocpp.wamp.client.OcppWampClient
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
@@ -41,7 +41,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
             client.connect()
 
             val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
@@ -73,7 +73,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1",
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1",
                 OcppVersion.OCPP_1_6, timeoutInMs = 200)
             client.connect()
 
@@ -100,7 +100,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
             client.onAction { meta: WampMessageMeta, msg: WampMessage ->
                 when (msg.action?.lowercase()) {
                     "remotebeat" ->
@@ -139,7 +139,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
             client.onAction { meta: WampMessageMeta, msg: WampMessage ->
                 Thread.sleep(500)
                 null
@@ -170,7 +170,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST2", OcppVersion.OCPP_1_6,
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST2", OcppVersion.OCPP_1_6,
                 timeoutInMs = 600)
             val time = measureTimeMillis {
                 expectCatching { client.connect() }.isFailure()
@@ -195,7 +195,7 @@ class WampIntegrationTest {
         server.start()
 
         try {
-            val client = OcppWampClientImpl(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
             client.connect()
             server.stop()
 
@@ -211,7 +211,7 @@ class WampIntegrationTest {
     fun `should timeout on server not available`() {
         val port = 12346
 
-        val client = OcppWampClientImpl(
+        val client = OcppWampClient.newClient(
             Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6,
             timeoutInMs = 50)
         val time = measureTimeMillis {
