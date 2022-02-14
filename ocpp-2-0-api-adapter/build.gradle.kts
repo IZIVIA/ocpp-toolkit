@@ -3,4 +3,6 @@ plugins {
     java
 }
 
-dependencies {}
+dependencies {
+    implementation(project(":ocpp-2-0-core"))
+}
