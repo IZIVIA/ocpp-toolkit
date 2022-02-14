@@ -7,6 +7,7 @@ import org.http4k.core.Uri
 import org.http4k.websocket.*
 import org.java_websocket.drafts.Draft
 import org.java_websocket.drafts.Draft_6455
+import java.net.ConnectException
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -26,7 +27,7 @@ object Http4kWebSocketClient {
             onClose(onClose)
         })
         if (!client.connectBlocking(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
-            throw IllegalStateException("connection to $uri failed - the ocpp id may not be recognized").also(onError)
+            throw ConnectException("connection to $uri failed - the ocpp id may not be recognized").also(onError)
         }
         return socket.get()
     }
