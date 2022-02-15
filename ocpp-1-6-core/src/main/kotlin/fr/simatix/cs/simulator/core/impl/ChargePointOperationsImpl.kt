@@ -8,9 +8,9 @@ import fr.simatix.cs.simulator.core.model.HeartbeatResponse
 import fr.simatix.cs.simulator.websocket.WebsocketClient
 import java.net.ConnectException
 
-class ChargePointOperationsImpl(target: String, ocppId: String) : ChargePointOperations {
+class ChargePointOperationsImpl(ocppId: String) : ChargePointOperations {
 
-    private val client = WebsocketClient(target, ocppId)
+    private val client = WebsocketClient(ocppId)
     private val mapper = jacksonObjectMapper()
 
     @Throws(IllegalStateException::class, ConnectException::class)

@@ -8,7 +8,7 @@ import java.net.ConnectException
  */
 interface ChargePointOperations {
     companion object {
-        fun newChargePointOperations(target: String, ocppId: String) = ChargePointOperationsImpl(target, ocppId)
+        fun newChargePointOperations(ocppId: String) = ChargePointOperationsImpl(ocppId)
     }
 
     /**
