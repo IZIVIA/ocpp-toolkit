@@ -30,20 +30,8 @@ class WampLoadTest {
         println("preparing load test on one server serving $chargingStationNumber charging stations and $heartbeatsNumber heartbeats")
 
         val port = 12345
-        val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
-            override fun accept(ocppId: CSOcppId): Boolean = true
-
-            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
-                when (msg.action?.lowercase()) {
-                    "heartbeat" ->
-                        WampMessage.CallResult(msg.msgId, """{"currentTime":"${Clock.System.now()}"}""")
-                    else -> {
-                        println("unhandled action for message: ${msg.toJson()}")
-                        WampMessage.CallError(msg.msgId, "{}")
-                    }
-                }
-        })
+        val server = LocalServerManager(port)
+//        val server = NoopServerManager
         server.start()
 
         try {
@@ -135,6 +123,51 @@ class WampLoadTest {
                 """.trimIndent())
         } finally {
             server.stop()
+        }
+    }
+
+    interface ServerManager {
+        fun start()
+        fun shutdown()
+        fun stop()
+    }
+
+    class LocalServerManager(val port:Int):ServerManager {
+        private val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        override fun start() {
+            server.register(object : OcppWampServerHandler {
+                override fun accept(ocppId: CSOcppId): Boolean = true
+
+                override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
+                    when (msg.action?.lowercase()) {
+                        "heartbeat" ->
+                            WampMessage.CallResult(msg.msgId, """{"currentTime":"${Clock.System.now()}"}""")
+                        else -> {
+                            println("unhandled action for message: ${msg.toJson()}")
+                            WampMessage.CallError(msg.msgId, "{}")
+                        }
+                    }
+            })
+            server.start()
+        }
+
+        override fun shutdown() {
+            server.shutdown()
+        }
+
+        override fun stop() {
+            server.stop()
+        }
+    }
+
+    object NoopServerManager: ServerManager {
+        override fun start() {
+        }
+
+        override fun shutdown() {
+        }
+
+        override fun stop() {
         }
     }
 }
