@@ -4,6 +4,5 @@ plugins {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-    implementation(project(":ocpp-2-0-websocket"))
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.1")
 }

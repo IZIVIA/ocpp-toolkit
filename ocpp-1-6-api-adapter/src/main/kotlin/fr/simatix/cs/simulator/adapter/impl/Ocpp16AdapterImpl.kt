@@ -1,13 +1,16 @@
 package fr.simatix.cs.simulator.adapter.impl
 
 import fr.simatix.cs.simulator.adapter.Ocpp16Adapter
-import fr.simatix.cs.simulator.core.ChargePointOperations
+import fr.simatix.cs.simulator.api.model.HeartbeatRequestGeneric
+import fr.simatix.cs.simulator.api.model.HeartbeatResponseGeneric
+import fr.simatix.cs.simulator.core16.ChargePointOperations
+import fr.simatix.cs.simulator.core16.Transport
 
-class Ocpp16AdapterImpl(ocppId: String) : Ocpp16Adapter {
+class Ocpp16AdapterImpl(transport: Transport) : Ocpp16Adapter {
 
-    private val operations = ChargePointOperations.newChargePointOperations(ocppId)
+    private val operations = ChargePointOperations.newChargePointOperations(transport)
 
-    override fun heartbeat(): String {
-        return operations.heartbeat()
+    override fun heartbeat(request: HeartbeatRequestGeneric): HeartbeatResponseGeneric {
+        return HeartbeatResponseGeneric(operations.heartbeat().currentTime)
     }
 }
