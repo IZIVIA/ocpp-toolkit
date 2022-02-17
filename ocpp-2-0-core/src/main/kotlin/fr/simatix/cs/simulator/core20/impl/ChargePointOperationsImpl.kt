@@ -9,8 +9,7 @@ import java.net.ConnectException
 class ChargePointOperationsImpl(private val client: Transport) : ChargePointOperations {
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun heartbeat(): HeartbeatResponse {
-        val heartbeatRequest = HeartbeatRequest()
-        return client.sendMessage(heartbeatRequest)
+    override fun heartbeat(request: HeartbeatRequest): HeartbeatResponse {
+        return client.sendMessage(request)
     }
 }

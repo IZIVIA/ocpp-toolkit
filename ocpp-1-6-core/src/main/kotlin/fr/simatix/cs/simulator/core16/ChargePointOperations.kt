@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.core16
 
 import fr.simatix.cs.simulator.core16.impl.ChargePointOperationsImpl
+import fr.simatix.cs.simulator.core16.model.HeartbeatRequest
 import fr.simatix.cs.simulator.core16.model.HeartbeatResponse
 import java.net.ConnectException
 
@@ -17,5 +18,5 @@ interface ChargePointOperations {
      * @return current time of the Central System.
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun heartbeat(): HeartbeatResponse
+    fun heartbeat(request: HeartbeatRequest): HeartbeatResponse
 }

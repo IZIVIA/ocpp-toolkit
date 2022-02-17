@@ -1,10 +1,13 @@
 package fr.simatix.cs.simulator.core16.model
 
-import com.fasterxml.jackson.annotation.JsonFormat
-import java.util.*
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import fr.simatix.cs.simulator.utils.InstantDeserializer
+import fr.simatix.cs.simulator.utils.InstantSerializer
+import kotlinx.datetime.Instant
 
 data class HeartbeatResponse(
-    @JsonFormat
-        (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'")
-    val currentTime: Date
+    @JsonSerialize(using = InstantSerializer::class)
+    @JsonDeserialize(using = InstantDeserializer::class)
+    val currentTime: Instant
 )

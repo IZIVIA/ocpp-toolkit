@@ -17,13 +17,13 @@ class CSMSApiFactory {
                     TransportEnum.WEBSOCKET -> WebsocketClient16(ocppId)
                     TransportEnum.SOAP -> WebsocketClient16(ocppId)
                 }
-                Ocpp16Adapter.newOcpp16AdapterImpl(transport)
+                Ocpp16Adapter(transport)
             } else {
                 val transport = when (transportType) {
                     TransportEnum.WEBSOCKET -> WebsocketClient20(ocppId)
                     TransportEnum.SOAP -> WebsocketClient20(ocppId)
                 }
-                Ocpp20Adapter.newOcpp20AdapterImpl(transport)
+                Ocpp20Adapter(transport)
             }
         }
     }
