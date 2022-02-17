@@ -8,5 +8,7 @@ coreProject()
 dependencies {
     implementation(project(":generic-api"))
     implementation(project(":ocpp-1-6-core"))
-    testImplementation(project(":ocpp-1-6-websocket"))
+    implementation(project(":ocpp-transport"))
+    testImplementation(project(":ocpp-websocket"))
+    testImplementation(project(":ocpp-wamp"))
 }

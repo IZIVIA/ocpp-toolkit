@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20
+package fr.simatix.cs.simulator.transport
 
 import java.net.ConnectException
 import kotlin.reflect.KClass

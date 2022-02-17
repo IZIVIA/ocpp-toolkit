@@ -3,6 +3,7 @@ package fr.simatix.cs.simulator.core16
 import fr.simatix.cs.simulator.core16.impl.ChargePointOperationsImpl
 import fr.simatix.cs.simulator.core16.model.HeartbeatRequest
 import fr.simatix.cs.simulator.core16.model.HeartbeatResponse
+import fr.simatix.cs.simulator.transport.Transport
 import java.net.ConnectException
 
 /**
