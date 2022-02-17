@@ -1,8 +1,7 @@
 package fr.simatix.cs.simulator.core16
 
-import fr.simatix.cs.simulator.core16.model.HeartbeatRequest
-import fr.simatix.cs.simulator.core16.model.HeartbeatResponse
 import java.net.ConnectException
+import kotlin.reflect.KClass
 
 interface Transport {
 
@@ -11,5 +10,10 @@ interface Transport {
 
     fun close()
 
-    fun sendMessage(payload: HeartbeatRequest): HeartbeatResponse
+    fun <T, P : Any> sendMessage(clazz: KClass<P>, action: String, message: T): P
+
+}
+
+inline fun <T, reified P : Any> Transport.sendMessage(action: String, message: T): P {
+    return sendMessage(P::class, action, message)
 }

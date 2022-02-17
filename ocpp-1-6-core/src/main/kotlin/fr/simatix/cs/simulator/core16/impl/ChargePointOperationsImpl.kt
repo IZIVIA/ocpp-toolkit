@@ -10,7 +10,7 @@ class ChargePointOperationsImpl(private val client: Transport) : ChargePointOper
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(request: HeartbeatRequest): HeartbeatResponse {
-        return client.sendMessage(request)
+        return client.sendMessage(HeartbeatResponse::class,"Heartbeat",request)
     }
 }
 
