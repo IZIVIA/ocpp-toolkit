@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.utils
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.networknt.schema.JsonSchema
@@ -10,7 +11,7 @@ import java.io.InputStream
 
 class JsonSchemaValidator {
     companion object {
-        private val mapper = jacksonObjectMapper()
+        private val mapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
         private fun <T> getJsonNodeObject(value: T): JsonNode {
             return mapper.readTree(mapper.writeValueAsString(value))

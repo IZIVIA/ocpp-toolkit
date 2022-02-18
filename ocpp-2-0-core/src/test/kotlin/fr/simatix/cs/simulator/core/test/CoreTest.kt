@@ -2,8 +2,11 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core20.ChargePointOperations
-import fr.simatix.cs.simulator.core20.model.HeartbeatReq
-import fr.simatix.cs.simulator.core20.model.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.*
+import fr.simatix.cs.simulator.core20.model.enumeration.AuthorizationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.enumeration.AuthorizeCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
@@ -30,8 +33,31 @@ class CoreTest {
     }
 
     @Test
-    fun `Heartbeat request format`() {
+    fun `heartbeat request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(HeartbeatReq(), "HeartbeatRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `authorize request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            AuthorizeReq(
+                idToken = IdTokenType("Tag1", IdTokenEnumType.Local)
+            ), "AuthorizeRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            AuthorizeReq(
+                idToken = IdTokenType("Tag1", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
+                certificate = "certificate1",
+                iso15118CertificateHashData = listOf(OCSPRequestDataType(HashAlgorithmEnumType.SHA256, "", "", "", ""))
+            ), "AuthorizeRequest.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -45,4 +71,28 @@ class CoreTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+
+    @Test
+    fun `authorize response format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            AuthorizeResp(
+                idTokenInfo = IdTokenInfoType(AuthorizationStatusEnumType.Accepted)
+            ), "AuthorizeResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            AuthorizeResp(
+                idTokenInfo = IdTokenInfoType(AuthorizationStatusEnumType.Blocked),
+                certificateStatus = AuthorizeCertificateStatusEnumType.CertificateExpired
+            ), "AuthorizeResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 }

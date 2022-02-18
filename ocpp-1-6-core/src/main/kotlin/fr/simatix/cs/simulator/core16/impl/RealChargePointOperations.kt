@@ -3,25 +3,32 @@ package fr.simatix.cs.simulator.core16.impl
 import fr.simatix.cs.simulator.api.model.ExecutionMetadata
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.ChargePointOperations
-import fr.simatix.cs.simulator.core16.model.CoreExecution
-import fr.simatix.cs.simulator.core16.model.HeartbeatReq
-import fr.simatix.cs.simulator.core16.model.HeartbeatResp
+import fr.simatix.cs.simulator.core16.model.*
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import kotlinx.datetime.Clock
 import java.net.ConnectException
 
 class RealChargePointOperations(private val client: Transport) : ChargePointOperations {
+    private inline fun <T, reified P> sendMessage(meta: RequestMetadata, action: String, request: T): CoreExecution<P>{
+        val requestTime = Clock.System.now()
+        val response : P = client.sendMessage(action, request)
+        val responseTime = Clock.System.now()
+        return CoreExecution(ExecutionMetadata(meta, requestTime, responseTime), response)
+    }
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(
         meta: RequestMetadata,
         request: HeartbeatReq
     ): CoreExecution<HeartbeatResp> {
-        val requestTime = Clock.System.now()
-        val response = client.sendMessage<HeartbeatReq, HeartbeatResp>("Heartbeat", request)
-        val responseTime = Clock.System.now()
-        return CoreExecution(ExecutionMetadata(meta, requestTime, responseTime), response)
+        return sendMessage(meta, "Heartbeat",request)
     }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp>{
+        return sendMessage(meta, "Authorize",request)
+    }
+
 }
 
