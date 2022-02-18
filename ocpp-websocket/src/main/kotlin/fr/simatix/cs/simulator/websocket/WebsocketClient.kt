@@ -26,7 +26,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion) : Transport {
     }
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun <T, P : Any> sendMessage(clazz: KClass<P>, action: String, message: T): P {
+    override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P {
         val msgId: String = UUID.randomUUID().toString()
         return try {
             connect()

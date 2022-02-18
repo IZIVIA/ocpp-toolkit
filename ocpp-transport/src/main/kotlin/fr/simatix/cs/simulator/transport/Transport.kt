@@ -10,10 +10,10 @@ interface Transport {
 
     fun close()
 
-    fun <T, P : Any> sendMessage(clazz: KClass<P>, action: String, message: T): P
+    fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P
 
 }
 
 inline fun <T, reified P : Any> Transport.sendMessage(action: String, message: T): P {
-    return sendMessage(P::class, action, message)
+    return sendMessageClass(P::class, action, message)
 }
