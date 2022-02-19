@@ -6,6 +6,11 @@ plugins {
 coreProject()
 
 dependencies {
+    implementation("org.http4k:http4k-core:_")
+    implementation("org.http4k:http4k-client-websocket:_")
+    implementation("org.http4k:http4k-server-undertow:_")
+    implementation("org.http4k:http4k-client-apache:_")
+
     implementation(project(":generic-api"))
     implementation(project(":ocpp-wamp"))
     implementation(project(":ocpp-websocket"))
