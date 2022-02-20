@@ -2,8 +2,6 @@ package io.simatix.ev.ocpp.wamp.core
 
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import kotlinx.datetime.Clock
-import org.http4k.websocket.Websocket
-import org.http4k.websocket.WsMessage
 import org.slf4j.Logger
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -11,7 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class WampCallManager(
     private val logger:Logger,
-    private val ws:Websocket,
+    private val send:(str:String)->Unit,
     val timeoutInMs:Long,
     private val shutdown: AtomicBoolean = AtomicBoolean(false)
 ) {
@@ -31,7 +29,7 @@ class WampCallManager(
         }
         val msgString = message.toJson()
         logger.info("$logContext => $msgString")
-        ws?.send(WsMessage(msgString))
+        send(msgString)
         currentCall?.latch?.await(timeoutInMs - ((Clock.System.now() - now).inWholeMilliseconds), TimeUnit.MILLISECONDS)
         val response = currentCall?.response
         if (response != null) {

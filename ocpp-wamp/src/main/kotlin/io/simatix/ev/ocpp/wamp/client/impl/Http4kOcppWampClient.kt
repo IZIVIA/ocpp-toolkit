@@ -15,7 +15,7 @@ import org.http4k.websocket.WsMessage
 import org.slf4j.LoggerFactory
 import java.time.Duration
 
-class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVersion, val timeoutInMs:Long = 30_000) : OcppWampClient {
+class Http4kOcppWampClient(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVersion, val timeoutInMs:Long = 30_000) : OcppWampClient {
     val serverUri = target.path("${target.path.removeSuffix("/")}/$ocppId")
 
     private var ws: Websocket? = null
@@ -71,7 +71,7 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
             }
         ) {
             logger.info("connected to $serverUri")
-            callManager = WampCallManager(logger, it, timeoutInMs)
+            callManager = WampCallManager(logger, {m:String -> it.send(WsMessage(m))}, timeoutInMs)
             ws = it
         }
     }
@@ -103,13 +103,13 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(OcppWampClientImpl::class.java)
+        private val logger = LoggerFactory.getLogger(Http4kOcppWampClient::class.java)
     }
 }
 
 
 fun main() {
-    val client = OcppWampClientImpl(Uri.of("ws://localhost:5000/ws"), "TEST1", OcppVersion.OCPP_1_6)
+    val client = Http4kOcppWampClient(Uri.of("ws://localhost:5000/ws"), "TEST1", OcppVersion.OCPP_1_6)
     client.connect()
     println("sending heartbeat...")
     val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))

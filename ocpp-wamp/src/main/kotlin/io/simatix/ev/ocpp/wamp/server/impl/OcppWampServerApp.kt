@@ -122,7 +122,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                                                  val ocppId:CSOcppId, val ws: Websocket,
                                                  timeoutInMs:Long, shutdown: AtomicBoolean
     ) {
-        val callManager:WampCallManager = WampCallManager(logger, ws, timeoutInMs, shutdown)
+        val callManager:WampCallManager = WampCallManager(logger, {m:String -> ws.send(WsMessage(m))}, timeoutInMs, shutdown)
 
         fun sendBlocking(message: WampMessage): WampMessage =
             callManager.callBlocking("[$ocppId] [$wsConnectionId]", message)
