@@ -8,6 +8,7 @@ import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import io.simatix.ev.ocpp.wamp.server.OcppWampServer
 import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import kotlinx.coroutines.runBlocking
 import kotlinx.datetime.Clock
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -40,20 +41,22 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
-            client.connect()
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+                client.connect()
 
-            val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
-            expectThat(r) {
-                get { msgId }.isEqualTo("1")
-                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
-                get { payload }.isEqualTo(heartbeatResponsePayload)
+                val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+                expectThat(r) {
+                    get { msgId }.isEqualTo("1")
+                    get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+                    get { payload }.isEqualTo(heartbeatResponsePayload)
+                }
+
+                client.close()
+            } finally {
+                server.stop()
             }
-
-            client.close()
-        } finally {
-            server.stop()
         }
     }
 
@@ -72,18 +75,22 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1",
-                OcppVersion.OCPP_1_6, timeoutInMs = 200)
-            client.connect()
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(
+                    Uri.of("ws://localhost:$port/ws"), "TEST1",
+                    OcppVersion.OCPP_1_6, timeoutInMs = 200
+                )
+                client.connect()
 
-            expectCatching {
-                client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
-            }.isFailure()
+                expectCatching {
+                    client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+                }.isFailure()
 
-            client.close()
-        } finally {
-            server.stop()
+                client.close()
+            } finally {
+                server.stop()
+            }
         }
     }
 
@@ -99,31 +106,33 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
-            client.onAction { meta: WampMessageMeta, msg: WampMessage ->
-                when (msg.action?.lowercase()) {
-                    "remotebeat" ->
-                        WampMessage.CallResult(msg.msgId, heartbeatResponsePayload)
-                    else -> {
-                        println("unhandled action for message: ${msg.toJson()}")
-                        WampMessage.CallError(msg.msgId, "{}")
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+                client.onAction { meta: WampMessageMeta, msg: WampMessage ->
+                    when (msg.action?.lowercase()) {
+                        "remotebeat" ->
+                            WampMessage.CallResult(msg.msgId, heartbeatResponsePayload)
+                        else -> {
+                            println("unhandled action for message: ${msg.toJson()}")
+                            WampMessage.CallError(msg.msgId, "{}")
+                        }
                     }
                 }
+                client.connect()
+
+                val r = server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+
+                expectThat(r) {
+                    get { msgId }.isEqualTo("1")
+                    get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+                    get { payload }.isEqualTo(heartbeatResponsePayload)
+                }
+
+                client.close()
+            } finally {
+                server.stop()
             }
-            client.connect()
-
-            val r = server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
-
-            expectThat(r) {
-                get { msgId }.isEqualTo("1")
-                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
-                get { payload }.isEqualTo(heartbeatResponsePayload)
-            }
-
-            client.close()
-        } finally {
-            server.stop()
         }
     }
 
@@ -138,21 +147,23 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
-            client.onAction { meta: WampMessageMeta, msg: WampMessage ->
-                Thread.sleep(500)
-                null
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+                client.onAction { meta: WampMessageMeta, msg: WampMessage ->
+                    Thread.sleep(500)
+                    null
+                }
+                client.connect()
+
+                expectCatching {
+                    server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+                }.isFailure()
+
+                client.close()
+            } finally {
+                server.stop()
             }
-            client.connect()
-
-            expectCatching {
-                server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
-            }.isFailure()
-
-            client.close()
-        } finally {
-            server.stop()
         }
     }
 
@@ -169,17 +180,21 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST2", OcppVersion.OCPP_1_6,
-                timeoutInMs = 600)
-            val time = measureTimeMillis {
-                expectCatching { client.connect() }.isFailure()
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(
+                    Uri.of("ws://localhost:$port/ws"), "TEST2", OcppVersion.OCPP_1_6,
+                    timeoutInMs = 600
+                )
+                val time = measureTimeMillis {
+                    expectCatching { client.connect() }.isFailure()
+                }
+                expectThat(time)
+                    .describedAs("connection failure time ($time ms) for 404 should be fast")
+                    .isLessThan(500)
+            } finally {
+                server.stop()
             }
-            expectThat(time)
-                .describedAs("connection failure time ($time ms) for 404 should be fast")
-                .isLessThan(500)
-        } finally {
-            server.stop()
         }
     }
 
@@ -194,16 +209,18 @@ class WampIntegrationTest {
         })
         server.start()
 
-        try {
-            val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
-            client.connect()
-            server.stop()
+        runBlocking {
+            try {
+                val client = OcppWampClient.newClient(Uri.of("ws://localhost:$port/ws"), "TEST1", OcppVersion.OCPP_1_6)
+                client.connect()
+                server.stop()
 
-            expectCatching { client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }.isFailure()
+                expectCatching { client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }.isFailure()
 
-            client.close()
-        } finally {
-            server.stop()
+                client.close()
+            } finally {
+                server.stop()
+            }
         }
     }
 

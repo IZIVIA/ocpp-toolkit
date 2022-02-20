@@ -8,6 +8,7 @@ import io.simatix.ev.ocpp.wamp.core.WampCallManager
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import kotlinx.coroutines.runBlocking
 import org.http4k.asString
 import org.http4k.core.Uri
 import org.http4k.websocket.Websocket
@@ -22,7 +23,7 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
     private var callManager:WampCallManager? = null
     private val handlers = mutableListOf<WampOnActionHandler>()
 
-    override fun connect() {
+    override suspend fun connect(onConnect: ()->Unit) {
         logger.info("connecting to $serverUri with ocpp version $ocppVersion")
         val websocket = Http4kWebSocketClient.connnectWebsocket(
             uri = serverUri,
@@ -71,12 +72,12 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
             }
         ) {
             logger.info("connected to $serverUri")
-            callManager = WampCallManager(logger, it, timeoutInMs)
+            callManager = WampCallManager(logger, {m:String -> it.send(WsMessage(m))}, timeoutInMs)
             ws = it
         }
     }
 
-    override fun close() {
+    override suspend fun close() {
         logger.info("disconnecting from $serverUri")
         callManager?.close()
         val closingWs = ws
@@ -85,11 +86,11 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
         closingWs?.close()
     }
 
-    override fun sendBlocking(message: WampMessage): WampMessage {
+    override suspend fun sendBlocking(message: WampMessage): WampMessage {
         return getCallManager().callBlocking("[$ocppId]", message)
     }
 
-    override fun onAction(handler: WampOnActionHandler) {
+    override suspend fun onAction(handler: WampOnActionHandler) {
         handlers.add(handler)
     }
 
@@ -109,11 +110,13 @@ class OcppWampClientImpl(target:Uri, val ocppId:CSOcppId, val ocppVersion:OcppVe
 
 
 fun main() {
-    val client = OcppWampClientImpl(Uri.of("ws://localhost:5000/ws"), "TEST1", OcppVersion.OCPP_1_6)
-    client.connect()
-    println("sending heartbeat...")
-    val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
-    println("heartbeat response: $r")
-    client.close()
-    println("done")
+    runBlocking {
+        val client = OcppWampClientImpl(Uri.of("ws://localhost:5000/ws"), "TEST1", OcppVersion.OCPP_1_6)
+        client.connect()
+        println("sending heartbeat...")
+        val r = client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+        println("heartbeat response: $r")
+        client.close()
+        println("done")
+    }
 }

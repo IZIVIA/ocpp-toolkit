@@ -10,6 +10,10 @@ dependencies {
     implementation("org.http4k:http4k-server-undertow:_")
     implementation("org.http4k:http4k-client-apache:_")
 
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+    implementation("io.ktor:ktor-client-cio:1.6.7")
+
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:_")
 
     implementation("org.slf4j:slf4j-api:_")

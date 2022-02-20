@@ -7,6 +7,7 @@ import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import kotlinx.coroutines.runBlocking
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.websocket.Websocket
@@ -122,10 +123,11 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                                                  val ocppId:CSOcppId, val ws: Websocket,
                                                  timeoutInMs:Long, shutdown: AtomicBoolean
     ) {
-        val callManager:WampCallManager = WampCallManager(logger, ws, timeoutInMs, shutdown)
+        val callManager:WampCallManager = WampCallManager(logger, {m:String -> ws.send(WsMessage(m))}, timeoutInMs, shutdown)
 
-        fun sendBlocking(message: WampMessage): WampMessage =
+        fun sendBlocking(message: WampMessage): WampMessage = runBlocking {
             callManager.callBlocking("[$ocppId] [$wsConnectionId]", message)
+        }
 
         fun close() {
             logger.info("[$ocppId] [$wsConnectionId] - closing")
