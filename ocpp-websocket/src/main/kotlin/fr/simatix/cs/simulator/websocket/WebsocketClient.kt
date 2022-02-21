@@ -4,7 +4,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import fr.simatix.cs.simulator.transport.Transport
 import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.client.impl.OcppWampClientImpl
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import org.http4k.core.Uri
 import java.net.ConnectException
@@ -13,7 +12,7 @@ import kotlin.reflect.KClass
 
 class WebsocketClient(ocppId: String, ocppVersion: OcppVersion) : Transport {
 
-    private val client: OcppWampClientImpl =
+    private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(Target.target), ocppId, ocppVersion)
     private val mapper = jacksonObjectMapper()
 

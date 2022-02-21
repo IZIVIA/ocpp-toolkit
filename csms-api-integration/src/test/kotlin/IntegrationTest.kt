@@ -7,7 +7,7 @@ import io.mockk.mockkObject
 import io.mockk.mockkStatic
 import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.client.impl.OcppWampClientImpl
+import io.simatix.ev.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import kotlinx.datetime.Instant
@@ -26,7 +26,7 @@ class IntegrationTest {
         mockkStatic(UUID::class)
         every { UUID.randomUUID() } returns uuid
 
-        val ocppWampClient = mockk<OcppWampClientImpl>()
+        val ocppWampClient = mockk<OkHttpOcppWampClient>()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
@@ -36,7 +36,7 @@ class IntegrationTest {
             action = "heartbeat"
         )
         mockkObject(OcppWampClient.Companion)
-        every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns  ocppWampClient
+        every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
         val csmsApi = CSMSApiFactory.getCSMSApi(OcppVersion.OCPP_1_6, "chargePoint2", TransportEnum.WEBSOCKET)
         val currentTime = csmsApi.heartbeat(HeartbeatRequest())
