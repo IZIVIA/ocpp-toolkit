@@ -1,8 +1,8 @@
 package fr.simatix.cs.simulator.core20
 
-import fr.simatix.cs.simulator.core20.impl.ChargePointOperationsImpl
-import fr.simatix.cs.simulator.core20.model.HeartbeatRequest
-import fr.simatix.cs.simulator.core20.model.HeartbeatResponse
+import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
+import fr.simatix.cs.simulator.core20.model.HeartbeatReq
+import fr.simatix.cs.simulator.core20.model.HeartbeatResp
 import fr.simatix.cs.simulator.transport.Transport
 import java.net.ConnectException
 
@@ -11,7 +11,7 @@ import java.net.ConnectException
  */
 interface ChargePointOperations {
     companion object {
-        fun newChargePointOperations(transport: Transport) = ChargePointOperationsImpl(transport)
+        fun newChargePointOperations(transport: Transport) = RealChargePointOperations(transport)
     }
 
     /**
@@ -19,5 +19,5 @@ interface ChargePointOperations {
      * @return current time of the Central System.
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun heartbeat(request: HeartbeatRequest): HeartbeatResponse
+    fun heartbeat(request: HeartbeatReq): HeartbeatResp
 }

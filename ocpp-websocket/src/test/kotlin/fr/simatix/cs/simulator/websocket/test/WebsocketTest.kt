@@ -1,7 +1,7 @@
 package fr.simatix.cs.simulator.websocket.test
 
-import fr.simatix.cs.simulator.core16.model.HeartbeatRequest
-import fr.simatix.cs.simulator.core16.model.HeartbeatResponse
+import fr.simatix.cs.simulator.core16.model.HeartbeatReq
+import fr.simatix.cs.simulator.core16.model.HeartbeatResp
 import fr.simatix.cs.simulator.websocket.WebsocketClient
 import io.mockk.every
 import io.mockk.mockk
@@ -45,7 +45,7 @@ class WebsocketTest {
 
         val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6)
         val heartbeatResponse =
-            websocketClient.sendMessageClass(HeartbeatResponse::class, "heartbeat", HeartbeatRequest())
+            websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq())
         expectThat(heartbeatResponse)
             .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }
@@ -70,7 +70,7 @@ class WebsocketTest {
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
         val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6)
-        expectCatching { websocketClient.sendMessageClass(HeartbeatResponse::class, "heartbeat", HeartbeatRequest()) }
+        expectCatching { websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq()) }
             .isFailure()
             .isA<IllegalStateException>()
     }

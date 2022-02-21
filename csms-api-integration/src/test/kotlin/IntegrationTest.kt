@@ -1,4 +1,4 @@
-import fr.simatix.cs.simulator.api.model.HeartbeatRequest
+import fr.simatix.cs.simulator.api.model.HeartbeatReq
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.TransportEnum
 import io.mockk.every
@@ -39,7 +39,7 @@ class IntegrationTest {
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
         val csmsApi = CSMSApiFactory.getCSMSApi(OcppVersion.OCPP_1_6, "chargePoint2", TransportEnum.WEBSOCKET)
-        val currentTime = csmsApi.heartbeat(HeartbeatRequest())
+        val currentTime = csmsApi.heartbeat(HeartbeatReq())
         expectThat(currentTime)
             .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }

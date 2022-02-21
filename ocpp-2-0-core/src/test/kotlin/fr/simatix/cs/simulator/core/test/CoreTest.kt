@@ -1,8 +1,8 @@
 package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.core20.ChargePointOperations
-import fr.simatix.cs.simulator.core20.model.HeartbeatRequest
-import fr.simatix.cs.simulator.core20.model.HeartbeatResponse
+import fr.simatix.cs.simulator.core20.model.HeartbeatReq
+import fr.simatix.cs.simulator.core20.model.HeartbeatResp
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import io.mockk.every
@@ -17,13 +17,13 @@ class CoreTest {
     fun `heartbeat request`() {
 
         val transport = mockk<Transport>()
-        every { transport.sendMessage<HeartbeatRequest, HeartbeatResponse>(any(),any()) } returns HeartbeatResponse(
+        every { transport.sendMessage<HeartbeatReq, HeartbeatResp>(any(),any()) } returns HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
         )
 
         val operations =
             ChargePointOperations.newChargePointOperations(transport)
-        val response = operations.heartbeat(HeartbeatRequest())
+        val response = operations.heartbeat(HeartbeatReq())
         expectThat(response)
             .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }

@@ -1,10 +1,10 @@
 package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter.Ocpp16Adapter
-import fr.simatix.cs.simulator.api.model.HeartbeatRequest
+import fr.simatix.cs.simulator.api.model.HeartbeatReq
 import fr.simatix.cs.simulator.core16.ChargePointOperations
-import fr.simatix.cs.simulator.core16.impl.ChargePointOperationsImpl
-import fr.simatix.cs.simulator.core16.model.HeartbeatResponse
+import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
+import fr.simatix.cs.simulator.core16.model.HeartbeatResp
 import fr.simatix.cs.simulator.transport.Transport
 import io.mockk.every
 import io.mockk.mockk
@@ -19,8 +19,8 @@ class AdapterTest {
     fun `heartbeat request`() {
         val transport = mockk<Transport>()
 
-        val chargePointOperations = mockk<ChargePointOperationsImpl>()
-        every { chargePointOperations.heartbeat(any()) } returns HeartbeatResponse(
+        val chargePointOperations = mockk<RealChargePointOperations>()
+        every { chargePointOperations.heartbeat(any()) } returns HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
         )
 
@@ -28,7 +28,7 @@ class AdapterTest {
         every { ChargePointOperations.Companion.newChargePointOperations(any()) } returns chargePointOperations
 
         val operations = Ocpp16Adapter(transport)
-        val response = operations.heartbeat(HeartbeatRequest())
+        val response = operations.heartbeat(HeartbeatReq())
         expectThat(response)
             .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }

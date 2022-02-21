@@ -1,10 +1,10 @@
 package fr.simatix.cs.simulator.api
 
-import fr.simatix.cs.simulator.api.model.HeartbeatRequest
-import fr.simatix.cs.simulator.api.model.HeartbeatResponse
+import fr.simatix.cs.simulator.api.model.HeartbeatReq
+import fr.simatix.cs.simulator.api.model.HeartbeatResp
 
 interface CSMSApi {
 
-    fun heartbeat(request: HeartbeatRequest): HeartbeatResponse
+    fun heartbeat(request: HeartbeatReq): HeartbeatResp
 
 }
