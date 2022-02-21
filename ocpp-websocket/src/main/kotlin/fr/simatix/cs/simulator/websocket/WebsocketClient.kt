@@ -10,10 +10,10 @@ import java.net.ConnectException
 import java.util.*
 import kotlin.reflect.KClass
 
-class WebsocketClient(ocppId: String, ocppVersion: OcppVersion) : Transport {
+class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) : Transport {
 
     private val client: OcppWampClient =
-        OcppWampClient.newClient(Uri.of(Target.target), ocppId, ocppVersion)
+        OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
     private val mapper = jacksonObjectMapper()
 
     override fun connect() {
