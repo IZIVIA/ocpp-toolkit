@@ -11,7 +11,7 @@ dependencies {
     implementation("org.http4k:http4k-server-undertow:_")
     implementation("org.http4k:http4k-client-apache:_")
 
-    implementation(project(":generic-api"))
+    implementation(project(":csms-api"))
     implementation(project(":ocpp-wamp"))
     implementation(project(":ocpp-websocket"))
     implementation(project(":ocpp-1-6-api-adapter"))

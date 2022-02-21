@@ -6,7 +6,7 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation(project(":generic-api"))
+    implementation(project(":csms-api"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-transport"))
 }
