@@ -26,4 +26,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp>
+
+    /**
+     * Sends periodic, possibly clock-aligned MeterValues
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>
 }

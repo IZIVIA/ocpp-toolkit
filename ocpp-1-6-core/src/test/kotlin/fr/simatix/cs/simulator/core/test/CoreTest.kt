@@ -4,12 +4,12 @@ import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.model.*
 import fr.simatix.cs.simulator.core16.model.enumeration.AuthorizationStatus
+import fr.simatix.cs.simulator.core16.model.enumeration.Phase
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -50,6 +50,35 @@ class CoreTest {
     }
 
     @Test
+    fun `meterValues request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            MeterValuesReq(
+                connectorId = 1,
+                meterValue = listOf(MeterValue(listOf(SampledValue("0")), Instant.parse("2022-02-15T00:00:00.000Z")))
+            ), "MeterValuesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV4(
+            MeterValuesReq(
+                connectorId = 1,
+                meterValue = listOf(
+                    MeterValue(
+                        listOf(SampledValue(value = "0", phase = Phase.L1L2)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                ),
+                transactionId = 1
+            ), "MeterValuesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -73,8 +102,17 @@ class CoreTest {
         /* Every field */
         errors = JsonSchemaValidator.isValidObjectV4(
             AuthorizeResp(
-                idTagInfo = IdTagInfo(AuthorizationStatus.Accepted, Clock.System.now(), "Parent")
+                idTagInfo = IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Parent")
             ), "AuthorizeResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `meterValues response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            MeterValuesResp(), "MeterValuesResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

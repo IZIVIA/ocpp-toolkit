@@ -29,4 +29,9 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
     override fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp> {
         return sendMessage(meta, "Authorize", request)
     }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>{
+        return sendMessage(meta, "MeterValues",request)
+    }
 }

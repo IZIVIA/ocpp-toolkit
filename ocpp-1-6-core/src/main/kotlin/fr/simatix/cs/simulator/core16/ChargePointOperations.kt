@@ -19,7 +19,7 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): CoreExecution<HeartbeatResp>
-    
+
     /**
      * Sends an Authorize request to the Central System if the identifier is authorize to start/stop
      * to charge.
@@ -27,4 +27,9 @@ interface ChargePointOperations {
     @Throws(IllegalStateException::class, ConnectException::class)
     fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp>
 
+    /**
+     * Sends periodic, possibly clock-aligned MeterValues
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>
 }

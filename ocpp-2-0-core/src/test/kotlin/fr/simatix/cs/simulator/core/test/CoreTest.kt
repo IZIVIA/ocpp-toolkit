@@ -3,10 +3,7 @@ package fr.simatix.cs.simulator.core.test
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.*
-import fr.simatix.cs.simulator.core20.model.enumeration.AuthorizationStatusEnumType
-import fr.simatix.cs.simulator.core20.model.enumeration.AuthorizeCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.enumeration.HashAlgorithmEnumType
-import fr.simatix.cs.simulator.core20.model.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.enumeration.*
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
@@ -63,6 +60,45 @@ class CoreTest {
     }
 
     @Test
+    fun `meterValues request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            MeterValuesReq(
+                evseId = 1,
+                meterValue = listOf(
+                    MeterValueType(
+                        listOf(SampledValueType(value = 0.9)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            ), "MeterValuesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            MeterValuesReq(
+                evseId = 1,
+                meterValue = listOf(
+                    MeterValueType(
+                        listOf(
+                            SampledValueType(
+                                value = 0.9,
+                                phase = PhaseEnumType.L1,
+                                signedMeterValue = SignedMeterValueType("", "", "", ""),
+                                unitOfMeasure = UnitOfMeasure("", 2)
+                            )
+                        ), Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            ), "MeterValuesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -95,4 +131,12 @@ class CoreTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `meterValues response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            MeterValuesResp(), "MeterValuesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 }
