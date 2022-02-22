@@ -5,6 +5,7 @@ import fr.simatix.cs.simulator.core20.model.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.HeartbeatResp
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
+import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.datetime.Instant
@@ -26,5 +27,22 @@ class CoreTest {
         val response = operations.heartbeat(HeartbeatReq())
         expectThat(response)
             .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+    }
+
+    @Test
+    fun `Heartbeat request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(HeartbeatReq(), "HeartbeatRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `heartbeat response format`() {
+        val heartbeatResp = HeartbeatResp(
+            currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
+        )
+        val errors = JsonSchemaValidator.isValidObjectV6(heartbeatResp, "HeartbeatResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 }
