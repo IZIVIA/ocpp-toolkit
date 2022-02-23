@@ -1,10 +1,10 @@
-package fr.simatix.cs.simulator.adapter.mapper
+package fr.simatix.cs.simulator.adapter16.mapper
 
-import fr.simatix.cs.simulator.core20.model.HeartbeatReq
-import fr.simatix.cs.simulator.core20.model.HeartbeatResp
-import org.mapstruct.Mapper
+import fr.simatix.cs.simulator.core16.model.HeartbeatReq
+import fr.simatix.cs.simulator.core16.model.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.HeartbeatResp as HeartbeatRespGen
+import org.mapstruct.Mapper
 
 @Mapper
 interface HeartbeatMapper {

@@ -1,7 +1,7 @@
 package fr.simatix.cs.simulator.integration
 
-import fr.simatix.cs.simulator.adapter.Ocpp16Adapter
-import fr.simatix.cs.simulator.adapter.Ocpp20Adapter
+import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
+import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum

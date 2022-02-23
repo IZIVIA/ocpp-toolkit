@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.model.HeartbeatReq
+import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -20,7 +21,7 @@ import strikt.assertions.isEqualTo
 import java.util.*
 
 class IntegrationTest {
-    //Test d'integration
+
     @Test
     fun `heartbeat 1-6 request`() {
 
@@ -40,11 +41,16 @@ class IntegrationTest {
         )
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
+
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, "chargePoint2")
-        val currentTime = csmsApi.heartbeat(HeartbeatReq())
-        expectThat(currentTime)
-            .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+        val ocppId = "chargePoint2"
+        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = HeartbeatReq()
+        val response = csmsApi.heartbeat(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }
 
 }

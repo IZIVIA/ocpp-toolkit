@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.core.test
 
+import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.model.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.HeartbeatResp
@@ -24,9 +25,9 @@ class CoreTest {
 
         val operations =
             ChargePointOperations.newChargePointOperations(transport)
-        val response = operations.heartbeat(HeartbeatReq())
+        val response = operations.heartbeat(RequestMetadata(""), HeartbeatReq())
         expectThat(response)
-            .and { get { this.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
     }
 
     @Test
