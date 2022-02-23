@@ -1,7 +1,10 @@
 package fr.simatix.cs.simulator.adapter20
 
+import fr.simatix.cs.simulator.adapter20.mapper.AuthorizeMapper
 import fr.simatix.cs.simulator.adapter20.mapper.HeartbeatMapper
 import fr.simatix.cs.simulator.api.CSMSApi
+import fr.simatix.cs.simulator.api.model.AuthorizeReq
+import fr.simatix.cs.simulator.api.model.AuthorizeResp
 import fr.simatix.cs.simulator.api.model.OperationExecution
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core20.ChargePointOperations
@@ -22,6 +25,15 @@ class Ocpp20Adapter(transport: Transport) : CSMSApi {
     ): OperationExecution<HeartbeatReqGen, HeartbeatRespGen> {
         val mapper: HeartbeatMapper = Mappers.getMapper(HeartbeatMapper::class.java)
         val response = operations.heartbeat(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun authorize(
+        meta: RequestMetadata,
+        request: AuthorizeReq
+    ): OperationExecution<AuthorizeReq, AuthorizeResp> {
+        val mapper: AuthorizeMapper = Mappers.getMapper(AuthorizeMapper::class.java)
+        val response = operations.authorize(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }
