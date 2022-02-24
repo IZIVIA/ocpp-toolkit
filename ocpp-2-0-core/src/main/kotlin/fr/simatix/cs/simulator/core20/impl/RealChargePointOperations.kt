@@ -2,6 +2,7 @@ package fr.simatix.cs.simulator.core20.impl
 
 import fr.simatix.cs.simulator.api.model.ExecutionMetadata
 import fr.simatix.cs.simulator.api.model.RequestMetadata
+import fr.simatix.cs.simulator.api.model.enumeration.RequestStatus
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.*
 import fr.simatix.cs.simulator.transport.Transport
@@ -15,7 +16,7 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
         val requestTime = Clock.System.now()
         val response: P = client.sendMessage(action, request)
         val responseTime = Clock.System.now()
-        return CoreExecution(ExecutionMetadata(meta, requestTime, responseTime), response)
+        return CoreExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime), response)
     }
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(
