@@ -19,29 +19,58 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.time.Duration
 
 class WampLoadTest {
     @Test
     fun `should handle 1k clients`() {
+        val startFromCSNumber = 0
         val chargingStationNumber = 1000
         val heartbeatsNumber = 10000
         val threadsNumber = 50
 
-        println("preparing load test on one server serving $chargingStationNumber charging stations and $heartbeatsNumber heartbeats")
+        val connectedCount = AtomicInteger(0)
+        val heartbeatCount = AtomicInteger(0)
+        val closedCount = AtomicInteger(0)
 
         val port = 12345
-        val server = LocalServerManager(port)
-//        val server = NoopServerManager
+        loadTest(
+            server = LocalServerManager(port),
+            port = port,
+            startFromCSNumber = startFromCSNumber,
+            chargingStationNumber = chargingStationNumber,
+            heartbeatsNumber = heartbeatsNumber,
+            threadsNumber = threadsNumber,
+            connectedCount = connectedCount,
+            heartbeatCount = heartbeatCount,
+            closedCount = closedCount
+        )
+
+        expectThat(connectedCount.get()).isEqualTo(chargingStationNumber)
+        expectThat(heartbeatCount.get()).isEqualTo(heartbeatsNumber)
+        expectThat(closedCount.get()).isEqualTo(chargingStationNumber)
+    }
+
+    fun loadTest(
+        server: ServerManager,
+        port: Int,
+        startFromCSNumber: Int,
+        chargingStationNumber: Int,
+        heartbeatsNumber: Int,
+        threadsNumber: Int = 50,
+        delayAfterConnection: Duration = Duration.ZERO,
+        connectedCount: AtomicInteger = AtomicInteger(0),
+        heartbeatCount: AtomicInteger = AtomicInteger(0),
+        closedCount: AtomicInteger = AtomicInteger(0)
+    ) {
+        println("preparing load test on one server serving $chargingStationNumber charging stations and $heartbeatsNumber heartbeats")
         server.start()
 
         try {
             val executor = Executors.newFixedThreadPool(threadsNumber)
             val connections = ConcurrentHashMap<CSOcppId, OcppWampClient>()
-            val ocppIds = (1..chargingStationNumber).map { "CS-$it" }
-            val connectedCount = AtomicInteger(0)
-            val heartbeatCount = AtomicInteger(0)
-            val closedCount = AtomicInteger(0)
-            val getClient = { ocppId:CSOcppId ->
+            val ocppIds = (1..chargingStationNumber).map { "CS-${it + startFromCSNumber}" }
+            val getClient = { ocppId: CSOcppId ->
                 var client = connections[ocppId]
                 var attempts = 10
                 while (client == null && attempts > 0) {
@@ -49,14 +78,15 @@ class WampLoadTest {
                     client = connections[ocppId]
                     attempts--
                 }
-                client?:throw IllegalStateException("connection $ocppId not available")
+                client ?: throw IllegalStateException("connection $ocppId not available")
             }
 
             val connectionLatch = CountDownLatch(chargingStationNumber)
             ocppIds.forEach { ocppId ->
                 executor.submit {
                     val client = OcppWampClient.newClient(
-                        Uri.of("ws://localhost:$port/ws"), ocppId, OcppVersion.OCPP_1_6, 20_000)
+                        Uri.of("ws://localhost:$port/ws"), ocppId, OcppVersion.OCPP_1_6, 20_000
+                    )
                     client.connect()
                     connections[ocppId] = client
                     connectionLatch.countDown()
@@ -65,6 +95,22 @@ class WampLoadTest {
                 }
             }
             connectionLatch.await(1, TimeUnit.MINUTES)
+            println("""
+                -----------------------------------------------------------------------
+                $connectedCount CHARGING STATIONS CONNECTED
+                -----------------------------------------------------------------------
+                
+                
+                
+            """.trimIndent())
+            Thread.sleep(delayAfterConnection.inWholeMilliseconds)
+
+            println("""
+                
+                -----------------------------------------------------------------------
+                STARTING HEARTBEATS
+                -----------------------------------------------------------------------
+            """.trimIndent())
             val start = Clock.System.now()
             val heartbeatLatch = CountDownLatch(heartbeatsNumber)
             (1..heartbeatsNumber).forEach {
@@ -77,7 +123,7 @@ class WampLoadTest {
                             get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
                         }
                         heartbeatCount.incrementAndGet()
-                    } catch (e:Exception) {
+                    } catch (e: Exception) {
                         System.err.println("error when sending heartbeat: $e")
                     } finally {
                         heartbeatLatch.countDown()
@@ -86,12 +132,26 @@ class WampLoadTest {
                 }
             }
             if (heartbeatLatch.await(1, TimeUnit.MINUTES)) {
-                println("all heartbeats done")
+                println("""
+                
+                -----------------------------------------------------------------------
+                ALL HEARTBEATS SENT
+                -----------------------------------------------------------------------
+                
+                
+            """.trimIndent())
             } else {
                 println("timeout waiting for heartbeats - remaining ${heartbeatLatch.count}")
             }
             val elapsed = Clock.System.now() - start
 
+            println("""
+                
+                -----------------------------------------------------------------------
+                CLOSING ALL CONNECTIONS
+                -----------------------------------------------------------------------
+                
+            """.trimIndent())
             ocppIds.forEach { ocppId ->
                 executor.submit {
                     val client = getClient(ocppId)
@@ -104,23 +164,20 @@ class WampLoadTest {
             println("awaiting termination...")
             executor.awaitTermination(1, TimeUnit.MINUTES)
 
-            expectThat(connectedCount.get()).isEqualTo(chargingStationNumber)
-            expectThat(heartbeatCount.get()).isEqualTo(heartbeatsNumber)
-            expectThat(closedCount.get()).isEqualTo(chargingStationNumber)
-
             server.shutdown()
 
             val heartbeatPerSecond = (heartbeatsNumber.toDouble() / elapsed.inWholeMilliseconds) * 1000
             println(
                 """
-                    -------------------------------------------------------------------------------------------
-                    -LOAD TEST SUCCESSFUL
-                     heartbeats:            $heartbeatsNumber  
-                     charging stations:     $chargingStationNumber 
-                     duration:              $elapsed
-                     req per second:        $heartbeatPerSecond/s
-                    -------------------------------------------------------------------------------------------                    
-                """.trimIndent())
+                        -------------------------------------------------------------------------------------------
+                        -LOAD TEST SUCCESSFUL
+                         heartbeats:            $heartbeatsNumber  
+                         charging stations:     $chargingStationNumber 
+                         duration:              $elapsed
+                         req per second:        $heartbeatPerSecond/s
+                        -------------------------------------------------------------------------------------------                    
+                    """.trimIndent()
+            )
         } finally {
             server.stop()
         }
