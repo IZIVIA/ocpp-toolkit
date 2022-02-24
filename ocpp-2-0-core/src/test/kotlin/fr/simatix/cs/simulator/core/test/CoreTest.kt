@@ -99,6 +99,43 @@ class CoreTest {
     }
 
     @Test
+    fun `transactionEvent request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            TransactionEventReq(
+                TransactionEventEnumType.Started,
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                TriggerReasonEnumType.Authorized,
+                1,
+                TransactionType("")
+            ), "TransactionEventRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            TransactionEventReq(
+                TransactionEventEnumType.Started,
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                TriggerReasonEnumType.Authorized,
+                1,
+                TransactionType(""),
+                1,
+                EVSEType(1, 2),
+                IdTokenType(
+                    "", IdTokenEnumType.Central,
+                    listOf(AdditionalInfoType("", ""))
+                ),
+                listOf(MeterValueType(listOf(SampledValueType(10.9)), Instant.parse("2022-02-15T00:00:00.000Z"))),
+                3,
+                true,
+                100
+            ), "TransactionEventRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -135,6 +172,35 @@ class CoreTest {
     fun `meterValues response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             MeterValuesResp(), "MeterValuesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `transactionEvent response format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(TransactionEventResp(), "TransactionEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            TransactionEventResp(
+                200.0, 9,
+                IdTokenInfoType(
+                    AuthorizationStatusEnumType.Accepted,
+                    Instant.parse("2022-02-15T00:00:00.000Z"),
+                    9,
+                    "",
+                    listOf(2, 4),
+                    "",
+                    IdTokenType(
+                        "", IdTokenEnumType.Central,
+                        listOf(AdditionalInfoType("", ""))
+                    ), MessageContentType(MessageFormatEnumType.ASCII, "", "")
+                ), MessageContentType(MessageFormatEnumType.ASCII, "", "")
+            ), "TransactionEventResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

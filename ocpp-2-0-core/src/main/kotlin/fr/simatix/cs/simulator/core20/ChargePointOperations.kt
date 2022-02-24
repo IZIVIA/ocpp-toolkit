@@ -32,4 +32,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>
+
+    /**
+     * Sends information about a transaction event (started, updated, ended)
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun transactionEvent(meta: RequestMetadata, request: TransactionEventReq): CoreExecution<TransactionEventResp>
 }

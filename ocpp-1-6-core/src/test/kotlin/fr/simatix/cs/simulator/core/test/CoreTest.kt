@@ -5,6 +5,7 @@ import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.model.*
 import fr.simatix.cs.simulator.core16.model.enumeration.AuthorizationStatus
 import fr.simatix.cs.simulator.core16.model.enumeration.Phase
+import fr.simatix.cs.simulator.core16.model.enumeration.Reason
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
@@ -79,6 +80,67 @@ class CoreTest {
     }
 
     @Test
+    fun `startTransaction request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            StartTransactionReq(
+                connectorId = 1,
+                idTag = "Tag1",
+                meterStart = 100,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+            ), "StartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV4(
+            StartTransactionReq(
+                connectorId = 1,
+                idTag = "Tag1",
+                meterStart = 100,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                reservationId = 110
+            ), "StartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `stopTransaction request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            StopTransactionReq(
+                meterStop = 200,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                transactionId = 12
+            ),
+            "StopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            StopTransactionReq(
+                meterStop = 200,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                transactionId = 12,
+                idTag = "Tag1",
+                reason = Reason.EVDisconnected,
+                transactionData = listOf(
+                    MeterValue(
+                        listOf(SampledValue(value = "0", phase = Phase.L1L2)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            ),
+            "StopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -102,7 +164,11 @@ class CoreTest {
         /* Every field */
         errors = JsonSchemaValidator.isValidObjectV4(
             AuthorizeResp(
-                idTagInfo = IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Parent")
+                idTagInfo = IdTagInfo(
+                    status = AuthorizationStatus.Accepted,
+                    expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    parentIdTag = "Parent"
+                )
             ), "AuthorizeResponse.json"
         )
         expectThat(errors)
@@ -113,6 +179,52 @@ class CoreTest {
     fun `meterValues response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             MeterValuesResp(), "MeterValuesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `startTransaction response format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            StartTransactionResp(IdTagInfo(AuthorizationStatus.Accepted), 12),
+            "StartTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV4(
+            StartTransactionResp(
+                idTagInfo = IdTagInfo(
+                    status = AuthorizationStatus.Accepted,
+                    expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    parentIdTag = "Tag1"
+                ), transactionId = 12
+            ),
+            "StartTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `stopTransaction response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            StopTransactionResp(), "StopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            StopTransactionResp(
+                IdTagInfo(
+                    status = AuthorizationStatus.Accepted,
+                    expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    parentIdTag = "Tag1"
+                )
+            ), "StopTransactionResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

@@ -36,5 +36,14 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
         return sendMessage(meta, "MeterValues",request)
     }
 
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun startTransaction(meta: RequestMetadata, request: StartTransactionReq): CoreExecution<StartTransactionResp> {
+        return sendMessage(meta,"StartTransaction",request)
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun stopTransaction(meta: RequestMetadata, request: StopTransactionReq): CoreExecution<StopTransactionResp> {
+        return sendMessage(meta,"StopTransaction",request)
+    }
 }
 

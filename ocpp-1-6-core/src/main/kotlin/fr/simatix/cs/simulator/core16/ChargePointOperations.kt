@@ -32,4 +32,17 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>
+
+    /**
+     * Sends a StartTransaction request to the Central System to inform about a transaction that has been started.
+     * If this transaction ends a reservation the StartTransaction.req MUST contain the reservationId.
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun startTransaction(meta: RequestMetadata, request: StartTransactionReq): CoreExecution<StartTransactionResp>
+
+    /**
+     * Sends a StopTransaction request to the Central System to inform about a transaction that has been stopped.
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun stopTransaction(meta: RequestMetadata, request: StopTransactionReq): CoreExecution<StopTransactionResp>
 }

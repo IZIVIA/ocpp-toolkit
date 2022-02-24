@@ -18,6 +18,7 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
         val responseTime = Clock.System.now()
         return CoreExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime), response)
     }
+
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(
         meta: RequestMetadata,
@@ -32,7 +33,15 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
     }
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>{
-        return sendMessage(meta, "MeterValues",request)
+    override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp> {
+        return sendMessage(meta, "MeterValues", request)
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun transactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): CoreExecution<TransactionEventResp> {
+        return sendMessage(meta, "TransactionEvent", request)
     }
 }
