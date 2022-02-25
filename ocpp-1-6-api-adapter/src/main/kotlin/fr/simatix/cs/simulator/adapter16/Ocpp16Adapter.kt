@@ -5,16 +5,18 @@ import fr.simatix.cs.simulator.adapter16.mapper.HeartbeatMapper
 import fr.simatix.cs.simulator.adapter16.mapper.MeterValuesMapper
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.*
-import fr.simatix.cs.simulator.api.model.enumeration.RequestStatus
+import fr.simatix.cs.simulator.api.model.RequestStatus
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.transport.Transport
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
-import fr.simatix.cs.simulator.api.model.AuthorizeReq as AuthorizeReqGen
-import fr.simatix.cs.simulator.api.model.AuthorizeResp as AuthorizeRespGen
-import fr.simatix.cs.simulator.api.model.HeartbeatReq as HeartbeatReqGen
-import fr.simatix.cs.simulator.api.model.HeartbeatResp as HeartbeatRespGen
+import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp as AuthorizeRespGen
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
 class Ocpp16Adapter(transport: Transport) : CSMSApi {
 
@@ -53,7 +55,7 @@ class Ocpp16Adapter(transport: Transport) : CSMSApi {
             OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
         } catch (e: IllegalStateException){
             logger.warn(e.message)
-            OperationExecution(ExecutionMetadata(meta,RequestStatus.NOT_SEND), request, MeterValuesResp())
+            OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
         }
     }
 }

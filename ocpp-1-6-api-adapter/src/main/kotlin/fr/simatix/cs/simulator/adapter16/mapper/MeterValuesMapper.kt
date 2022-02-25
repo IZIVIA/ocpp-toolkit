@@ -1,22 +1,22 @@
 package fr.simatix.cs.simulator.adapter16.mapper
 
-import fr.simatix.cs.simulator.api.model.SampledValueType
-import fr.simatix.cs.simulator.api.model.SignedMeterValueType
-import fr.simatix.cs.simulator.api.model.UnitOfMeasure
-import fr.simatix.cs.simulator.api.model.enumeration.LocationEnumType
-import fr.simatix.cs.simulator.api.model.enumeration.MeasurandEnumType
-import fr.simatix.cs.simulator.api.model.enumeration.PhaseEnumType
-import fr.simatix.cs.simulator.api.model.enumeration.ReadingContextEnumType
-import fr.simatix.cs.simulator.core16.model.MeterValue
-import fr.simatix.cs.simulator.core16.model.MeterValuesReq
-import fr.simatix.cs.simulator.core16.model.MeterValuesResp
-import fr.simatix.cs.simulator.core16.model.SampledValue
-import fr.simatix.cs.simulator.core16.model.enumeration.*
+import fr.simatix.cs.simulator.api.model.common.SampledValueType
+import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
+import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure
+import fr.simatix.cs.simulator.api.model.common.enumeration.LocationEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MeasurandEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.PhaseEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
+import fr.simatix.cs.simulator.core16.model.common.MeterValue
+import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.common.SampledValue
+import fr.simatix.cs.simulator.core16.model.common.enumeration.*
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
-import fr.simatix.cs.simulator.api.model.MeterValuesReq as MeterValuesReqGen
-import fr.simatix.cs.simulator.api.model.MeterValuesResp as MeterValuesRespGen
-import fr.simatix.cs.simulator.core16.model.enumeration.UnitOfMeasure as UnitOfMeasure16
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp as MeterValuesRespGen
+import fr.simatix.cs.simulator.core16.model.common.enumeration.UnitOfMeasure as UnitOfMeasure16
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class MeterValuesMapper {

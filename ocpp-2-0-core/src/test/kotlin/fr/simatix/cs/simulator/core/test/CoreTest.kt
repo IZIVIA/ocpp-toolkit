@@ -2,8 +2,28 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core20.ChargePointOperations
-import fr.simatix.cs.simulator.core20.model.*
-import fr.simatix.cs.simulator.core20.model.enumeration.*
+import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.authorize.OCSPRequestDataType
+import fr.simatix.cs.simulator.core20.model.authorize.enumeration.AuthorizeCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.common.*
+import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.PhaseEnumType
+import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
+import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType
+import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
@@ -137,7 +157,8 @@ class CoreTest {
 
     @Test
     fun `statusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(StatusNotificationReq(
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            StatusNotificationReq(
             connectorId = 2,
             connectorStatus = ConnectorStatusEnumType.Available,
             evseId = 12,

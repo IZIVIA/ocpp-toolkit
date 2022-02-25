@@ -1,7 +1,14 @@
 package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.model.*
-import fr.simatix.cs.simulator.api.model.enumeration.*
+import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.api.model.common.IdTokenType
+import fr.simatix.cs.simulator.api.model.common.MeterValueType
+import fr.simatix.cs.simulator.api.model.common.SampledValueType
+import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
+import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum

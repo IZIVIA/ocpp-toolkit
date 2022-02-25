@@ -2,9 +2,21 @@ package fr.simatix.cs.simulator.core16.impl
 
 import fr.simatix.cs.simulator.api.model.ExecutionMetadata
 import fr.simatix.cs.simulator.api.model.RequestMetadata
-import fr.simatix.cs.simulator.api.model.enumeration.RequestStatus
+import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.model.*
+import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
+import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
+import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
+import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
+import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import kotlinx.datetime.Clock

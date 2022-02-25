@@ -5,14 +5,18 @@ import fr.simatix.cs.simulator.adapter20.mapper.HeartbeatMapper
 import fr.simatix.cs.simulator.adapter20.mapper.MeterValuesMapper
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.*
-import fr.simatix.cs.simulator.api.model.enumeration.RequestStatus
+import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.api.model.RequestStatus
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.transport.Transport
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
-import fr.simatix.cs.simulator.api.model.HeartbeatReq as HeartbeatReqGen
-import fr.simatix.cs.simulator.api.model.HeartbeatResp as HeartbeatRespGen
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
 class Ocpp20Adapter(transport: Transport) : CSMSApi {
 

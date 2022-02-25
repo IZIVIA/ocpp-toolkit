@@ -1,6 +1,5 @@
 package fr.simatix.cs.simulator.api.model
 
-import fr.simatix.cs.simulator.api.model.enumeration.RequestStatus
 import kotlinx.datetime.Instant
 
 data class ExecutionMetadata(

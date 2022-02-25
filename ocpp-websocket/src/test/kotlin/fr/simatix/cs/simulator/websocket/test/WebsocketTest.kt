@@ -1,7 +1,7 @@
 package fr.simatix.cs.simulator.websocket.test
 
-import fr.simatix.cs.simulator.core16.model.HeartbeatReq
-import fr.simatix.cs.simulator.core16.model.HeartbeatResp
+import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
+import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.websocket.WebsocketClient
 import io.mockk.every
 import io.mockk.mockk
