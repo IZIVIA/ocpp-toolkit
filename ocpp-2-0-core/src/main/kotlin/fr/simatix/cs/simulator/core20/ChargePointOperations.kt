@@ -5,6 +5,8 @@ import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.*
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
@@ -54,4 +56,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun statusNotification(meta: RequestMetadata, request: StatusNotificationReq): CoreExecution<StatusNotificationResp>
+
+    /**
+     * Sends information to the Central System for a function not supported by OCPP
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp>
 }

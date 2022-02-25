@@ -7,6 +7,8 @@ import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.*
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
@@ -61,5 +63,10 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
         request: StatusNotificationReq
     ): CoreExecution<StatusNotificationResp> {
         return sendMessage(meta, "StatusNotification", request)
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp> {
+        return sendMessage(meta, "DataTransfer", request)
     }
 }
