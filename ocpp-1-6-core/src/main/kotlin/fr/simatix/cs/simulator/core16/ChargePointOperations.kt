@@ -2,9 +2,11 @@ package fr.simatix.cs.simulator.core16
 
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
-import fr.simatix.cs.simulator.core16.model.*
+import fr.simatix.cs.simulator.core16.model.CoreExecution
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
@@ -71,4 +73,11 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp>
+
+    /**
+     * Sends a request to the Central System with information about its configuration
+     * each time it boots or reboots
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun bootNotification(meta: RequestMetadata, request: BootNotificationReq): CoreExecution<BootNotificationResp>
 }

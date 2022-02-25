@@ -5,6 +5,12 @@ import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.authorize.OCSPRequestDataType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.AuthorizeCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
+import fr.simatix.cs.simulator.core20.model.bootnotification.ModemType
+import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootReasonEnumType
+import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
@@ -173,6 +179,36 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `bootNotification request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            BootNotificationReq(
+                chargingStation = ChargingStationType(model = "model", vendorName = "vendor"),
+                reason = BootReasonEnumType.ApplicationReset
+            ),
+            "BootNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            BootNotificationReq(
+                chargingStation = ChargingStationType(
+                    model = "model",
+                    vendorName = "vendor",
+                    firmwareVersion = "version",
+                    modem = ModemType("", ""),
+                    serialNumber = "0"
+                ), reason = BootReasonEnumType.ApplicationReset
+            ),
+            "BootNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -273,4 +309,31 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `bootNotification response format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            BootNotificationResp(
+                currentTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                interval = 10,
+                status = RegistrationStatusEnumType.Accepted
+            ),
+            "BootNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV6(
+            BootNotificationResp(
+                currentTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                interval = 10,
+                status = RegistrationStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("", "")
+            ),
+            "BootNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 }

@@ -2,6 +2,9 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.core16.model.bootnotification.enumeration.RegistrationStatus
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
@@ -189,6 +192,35 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `bootNotification request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            BootNotificationReq(chargePointModel = "model1", chargePointVendor = "vendor1"),
+            "BootNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV4(
+            BootNotificationReq(
+                chargePointModel = "model1",
+                chargePointVendor = "vendor1",
+                chargePointSerialNumber = "SR-100",
+                chargeBoxSerialNumber = "BOX-SR-100",
+                firmwareVersion = "2.0",
+                iccid = "0",
+                imsi = "0",
+                meterSerialNumber = "SR",
+                meterType = "kW"
+            ),
+            "BootNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -280,7 +312,8 @@ class JsonSchemaTest {
 
     @Test
     fun `statusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV4(StatusNotificationResp(), "StatusNotificationResponse.json")
+        val errors =
+            JsonSchemaValidator.isValidObjectV4(StatusNotificationResp(), "StatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -297,8 +330,23 @@ class JsonSchemaTest {
 
         /* Every field */
         errors = JsonSchemaValidator.isValidObjectV4(
-            DataTransferResp(DataTransferStatus.Accepted,"data1"),
+            DataTransferResp(DataTransferStatus.Accepted, "data1"),
             "DataTransferResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `bootNotification response format`() {
+        /* Required field only */
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            BootNotificationResp(
+                currentTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                interval = 10,
+                status = RegistrationStatus.Accepted
+            ),
+            "BootNotificationResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

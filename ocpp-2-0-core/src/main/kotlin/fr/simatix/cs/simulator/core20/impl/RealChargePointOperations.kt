@@ -7,6 +7,8 @@ import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.*
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
@@ -68,5 +70,13 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp> {
         return sendMessage(meta, "DataTransfer", request)
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun bootNotification(
+        meta: RequestMetadata,
+        request: BootNotificationReq
+    ): CoreExecution<BootNotificationResp> {
+        return sendMessage(meta, "BootNotification", request)
     }
 }
