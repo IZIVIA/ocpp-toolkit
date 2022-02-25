@@ -38,4 +38,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun transactionEvent(meta: RequestMetadata, request: TransactionEventReq): CoreExecution<TransactionEventResp>
+
+    /**
+     * Sends a notification to the Central System about a status change or an error within a connector
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun statusNotification(meta: RequestMetadata, request: StatusNotificationReq): CoreExecution<StatusNotificationResp>
 }

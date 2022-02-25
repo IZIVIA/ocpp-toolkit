@@ -44,4 +44,12 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
     ): CoreExecution<TransactionEventResp> {
         return sendMessage(meta, "TransactionEvent", request)
     }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun statusNotification(
+        meta: RequestMetadata,
+        request: StatusNotificationReq
+    ): CoreExecution<StatusNotificationResp> {
+        return sendMessage(meta, "StatusNotification", request)
+    }
 }

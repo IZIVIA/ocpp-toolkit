@@ -45,4 +45,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun stopTransaction(meta: RequestMetadata, request: StopTransactionReq): CoreExecution<StopTransactionResp>
+
+    /**
+     * Sends a notification to the Central System about a status change or an error within the Charge Point
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun statusNotification(meta: RequestMetadata, request: StatusNotificationReq): CoreExecution<StatusNotificationResp>
 }

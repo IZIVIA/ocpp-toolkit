@@ -3,9 +3,7 @@ package fr.simatix.cs.simulator.core.test
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.model.*
-import fr.simatix.cs.simulator.core16.model.enumeration.AuthorizationStatus
-import fr.simatix.cs.simulator.core16.model.enumeration.Phase
-import fr.simatix.cs.simulator.core16.model.enumeration.Reason
+import fr.simatix.cs.simulator.core16.model.enumeration.*
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
@@ -109,6 +107,7 @@ class CoreTest {
 
     @Test
     fun `stopTransaction request format`() {
+        /* Required field only */
         var errors = JsonSchemaValidator.isValidObjectV4(
             StopTransactionReq(
                 meterStop = 200,
@@ -120,6 +119,7 @@ class CoreTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
+        /* Every field */
         errors = JsonSchemaValidator.isValidObjectV4(
             StopTransactionReq(
                 meterStop = 200,
@@ -138,6 +138,34 @@ class CoreTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `statusNotification request format`() {
+        /* Required field only */
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            StatusNotificationReq(
+                connectorId = 1, errorCode = ChargePointErrorCode.NoError, status = ChargePointStatus.Charging
+            ), "StatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        /* Every field */
+        errors = JsonSchemaValidator.isValidObjectV4(
+            StatusNotificationReq(
+                connectorId = 1,
+                errorCode = ChargePointErrorCode.NoError,
+                status = ChargePointStatus.Charging,
+                info = "Charging",
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                vendorErrorCode = "Error",
+                vendorId = "vendor1"
+            ), "StatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
     }
 
     @Test
@@ -226,6 +254,13 @@ class CoreTest {
                 )
             ), "StopTransactionResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `statusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(StatusNotificationResp(), "StatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

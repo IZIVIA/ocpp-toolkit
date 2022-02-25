@@ -136,6 +136,18 @@ class CoreTest {
     }
 
     @Test
+    fun `statusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(StatusNotificationReq(
+            connectorId = 2,
+            connectorStatus = ConnectorStatusEnumType.Available,
+            evseId = 12,
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+        ), "StatusNotificationRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -202,6 +214,13 @@ class CoreTest {
                 ), MessageContentType(MessageFormatEnumType.ASCII, "", "")
             ), "TransactionEventResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `statusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(StatusNotificationResp(), "StatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
