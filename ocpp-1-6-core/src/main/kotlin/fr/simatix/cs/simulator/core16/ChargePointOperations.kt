@@ -1,7 +1,5 @@
 package fr.simatix.cs.simulator.core16
 
-import fr.simatix.cs.simulator.api.model.OperationExecution
-import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
@@ -19,6 +17,8 @@ import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.transport.Transport
 import java.net.ConnectException
 

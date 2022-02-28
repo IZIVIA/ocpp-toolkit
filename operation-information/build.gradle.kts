@@ -6,5 +6,4 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation(project(":operation-information"))
 }

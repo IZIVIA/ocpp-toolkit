@@ -1,7 +1,6 @@
 package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.CSMSApi
-import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
@@ -17,6 +16,7 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import io.simatix.ev.ocpp.OcppVersion
 import kotlinx.datetime.Instant
 

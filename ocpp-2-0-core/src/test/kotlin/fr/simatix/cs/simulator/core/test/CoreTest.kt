@@ -1,9 +1,9 @@
 package fr.simatix.cs.simulator.core.test
 
-import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import io.mockk.every

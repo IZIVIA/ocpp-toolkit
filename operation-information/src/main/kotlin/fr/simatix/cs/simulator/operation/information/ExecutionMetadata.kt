@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model
+package fr.simatix.cs.simulator.operation.information
 
 import kotlinx.datetime.Instant
 

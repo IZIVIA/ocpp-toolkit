@@ -1,10 +1,6 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
-import fr.simatix.cs.simulator.api.model.ExecutionMetadata
-import fr.simatix.cs.simulator.api.model.OperationExecution
-import fr.simatix.cs.simulator.api.model.RequestMetadata
-import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.common.SampledValueType
@@ -34,6 +30,10 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransfe
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
 import io.mockk.every
 import io.mockk.mockk

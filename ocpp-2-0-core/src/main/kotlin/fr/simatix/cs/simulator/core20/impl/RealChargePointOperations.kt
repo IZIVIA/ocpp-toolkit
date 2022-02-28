@@ -1,9 +1,5 @@
 package fr.simatix.cs.simulator.core20.impl
 
-import fr.simatix.cs.simulator.api.model.ExecutionMetadata
-import fr.simatix.cs.simulator.api.model.OperationExecution
-import fr.simatix.cs.simulator.api.model.RequestMetadata
-import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
@@ -19,6 +15,10 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
 import fr.simatix.cs.simulator.transport.sendMessage
 import kotlinx.datetime.Clock

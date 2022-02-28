@@ -2,10 +2,6 @@ package fr.simatix.cs.simulator.adapter20
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.CSMSApi
-import fr.simatix.cs.simulator.api.model.ExecutionMetadata
-import fr.simatix.cs.simulator.api.model.OperationExecution
-import fr.simatix.cs.simulator.api.model.RequestMetadata
-import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
@@ -15,6 +11,10 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory

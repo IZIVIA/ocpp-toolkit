@@ -1,18 +1,12 @@
 package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
-import fr.simatix.cs.simulator.api.model.ExecutionMetadata
-import fr.simatix.cs.simulator.api.model.OperationExecution
-import fr.simatix.cs.simulator.api.model.RequestMetadata
-import fr.simatix.cs.simulator.api.model.RequestStatus
-import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
-import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
@@ -30,6 +24,10 @@ import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
 import io.mockk.every
 import io.mockk.mockk
@@ -41,6 +39,8 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
 
