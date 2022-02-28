@@ -10,19 +10,17 @@ import com.networknt.schema.ValidationMessage
 import java.io.InputStream
 
 class JsonSchemaValidator {
+
     companion object {
         private val mapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
-        private fun <T> getJsonNodeObject(value: T): JsonNode {
-            return mapper.readTree(mapper.writeValueAsString(value))
-        }
+        private fun <T> getJsonNodeObject(value: T): JsonNode = mapper.readTree(mapper.writeValueAsString(value))
 
         private fun getJsonSchema(file: String, version : SpecVersion.VersionFlag): JsonSchema {
             val factory: JsonSchemaFactory = JsonSchemaFactory.getInstance(version)
             val input: InputStream? = Thread.currentThread().contextClassLoader.getResourceAsStream(file)
             return factory.getSchema(input)
         }
-
 
         /**
          * Serialize the object with jackson and verify that the format is conformed to the
@@ -43,6 +41,6 @@ class JsonSchemaValidator {
             val schema = getJsonSchema(file,SpecVersion.VersionFlag.V6)
             return schema.validate(jsonNode)
         }
-
     }
+
 }

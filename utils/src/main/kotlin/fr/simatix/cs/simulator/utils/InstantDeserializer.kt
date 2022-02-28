@@ -7,11 +7,11 @@ import kotlinx.datetime.Instant
 
 class InstantDeserializer : JsonDeserializer<Instant>() {
 
-    override fun deserialize(jsonParser: JsonParser?, deserializationContext: DeserializationContext?): Instant {
+    @Throws(IllegalStateException::class)
+    override fun deserialize(jsonParser: JsonParser?, deserializationContext: DeserializationContext?): Instant =
         if (jsonParser != null) {
-            return Instant.parse(jsonParser.valueAsString)
+            Instant.parse(jsonParser.valueAsString)
         } else {
-            throw IllegalStateException("Error while deserialization")
+            throw IllegalStateException("Error while deserialization : jsonParser null")
         }
-    }
 }

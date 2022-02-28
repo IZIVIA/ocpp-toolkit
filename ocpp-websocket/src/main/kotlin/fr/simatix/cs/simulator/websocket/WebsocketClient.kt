@@ -16,22 +16,18 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
     private val mapper = jacksonObjectMapper()
 
-    override fun connect() {
-        client.connect()
-    }
+    override fun connect(): Unit = client.connect()
 
-    override fun close() {
-        client.close()
-    }
+    override fun close(): Unit = client.close()
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P {
-        val msgId: String = UUID.randomUUID().toString()
-        return try {
+    override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P =
+        try {
+            val msgId: String = UUID.randomUUID().toString()
             connect()
             val response = client.sendBlocking(WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
             if (response.msgId != msgId) {
-                throw IllegalStateException("Wrong response received")
+                throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected")
             }
             mapper.readValue(response.payload, clazz.java)
         } catch (e: Exception) {
@@ -39,6 +35,6 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
         } finally {
             close()
         }
-    }
+
 }
 

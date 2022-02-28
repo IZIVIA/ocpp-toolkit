@@ -24,7 +24,5 @@ enum class PhaseEnumType(val value: String) {
     L3L1("L3-L1");
 
     @JsonValue
-    fun getEnumValue(): String{
-        return value
-    }
+    fun getEnumValue(): String = value
 }

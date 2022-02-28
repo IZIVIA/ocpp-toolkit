@@ -38,7 +38,5 @@ enum class UnitOfMeasure(val value: String) {
     Percent("Percent");
 
     @JsonValue
-    fun getEnumValue(): String{
-        return value
-    }
+    fun getEnumValue(): String = value
 }

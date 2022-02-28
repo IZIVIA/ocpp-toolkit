@@ -55,8 +55,6 @@ enum class MeasurandEnumType(val value: String) {
     SoC("SoC");
 
     @JsonValue
-    fun getEnumValue(): String{
-        return value
-    }
+    fun getEnumValue(): String = value
 
 }

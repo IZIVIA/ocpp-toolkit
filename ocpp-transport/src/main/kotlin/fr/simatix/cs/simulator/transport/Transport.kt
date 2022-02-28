@@ -14,6 +14,4 @@ interface Transport {
 
 }
 
-inline fun <T, reified P : Any> Transport.sendMessage(action: String, message: T): P {
-    return sendMessageClass(P::class, action, message)
-}
+inline fun <T, reified P : Any> Transport.sendMessage(action: String, message: T): P = sendMessageClass(P::class, action, message)

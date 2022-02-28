@@ -48,7 +48,5 @@ enum class Measurand(val value: String) {
     RPM("RPM");
 
     @JsonValue
-    fun getEnumValue(): String {
-        return value
-    }
+    fun getEnumValue(): String = value
 }

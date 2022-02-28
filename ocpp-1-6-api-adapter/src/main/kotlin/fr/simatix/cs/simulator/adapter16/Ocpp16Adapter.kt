@@ -4,7 +4,9 @@ import fr.simatix.cs.simulator.adapter16.mapper.AuthorizeMapper
 import fr.simatix.cs.simulator.adapter16.mapper.HeartbeatMapper
 import fr.simatix.cs.simulator.adapter16.mapper.MeterValuesMapper
 import fr.simatix.cs.simulator.api.CSMSApi
-import fr.simatix.cs.simulator.api.model.*
+import fr.simatix.cs.simulator.api.model.ExecutionMetadata
+import fr.simatix.cs.simulator.api.model.OperationExecution
+import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
@@ -48,14 +50,12 @@ class Ocpp16Adapter(transport: Transport) : CSMSApi {
     override fun meterValues(
         meta: RequestMetadata,
         request: MeterValuesReq
-    ): OperationExecution<MeterValuesReq, MeterValuesResp> {
+    ): OperationExecution<MeterValuesReq, MeterValuesResp> = try {
         val mapper: MeterValuesMapper = Mappers.getMapper(MeterValuesMapper::class.java)
-        return try {
-            val response = operations.meterValues(meta, mapper.genToCoreReq(request))
-            OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-        } catch (e: IllegalStateException){
-            logger.warn(e.message)
-            OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
-        }
+        val response = operations.meterValues(meta, mapper.genToCoreReq(request))
+        OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    } catch (e: IllegalStateException) {
+        logger.warn(e.message)
+        OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
     }
 }

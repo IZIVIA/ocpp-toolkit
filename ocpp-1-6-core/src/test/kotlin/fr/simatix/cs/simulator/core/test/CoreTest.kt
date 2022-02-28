@@ -9,15 +9,22 @@ import fr.simatix.cs.simulator.transport.sendMessage
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.datetime.Instant
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
 class CoreTest {
+    private lateinit var transport: Transport
+
+    @BeforeEach
+    fun init(){
+        transport = mockk()
+    }
+
     @Test
     fun `heartbeat request`() {
 
-        val transport = mockk<Transport>()
         every { transport.sendMessage<HeartbeatReq, HeartbeatResp>(any(), any()) } returns HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
         )

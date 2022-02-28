@@ -11,15 +11,20 @@ import io.simatix.ev.ocpp.OcppVersion
 
 class CSMSApiFactory {
     companion object {
-        private fun createTransport(ocppVersion: OcppVersion, ocppId: String, transportType: TransportEnum, target: String): Transport{
-            return when (transportType) {
-                TransportEnum.WEBSOCKET -> WebsocketClient(ocppId, ocppVersion,target)
+        private fun createTransport(
+            ocppVersion: OcppVersion,
+            ocppId: String,
+            transportType: TransportEnum,
+            target: String
+        ): Transport =
+            when (transportType) {
+                TransportEnum.WEBSOCKET -> WebsocketClient(ocppId, ocppVersion, target)
                 TransportEnum.SOAP -> WebsocketClient(ocppId, ocppVersion, target)
             }
-        }
 
         fun getCSMSApi(settings: Settings, ocppId: String): CSMSApi {
-            val transport: Transport = createTransport(settings.ocppVersion,ocppId, settings.transportType,settings.target)
+            val transport: Transport =
+                createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
             return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
                 Ocpp16Adapter(transport)
             } else {

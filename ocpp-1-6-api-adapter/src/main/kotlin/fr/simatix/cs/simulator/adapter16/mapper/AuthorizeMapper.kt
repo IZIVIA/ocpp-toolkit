@@ -18,15 +18,16 @@ abstract class AuthorizeMapper {
     @Mapping(source = "idToken.idToken", target = "idTag")
     abstract fun genToCoreReq(authorizeReq: AuthorizeReqGen?): AuthorizeReq
 
-    fun coreToGenResp(authorizeResp: AuthorizeResp?): AuthorizeRespGen{
-        val idTag = authorizeResp?.idTagInfo
-        val status = AuthorizationStatusEnumType.valueOf(idTag?.status!!.name)
+    fun coreToGenResp(authorizeResp: AuthorizeResp): AuthorizeRespGen {
+        val idTag = authorizeResp.idTagInfo
+        val status = AuthorizationStatusEnumType.valueOf(idTag.status.name)
         val groupIdToken = if (idTag.parentIdTag != null) {
             IdTokenType(idTag.parentIdTag!!, IdTokenEnumType.Central)
         } else {
             null
         }
-        val idTokenInfo = IdTokenInfoType(status = status, cacheExpiryDateTime = idTag.expiryDate, groupIdToken = groupIdToken)
+        val idTokenInfo =
+            IdTokenInfoType(status = status, cacheExpiryDateTime = idTag.expiryDate, groupIdToken = groupIdToken)
         return AuthorizeRespGen(idTokenInfo)
     }
 

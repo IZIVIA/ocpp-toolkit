@@ -4,7 +4,7 @@ import fr.simatix.cs.simulator.api.model.ExecutionMetadata
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.core20.ChargePointOperations
-import fr.simatix.cs.simulator.core20.model.*
+import fr.simatix.cs.simulator.core20.model.CoreExecution
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
@@ -34,49 +34,39 @@ class RealChargePointOperations(private val client: Transport) : ChargePointOper
     }
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun heartbeat(
-        meta: RequestMetadata,
-        request: HeartbeatReq
-    ): CoreExecution<HeartbeatResp> {
-        return sendMessage(meta, "Heartbeat", request)
-    }
+    override fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): CoreExecution<HeartbeatResp> =
+        sendMessage(meta, "Heartbeat", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp> {
-        return sendMessage(meta, "Authorize", request)
-    }
+    override fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp> =
+        sendMessage(meta, "Authorize", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp> {
-        return sendMessage(meta, "MeterValues", request)
-    }
+    override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp> =
+        sendMessage(meta, "MeterValues", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun transactionEvent(
         meta: RequestMetadata,
         request: TransactionEventReq
-    ): CoreExecution<TransactionEventResp> {
-        return sendMessage(meta, "TransactionEvent", request)
-    }
+    ): CoreExecution<TransactionEventResp> =
+        sendMessage(meta, "TransactionEvent", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun statusNotification(
         meta: RequestMetadata,
         request: StatusNotificationReq
-    ): CoreExecution<StatusNotificationResp> {
-        return sendMessage(meta, "StatusNotification", request)
-    }
+    ): CoreExecution<StatusNotificationResp> =
+        sendMessage(meta, "StatusNotification", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
-    override fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp> {
-        return sendMessage(meta, "DataTransfer", request)
-    }
+    override fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp> =
+        sendMessage(meta, "DataTransfer", request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun bootNotification(
         meta: RequestMetadata,
         request: BootNotificationReq
-    ): CoreExecution<BootNotificationResp> {
-        return sendMessage(meta, "BootNotification", request)
-    }
+    ): CoreExecution<BootNotificationResp> =
+        sendMessage(meta, "BootNotification", request)
 }

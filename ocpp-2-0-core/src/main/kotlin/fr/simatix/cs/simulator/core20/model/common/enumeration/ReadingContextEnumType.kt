@@ -20,8 +20,6 @@ enum class ReadingContextEnumType(val value: String) {
     Other("Other");
 
     @JsonValue
-    fun getEnumValue(): String {
-        return value
-    }
+    fun getEnumValue(): String = value
 
 }
