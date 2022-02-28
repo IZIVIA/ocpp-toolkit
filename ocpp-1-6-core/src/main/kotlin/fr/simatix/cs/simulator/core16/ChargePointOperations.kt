@@ -1,8 +1,8 @@
 package fr.simatix.cs.simulator.core16
 
+import fr.simatix.cs.simulator.api.model.OperationExecution
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
-import fr.simatix.cs.simulator.core16.model.CoreExecution
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
@@ -34,50 +34,50 @@ interface ChargePointOperations {
      * Sends a Heartbeat request to let the Central System know the Charge Point is still connected
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): CoreExecution<HeartbeatResp>
+    fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): OperationExecution<HeartbeatReq, HeartbeatResp>
 
     /**
      * Sends an Authorize request to the Central System if the identifier is authorize to start/stop
      * to charge.
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun authorize(meta: RequestMetadata, request: AuthorizeReq): CoreExecution<AuthorizeResp>
+    fun authorize(meta: RequestMetadata, request: AuthorizeReq): OperationExecution<AuthorizeReq, AuthorizeResp>
 
     /**
      * Sends periodic, possibly clock-aligned MeterValues
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun meterValues(meta: RequestMetadata, request: MeterValuesReq): CoreExecution<MeterValuesResp>
+    fun meterValues(meta: RequestMetadata, request: MeterValuesReq): OperationExecution<MeterValuesReq, MeterValuesResp>
 
     /**
      * Sends a StartTransaction request to the Central System to inform about a transaction that has been started.
      * If this transaction ends a reservation the StartTransaction.req MUST contain the reservationId.
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun startTransaction(meta: RequestMetadata, request: StartTransactionReq): CoreExecution<StartTransactionResp>
+    fun startTransaction(meta: RequestMetadata, request: StartTransactionReq): OperationExecution<StartTransactionReq, StartTransactionResp>
 
     /**
      * Sends a StopTransaction request to the Central System to inform about a transaction that has been stopped.
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun stopTransaction(meta: RequestMetadata, request: StopTransactionReq): CoreExecution<StopTransactionResp>
+    fun stopTransaction(meta: RequestMetadata, request: StopTransactionReq): OperationExecution<StopTransactionReq, StopTransactionResp>
 
     /**
      * Sends a notification to the Central System about a status change or an error within the Charge Point
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun statusNotification(meta: RequestMetadata, request: StatusNotificationReq): CoreExecution<StatusNotificationResp>
+    fun statusNotification(meta: RequestMetadata, request: StatusNotificationReq): OperationExecution<StatusNotificationReq, StatusNotificationResp>
 
     /**
      * Sends information to the Central System for a function not supported by OCPP
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): CoreExecution<DataTransferResp>
+    fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
 
     /**
      * Sends a request to the Central System with information about its configuration
      * each time it boots or reboots
      */
     @Throws(IllegalStateException::class, ConnectException::class)
-    fun bootNotification(meta: RequestMetadata, request: BootNotificationReq): CoreExecution<BootNotificationResp>
+    fun bootNotification(meta: RequestMetadata, request: BootNotificationReq): OperationExecution<BootNotificationReq, BootNotificationResp>
 }
