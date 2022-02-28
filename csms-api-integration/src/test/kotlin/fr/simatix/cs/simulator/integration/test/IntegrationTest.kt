@@ -2,6 +2,10 @@ package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.model.*
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
+import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
+import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.IdTokenType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.common.SampledValueType
@@ -173,6 +177,30 @@ class IntegrationTest {
             .and { get { this.response.data }.isEqualTo("2022-02-15T00:00:00.000Z") }
             .and { get { this.response.status }.isEqualTo(DataTransferStatusEnumType.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `bootNotification 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"currentTime\" : \"2022-02-15T00:00:00.000Z\", \"interval\" : 10, \"status\": \"Accepted\"}",
+            action = "BootNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = BootNotificationReq(ChargingStationType("model","vendor","firware"),BootReasonEnumType.ApplicationReset)
+        val response = csmsApi.bootNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { this.response.interval }.isEqualTo(10) }
+            .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumType.Accepted) }
     }
 
 

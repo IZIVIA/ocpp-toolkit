@@ -1,21 +1,30 @@
 package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
-import fr.simatix.cs.simulator.api.model.*
+import fr.simatix.cs.simulator.api.model.ExecutionMetadata
+import fr.simatix.cs.simulator.api.model.RequestMetadata
+import fr.simatix.cs.simulator.api.model.RequestStatus
+import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
+import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
+import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
+import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
+import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
-import fr.simatix.cs.simulator.core16.model.*
+import fr.simatix.cs.simulator.core16.model.CoreExecution
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
-import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
-import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.core16.model.bootnotification.enumeration.RegistrationStatus
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.enumeration.AuthorizationStatus
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.transport.Transport
 import io.mockk.every
 import io.mockk.mockk
@@ -26,8 +35,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
-import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
 
 
@@ -153,6 +162,33 @@ class AdapterTest {
             }
             .and { get { this.response.data }.isEqualTo("Hello") }
             .and { get { this.response.status }.isEqualTo(DataTransferStatusEnumType.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `bootNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.bootNotification(any(), any()) } returns CoreExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            BootNotificationResp(
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                10,
+                RegistrationStatus.Accepted
+            )
+        )
+
+        val operations = Ocpp16Adapter(transport)
+        val request =
+            BootNotificationReq(ChargingStationType("model", "vendor", "firmware", ModemType("a","b")), BootReasonEnumType.ApplicationReset)
+        val response = operations.bootNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { this.response.interval }.isEqualTo(10) }
+            .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumType.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(null) }
     }
 }
