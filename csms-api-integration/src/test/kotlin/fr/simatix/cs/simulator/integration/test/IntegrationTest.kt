@@ -194,7 +194,7 @@ class IntegrationTest {
         val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
 
         val requestMetadata = RequestMetadata(ocppId)
-        val request = BootNotificationReq(ChargingStationType("model","vendor","firware"),BootReasonEnumType.ApplicationReset)
+        val request = BootNotificationReq(ChargingStationType("model","vendor","firmware"),BootReasonEnumType.ApplicationReset)
         val response = csmsApi.bootNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
@@ -202,6 +202,5 @@ class IntegrationTest {
             .and { get { this.response.interval }.isEqualTo(10) }
             .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumType.Accepted) }
     }
-
 
 }
