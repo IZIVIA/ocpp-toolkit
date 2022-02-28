@@ -4,6 +4,8 @@ import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
 import fr.simatix.cs.simulator.api.model.*
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core16.model.*
@@ -12,6 +14,8 @@ import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.enumeration.AuthorizationStatus
+import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
 import fr.simatix.cs.simulator.transport.Transport
 import io.mockk.every
 import io.mockk.mockk
@@ -122,5 +126,33 @@ class AdapterTest {
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND) }
+    }
+
+    @Test
+    fun `dataTransfer request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.dataTransfer(any(), any()) } returns CoreExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            DataTransferResp(
+                status = DataTransferStatus.Accepted,
+                data = "Hello",
+            )
+        )
+
+        val operations = Ocpp16Adapter(transport)
+        val request = DataTransferReq(
+            vendorId = "vendor1",
+            messageId = "ID100",
+            data = "Bye"
+        )
+        val response = operations.dataTransfer(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and { get { this.response.data }.isEqualTo("Hello") }
+            .and { get { this.response.status }.isEqualTo(DataTransferStatusEnumType.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(null) }
     }
 }

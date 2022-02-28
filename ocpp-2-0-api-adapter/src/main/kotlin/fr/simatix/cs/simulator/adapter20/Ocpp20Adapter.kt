@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter20
 
 import fr.simatix.cs.simulator.adapter20.mapper.AuthorizeMapper
+import fr.simatix.cs.simulator.adapter20.mapper.DataTransferMapper
 import fr.simatix.cs.simulator.adapter20.mapper.HeartbeatMapper
 import fr.simatix.cs.simulator.adapter20.mapper.MeterValuesMapper
 import fr.simatix.cs.simulator.api.CSMSApi
@@ -10,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.api.model.RequestStatus
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
@@ -59,4 +62,13 @@ class Ocpp20Adapter(transport: Transport) : CSMSApi {
             logger.warn(e.message)
             OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
         }
+
+    override fun dataTransfer(
+        meta: RequestMetadata,
+        request: DataTransferReq
+    ): OperationExecution<DataTransferReq, DataTransferResp> {
+        val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
+        val response = operations.dataTransfer(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 }

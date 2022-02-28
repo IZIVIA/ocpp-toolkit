@@ -7,6 +7,8 @@ import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.common.SampledValueType
 import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
@@ -33,7 +35,7 @@ class IntegrationTest {
     private lateinit var ocppWampClient: OkHttpOcppWampClient
 
     @BeforeEach
-    fun init(){
+    fun init() {
         val id = "a727d144-82bb-497a-a0c7-4ef2295910d4"
         val uuid = UUID.fromString(id)
         mockkStatic(UUID::class)
@@ -148,5 +150,30 @@ class IntegrationTest {
         expectThat(response2)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND) }
     }
+
+    @Test
+    fun `dataTransfer 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\" : \"Accepted\", \"data\" : \"2022-02-15T00:00:00.000Z\"}",
+            action = "DataTransfer"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = DataTransferReq("vendor", "msgId12", "Hello")
+        val response = csmsApi.dataTransfer(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.data }.isEqualTo("2022-02-15T00:00:00.000Z") }
+            .and { get { this.response.status }.isEqualTo(DataTransferStatusEnumType.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
 
 }

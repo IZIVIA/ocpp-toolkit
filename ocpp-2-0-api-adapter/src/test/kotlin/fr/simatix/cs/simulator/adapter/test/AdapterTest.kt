@@ -4,18 +4,18 @@ import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
 import fr.simatix.cs.simulator.api.model.ExecutionMetadata
 import fr.simatix.cs.simulator.api.model.RequestMetadata
 import fr.simatix.cs.simulator.api.model.RequestStatus
-import fr.simatix.cs.simulator.api.model.common.IdTokenInfoType
-import fr.simatix.cs.simulator.api.model.common.IdTokenType
-import fr.simatix.cs.simulator.api.model.common.MeterValueType
-import fr.simatix.cs.simulator.api.model.common.SampledValueType
-import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
+import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.CoreExecution
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.common.StatusInfoType as StatusInfoType20
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.transport.Transport
@@ -94,7 +94,6 @@ class AdapterTest {
     @Test
     fun `meterValues request`() {
         val requestMetadata = RequestMetadata("")
-        val chargePointOperations = mockk<RealChargePointOperations>()
         every { chargePointOperations.meterValues(any(), any()) } returns CoreExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
             MeterValuesResp()
@@ -124,5 +123,34 @@ class AdapterTest {
             .and {
                 get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND)
             }
+    }
+
+    @Test
+    fun `dataTransfer request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.dataTransfer(any(), any()) } returns CoreExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            DataTransferResp(
+                status = DataTransferStatusEnumType.Accepted,
+                data = "Hello",
+                statusInfo = StatusInfoType20("reason","additional")
+            )
+        )
+
+        val operations = Ocpp20Adapter(transport)
+        val request = DataTransferReq(
+            vendorId = "vendor1",
+            messageId = "ID100",
+            data = "Bye"
+        )
+        val response = operations.dataTransfer(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and { get { this.response.data }.isEqualTo("Hello") }
+            .and { get { this.response.status }.isEqualTo(fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(StatusInfoType("reason","additional")) }
     }
 }
