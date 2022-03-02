@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.integration
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
+import fr.simatix.cs.simulator.adapter16.impl.RealTransactionRepository
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.integration.model.Settings
@@ -26,7 +27,7 @@ class CSMSApiFactory {
             val transport: Transport =
                 createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
             return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
-                Ocpp16Adapter(transport)
+                Ocpp16Adapter(transport, RealTransactionRepository())
             } else {
                 Ocpp20Adapter(transport)
             }

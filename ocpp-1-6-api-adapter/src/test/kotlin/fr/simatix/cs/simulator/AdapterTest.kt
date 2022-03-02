@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
+import fr.simatix.cs.simulator.adapter16.impl.RealTransactionRepository
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
@@ -81,7 +82,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport)
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
         val request = HeartbeatReqGen()
         val response = operations.heartbeat(requestMetadata, request)
         expectThat(response)
@@ -105,7 +106,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport)
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
         val request = AuthorizeReqGen(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
         val response = operations.authorize(requestMetadata, request)
         expectThat(response)
@@ -131,7 +132,7 @@ class AdapterTest {
             MeterValuesResp()
         )
 
-        val operations = Ocpp16Adapter(transport)
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
         val request = MeterValuesReqGen(
             1, listOf(
                 MeterValueType(
@@ -168,7 +169,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport)
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
         val request = DataTransferReqGen(
             vendorId = "vendor1",
             messageId = "ID100",
@@ -198,7 +199,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport)
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
         val request =
             BootNotificationReqGen(
                 ChargingStationType("model", "vendor", "firmware", ModemType("a", "b")),
@@ -217,7 +218,7 @@ class AdapterTest {
     }
 
     @Test
-    fun `startTransaction request`() {
+    fun `startTransaction and stop request`() {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.startTransaction(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
@@ -227,8 +228,16 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport)
-        val request =
+        every { chargePointOperations.stopTransaction(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StopTransactionReq(200, Instant.parse("2022-02-15T00:00:00.000Z"), 12),
+            StopTransactionResp(
+                IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Tag2")
+            )
+        )
+
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val requestStart =
             TransactionEventReq(
                 eventType = TransactionEventEnumType.Started,
                 timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -238,16 +247,16 @@ class AdapterTest {
                 evse = EVSEType(1),
                 meterValue = listOf(
                     MeterValueType(
-                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionBegin)),
+                        listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionBegin)),
                         Instant.parse("2022-02-15T00:00:00.000Z")
                     )
                 ),
                 idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
                 reservationId = 10
             )
-        val response = operations.transactionEvent(requestMetadata, request)
-        expectThat(response)
-            .and { get { this.request }.isEqualTo(request) }
+        val responseStart = operations.transactionEvent(requestMetadata, requestStart)
+        expectThat(responseStart)
+            .and { get { this.request }.isEqualTo(requestStart) }
             .and {
                 get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
             }
@@ -260,21 +269,8 @@ class AdapterTest {
                     )
                 )
             }
-    }
 
-    @Test
-    fun `stopTransaction request`() {
-        val requestMetadata = RequestMetadata("")
-        every { chargePointOperations.stopTransaction(any(), any()) } returns OperationExecution(
-            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            StopTransactionReq(200,  Instant.parse("2022-02-15T00:00:00.000Z"),12),
-            StopTransactionResp(
-                IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Tag2")
-            )
-        )
-
-        val operations = Ocpp16Adapter(transport)
-        val request =
+        val requestStop =
             TransactionEventReq(
                 eventType = TransactionEventEnumType.Ended,
                 timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -284,20 +280,45 @@ class AdapterTest {
                 evse = EVSEType(1),
                 meterValue = listOf(
                     MeterValueType(
-                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionEnd),
-                            SampledValueType(20.0, ReadingContextEnumType.TransactionEnd, MeasurandEnumType.CurrentExport)),
+                        listOf(
+                            SampledValueType(10.0, ReadingContextEnumType.TransactionEnd),
+                            SampledValueType(
+                                20.0,
+                                ReadingContextEnumType.TransactionEnd,
+                                MeasurandEnumType.CurrentExport
+                            )
+                        ),
                         Instant.parse("2022-02-15T00:00:00.000Z")
                     ),
                     MeterValueType(
-                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionEnd, MeasurandEnumType.EnergyActiveExportRegister),
-                            SampledValueType(20.0, ReadingContextEnumType.TransactionBegin)),
+                        listOf(
+                            SampledValueType(
+                                10.0,
+                                ReadingContextEnumType.TransactionEnd,
+                                MeasurandEnumType.EnergyActiveExportRegister
+                            ),
+                            SampledValueType(20.0, ReadingContextEnumType.TransactionBegin)
+                        ),
                         Instant.parse("2022-02-15T00:00:00.000Z")
                     )
                 ),
                 idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
                 reservationId = 10
             )
-        val response = operations.transactionEvent(requestMetadata, request)
-       println(response.response)
+        val responseStop = operations.transactionEvent(requestMetadata, requestStop)
+        expectThat(responseStop)
+            .and { get { this.request }.isEqualTo(requestStop) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and {
+                get { this.response.idTokenInfo }.isEqualTo(
+                    IdTokenInfoType(
+                        status = AuthorizationStatusEnumType.Accepted,
+                        cacheExpiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        groupIdToken = IdTokenType("Tag2", IdTokenEnumType.Central)
+                    )
+                )
+            }
     }
 }
