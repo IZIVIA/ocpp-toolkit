@@ -26,6 +26,7 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
+import fr.simatix.cs.simulator.core20.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType

@@ -8,6 +8,12 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.Registrati
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ReasonEnumType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
@@ -24,6 +30,10 @@ import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
+import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
+import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
+import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
@@ -48,6 +58,7 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValu
 class AdapterTest {
     private lateinit var transport: Transport
     private lateinit var chargePointOperations: RealChargePointOperations
+
 
     @BeforeEach
     fun init() {
@@ -179,7 +190,7 @@ class AdapterTest {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.bootNotification(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            BootNotificationReq("",""),
+            BootNotificationReq("", ""),
             BootNotificationResp(
                 Instant.parse("2022-02-15T00:00:00.000Z"),
                 10,
@@ -189,7 +200,10 @@ class AdapterTest {
 
         val operations = Ocpp16Adapter(transport)
         val request =
-            BootNotificationReqGen(ChargingStationType("model", "vendor", "firmware", ModemType("a","b")), BootReasonEnumType.ApplicationReset)
+            BootNotificationReqGen(
+                ChargingStationType("model", "vendor", "firmware", ModemType("a", "b")),
+                BootReasonEnumType.ApplicationReset
+            )
         val response = operations.bootNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
@@ -200,5 +214,90 @@ class AdapterTest {
             .and { get { this.response.interval }.isEqualTo(10) }
             .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumType.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `startTransaction request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.startTransaction(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StartTransactionReq(1, "Tag1", 100, Instant.parse("2022-02-15T00:00:00.000Z")),
+            StartTransactionResp(
+                IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Tag2"), 10,
+            )
+        )
+
+        val operations = Ocpp16Adapter(transport)
+        val request =
+            TransactionEventReq(
+                eventType = TransactionEventEnumType.Started,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                triggerReason = TriggerReasonEnumType.EVDetected,
+                seqNo = 100,
+                transactionInfo = TransactionType("T1"),
+                evse = EVSEType(1),
+                meterValue = listOf(
+                    MeterValueType(
+                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionBegin)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                ),
+                idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
+                reservationId = 10
+            )
+        val response = operations.transactionEvent(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and {
+                get { this.response.idTokenInfo }.isEqualTo(
+                    IdTokenInfoType(
+                        status = AuthorizationStatusEnumType.Accepted,
+                        cacheExpiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        groupIdToken = IdTokenType("Tag2", IdTokenEnumType.Central)
+                    )
+                )
+            }
+    }
+
+    @Test
+    fun `stopTransaction request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.stopTransaction(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StopTransactionReq(200,  Instant.parse("2022-02-15T00:00:00.000Z"),12),
+            StopTransactionResp(
+                IdTagInfo(AuthorizationStatus.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"), "Tag2")
+            )
+        )
+
+        val operations = Ocpp16Adapter(transport)
+        val request =
+            TransactionEventReq(
+                eventType = TransactionEventEnumType.Ended,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                triggerReason = TriggerReasonEnumType.Deauthorized,
+                seqNo = 100,
+                transactionInfo = TransactionType("T1", stoppedReason = ReasonEnumType.Timeout),
+                evse = EVSEType(1),
+                meterValue = listOf(
+                    MeterValueType(
+                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionEnd),
+                            SampledValueType(20.0, ReadingContextEnumType.TransactionEnd, MeasurandEnumType.CurrentExport)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    ),
+                    MeterValueType(
+                        listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionEnd, MeasurandEnumType.EnergyActiveExportRegister),
+                            SampledValueType(20.0, ReadingContextEnumType.TransactionBegin)),
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                ),
+                idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
+                reservationId = 10
+            )
+        val response = operations.transactionEvent(requestMetadata, request)
+       println(response.response)
     }
 }

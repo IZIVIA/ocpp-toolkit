@@ -13,12 +13,19 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import io.simatix.ev.ocpp.OcppVersion
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import java.lang.Thread.sleep
 
 fun heartbeat(csmsApi: CSMSApi, ocppId: String, request: HeartbeatReq) {
     val requestMetadata = RequestMetadata(ocppId)
@@ -48,6 +55,12 @@ fun bootNotification(csmsApi: CSMSApi, ocppId: String, request: BootNotification
     val requestMetadata = RequestMetadata(ocppId)
     val response = csmsApi.bootNotification(requestMetadata, request)
     println("BootNotification: $response\n")
+}
+
+fun transactionEvent(csmsApi: CSMSApi, ocppId: String, request: TransactionEventReq) {
+    val requestMetadata = RequestMetadata(ocppId)
+    val response = csmsApi.transactionEvent(requestMetadata, request)
+    println("TransactionEvent: $response\n")
 }
 
 fun main(args: Array<String>) {
@@ -90,4 +103,42 @@ fun main(args: Array<String>) {
     )
 
     dataTransfer(csmsApi, ocppId, DataTransferReq("vendor", "msgId12", "Hello"))
+
+    transactionEvent(
+        csmsApi, ocppId, TransactionEventReq(
+            eventType = TransactionEventEnumType.Started,
+            timestamp = Clock.System.now(),
+            triggerReason = TriggerReasonEnumType.Authorized,
+            seqNo = 0,
+            transactionInfo = TransactionType("2"),
+            meterValue = listOf(
+                MeterValueType(
+                    listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionBegin)),
+                    Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ),
+            idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
+            evse = EVSEType(1, 1)
+        )
+    )
+
+    sleep(10000)
+
+    transactionEvent(
+        csmsApi, ocppId, TransactionEventReq(
+            eventType = TransactionEventEnumType.Ended,
+            timestamp = Clock.System.now(),
+            triggerReason = TriggerReasonEnumType.Authorized,
+            seqNo = 0,
+            transactionInfo = TransactionType("2"),
+            meterValue = listOf(
+                MeterValueType(
+                    listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionEnd)),
+                    Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ),
+            idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
+            evse = EVSEType(1, 1)
+        )
+    )
 }

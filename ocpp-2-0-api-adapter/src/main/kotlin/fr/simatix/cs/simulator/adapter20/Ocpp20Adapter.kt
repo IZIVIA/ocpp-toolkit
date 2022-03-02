@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -77,5 +79,15 @@ class Ocpp20Adapter(transport: Transport) : CSMSApi {
     ): OperationExecution<BootNotificationReq, BootNotificationResp> {
         val mapper: BootNotificationMapper = Mappers.getMapper(BootNotificationMapper::class.java)
         val response = operations.bootNotification(meta, mapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))    }
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun transactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: TransactionEventMapper = Mappers.getMapper(TransactionEventMapper::class.java)
+        val response = operations.transactionEvent(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 }

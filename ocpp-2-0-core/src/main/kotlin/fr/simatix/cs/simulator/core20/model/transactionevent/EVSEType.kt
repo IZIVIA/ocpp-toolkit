@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20.model.common
+package fr.simatix.cs.simulator.core20.model.transactionevent
 
 data class EVSEType(
     val id: Int,

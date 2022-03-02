@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 
@@ -21,8 +23,18 @@ interface CSMSApi {
 
     fun meterValues(meta: RequestMetadata, request: MeterValuesReq): OperationExecution<MeterValuesReq, MeterValuesResp>
 
-    fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
+    fun dataTransfer(
+        meta: RequestMetadata,
+        request: DataTransferReq
+    ): OperationExecution<DataTransferReq, DataTransferResp>
 
-    fun bootNotification(meta: RequestMetadata, request: BootNotificationReq): OperationExecution<BootNotificationReq, BootNotificationResp>
+    fun bootNotification(
+        meta: RequestMetadata,
+        request: BootNotificationReq
+    ): OperationExecution<BootNotificationReq, BootNotificationResp>
 
+    fun transactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp>
 }

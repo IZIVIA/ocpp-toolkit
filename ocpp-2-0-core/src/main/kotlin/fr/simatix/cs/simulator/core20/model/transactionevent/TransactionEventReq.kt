@@ -2,7 +2,6 @@ package fr.simatix.cs.simulator.core20.model.transactionevent
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import fr.simatix.cs.simulator.core20.model.common.EVSEType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
 import fr.simatix.cs.simulator.core20.model.common.MeterValueType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType

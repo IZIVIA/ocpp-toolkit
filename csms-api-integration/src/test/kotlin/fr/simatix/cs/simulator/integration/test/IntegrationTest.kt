@@ -5,15 +5,17 @@ import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
-import fr.simatix.cs.simulator.api.model.common.IdTokenType
-import fr.simatix.cs.simulator.api.model.common.MeterValueType
-import fr.simatix.cs.simulator.api.model.common.SampledValueType
-import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
+import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -195,13 +197,48 @@ class IntegrationTest {
         val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
 
         val requestMetadata = RequestMetadata(ocppId)
-        val request = BootNotificationReq(ChargingStationType("model","vendor","firmware"),BootReasonEnumType.ApplicationReset)
+        val request =
+            BootNotificationReq(ChargingStationType("model", "vendor", "firmware"), BootReasonEnumType.ApplicationReset)
         val response = csmsApi.bootNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
             .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
             .and { get { this.response.interval }.isEqualTo(10) }
             .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumType.Accepted) }
+    }
+
+    @Test
+    fun `start transaction 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"idTagInfo\" : { \"expiryDate\" : \"2022-02-15T00:00:00.000Z\", \"status\" : \"Accepted\"}, \"transactionId\" : 100}",
+            action = "startTransaction"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = TransactionEventReq(
+            eventType = TransactionEventEnumType.Started,
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            triggerReason = TriggerReasonEnumType.Authorized,
+            seqNo = 0,
+            transactionInfo = TransactionType("1"),
+            meterValue = listOf(MeterValueType(listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionBegin)), Instant.parse("2022-02-15T00:00:00.000Z"))),
+            idToken = IdTokenType("Tag1",IdTokenEnumType.Central),
+            evse = EVSEType(1,1)
+        )
+        val response = csmsApi.transactionEvent(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.totalCost }.isEqualTo(null) }
+            .and { get { this.response.chargingPriority }.isEqualTo(0) }
+            .and { get { this.response.idTokenInfo }.isEqualTo(IdTokenInfoType(AuthorizationStatusEnumType.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"))) }
+            .and { get { this.response.updatedPersonalMessage }.isEqualTo(null) }
     }
 
 }

@@ -22,14 +22,21 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootRea
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenInfoType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
+import fr.simatix.cs.simulator.core20.model.common.MessageContentType
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
+import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType
+import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
@@ -55,7 +62,12 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusEnumType as AuthorizationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
-
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as TransactionTypeGen
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -210,5 +222,63 @@ class AdapterTest {
             .and { get { this.response.interval }.isEqualTo(10) }
             .and { get { this.response.status }.isEqualTo(RegistrationStatusEnumTypeGen.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `transactionEvent request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.transactionEvent(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            TransactionEventReq(
+                TransactionEventEnumType.Started,
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                TriggerReasonEnumType.Authorized,
+                0,
+                TransactionType("tr")
+            ),
+            TransactionEventResp(
+                totalCost = 100.0,
+                chargingPriority = -1,
+                idTokenInfo = IdTokenInfoType(
+                    AuthorizationStatusEnumType.Accepted,
+                    Instant.parse("2022-02-15T00:00:00.000Z")
+                ),
+                updatedPersonalMessage = MessageContentType(MessageFormatEnumType.ASCII, "Hello")
+            )
+        )
+
+        val operations = Ocpp20Adapter(transport)
+        val request =
+            TransactionEventReqGen(
+                TransactionEventEnumTypeGen.Started,
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                TriggerReasonEnumTypeGen.Authorized,
+                0,
+                TransactionTypeGen("tr")
+            )
+        val response = operations.transactionEvent(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            .and { get { this.response.totalCost }.isEqualTo(100.0) }
+            .and { get { this.response.chargingPriority }.isEqualTo(-1) }
+            .and {
+                get { this.response.idTokenInfo }.isEqualTo(
+                    IdTokenInfoTypeGen(
+                        AuthorizationStatusEnumTypeGen.Accepted,
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            }
+            .and {
+                get { this.response.updatedPersonalMessage }.isEqualTo(
+                    MessageContentTypeGen(
+                        MessageFormatEnumTypeGen.ASCII,
+                        "Hello"
+                    )
+                )
+            }
     }
 }

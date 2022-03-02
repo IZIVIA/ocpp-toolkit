@@ -20,4 +20,6 @@ dependencies {
     implementation(project(":ocpp-2-0-api-adapter"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-transport"))
+    implementation(project(":operation-information"))
+
 }
