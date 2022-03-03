@@ -63,6 +63,12 @@ fun transactionEvent(csmsApi: CSMSApi, ocppId: String, request: TransactionEvent
     println("TransactionEvent: $response\n")
 }
 
+fun statusNotification(csmsApi: CSMSApi, ocppId: String, request: StatusNotificationReq) {
+    val requestMetadata = RequestMetadata(ocppId)
+    val response = csmsApi.statusNotification(requestMetadata, request)
+    println("StatusNotification: $response\n")
+}
+
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
         throw IllegalArgumentException("1 argument is required")
@@ -122,7 +128,33 @@ fun main(args: Array<String>) {
         )
     )
 
-    sleep(10000)
+    sleep(8000)
+
+    transactionEvent(
+        csmsApi, ocppId, TransactionEventReq(
+            eventType = TransactionEventEnumType.Updated,
+            timestamp = Clock.System.now(),
+            triggerReason = TriggerReasonEnumType.Authorized,
+            seqNo = 0,
+            transactionInfo = TransactionType("2", chargingState = ChargingStateEnumType.Charging),
+            evse = EVSEType(1)
+        )
+    )
+
+    sleep(8000)
+
+    statusNotification(
+        csmsApi,
+        ocppId,
+        StatusNotificationReq(
+            connectorId = 1,
+            connectorStatus = ConnectorStatusEnumType.Faulted,
+            evseId = 1,
+            timestamp = Clock.System.now(),
+            errorCode = ChargePointErrorCode.EVCommunicationError
+        )
+    )
+    sleep(8000)
 
     transactionEvent(
         csmsApi, ocppId, TransactionEventReq(

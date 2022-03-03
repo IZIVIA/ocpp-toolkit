@@ -32,6 +32,9 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransfe
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
@@ -58,16 +61,18 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReason
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType as RegistrationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenInfoType as IdTokenInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
+import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusEnumType as AuthorizationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as TransactionTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -281,4 +286,34 @@ class AdapterTest {
                 )
             }
     }
+
+    @Test
+    fun `statusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.statusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StatusNotificationReq(
+                connectorId = 1,
+                connectorStatus = ConnectorStatusEnumType.Available,
+                evseId = 2,
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+            ),
+            StatusNotificationResp()
+        )
+
+        val operations = Ocpp20Adapter(transport)
+        val request = StatusNotificationReqGen(
+            connectorId = 1,
+            connectorStatus = ConnectorStatusEnumTypeGen.Available,
+            evseId = 2,
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+        )
+        val response = operations.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
 }

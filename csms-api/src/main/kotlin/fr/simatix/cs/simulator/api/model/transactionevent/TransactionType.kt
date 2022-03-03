@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.api.model.transactionevent
 
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ReasonEnumType
 
@@ -8,5 +9,6 @@ data class TransactionType(
     val chargingState: ChargingStateEnumType? = null,
     val timeSpentCharging: Int? = null,
     val stoppedReason: ReasonEnumType? = null,
-    val remoteStartId: Int? = null
+    val remoteStartId: Int? = null,
+    val errorCode: ChargePointErrorCode = ChargePointErrorCode.NoError
 )

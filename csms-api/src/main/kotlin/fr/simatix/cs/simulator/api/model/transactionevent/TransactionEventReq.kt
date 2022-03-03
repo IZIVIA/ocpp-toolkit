@@ -4,7 +4,6 @@ import fr.simatix.cs.simulator.api.model.common.IdTokenType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
-
 import kotlinx.datetime.Instant
 
 data class TransactionEventReq(
@@ -19,5 +18,5 @@ data class TransactionEventReq(
     val meterValue: List<MeterValueType>? = null,
     val numberOfPhasesUsed: Int? = null,
     val offline: Boolean? = false,
-    val reservationId: Int? = null
+    val reservationId: Int? = null,
 )

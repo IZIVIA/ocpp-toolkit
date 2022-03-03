@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
@@ -82,32 +84,63 @@ class Ocpp16Adapter(transport: Transport, private val transactionIds: Transactio
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 
+    private fun updateTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenRespTransac(response.response))
+    }
+
+    private fun stopTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: StopTransactionMapper = Mappers.getMapper(StopTransactionMapper::class.java)
+        val transactionId =
+            transactionIds.getTransactionIdsByLocalId(request.transactionInfo.transactionId).csmsId
+        val response = operations.stopTransaction(meta, mapper.genToCoreReq(request, transactionId))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    private fun startTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: StartTransactionMapper = Mappers.getMapper(StartTransactionMapper::class.java)
+        val response = operations.startTransaction(meta, mapper.genToCoreReq(request))
+        transactionIds.saveTransactionIds(
+            Ocpp16TransactionIds(
+                request.transactionInfo.transactionId,
+                response.response.transactionId
+            )
+        )
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
     override fun transactionEvent(
         meta: RequestMetadata,
         request: TransactionEventReq
     ): OperationExecution<TransactionEventReq, TransactionEventResp> =
         when (request.eventType) {
             TransactionEventEnumType.Started -> {
-                val mapper: StartTransactionMapper = Mappers.getMapper(StartTransactionMapper::class.java)
-                val response = operations.startTransaction(meta, mapper.genToCoreReq(request))
-                transactionIds.saveTransactionIds(
-                    Ocpp16TransactionIds(
-                        request.transactionInfo.transactionId,
-                        response.response.transactionId
-                    )
-                )
-                OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+                startTransactionEvent(meta, request)
             }
             TransactionEventEnumType.Ended -> {
-                val mapper: StopTransactionMapper = Mappers.getMapper(StopTransactionMapper::class.java)
-                val transactionId =
-                    transactionIds.getTransactionIdsByLocalId(request.transactionInfo.transactionId).csmsId
-                val response = operations.stopTransaction(meta, mapper.genToCoreReq(request, transactionId))
-                OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+                stopTransactionEvent(meta, request)
             }
             TransactionEventEnumType.Updated -> {
-                TODO()
+                updateTransactionEvent(meta, request)
             }
         }
 
+    override fun statusNotification(
+        meta: RequestMetadata,
+        request: StatusNotificationReq
+    ): OperationExecution<StatusNotificationReq, StatusNotificationResp> {
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 }

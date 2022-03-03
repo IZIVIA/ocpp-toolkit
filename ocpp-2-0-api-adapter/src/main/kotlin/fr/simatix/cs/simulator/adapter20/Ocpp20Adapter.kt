@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
@@ -90,4 +92,13 @@ class Ocpp20Adapter(transport: Transport) : CSMSApi {
         val response = operations.transactionEvent(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
+
+    override fun statusNotification(
+        meta: RequestMetadata,
+        request: StatusNotificationReq
+    ): OperationExecution<StatusNotificationReq, StatusNotificationResp> {
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))    }
+
 }

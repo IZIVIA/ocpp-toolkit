@@ -3,6 +3,7 @@ package fr.simatix.cs.simulator.adapter16.mapper
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.*
@@ -105,5 +106,18 @@ abstract class CommonMapper {
     @Named("convertIdTokenType")
     fun convertIdTokenType(idToken: IdTokenType?): String =
         idToken?.idToken
-            ?: throw IllegalArgumentException("Argument idToken is required in OCPP 1.6 to start a transaction")
+            ?: throw IllegalArgumentException("Argument idToken is required in OCPP 1.6 to start/update a transaction")
+
+    @Named("convertEVSEType")
+    fun convertEVSEType(evse: EVSEType?): Int =
+        if (evse != null) {
+            if (evse.connectorId != null && evse.connectorId != evse.id) {
+                throw IllegalArgumentException("Argument evse can't have different id and connectorId : ${evse.id} != ${evse.connectorId}")
+            } else {
+                evse.id
+            }
+        } else {
+            throw IllegalArgumentException("Argument evse is required in OCPP 1.6 to start a transaction")
+        }
+
 }

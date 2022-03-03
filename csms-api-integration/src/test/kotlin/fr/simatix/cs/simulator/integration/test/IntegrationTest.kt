@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
@@ -57,7 +59,7 @@ class IntegrationTest {
     }
 
     @Test
-    fun `heartbeat 1-6 request`() {
+    fun `heartbeat request`() {
 
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
@@ -101,7 +103,7 @@ class IntegrationTest {
     }
 
     @Test
-    fun `meterValues 1-6 request`() {
+    fun `meterValues request`() {
 
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
@@ -239,6 +241,29 @@ class IntegrationTest {
             .and { get { this.response.chargingPriority }.isEqualTo(0) }
             .and { get { this.response.idTokenInfo }.isEqualTo(IdTokenInfoType(AuthorizationStatusEnumType.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"))) }
             .and { get { this.response.updatedPersonalMessage }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `status notification request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "statusNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = StatusNotificationReq(
+            1,ConnectorStatusEnumType.Occupied,1, Instant.parse("2022-02-15T00:00:00.000Z")
+        )
+        val response = csmsApi.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 
 }

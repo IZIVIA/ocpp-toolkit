@@ -9,9 +9,13 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.Registrati
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
+import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ReasonEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
@@ -33,6 +37,9 @@ import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
+import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.ChargePointErrorCode
+import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.ChargePointStatus
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
@@ -54,7 +61,7 @@ import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
-
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -218,7 +225,7 @@ class AdapterTest {
     }
 
     @Test
-    fun `startTransaction and stop request`() {
+    fun `startTransaction and stopTransaction request`() {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.startTransaction(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
@@ -319,6 +326,57 @@ class AdapterTest {
                         groupIdToken = IdTokenType("Tag2", IdTokenEnumType.Central)
                     )
                 )
+            }
+    }
+
+    @Test
+    fun `statusNotification request with transactionEvent`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.statusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StatusNotificationReq(1,ChargePointErrorCode.NoError,ChargePointStatus.Available),
+            StatusNotificationResp()
+        )
+
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val request =  TransactionEventReq(
+            eventType = TransactionEventEnumType.Updated,
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            triggerReason = TriggerReasonEnumType.Deauthorized,
+            seqNo = 100,
+            evse = EVSEType(10),
+            transactionInfo = TransactionType("T1", ChargingStateEnumType.Charging, errorCode = ChargePointErrorCodeGen.EVCommunicationError),
+        )
+        val response = operations.transactionEvent(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `statusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.statusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            StatusNotificationReq(1,ChargePointErrorCode.NoError,ChargePointStatus.Available),
+            StatusNotificationResp()
+        )
+
+        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val request = StatusNotificationReqGen(
+            connectorId = 1,
+            connectorStatus = ConnectorStatusEnumType.Available,
+            evseId = 2,
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            errorCode = ChargePointErrorCodeGen.EVCommunicationError
+        )
+        val response = operations.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
             }
     }
 }
