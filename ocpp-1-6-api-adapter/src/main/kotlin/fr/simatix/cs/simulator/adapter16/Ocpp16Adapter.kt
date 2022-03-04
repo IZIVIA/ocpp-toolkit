@@ -19,6 +19,8 @@ import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.plus
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
@@ -93,6 +95,22 @@ class Ocpp16Adapter(transport: Transport, private val transactionIds: Transactio
         return OperationExecution(response.executionMeta, request, mapper.coreToGenRespTransac(response.response))
     }
 
+    private fun updateStatusEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq,
+        responseMeta: ExecutionMetadata
+    ): ExecutionMetadata {
+        var executionMetadata = responseMeta
+        if (request.transactionInfo.chargingState != null) {
+            // Add 1ms to the timestamp so that the statusNotification request timestamp
+            // is the latest one compare to the previous request timestamp
+            request.timestamp = request.timestamp.plus(1, DateTimeUnit.MILLISECOND)
+            val updateResponse = updateTransactionEvent(meta, request)
+            executionMetadata = executionMetadata.combine(updateResponse.executionMeta)
+        }
+        return executionMetadata
+    }
+
     private fun stopTransactionEvent(
         meta: RequestMetadata,
         request: TransactionEventReq
@@ -101,8 +119,10 @@ class Ocpp16Adapter(transport: Transport, private val transactionIds: Transactio
         val transactionId =
             transactionIds.getTransactionIdsByLocalId(request.transactionInfo.transactionId).csmsId
         val response = operations.stopTransaction(meta, mapper.genToCoreReq(request, transactionId))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        val executionMetadata = updateStatusEvent(meta, request, response.executionMeta)
+        return OperationExecution(executionMetadata, request, mapper.coreToGenResp(response.response))
     }
+
 
     private fun startTransactionEvent(
         meta: RequestMetadata,
@@ -116,7 +136,8 @@ class Ocpp16Adapter(transport: Transport, private val transactionIds: Transactio
                 response.response.transactionId
             )
         )
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        val executionMetadata = updateStatusEvent(meta, request, response.executionMeta)
+        return OperationExecution(executionMetadata, request, mapper.coreToGenResp(response.response))
     }
 
     override fun transactionEvent(

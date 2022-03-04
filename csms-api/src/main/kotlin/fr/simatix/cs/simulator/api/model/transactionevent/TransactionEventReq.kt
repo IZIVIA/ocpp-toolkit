@@ -8,7 +8,7 @@ import kotlinx.datetime.Instant
 
 data class TransactionEventReq(
     val eventType: TransactionEventEnumType,
-    val timestamp: Instant,
+    var timestamp: Instant,
     val triggerReason: TriggerReasonEnumType,
     val seqNo: Int,
     val transactionInfo: TransactionType,

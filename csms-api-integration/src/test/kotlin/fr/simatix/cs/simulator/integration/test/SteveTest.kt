@@ -13,9 +13,13 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
+import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
 import fr.simatix.cs.simulator.integration.CSMSApiFactory
@@ -116,7 +120,7 @@ fun main(args: Array<String>) {
             timestamp = Clock.System.now(),
             triggerReason = TriggerReasonEnumType.Authorized,
             seqNo = 0,
-            transactionInfo = TransactionType("2"),
+            transactionInfo = TransactionType("2", chargingState = ChargingStateEnumType.EVConnected),
             meterValue = listOf(
                 MeterValueType(
                     listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionBegin)),
@@ -162,7 +166,7 @@ fun main(args: Array<String>) {
             timestamp = Clock.System.now(),
             triggerReason = TriggerReasonEnumType.Authorized,
             seqNo = 0,
-            transactionInfo = TransactionType("2"),
+            transactionInfo = TransactionType("2",ChargingStateEnumType.SuspendedEVSE),
             meterValue = listOf(
                 MeterValueType(
                     listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionEnd)),
