@@ -2,6 +2,10 @@ package fr.simatix.cs.simulator.websocket.test
 
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
+import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.common.IdTokenInfoType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.websocket.WebsocketClient
 import io.mockk.every
 import io.mockk.mockk
@@ -11,7 +15,11 @@ import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.client.OcppWampClient
 import io.simatix.ev.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
 import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import io.simatix.ev.ocpp.wamp.server.OcppWampServer
+import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectCatching
@@ -73,6 +81,41 @@ class WebsocketTest {
         expectCatching { websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq()) }
             .isFailure()
             .isA<IllegalStateException>()
+    }
+
+    @Test
+    fun `receiveMessageClass success`() {
+
+        val port = 12345
+
+        val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        server.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: String): Boolean = "chargePoint2" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =  null
+        })
+        server.start()
+
+        try {
+            val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6,"ws://localhost:$port/ws")
+
+
+            val heartbeatFun : (HeartbeatReq) -> HeartbeatResp = { HeartbeatResp(Clock.System.now()) }
+            websocketClient.receiveMessageClass(HeartbeatReq::class, "heartbeat", heartbeatFun)
+
+            val authorizeFun : (AuthorizeReq) -> AuthorizeResp = { AuthorizeResp(IdTokenInfoType(AuthorizationStatusEnumType.Blocked)) }
+            websocketClient.receiveMessageClass(AuthorizeReq::class, "authorize", authorizeFun)
+
+            websocketClient.connect()
+
+            server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL,"1","authorize","{\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"))
+
+            server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL,"2","heartbeat","{}"))
+
+            websocketClient.close()
+        } finally {
+            server.stop()
+        }
     }
 
 }

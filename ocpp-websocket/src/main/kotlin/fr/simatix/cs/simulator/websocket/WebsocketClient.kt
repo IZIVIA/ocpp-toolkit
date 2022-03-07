@@ -5,6 +5,8 @@ import fr.simatix.cs.simulator.transport.Transport
 import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.client.OcppWampClient
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
+import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import org.http4k.core.Uri
 import java.net.ConnectException
 import java.util.*
@@ -15,6 +17,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
     private val mapper = jacksonObjectMapper()
+    private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 
     override fun connect(): Unit = client.connect()
 
@@ -36,5 +39,17 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             close()
         }
 
+    override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, fn: (T) -> P) {
+        val handler: (WampMessageMeta, WampMessage) -> WampMessage? = { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
+            if (msgMeta == wampMessageMeta && wampMsg.action == action) {
+                val response = fn(mapper.readValue(wampMsg.payload, clazz.java))
+                val payload = mapper.writeValueAsString(response)
+                WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, wampMsg.action, payload)
+            } else {
+                null
+            }
+        }
+        client.onAction(handler)
+    }
 }
 
