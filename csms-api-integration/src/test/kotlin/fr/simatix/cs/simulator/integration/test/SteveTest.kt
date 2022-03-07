@@ -22,7 +22,7 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
-import fr.simatix.cs.simulator.integration.CSMSApiFactory
+import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
@@ -80,7 +80,7 @@ fun main(args: Array<String>) {
 
     val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = args[0])
     val ocppId = "chargePoint2"
-    val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+    val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
 
     heartbeat(csmsApi, ocppId, HeartbeatReq())
 
