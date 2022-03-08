@@ -27,7 +27,6 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P =
         try {
             val msgId: String = UUID.randomUUID().toString()
-            connect()
             val response = client.sendBlocking(WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
             if (response.msgId != msgId) {
                 throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected")
@@ -35,8 +34,6 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             mapper.readValue(response.payload, clazz.java)
         } catch (e: Exception) {
             throw e
-        } finally {
-            close()
         }
 
     override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, fn: (T) -> P) {

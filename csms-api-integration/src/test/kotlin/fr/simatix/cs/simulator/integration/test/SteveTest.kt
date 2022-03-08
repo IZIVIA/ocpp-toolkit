@@ -72,7 +72,7 @@ fun statusNotification(csmsApi: CSMSApi, ocppId: String, request: StatusNotifica
     val response = csmsApi.statusNotification(requestMetadata, request)
     println("StatusNotification: $response\n")
 }
-
+/*
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
         throw IllegalArgumentException("1 argument is required")
@@ -178,3 +178,4 @@ fun main(args: Array<String>) {
         )
     )
 }
+*/

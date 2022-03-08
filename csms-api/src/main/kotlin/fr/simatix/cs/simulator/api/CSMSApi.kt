@@ -19,6 +19,10 @@ import fr.simatix.cs.simulator.operation.information.RequestMetadata
 
 interface CSMSApi {
 
+    fun connect()
+
+    fun close()
+
     fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): OperationExecution<HeartbeatReq, HeartbeatResp>
 
     fun authorize(meta: RequestMetadata, request: AuthorizeReq): OperationExecution<AuthorizeReq, AuthorizeResp>

@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter16
 
 import fr.simatix.cs.simulator.adapter16.mapper.*
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationResp
@@ -29,13 +30,22 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp as AuthorizeRes
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp16Adapter(transport: Transport, private val transactionIds: TransactionRepository) : CSMSApi {
+class Ocpp16Adapter(private val transport: Transport, private val csApi: CSApi, private val transactionIds: TransactionRepository) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp16Adapter::class.java)
     }
 
     private val operations = ChargePointOperations.newChargePointOperations(transport)
+
+    override fun connect() {
+        Ocpp16CSApiAdapter(transport, csApi)
+        transport.connect()
+    }
+
+    override fun close() {
+        transport.close()
+    }
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(

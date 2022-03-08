@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter20
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
@@ -26,13 +27,22 @@ import java.net.ConnectException
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp20Adapter(transport: Transport) : CSMSApi {
+class Ocpp20Adapter(private val transport: Transport, private val csApi: CSApi) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp20Adapter::class.java)
     }
 
     private val operations = ChargePointOperations.newChargePointOperations(transport)
+
+    override fun connect() {
+        Ocpp20CSApiAdapter(transport,csApi)
+        transport.connect()
+    }
+
+    override fun close() {
+        transport.close()
+    }
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(

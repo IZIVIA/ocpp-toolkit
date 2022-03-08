@@ -40,7 +40,7 @@ import strikt.assertions.isEqualTo
 import java.util.*
 
 class IntegrationTest {
-
+/*
     private lateinit var ocppWampClient: OkHttpOcppWampClient
 
     @BeforeEach
@@ -265,5 +265,5 @@ class IntegrationTest {
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
-
+*/
 }

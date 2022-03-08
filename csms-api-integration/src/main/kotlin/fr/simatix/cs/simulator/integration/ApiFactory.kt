@@ -1,10 +1,8 @@
 package fr.simatix.cs.simulator.integration
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
-import fr.simatix.cs.simulator.adapter16.Ocpp16CSApiAdapter
 import fr.simatix.cs.simulator.adapter16.impl.RealTransactionRepository
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
-import fr.simatix.cs.simulator.adapter20.Ocpp20CSApiAdapter
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.integration.model.Settings
@@ -26,23 +24,13 @@ class ApiFactory {
                 TransportEnum.SOAP -> WebsocketClient(ocppId, ocppVersion, target)
             }
 
-        fun getCSMSApi(settings: Settings, ocppId: String): CSMSApi {
+        fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
             val transport: Transport =
                 createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
             return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
-                Ocpp16Adapter(transport, RealTransactionRepository())
+                Ocpp16Adapter(transport, csApi, RealTransactionRepository())
             } else {
-                Ocpp20Adapter(transport)
-            }
-        }
-
-        fun getCSApi(settings: Settings, ocppId: String): CSApi {
-            val transport: Transport =
-                createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
-            return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
-                Ocpp16CSApiAdapter(transport)
-            } else {
-                Ocpp20CSApiAdapter(transport)
+                Ocpp20Adapter(transport, csApi)
             }
         }
     }
