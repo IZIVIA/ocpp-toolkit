@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.integration.test
 
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
@@ -11,6 +12,9 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
@@ -21,6 +25,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerRea
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import io.mockk.every
@@ -40,8 +46,17 @@ import strikt.assertions.isEqualTo
 import java.util.*
 
 class IntegrationTest {
-/*
+
     private lateinit var ocppWampClient: OkHttpOcppWampClient
+    private val csApi: CSApi = object : CSApi {
+        override fun connect() {}
+        override fun close() {}
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,
+                ResetResp(ResetStatusEnumType.Accepted)
+            )
+        }
+    }
 
     @BeforeEach
     fun init() {
@@ -70,7 +85,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = HeartbeatReq()
@@ -91,7 +106,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = AuthorizeReq(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
@@ -114,7 +129,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = MeterValuesReq(
@@ -172,7 +187,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = DataTransferReq("vendor", "msgId12", "Hello")
@@ -196,7 +211,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request =
@@ -221,7 +236,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = TransactionEventReq(
@@ -255,7 +270,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = StatusNotificationReq(
@@ -265,5 +280,5 @@ class IntegrationTest {
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
-*/
+
 }

@@ -36,7 +36,7 @@ class Ocpp20Adapter(private val transport: Transport, private val csApi: CSApi) 
     private val operations = ChargePointOperations.newChargePointOperations(transport)
 
     override fun connect() {
-        Ocpp20CSApiAdapter(transport,csApi)
+        Ocpp20CSApiAdapter(transport, csApi)
         transport.connect()
     }
 

@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.integration.test
 
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
@@ -13,6 +14,9 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -25,7 +29,10 @@ import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerRea
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import io.simatix.ev.ocpp.OcppVersion
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -72,7 +79,7 @@ fun statusNotification(csmsApi: CSMSApi, ocppId: String, request: StatusNotifica
     val response = csmsApi.statusNotification(requestMetadata, request)
     println("StatusNotification: $response\n")
 }
-/*
+
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
         throw IllegalArgumentException("1 argument is required")
@@ -80,7 +87,20 @@ fun main(args: Array<String>) {
 
     val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = args[0])
     val ocppId = "chargePoint2"
-    val csmsApi = ApiFactory.getCSMSApi(settings, ocppId)
+    val csApi: CSApi = object : CSApi {
+        override fun connect() {}
+        override fun close() {}
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),req,
+                ResetResp(ResetStatusEnumType.Accepted)
+            )
+        }
+    }
+
+    val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+
+    csmsApi.connect()
 
     heartbeat(csmsApi, ocppId, HeartbeatReq())
 
@@ -177,5 +197,6 @@ fun main(args: Array<String>) {
             evse = EVSEType(1, 1)
         )
     )
+
+    csmsApi.close()
 }
-*/

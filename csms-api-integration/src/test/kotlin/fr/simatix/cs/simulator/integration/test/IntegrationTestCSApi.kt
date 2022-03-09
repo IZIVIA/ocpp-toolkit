@@ -9,7 +9,10 @@ import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.operation.information.RequestStatus
 import io.simatix.ev.ocpp.OcppVersion
 import io.simatix.ev.ocpp.wamp.messages.WampMessage
 import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
@@ -53,14 +56,25 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
         val csApi = object : CSApi {
-            override fun reset(req: ResetReq): ResetResp =
-                if (req.type == ResetEnumType.Immediate) {
+            override fun connect() {
+                // DO nothing
+            }
+
+            override fun close() {
+                //Do nothing
+            }
+
+            override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+                val response = if (req.type == ResetEnumType.Immediate) {
                     ResetResp(ResetStatusEnumType.Scheduled)
                 } else {
                     ResetResp(ResetStatusEnumType.Rejected)
                 }
+                return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+            }
+
         }
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         csmsApi.connect()
 
@@ -87,14 +101,25 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
         val csApi = object : CSApi {
-            override fun reset(req: ResetReq): ResetResp =
-                if (req.type == ResetEnumType.Immediate) {
+            override fun connect() {
+                // DO nothing
+            }
+
+            override fun close() {
+                //Do nothing
+            }
+
+            override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+                val response = if (req.type == ResetEnumType.Immediate) {
                     ResetResp(ResetStatusEnumType.Scheduled)
                 } else {
                     ResetResp(ResetStatusEnumType.Rejected)
                 }
+                return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+            }
+
         }
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         csmsApi.connect()
 

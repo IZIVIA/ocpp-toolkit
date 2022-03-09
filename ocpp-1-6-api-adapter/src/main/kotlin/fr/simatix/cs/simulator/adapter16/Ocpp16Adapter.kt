@@ -36,7 +36,7 @@ class Ocpp16Adapter(private val transport: Transport, private val csApi: CSApi, 
         private val logger = LoggerFactory.getLogger(Ocpp16Adapter::class.java)
     }
 
-    private val operations = ChargePointOperations.newChargePointOperations(transport)
+    private val operations: ChargePointOperations = ChargePointOperations.newChargePointOperations(transport)
 
     override fun connect() {
         Ocpp16CSApiAdapter(transport, csApi)

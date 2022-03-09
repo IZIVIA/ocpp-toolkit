@@ -3,24 +3,29 @@ package fr.simatix.cs.simulator.adapter16
 import fr.simatix.cs.simulator.adapter16.mapper.ResetMapper
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.core16.CSMSOperations
+import fr.simatix.cs.simulator.core16.OperationsHandler
+import fr.simatix.cs.simulator.core16.impl.RealCSMSOperations
 import fr.simatix.cs.simulator.core16.model.reset.ResetReq
 import fr.simatix.cs.simulator.core16.model.reset.ResetResp
+import fr.simatix.cs.simulator.core16.model.reset.enumeration.ResetType
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.transport.Transport
 import org.mapstruct.factory.Mappers
 
-class Ocpp16CSApiAdapter(transport: Transport, private val csApi: CSApi){
+class Ocpp16CSApiAdapter(transport: Transport, val csApi: CSApi) {
 
-    private val operations = CSMSOperations.newCSMSOperations(transport)
-
-    init {
-        reset()
+    private val handlers: OperationsHandler = object : OperationsHandler {
+        override val reset: (ResetReq) -> ResetResp = { req: ResetReq ->
+            val meta = RequestMetadata("")
+            val mapper: ResetMapper = Mappers.getMapper(ResetMapper::class.java)
+            mapper.genToCoreResp(csApi.reset(meta, mapper.coreToGenReq(req)).response)
+        }
     }
 
-    private fun reset() {
-        val fn16 : (ResetReq) -> ResetResp = { req: ResetReq ->
-            val mapper: ResetMapper = Mappers.getMapper(ResetMapper::class.java)
-            mapper.genToCoreResp(csApi.reset(mapper.coreToGenReq(req)))
-        }
-        operations.reset(fn16)
+    private val csmsOperations: CSMSOperations = RealCSMSOperations(transport, handlers)
+
+    init {
+        val meta = RequestMetadata("")
+        csmsOperations.reset(meta, ResetReq(ResetType.Hard))
     }
 }

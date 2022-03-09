@@ -1,15 +1,11 @@
 package fr.simatix.cs.simulator.core20
 
-import fr.simatix.cs.simulator.core20.impl.RealCSMSOperations
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
-import fr.simatix.cs.simulator.transport.Transport
+import fr.simatix.cs.simulator.operation.information.OperationExecution
+import fr.simatix.cs.simulator.operation.information.RequestMetadata
 
 interface CSMSOperations {
 
-    companion object {
-        fun newCSMSOperations(transport: Transport) = RealCSMSOperations(transport)
-    }
-
-    fun reset(fn: (ResetReq) -> ResetResp)
+    fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 }
