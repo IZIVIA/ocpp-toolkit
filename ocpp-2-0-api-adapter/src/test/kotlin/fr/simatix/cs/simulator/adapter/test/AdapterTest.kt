@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.common.SampledValueType
@@ -11,6 +12,9 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.PhaseEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
@@ -78,12 +82,22 @@ class AdapterTest {
     private lateinit var transport: Transport
     private lateinit var chargePointOperations: RealChargePointOperations
 
+    private val csApi: CSApi = object : CSApi {
+
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS), req,
+                ResetResp(ResetStatusEnumType.Accepted)
+            )
+        }
+    }
+
     @BeforeEach
     fun init() {
         transport = mockk()
         chargePointOperations = mockk()
         mockkObject(ChargePointOperations.Companion)
-        every { ChargePointOperations.Companion.newChargePointOperations(any()) } returns chargePointOperations
+        every { ChargePointOperations.Companion.newChargePointOperations(any(),any(),any()) } returns chargePointOperations
     }
 
     @Test
@@ -97,7 +111,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request = HeartbeatReqGen()
         val response = operations.heartbeat(requestMetadata, request)
         expectThat(response)
@@ -118,7 +132,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request = AuthorizeReqGen(idToken = IdTokenTypeGen("Tag1", IdTokenEnumTypeGen.Central))
         val response = operations.authorize(requestMetadata, request)
         expectThat(response)
@@ -142,7 +156,7 @@ class AdapterTest {
             MeterValuesResp()
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request = MeterValuesReq(
             1, listOf(
                 MeterValueType(
@@ -181,7 +195,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request = DataTransferReq(
             vendorId = "vendor1",
             messageId = "ID100",
@@ -211,7 +225,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request =
             BootNotificationReqGen(
                 ChargingStationTypeGen("model", "vendor", "firmware", ModemType("a", "b")),
@@ -252,7 +266,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request =
             TransactionEventReqGen(
                 TransactionEventEnumTypeGen.Started,
@@ -301,7 +315,7 @@ class AdapterTest {
             StatusNotificationResp()
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1",transport,csApi)
         val request = StatusNotificationReqGen(
             connectorId = 1,
             connectorStatus = ConnectorStatusEnumTypeGen.Available,

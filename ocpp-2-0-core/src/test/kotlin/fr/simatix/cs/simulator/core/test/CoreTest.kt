@@ -1,10 +1,15 @@
 package fr.simatix.cs.simulator.core.test
 
+import fr.simatix.cs.simulator.core20.CSMSOperations
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.reset.ResetReq
+import fr.simatix.cs.simulator.core20.model.reset.ResetResp
+import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.transport.Transport
+import fr.simatix.cs.simulator.transport.receiveMessage
 import fr.simatix.cs.simulator.transport.sendMessage
 import io.mockk.every
 import io.mockk.mockk
@@ -20,6 +25,9 @@ class CoreTest {
     @BeforeEach
     fun init(){
         transport = mockk()
+        every {transport.receiveMessage<Any,Any>(any(),any())} returns Unit
+        every { transport.receiveMessageClass<Any,Any>(any(),any(),any()) } returns Unit
+
     }
 
     @Test
@@ -28,8 +36,14 @@ class CoreTest {
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
         )
 
+        val csmsOperations : CSMSOperations = object : CSMSOperations{
+            override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+                TODO("Not yet implemented")
+            }
+        }
+
         val operations =
-            ChargePointOperations.newChargePointOperations(transport)
+            ChargePointOperations.newChargePointOperations("",transport,csmsOperations)
         val response = operations.heartbeat(RequestMetadata(""), HeartbeatReq())
         expectThat(response)
             .and { get { this.response.currentTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }

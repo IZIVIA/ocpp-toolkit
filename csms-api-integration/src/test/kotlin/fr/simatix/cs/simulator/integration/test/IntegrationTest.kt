@@ -49,10 +49,10 @@ class IntegrationTest {
 
     private lateinit var ocppWampClient: OkHttpOcppWampClient
     private val csApi: CSApi = object : CSApi {
-        override fun connect() {}
-        override fun close() {}
+
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
-            return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS), req,
                 ResetResp(ResetStatusEnumType.Accepted)
             )
         }
@@ -68,7 +68,7 @@ class IntegrationTest {
         ocppWampClient = mockk()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
-
+        every { ocppWampClient.onAction(any()) } returns Unit
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
     }
@@ -85,7 +85,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = HeartbeatReq()
@@ -106,7 +106,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = AuthorizeReq(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
@@ -129,7 +129,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = MeterValuesReq(
@@ -187,7 +187,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = DataTransferReq("vendor", "msgId12", "Hello")
@@ -211,7 +211,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request =
@@ -236,7 +236,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = TransactionEventReq(
@@ -270,11 +270,11 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = StatusNotificationReq(
-            1,ConnectorStatusEnumType.Occupied,1, Instant.parse("2022-02-15T00:00:00.000Z")
+            1, ConnectorStatusEnumType.Occupied, 1, Instant.parse("2022-02-15T00:00:00.000Z")
         )
         val response = csmsApi.statusNotification(requestMetadata, request)
         expectThat(response)

@@ -56,13 +56,6 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
         val csApi = object : CSApi {
-            override fun connect() {
-                // DO nothing
-            }
-
-            override fun close() {
-                //Do nothing
-            }
 
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
                 val response = if (req.type == ResetEnumType.Immediate) {
@@ -101,13 +94,6 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
         val csApi = object : CSApi {
-            override fun connect() {
-                // DO nothing
-            }
-
-            override fun close() {
-                //Do nothing
-            }
 
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
                 val response = if (req.type == ResetEnumType.Immediate) {

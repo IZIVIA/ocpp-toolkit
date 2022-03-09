@@ -7,10 +7,6 @@ import fr.simatix.cs.simulator.operation.information.RequestMetadata
 
 interface CSApi {
 
-    fun connect()
-
-    fun close()
-
     fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 
 }

@@ -27,16 +27,15 @@ import java.net.ConnectException
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp20Adapter(private val transport: Transport, private val csApi: CSApi) : CSMSApi {
+class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, csApi: CSApi) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp20Adapter::class.java)
     }
 
-    private val operations = ChargePointOperations.newChargePointOperations(transport)
+    private val operations = ChargePointOperations.newChargePointOperations(chargingStationId,transport,Ocpp20CSApiAdapter(csApi))
 
     override fun connect() {
-        Ocpp20CSApiAdapter(transport, csApi)
         transport.connect()
     }
 

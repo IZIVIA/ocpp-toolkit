@@ -42,6 +42,7 @@ class WebsocketTest {
         val ocppWampClient = mockk<OkHttpOcppWampClient>()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
+        every { ocppWampClient.onAction(any()) } returns Unit
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
             msgType = WampMessageType.CALL_RESULT,
@@ -51,7 +52,7 @@ class WebsocketTest {
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
-        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6,"")
+        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "")
         val heartbeatResponse =
             websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq())
         expectThat(heartbeatResponse)
@@ -68,6 +69,7 @@ class WebsocketTest {
         val ocppWampClient = mockk<OkHttpOcppWampClient>()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
+        every { ocppWampClient.onAction(any()) } returns Unit
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
             msgType = WampMessageType.CALL_RESULT,
@@ -77,7 +79,7 @@ class WebsocketTest {
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
-        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6,"")
+        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "")
         expectCatching { websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq()) }
             .isFailure()
             .isA<IllegalStateException>()
@@ -92,7 +94,7 @@ class WebsocketTest {
         server.register(object : OcppWampServerHandler {
             override fun accept(ocppId: String): Boolean = "chargePoint2" == ocppId
 
-            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =  null
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })
         server.start()
 

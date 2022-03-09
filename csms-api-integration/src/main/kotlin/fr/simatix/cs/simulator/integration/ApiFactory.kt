@@ -28,9 +28,9 @@ class ApiFactory {
             val transport: Transport =
                 createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
             return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
-                Ocpp16Adapter(transport, csApi, RealTransactionRepository())
+                Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
             } else {
-                Ocpp20Adapter(transport, csApi)
+                Ocpp20Adapter(ocppId, transport, csApi)
             }
         }
     }

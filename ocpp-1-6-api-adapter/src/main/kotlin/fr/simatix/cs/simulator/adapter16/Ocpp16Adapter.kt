@@ -30,16 +30,15 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp as AuthorizeRes
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp16Adapter(private val transport: Transport, private val csApi: CSApi, private val transactionIds: TransactionRepository) : CSMSApi {
+class Ocpp16Adapter(chargingStationId: String, private val transport: Transport, csApi: CSApi, private val transactionIds: TransactionRepository) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp16Adapter::class.java)
     }
 
-    private val operations: ChargePointOperations = ChargePointOperations.newChargePointOperations(transport)
+    private val operations: ChargePointOperations = ChargePointOperations.newChargePointOperations(chargingStationId,transport,Ocpp16CSApiAdapter(csApi))
 
     override fun connect() {
-        Ocpp16CSApiAdapter(transport, csApi)
         transport.connect()
     }
 

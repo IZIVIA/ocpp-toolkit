@@ -2,6 +2,7 @@ package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter16.Ocpp16Adapter
 import fr.simatix.cs.simulator.adapter16.impl.RealTransactionRepository
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
@@ -9,6 +10,9 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.Registrati
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -67,6 +71,15 @@ class AdapterTest {
     private lateinit var transport: Transport
     private lateinit var chargePointOperations: RealChargePointOperations
 
+    private val csApi: CSApi = object : CSApi {
+
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS), req,
+                ResetResp(ResetStatusEnumType.Accepted)
+            )
+        }
+    }
 
     @BeforeEach
     fun init() {
@@ -74,7 +87,13 @@ class AdapterTest {
         chargePointOperations = mockk()
 
         mockkObject(ChargePointOperations.Companion)
-        every { ChargePointOperations.Companion.newChargePointOperations(any()) } returns chargePointOperations
+        every {
+            ChargePointOperations.Companion.newChargePointOperations(
+                any(),
+                any(),
+                any()
+            )
+        } returns chargePointOperations
     }
 
     @Test
@@ -89,7 +108,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = HeartbeatReqGen()
         val response = operations.heartbeat(requestMetadata, request)
         expectThat(response)
@@ -113,7 +132,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = AuthorizeReqGen(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
         val response = operations.authorize(requestMetadata, request)
         expectThat(response)
@@ -139,7 +158,7 @@ class AdapterTest {
             MeterValuesResp()
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = MeterValuesReqGen(
             1, listOf(
                 MeterValueType(
@@ -176,7 +195,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = DataTransferReqGen(
             vendorId = "vendor1",
             messageId = "ID100",
@@ -206,7 +225,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request =
             BootNotificationReqGen(
                 ChargingStationType("model", "vendor", "firmware", ModemType("a", "b")),
@@ -243,7 +262,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val requestStart =
             TransactionEventReq(
                 eventType = TransactionEventEnumType.Started,
@@ -334,18 +353,22 @@ class AdapterTest {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.statusNotification(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            StatusNotificationReq(1,ChargePointErrorCode.NoError,ChargePointStatus.Available),
+            StatusNotificationReq(1, ChargePointErrorCode.NoError, ChargePointStatus.Available),
             StatusNotificationResp()
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
-        val request =  TransactionEventReq(
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val request = TransactionEventReq(
             eventType = TransactionEventEnumType.Updated,
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
             triggerReason = TriggerReasonEnumType.Deauthorized,
             seqNo = 100,
             evse = EVSEType(10),
-            transactionInfo = TransactionType("T1", ChargingStateEnumType.Charging, errorCode = ChargePointErrorCodeGen.EVCommunicationError),
+            transactionInfo = TransactionType(
+                "T1",
+                ChargingStateEnumType.Charging,
+                errorCode = ChargePointErrorCodeGen.EVCommunicationError
+            ),
         )
         val response = operations.transactionEvent(requestMetadata, request)
         expectThat(response)
@@ -360,11 +383,11 @@ class AdapterTest {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.statusNotification(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            StatusNotificationReq(1,ChargePointErrorCode.NoError,ChargePointStatus.Available),
+            StatusNotificationReq(1, ChargePointErrorCode.NoError, ChargePointStatus.Available),
             StatusNotificationResp()
         )
 
-        val operations = Ocpp16Adapter(transport, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = StatusNotificationReqGen(
             connectorId = 1,
             connectorStatus = ConnectorStatusEnumType.Available,

@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.core20.impl
 
+import fr.simatix.cs.simulator.core20.CSMSOperations
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
@@ -11,6 +12,7 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
@@ -20,13 +22,31 @@ import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import fr.simatix.cs.simulator.transport.Transport
+import fr.simatix.cs.simulator.transport.receiveMessage
 import fr.simatix.cs.simulator.transport.sendMessage
 import kotlinx.datetime.Clock
 import java.net.ConnectException
 
-class RealChargePointOperations(private val client: Transport) : ChargePointOperations {
+class RealChargePointOperations(
+    private val chargeStationId: String,
+    private val client: Transport,
+    private val csmsOperations: CSMSOperations
+) : ChargePointOperations {
 
-    private inline fun <T, reified P> sendMessage(meta: RequestMetadata, action: String, request: T): OperationExecution<T, P> {
+    init {
+        client.receiveMessage("reset") { req: ResetReq ->
+            csmsOperations.reset(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+    }
+
+    private inline fun <T, reified P> sendMessage(
+        meta: RequestMetadata,
+        action: String,
+        request: T
+    ): OperationExecution<T, P> {
         val requestTime = Clock.System.now()
         val response: P = client.sendMessage(action, request)
         val responseTime = Clock.System.now()
