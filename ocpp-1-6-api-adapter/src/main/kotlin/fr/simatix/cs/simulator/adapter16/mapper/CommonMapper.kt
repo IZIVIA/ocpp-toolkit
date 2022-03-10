@@ -3,7 +3,7 @@ package fr.simatix.cs.simulator.adapter16.mapper
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
-import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.*

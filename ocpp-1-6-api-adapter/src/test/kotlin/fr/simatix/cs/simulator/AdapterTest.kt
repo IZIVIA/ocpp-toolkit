@@ -16,7 +16,7 @@ import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType

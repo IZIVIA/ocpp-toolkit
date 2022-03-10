@@ -11,6 +11,10 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.core20.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
+import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
@@ -26,7 +30,7 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.core20.model.transactionevent.EVSEType
+import fr.simatix.cs.simulator.core20.model.common.EVSEType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
@@ -210,6 +214,23 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `changeAvailability request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityReq(OperationalStatusEnumType.Operative),
+            "ChangeAvailabilityRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityReq(OperationalStatusEnumType.Operative, EVSEType(1, 1)),
+            "ChangeAvailabilityRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -333,6 +354,23 @@ class JsonSchemaTest {
                 statusInfo = StatusInfoType("", "")
             ),
             "BootNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `changeAvailability response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted),
+            "ChangeAvailabilityResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted,StatusInfoType("","")),
+            "ChangeAvailabilityResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

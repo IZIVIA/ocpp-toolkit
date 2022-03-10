@@ -11,7 +11,7 @@ import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import org.mapstruct.factory.Mappers
 
-class Ocpp16CSApiAdapter(val csApi: CSApi): CSMSOperations {
+class Ocpp16CSApiAdapter(private val csApi: CSApi): CSMSOperations {
 
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
         val mapper: ResetMapper = Mappers.getMapper(ResetMapper::class.java)

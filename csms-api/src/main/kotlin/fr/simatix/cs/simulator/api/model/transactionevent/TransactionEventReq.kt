@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.api.model.transactionevent
 
+import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.common.IdTokenType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType

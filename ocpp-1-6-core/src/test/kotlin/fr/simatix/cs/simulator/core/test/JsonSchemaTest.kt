@@ -5,6 +5,10 @@ import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.enumeration.RegistrationStatus
+import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
+import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityType
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
@@ -221,6 +225,14 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `changeAvailability request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeAvailabilityReq(1,AvailabilityType.Operative), "ChangeAvailabilityRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -348,6 +360,14 @@ class JsonSchemaTest {
             ),
             "BootNotificationResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `changeAvailability response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeAvailabilityResp(AvailabilityStatus.Accepted), "ChangeAvailabilityResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

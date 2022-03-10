@@ -51,7 +51,7 @@ class IntegrationTestCSApi {
     }
 
     @Test
-    fun `reset 1-6 test`() {
+    fun `1-6 test`() {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
@@ -89,8 +89,7 @@ class IntegrationTestCSApi {
     }
 
     @Test
-    fun `reset 2-0 test`() {
-
+    fun `2-0 test`() {
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
         val csApi = object : CSApi {
