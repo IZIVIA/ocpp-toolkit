@@ -15,6 +15,9 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
@@ -231,6 +234,17 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `clearCache request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheReq(),
+            "ClearCacheRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -371,6 +385,23 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted,StatusInfoType("","")),
             "ChangeAvailabilityResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearCache response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheResp(ClearCacheStatusEnumType.Accepted),
+            "ClearCacheResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("","")),
+            "ClearCacheResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
