@@ -33,6 +33,9 @@ import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.Charg
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.core16.model.stoptransaction.enumeration.Reason
+import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
@@ -244,6 +247,14 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `unlockConnector request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UnlockConnectorReq(1), "UnlockConnectorRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -387,6 +398,14 @@ class JsonSchemaTest {
     fun `clearCache response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ClearCacheResp(ClearCacheStatus.Accepted), "ClearCacheResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UnlockConnectorResp(UnlockStatus.Unlocked), "UnlockConnectorResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

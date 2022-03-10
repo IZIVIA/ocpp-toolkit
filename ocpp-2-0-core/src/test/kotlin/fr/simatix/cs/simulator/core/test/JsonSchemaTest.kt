@@ -39,6 +39,9 @@ import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventRes
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TriggerReasonEnumType
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
@@ -243,6 +246,16 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `unlockConnector request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorReq(1,2),
+            "UnlockConnectorRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 
     @Test
     fun `heartbeat response format`() {
@@ -402,6 +415,23 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("","")),
             "ClearCacheResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorResp(UnlockStatusEnumType.Unlocked),
+            "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorResp(UnlockStatusEnumType.Unlocked,StatusInfoType("","")),
+            "UnlockConnectorResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

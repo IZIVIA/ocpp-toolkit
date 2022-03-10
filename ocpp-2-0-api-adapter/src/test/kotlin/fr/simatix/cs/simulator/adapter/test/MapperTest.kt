@@ -2,6 +2,8 @@ package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.ChangeAvailabilityMapper
 import fr.simatix.cs.simulator.adapter20.mapper.ClearCacheMapper
+import fr.simatix.cs.simulator.adapter20.mapper.UnlockConnectorMapper
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
@@ -9,6 +11,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
@@ -22,6 +26,8 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCache
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
+import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
+
 
 class MapperTest {
     @Test
@@ -49,5 +55,19 @@ class MapperTest {
         val req = mapper.coreToGenReq(ClearCacheReq())
         expectThat(req)
             .and { get {req}.isA<ClearCacheReqGen>() }
+    }
+
+    @Test
+    fun unlockConnectorMapper() {
+        val mapper: UnlockConnectorMapper = Mappers.getMapper(UnlockConnectorMapper::class.java)
+        val req = mapper.genToCoreResp(UnlockConnectorResp(UnlockStatusEnumTypeGen.UnknownConnector, StatusInfoTypeGen("reason","additional")))
+        expectThat(req)
+            .and { get {req.status}.isEqualTo(UnlockStatusEnumType.UnknownConnector) }
+            .and { get {req.statusInfo}.isEqualTo(StatusInfoType("reason","additional")) }
+
+        val resp = mapper.coreToGenReq(UnlockConnectorReq(1,2))
+        expectThat(resp)
+            .and { get {resp.connectorId}.isEqualTo(1) }
+            .and { get {resp.evseId}.isEqualTo(2) }
     }
 }
