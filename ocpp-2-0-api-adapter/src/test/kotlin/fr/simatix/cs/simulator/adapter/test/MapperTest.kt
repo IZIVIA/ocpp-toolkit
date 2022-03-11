@@ -2,7 +2,11 @@ package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.ChangeAvailabilityMapper
 import fr.simatix.cs.simulator.adapter20.mapper.ClearCacheMapper
+import fr.simatix.cs.simulator.adapter20.mapper.RequestStartTransactionMapper
 import fr.simatix.cs.simulator.adapter20.mapper.UnlockConnectorMapper
+import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -10,9 +14,23 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.Opera
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
+import fr.simatix.cs.simulator.core20.model.common.IdTokenType
+import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.*
+import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
+
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
+import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
@@ -35,39 +53,106 @@ class MapperTest {
         val mapper: ChangeAvailabilityMapper = Mappers.getMapper(ChangeAvailabilityMapper::class.java)
         val resp = mapper.genToCoreResp(ChangeAvailabilityRespGen(ChangeAvailabilityStatusEnumTypeGen.Accepted))
         expectThat(resp)
-            .and { get {status}.isEqualTo(ChangeAvailabilityStatusEnumType.Accepted) }
-            .and { get {statusInfo}.isEqualTo(null) }
+            .and { get { status }.isEqualTo(ChangeAvailabilityStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(null) }
 
         val req = mapper.coreToGenReq(ChangeAvailabilityReq(OperationalStatusEnumType.Operative, EVSEType(1)))
         expectThat(req)
-            .and { get {operationalStatus}.isEqualTo(OperationalStatusEnumTypeGen.Operative) }
-            .and { get {evse}.isEqualTo(EVSETypeGen(1)) }
+            .and { get { operationalStatus }.isEqualTo(OperationalStatusEnumTypeGen.Operative) }
+            .and { get { evse }.isEqualTo(EVSETypeGen(1)) }
     }
 
     @Test
     fun clearCacheMapper() {
         val mapper: ClearCacheMapper = Mappers.getMapper(ClearCacheMapper::class.java)
-        val resp = mapper.genToCoreResp(ClearCacheRespGen(ClearCacheStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason","additional")))
+        val resp = mapper.genToCoreResp(
+            ClearCacheRespGen(
+                ClearCacheStatusEnumTypeGen.Accepted,
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
         expectThat(resp)
-            .and { get {status}.isEqualTo(ClearCacheStatusEnumType.Accepted) }
-            .and { get {statusInfo}.isEqualTo(StatusInfoType("reason","additional")) }
+            .and { get { status }.isEqualTo(ClearCacheStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(ClearCacheReq())
         expectThat(req)
-            .and { get {req}.isA<ClearCacheReqGen>() }
+            .and { get { req }.isA<ClearCacheReqGen>() }
     }
 
     @Test
     fun unlockConnectorMapper() {
         val mapper: UnlockConnectorMapper = Mappers.getMapper(UnlockConnectorMapper::class.java)
-        val req = mapper.genToCoreResp(UnlockConnectorResp(UnlockStatusEnumTypeGen.UnknownConnector, StatusInfoTypeGen("reason","additional")))
+        val req = mapper.genToCoreResp(
+            UnlockConnectorResp(
+                UnlockStatusEnumTypeGen.UnknownConnector,
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
         expectThat(req)
-            .and { get {req.status}.isEqualTo(UnlockStatusEnumType.UnknownConnector) }
-            .and { get {req.statusInfo}.isEqualTo(StatusInfoType("reason","additional")) }
+            .and { get { req.status }.isEqualTo(UnlockStatusEnumType.UnknownConnector) }
+            .and { get { req.statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
-        val resp = mapper.coreToGenReq(UnlockConnectorReq(1,2))
+        val resp = mapper.coreToGenReq(UnlockConnectorReq(1, 2))
         expectThat(resp)
-            .and { get {resp.connectorId}.isEqualTo(1) }
-            .and { get {resp.evseId}.isEqualTo(2) }
+            .and { get { resp.connectorId }.isEqualTo(1) }
+            .and { get { resp.evseId }.isEqualTo(2) }
+    }
+
+    @Test
+    fun requestStartTransactionMapper() {
+        val mapper: RequestStartTransactionMapper = Mappers.getMapper(RequestStartTransactionMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            RequestStartTransactionResp(
+                RequestStartStopStatusEnumTypeGen.Accepted,
+                "1234",
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+            .and { get { transactionId }.isEqualTo("1234") }
+
+        val req = mapper.coreToGenReq(
+            RequestStartTransactionReq(
+                1, IdTokenType("token1", IdTokenEnumType.Central), 2,
+                ChargingProfileType(
+                    id = 3,
+                    stackLevel = 4,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 5,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            duration = 6,
+                            minChargingRate = 7.0,
+                            salesTariff = SalesTariffType(8, listOf())
+                        )
+                    ),
+                    recurrencyKind = RecurrencyKindEnumType.Daily,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
+                    transactionId = "transaction"
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { remoteStartId }.isEqualTo(1) }
+            .and { get { idToken }.isEqualTo(IdTokenTypeGen("token1", IdTokenEnumTypeGen.Central)) }
+            .and { get { evseId }.isEqualTo(2) }
+            .and { get { chargingProfile?.id }.isEqualTo(3) }
+            .and { get { chargingProfile?.stackLevel }.isEqualTo(4) }
+            .and { get { chargingProfile?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+            .and { get { chargingProfile?.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
+            .and { get { chargingProfile?.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
+            .and { get { chargingProfile?.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+            .and { get { chargingProfile?.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
+            .and { get { chargingProfile?.transactionId }.isEqualTo("transaction") }
+
+
     }
 }

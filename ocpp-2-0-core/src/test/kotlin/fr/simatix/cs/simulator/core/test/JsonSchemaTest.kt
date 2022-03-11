@@ -34,6 +34,11 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
+import fr.simatix.cs.simulator.core20.model.remotestart.*
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
@@ -249,8 +254,78 @@ class JsonSchemaTest {
     @Test
     fun `unlockConnector request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
-            UnlockConnectorReq(1,2),
+            UnlockConnectorReq(1, 2),
             "UnlockConnectorRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `requestStartTransaction request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central)
+            ),
+            "RequestStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central),
+                evseId = 1,
+                chargingProfile = ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                        )
+                    )
+                )
+            ),
+            "RequestStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
+                evseId = 1,
+                chargingProfile = ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            duration = 1,
+                            minChargingRate = 1.0,
+                            salesTariff = SalesTariffType(1,listOf(SalesTariffEntryType(RelativeTimeIntervalType(1))))
+                        )
+                    ),
+                    recurrencyKind = RecurrencyKindEnumType.Daily,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    transactionId = ""
+                )
+            ),
+            "RequestStartTransactionRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -396,7 +471,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors = JsonSchemaValidator.isValidObjectV6(
-            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted,StatusInfoType("","")),
+            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted, StatusInfoType("", "")),
             "ChangeAvailabilityResponse.json"
         )
         expectThat(errors)
@@ -413,7 +488,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors = JsonSchemaValidator.isValidObjectV6(
-            ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("","")),
+            ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("", "")),
             "ClearCacheResponse.json"
         )
         expectThat(errors)
@@ -430,7 +505,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors = JsonSchemaValidator.isValidObjectV6(
-            UnlockConnectorResp(UnlockStatusEnumType.Unlocked,StatusInfoType("","")),
+            UnlockConnectorResp(UnlockStatusEnumType.Unlocked, StatusInfoType("", "")),
             "UnlockConnectorResponse.json"
         )
         expectThat(errors)

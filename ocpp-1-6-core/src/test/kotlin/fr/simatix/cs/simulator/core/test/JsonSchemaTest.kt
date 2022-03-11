@@ -17,6 +17,7 @@ import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.AuthorizationStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.Phase
+import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
@@ -24,6 +25,11 @@ import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.remotestart.*
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -233,7 +239,8 @@ class JsonSchemaTest {
     @Test
     fun `changeAvailability request format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            ChangeAvailabilityReq(1,AvailabilityType.Operative), "ChangeAvailabilityRequest.json")
+            ChangeAvailabilityReq(1, AvailabilityType.Operative), "ChangeAvailabilityRequest.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -241,7 +248,8 @@ class JsonSchemaTest {
     @Test
     fun `clearCache request format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            ClearCacheReq(), "ClearCacheRequest.json")
+            ClearCacheReq(), "ClearCacheRequest.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -249,7 +257,41 @@ class JsonSchemaTest {
     @Test
     fun `unlockConnector request format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            UnlockConnectorReq(1), "UnlockConnectorRequest.json")
+            UnlockConnectorReq(1), "UnlockConnectorRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStartTransaction request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionReq("Tag1"), "RemoteStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionReq(
+                idTag = "Tag1", connectorId = 1, chargingProfile = ChargingProfile(
+                    chargingProfileId = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeType.ChargePointMaxProfile,
+                    chargingProfileKind = ChargingProfileKindType.Absolute,
+                    chargingSchedule = ChargingSchedule(
+                        chargingRateUnit = ChargingRateUnitType.A,
+                        chargingSchedulePeriod = listOf(ChargingSchedulePeriod(0, 0.1, 2)),
+                        duration = 100,
+                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        minChargingRate = 0.2
+                    ),
+                    recurrencyKind = RecurrencyKindType.Weekly,
+                    transactionId = 10,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ), "RemoteStartTransactionRequest.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -389,7 +431,8 @@ class JsonSchemaTest {
     @Test
     fun `changeAvailability response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            ChangeAvailabilityResp(AvailabilityStatus.Accepted), "ChangeAvailabilityResponse.json")
+            ChangeAvailabilityResp(AvailabilityStatus.Accepted), "ChangeAvailabilityResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -397,7 +440,8 @@ class JsonSchemaTest {
     @Test
     fun `clearCache response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            ClearCacheResp(ClearCacheStatus.Accepted), "ClearCacheResponse.json")
+            ClearCacheResp(ClearCacheStatus.Accepted), "ClearCacheResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -405,7 +449,17 @@ class JsonSchemaTest {
     @Test
     fun `unlockConnector response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
-            UnlockConnectorResp(UnlockStatus.Unlocked), "UnlockConnectorResponse.json")
+            UnlockConnectorResp(UnlockStatus.Unlocked), "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStartTransaction response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStartTransactionResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
