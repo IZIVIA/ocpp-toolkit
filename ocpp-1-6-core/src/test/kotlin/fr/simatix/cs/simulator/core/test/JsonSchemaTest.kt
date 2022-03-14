@@ -30,6 +30,8 @@ import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProf
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
+import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
+import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -297,6 +299,15 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `remoteStopTransaction request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStopTransactionReq(1), "RemoteStopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -459,6 +470,15 @@ class JsonSchemaTest {
     fun `remoteStartTransaction response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             RemoteStartTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStartTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStopTransaction response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStopTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStopTransactionResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

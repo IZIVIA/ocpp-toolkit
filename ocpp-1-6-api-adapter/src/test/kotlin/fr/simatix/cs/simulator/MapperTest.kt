@@ -1,9 +1,6 @@
 package fr.simatix.cs.simulator
 
-import fr.simatix.cs.simulator.adapter16.mapper.ChangeAvailabilityMapper
-import fr.simatix.cs.simulator.adapter16.mapper.ClearCacheMapper
-import fr.simatix.cs.simulator.adapter16.mapper.RemoteStartTransactionMapper
-import fr.simatix.cs.simulator.adapter16.mapper.UnlockConnectorMapper
+import fr.simatix.cs.simulator.adapter16.mapper.*
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
@@ -17,6 +14,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
@@ -29,6 +27,7 @@ import fr.simatix.cs.simulator.core16.model.remotestart.*
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
 import org.junit.jupiter.api.Test
@@ -124,6 +123,19 @@ class MapperTest {
                     )
                 )
             }
+    }
 
+    @Test
+    fun remoteStopTransactionMapper() {
+        val mapper: RemoteStopTransactionMapper = Mappers.getMapper(RemoteStopTransactionMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Rejected, StatusInfoType("reason", "additional"))
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(RemoteStartStopStatus.Rejected) }
+
+        val req = mapper.coreToGenReq(RemoteStopTransactionReq(1))
+        expectThat(req)
+            .and { get { transactionId }.isEqualTo("1") }
     }
 }

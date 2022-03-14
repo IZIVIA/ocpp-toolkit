@@ -19,10 +19,6 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
-import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.PhaseEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
@@ -34,11 +30,14 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
@@ -331,6 +330,15 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `requestStopTransaction request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionReq("tag1"),
+            "RequestStopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 
     @Test
     fun `heartbeat response format`() {
@@ -507,6 +515,23 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             UnlockConnectorResp(UnlockStatusEnumType.Unlocked, StatusInfoType("", "")),
             "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `requestStopTransaction response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted),
+            "RequestStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted,StatusInfoType("reason","additional")),
+            "RequestStopTransactionResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

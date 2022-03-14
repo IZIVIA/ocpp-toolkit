@@ -1,12 +1,10 @@
 package fr.simatix.cs.simulator.adapter.test
 
-import fr.simatix.cs.simulator.adapter20.mapper.ChangeAvailabilityMapper
-import fr.simatix.cs.simulator.adapter20.mapper.ClearCacheMapper
-import fr.simatix.cs.simulator.adapter20.mapper.RequestStartTransactionMapper
-import fr.simatix.cs.simulator.adapter20.mapper.UnlockConnectorMapper
+import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -25,6 +23,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfile
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
 
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
@@ -152,7 +151,24 @@ class MapperTest {
             .and { get { chargingProfile?.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
             .and { get { chargingProfile?.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
             .and { get { chargingProfile?.transactionId }.isEqualTo("transaction") }
-
-
     }
+
+    @Test
+    fun requestStopTransactionMapper() {
+        val mapper: RequestStopTransactionMapper = Mappers.getMapper(RequestStopTransactionMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            RequestStopTransactionResp(
+                RequestStartStopStatusEnumTypeGen.Rejected,
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Rejected) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(RequestStopTransactionReq("tag1"))
+        expectThat(req)
+            .and { get { transactionId }.isEqualTo("tag1") }
+    }
+
 }
