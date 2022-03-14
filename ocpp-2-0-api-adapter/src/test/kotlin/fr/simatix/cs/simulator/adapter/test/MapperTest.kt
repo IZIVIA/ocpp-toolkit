@@ -11,6 +11,9 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStat
 import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -32,8 +35,10 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProf
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
-
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
@@ -239,6 +244,73 @@ class MapperTest {
             }
             .and { get { variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
             .and { get { attributeType }.isEqualTo(AttributeEnumTypeGen.MaxSet) }
+    }
+
+    @Test
+    fun setVariablesMapper() {
+        val mapper: SetVariablesMapper = Mappers.getMapper(SetVariablesMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumTypeGen.RebootRequired,
+                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
+                        variable = VariableTypeGen("variable", "instance"),
+                        attributeType = AttributeEnumTypeGen.MaxSet,
+                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
+                    )
+                )
+            )
+        )
+        expectThat(resp)
+            .and { get { setVariableResult.size }.isEqualTo(1) }
+            .and { get { setVariableResult[0].attributeStatus }.isEqualTo(SetVariableStatusEnumType.RebootRequired) }
+            .and {
+                get { setVariableResult[0].component }.isEqualTo(
+                    ComponentType(
+                        "component",
+                        "instance",
+                        EVSEType(1, 2)
+                    )
+                )
+            }
+            .and { get { setVariableResult[0].variable }.isEqualTo(VariableType("variable", "instance")) }
+            .and { get { setVariableResult[0].attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
+            .and {
+                get { setVariableResult[0].attributeStatusInfo }.isEqualTo(
+                    StatusInfoType(
+                        "reason",
+                        "additional"
+                    )
+                )
+            }
+
+        val req = mapper.coreToGenReq(
+            SetVariablesReq(
+                listOf(
+                    SetVariableDataType(
+                        attributeValue = "value",
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.Target
+                    )
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { setVariableData.size }.isEqualTo(1) }
+            .and { get { setVariableData[0].attributeValue }.isEqualTo("value") }
+            .and {
+                get { setVariableData[0].component }.isEqualTo(
+                    ComponentTypeGen(
+                        "component",
+                        "instance",
+                        EVSETypeGen(1, 2)
+                    )
+                )
+            }
+            .and { get { setVariableData[0].variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
+            .and { get { setVariableData[0].attributeType }.isEqualTo(AttributeEnumTypeGen.Target) }
     }
 
 }

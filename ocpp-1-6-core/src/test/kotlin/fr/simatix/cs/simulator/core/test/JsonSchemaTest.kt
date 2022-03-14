@@ -9,6 +9,9 @@ import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityType
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.ConfigurationStatus
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
@@ -323,7 +326,15 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
 
+    @Test
+    fun `changeConfiguration request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeConfigurationReq("key", "value"), "ChangeConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
@@ -523,4 +534,14 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `changeConfiguration response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 }

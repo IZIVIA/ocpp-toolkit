@@ -4,8 +4,10 @@ import fr.simatix.cs.simulator.adapter16.mapper.*
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
+import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingSchedulePeriodType
@@ -15,15 +17,23 @@ import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfile
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityType
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.ConfigurationStatus
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
-import fr.simatix.cs.simulator.core16.model.remotestart.*
+import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
+import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
+import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
+import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
@@ -33,6 +43,7 @@ import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockSt
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
@@ -137,5 +148,47 @@ class MapperTest {
         val req = mapper.coreToGenReq(RemoteStopTransactionReq(1))
         expectThat(req)
             .and { get { transactionId }.isEqualTo("1") }
+    }
+
+    @Test
+    fun changeConfigurationMapper() {
+        val mapper: ChangeConfigurationMapper = Mappers.getMapper(ChangeConfigurationMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(ConfigurationStatus.NotSupported) }
+
+
+        expectThrows<IllegalStateException> {
+            mapper.genToCoreResp(
+                SetVariablesResp(
+                    listOf(
+                        SetVariableResultType(
+                            SetVariableStatusEnumType.NotSupportedAttributeType,
+                            ComponentType("component"), VariableType("variable")
+                        ),
+                        SetVariableResultType(
+                            SetVariableStatusEnumType.Accepted,
+                            ComponentType("component"), VariableType("variable")
+                        )
+                    )
+                )
+            )
+        }
+
+        val req = mapper.coreToGenReq(ChangeConfigurationReq("key", "value"))
+        expectThat(req)
+            .and { get { setVariableData[0].attributeValue }.isEqualTo("value") }
+            .and { get { setVariableData[0].variable.name }.isEqualTo("key") }
+            .and { get { setVariableData[0].component.name }.isEqualTo("key") }
     }
 }

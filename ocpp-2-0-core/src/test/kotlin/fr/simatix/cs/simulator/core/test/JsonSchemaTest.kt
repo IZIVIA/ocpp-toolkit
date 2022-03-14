@@ -19,23 +19,19 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
+import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
-import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
-import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
-import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
-import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
-import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
-import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
-import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.EVSEType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
+import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
@@ -43,6 +39,14 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRate
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
@@ -371,6 +375,40 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `setVariables request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesReq(
+                listOf(
+                    SetVariableDataType(
+                        attributeValue = "value",
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "SetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesReq(
+                listOf(
+                    SetVariableDataType(
+                        attributeValue = "value",
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.Target
+                    )
+                )
+            ),
+            "SetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -597,6 +635,41 @@ class JsonSchemaTest {
                 )
             ),
             "GetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setVariables response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumType.Accepted,
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "SetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumType.Accepted,
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        AttributeEnumType.Target,
+                        StatusInfoType("reason", "additional")
+                    )
+                )
+            ),
+            "SetVariablesResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
