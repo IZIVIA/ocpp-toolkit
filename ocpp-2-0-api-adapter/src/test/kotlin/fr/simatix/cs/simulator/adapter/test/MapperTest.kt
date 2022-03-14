@@ -1,6 +1,12 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
+import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
+import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -11,11 +17,13 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.Chang
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.EVSEType
-import fr.simatix.cs.simulator.core20.model.common.IdTokenType
+import fr.simatix.cs.simulator.core20.model.common.*
+import fr.simatix.cs.simulator.core20.model.common.enumeration.AttributeEnumType
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
-import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
@@ -169,6 +177,68 @@ class MapperTest {
         val req = mapper.coreToGenReq(RequestStopTransactionReq("tag1"))
         expectThat(req)
             .and { get { transactionId }.isEqualTo("tag1") }
+    }
+
+    @Test
+    fun getVariablesMapper() {
+        val mapper: GetVariablesMapper = Mappers.getMapper(GetVariablesMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultTypeGen(
+                        attributeStatus = GetVariableStatusEnumTypeGen.Accepted,
+                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
+                        variable = VariableTypeGen("variable", "instance"),
+                        attributeType = AttributeEnumTypeGen.MaxSet,
+                        attributeValue = "value",
+                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
+                    )
+                )
+            )
+        )
+
+        expectThat(resp.getVariableResult[0])
+            .and { get { attributeStatus }.isEqualTo(GetVariableStatusEnumType.Accepted) }
+            .and { get { component }.isEqualTo(ComponentType("component", "instance", EVSEType(1, 2))) }
+            .and { get { variable }.isEqualTo(VariableType("variable", "instance")) }
+            .and { get { attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
+            .and { get { attributeValue }.isEqualTo("value") }
+            .and {
+                get { attributeStatusInfo }.isEqualTo(
+                    StatusInfoType(
+                        "reason",
+                        "additional"
+                    )
+                )
+            }
+
+
+        val req = mapper.coreToGenReq(
+            GetVariablesReq(
+                listOf(
+                    GetVariableDataType(
+                        component = ComponentType(
+                            "component", "instance",
+                            EVSEType(1, 2)
+                        ),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.MaxSet
+                    )
+                )
+            )
+        )
+        expectThat(req.getVariableData[0])
+            .and {
+                get { component }.isEqualTo(
+                    ComponentTypeGen(
+                        "component",
+                        "instance",
+                        EVSETypeGen(1, 2)
+                    )
+                )
+            }
+            .and { get { variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
+            .and { get { attributeType }.isEqualTo(AttributeEnumTypeGen.MaxSet) }
     }
 
 }

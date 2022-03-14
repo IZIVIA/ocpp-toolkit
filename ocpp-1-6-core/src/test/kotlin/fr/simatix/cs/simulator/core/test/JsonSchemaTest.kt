@@ -21,6 +21,9 @@ import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopSt
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
@@ -308,6 +311,22 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getConfiguration request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationReq(), "GetConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationReq(listOf("key")), "GetConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -479,6 +498,27 @@ class JsonSchemaTest {
     fun `remoteStopTransaction response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             RemoteStopTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getConfiguration response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(), "GetConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(listOf(KeyValue("key", true)), listOf("unknown key")), "GetConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(listOf(KeyValue("key", true, "value"))), "GetConfigurationResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

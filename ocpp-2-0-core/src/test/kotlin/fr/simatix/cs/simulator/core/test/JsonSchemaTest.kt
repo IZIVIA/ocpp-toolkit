@@ -31,6 +31,11 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
@@ -315,7 +320,7 @@ class JsonSchemaTest {
                             startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
                             duration = 1,
                             minChargingRate = 1.0,
-                            salesTariff = SalesTariffType(1,listOf(SalesTariffEntryType(RelativeTimeIntervalType(1))))
+                            salesTariff = SalesTariffType(1, listOf(SalesTariffEntryType(RelativeTimeIntervalType(1))))
                         )
                     ),
                     recurrencyKind = RecurrencyKindEnumType.Daily,
@@ -341,6 +346,31 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getVariables request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesReq(listOf(GetVariableDataType(ComponentType("component"), VariableType("variable")))),
+            "GetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesReq(
+                listOf(
+                    GetVariableDataType(
+                        component = ComponentType(name = "component", instance = "instance", evse = EVSEType(1)),
+                        variable = VariableType(name = "variable", instance = "instance"),
+                        attributeType = AttributeEnumType.Target
+                    )
+                )
+            ),
+            "GetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -349,7 +379,6 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
-
 
     @Test
     fun `authorize response format`() {
@@ -530,8 +559,44 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors = JsonSchemaValidator.isValidObjectV6(
-            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted,StatusInfoType("reason","additional")),
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted, StatusInfoType("reason", "additional")),
             "RequestStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getVariables response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "GetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.Target,
+                        attributeValue = "value",
+                        attributeStatusInfo = StatusInfoType("reason")
+                    )
+                )
+            ),
+            "GetVariablesResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
