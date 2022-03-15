@@ -23,6 +23,13 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -409,6 +416,32 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getReport request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(GetReportReq(1), "GetReportRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportReq(
+                1, listOf(ComponentCriterionEnumType.Active),
+                listOf(ComponentVariableType(ComponentType("component")))
+            ), "GetReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getBaseReport request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
+            "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -674,4 +707,45 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `getReport response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportResp(GenericDeviceModelStatusEnumType.Accepted),
+            "GetReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportResp(
+                GenericDeviceModelStatusEnumType.EmptyResultSet,
+                StatusInfoType("reason", "additional")
+            ),
+            "GetReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getBaseReport response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportResp(GenericDeviceModelStatusEnumType.Rejected),
+            "GetBaseReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportResp(
+                GenericDeviceModelStatusEnumType.Rejected,
+                StatusInfoType("reason", "additional")
+            ),
+            "GetBaseReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 }

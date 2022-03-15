@@ -1,19 +1,13 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
-import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
-import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
-import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
-import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
-import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -22,15 +16,19 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AttributeEnumType
-import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericDeviceModelStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
-import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
@@ -38,8 +36,6 @@ import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import kotlinx.datetime.Instant
@@ -54,10 +50,25 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.Operatio
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
+import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
+import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType as GenericDeviceModelStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
+import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
-
 
 class MapperTest {
     @Test
@@ -313,4 +324,58 @@ class MapperTest {
             .and { get { setVariableData[0].attributeType }.isEqualTo(AttributeEnumTypeGen.Target) }
     }
 
+    @Test
+    fun getBaseReportMapper() {
+        val mapper: GetBaseReportMapper = Mappers.getMapper(GetBaseReportMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetBaseReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory)
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(1) }
+            .and { get { reportBase }.isEqualTo(ReportBaseEnumTypeGen.ConfigurationInventory) }
+    }
+
+    @Test
+    fun getReportMapper() {
+        val mapper: GetReportMapper = Mappers.getMapper(GetReportMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            GetReportReq(
+                1, listOf(ComponentCriterionEnumType.Active), listOf(
+                    ComponentVariableType(
+                        ComponentType("component"),
+                        VariableType("variable")
+                    )
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(1) }
+            .and { get { componentCriteria }.isEqualTo(listOf(ComponentCriterionEnumTypeGen.Active)) }
+            .and {
+                get { componentVariable }.isEqualTo(
+                    listOf(
+                        ComponentVariableTypeGen(
+                            ComponentTypeGen("component"),
+                            VariableTypeGen("variable")
+                        )
+                    )
+                )
+            }
+    }
+
 }
+
