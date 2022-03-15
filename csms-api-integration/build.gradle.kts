@@ -22,4 +22,6 @@ dependencies {
     implementation(project(":ocpp-transport"))
     implementation(project(":operation-information"))
 
+    testImplementation("org.mockito.kotlin:mockito-kotlin:_")
+    testImplementation("org.mockito:mockito-inline:_")
 }

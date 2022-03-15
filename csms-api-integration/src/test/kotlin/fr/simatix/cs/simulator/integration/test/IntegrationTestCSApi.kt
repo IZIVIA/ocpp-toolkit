@@ -10,7 +10,6 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
-import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -43,6 +42,10 @@ import kotlinx.datetime.Clock
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.spy
+import org.mockito.kotlin.any
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import java.lang.Thread.sleep
 
 class IntegrationTestCSApi {
@@ -137,7 +140,6 @@ class IntegrationTestCSApi {
                 return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
             }
         }
-
     }
 
     @Test
@@ -146,7 +148,8 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
 
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csApiSpy = spy(csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApiSpy)
 
         csmsApi.connect()
 
@@ -165,17 +168,15 @@ class IntegrationTestCSApi {
         server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
             "Reset", "{\"type\": \"Hard\"}"))
 
+        verify(csApiSpy,times(1)).reset(any(),any())
+        verify(csApiSpy,times(1)).changeAvailability(any(),any())
+        verify(csApiSpy,times(1)).setVariables(any(),any())
+        verify(csApiSpy,times(1)).clearCache(any(),any())
+        verify(csApiSpy,times(1)).requestStartTransaction(any(),any())
+        verify(csApiSpy,times(1)).requestStopTransaction(any(),any())
+        verify(csApiSpy,times(1)).unlockConnector(any(),any())
+
         csmsApi.close()
-
-        sleep(1000)
-
-        csmsApi.connect()
-
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1", "Reset", "{\"type\": \"Hard\"}"))
-
-        csmsApi.close()
-
-
     }
 
     @Test
@@ -183,7 +184,8 @@ class IntegrationTestCSApi {
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
 
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csApiSpy = spy(csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApiSpy)
 
         csmsApi.connect()
 
@@ -203,6 +205,14 @@ class IntegrationTestCSApi {
             "chargePoint2",
             WampMessage(WampMessageType.CALL, "1", "Reset", "{\"type\": \"OnIdle\"}")
         )
+
+        verify(csApiSpy,times(1)).reset(any(),any())
+        verify(csApiSpy,times(1)).changeAvailability(any(),any())
+        verify(csApiSpy,times(1)).setVariables(any(),any())
+        verify(csApiSpy,times(1)).clearCache(any(),any())
+        verify(csApiSpy,times(1)).requestStartTransaction(any(),any())
+        verify(csApiSpy,times(1)).requestStopTransaction(any(),any())
+        verify(csApiSpy,times(1)).unlockConnector(any(),any())
 
         csmsApi.close()
     }
