@@ -6,17 +6,23 @@ import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
@@ -34,12 +40,55 @@ class RealChargePointOperations(
 ) : ChargePointOperations {
 
     init {
-        client.receiveMessage("reset") { req: ResetReq ->
+        client.receiveMessage("Reset") { req: ResetReq ->
             csmsOperations.reset(
                 RequestMetadata(chargeStationId),
                 req
             ).response
         }
+
+        client.receiveMessage("ChangeAvailability") { req: ChangeAvailabilityReq ->
+            csmsOperations.changeAvailability(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("SetVariables") { req: SetVariablesReq ->
+            csmsOperations.setVariables(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("ClearCache") { req: ClearCacheReq ->
+            csmsOperations.clearCache(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("RequestStartTransaction") { req: RequestStartTransactionReq ->
+            csmsOperations.requestStartTransaction(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("RequestStopTransaction") { req: RequestStopTransactionReq ->
+            csmsOperations.requestStopTransaction(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("UnlockConnector") { req: UnlockConnectorReq ->
+            csmsOperations.unlockConnector(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
     }
 
     private inline fun <T, reified P> sendMessage(

@@ -7,22 +7,36 @@ import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
-import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
-import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ReasonEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
@@ -41,6 +55,7 @@ import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
+import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.ChargePointErrorCode
 import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.ChargePointStatus
@@ -65,6 +80,7 @@ import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
 
 class AdapterTest {
@@ -75,9 +91,66 @@ class AdapterTest {
 
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(
-                ExecutionMetadata(meta, RequestStatus.SUCCESS), req,
-                ResetResp(ResetStatusEnumType.Accepted)
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                ResetResp(ResetStatusEnumType.Scheduled)
             )
+        }
+
+        override fun changeAvailability(
+            meta: RequestMetadata,
+            req: ChangeAvailabilityReq
+        ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> {
+            val response = ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearCache(
+            meta: RequestMetadata,
+            req: ClearCacheReq
+        ): OperationExecution<ClearCacheReq, ClearCacheResp> {
+            val response = ClearCacheResp(ClearCacheStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStartTransaction(
+            meta: RequestMetadata,
+            req: RequestStartTransactionReq
+        ): OperationExecution<RequestStartTransactionReq, RequestStartTransactionResp> {
+            val response = RequestStartTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStopTransaction(
+            meta: RequestMetadata,
+            req: RequestStopTransactionReq
+        ): OperationExecution<RequestStopTransactionReq, RequestStopTransactionResp> {
+            val response = RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setVariables(
+            meta: RequestMetadata,
+            req: SetVariablesReq
+        ): OperationExecution<SetVariablesReq, SetVariablesResp> {
+            val response = SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        SetVariableStatusEnumType.Accepted,
+                        ComponentType("component"),
+                        VariableType("name")
+                    )
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun unlockConnector(
+            meta: RequestMetadata,
+            req: UnlockConnectorReq
+        ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
+            val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
 
