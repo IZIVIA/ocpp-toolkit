@@ -10,6 +10,10 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -30,6 +34,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.Conf
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
@@ -191,4 +197,43 @@ class MapperTest {
             .and { get { setVariableData[0].variable.name }.isEqualTo("key") }
             .and { get { setVariableData[0].component.name }.isEqualTo("key") }
     }
+
+    @Test
+    fun getConfiguration() {
+        val mapper: GetConfigurationMapper = Mappers.getMapper(GetConfigurationMapper::class.java)
+
+        val reqAll = mapper.coreToGenGetAllVariablesReq()
+        expectThat(reqAll)
+            .and { get { this }.isA<GetAllVariablesReq>() }
+
+        val resp = mapper.genToCoreGetVariablesResp(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.Accepted,
+                        component = ComponentType("global"),
+                        variable = VariableType("variable-1", "instance"),
+                        readonly = true,
+                        attributeValue = "123"
+                    ),
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("global"),
+                        variable = VariableType("variable-2", "instance"),
+                    )
+                )
+            )
+        )
+        expectThat(resp)
+            .and { get { configurationKey }.isEqualTo(listOf(KeyValue("variable-1instance", true, "123"))) }
+            .and { get { unknownKey }.isEqualTo(listOf("variable-2instance")) }
+
+        val req = mapper.coreToGenGetVariablesReq(GetConfigurationReq(listOf("variable1", "variable2")))
+        expectThat(req)
+            .and { get { getVariableData[0].variable.name }.isEqualTo("variable1") }
+            .and { get { getVariableData[1].variable.name }.isEqualTo("variable2") }
+            .and { get { getVariableData[0].component.name }.isEqualTo("variable1") }
+            .and { get { getVariableData[1].component.name }.isEqualTo("variable2") }
+    }
+
 }

@@ -9,6 +9,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionResp
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
@@ -113,5 +115,28 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             req,
             mapper.genToCoreResp(response.response)
         )
+    }
+
+    override fun getConfiguration(
+        meta: RequestMetadata,
+        req: GetConfigurationReq
+    ): OperationExecution<GetConfigurationReq, GetConfigurationResp> {
+        val mapper: GetConfigurationMapper = Mappers.getMapper(GetConfigurationMapper::class.java)
+        return if (req.key != null && req.key!!.isNotEmpty()) {
+            val response = csApi.getVariables(meta, mapper.coreToGenGetVariablesReq(req))
+            OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreGetVariablesResp(response.response)
+            )
+        } else {
+            val response = csApi.getAllVariables(meta, mapper.coreToGenGetAllVariablesReq())
+            OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreGetAllVariablesResp(response.response)
+            )
+
+        }
     }
 }

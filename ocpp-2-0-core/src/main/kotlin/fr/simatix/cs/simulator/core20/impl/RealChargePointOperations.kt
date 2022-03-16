@@ -10,6 +10,9 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
@@ -84,6 +87,27 @@ class RealChargePointOperations(
 
         client.receiveMessage("UnlockConnector") { req: UnlockConnectorReq ->
             csmsOperations.unlockConnector(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetVariables") { req: GetVariablesReq ->
+            csmsOperations.getVariables(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetReport") { req: GetReportReq ->
+            csmsOperations.getReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetBaseReport") { req: GetBaseReportReq ->
+            csmsOperations.getBaseReport(
                 RequestMetadata(chargeStationId),
                 req
             ).response

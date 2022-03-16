@@ -6,6 +6,12 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -50,49 +56,70 @@ class CoreTest {
 
         val csmsOperations : CSMSOperations = object : CSMSOperations{
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun changeAvailability(
                 meta: RequestMetadata,
                 req: ChangeAvailabilityReq
             ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun clearCache(
                 meta: RequestMetadata,
                 req: ClearCacheReq
             ): OperationExecution<ClearCacheReq, ClearCacheResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun requestStartTransaction(
                 meta: RequestMetadata,
                 req: RequestStartTransactionReq
             ): OperationExecution<RequestStartTransactionReq, RequestStartTransactionResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun requestStopTransaction(
                 meta: RequestMetadata,
                 req: RequestStopTransactionReq
             ): OperationExecution<RequestStopTransactionReq, RequestStopTransactionResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun setVariables(
                 meta: RequestMetadata,
                 req: SetVariablesReq
             ): OperationExecution<SetVariablesReq, SetVariablesResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun unlockConnector(
                 meta: RequestMetadata,
                 req: UnlockConnectorReq
             ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
+            }
+
+            override fun getBaseReport(
+                meta: RequestMetadata,
+                req: GetBaseReportReq
+            ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getReport(
+                meta: RequestMetadata,
+                req: GetReportReq
+            ): OperationExecution<GetReportReq, GetReportResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getVariables(
+                meta: RequestMetadata,
+                req: GetVariablesReq
+            ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+                TODO("Not implemented")
             }
         }
 

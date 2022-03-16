@@ -11,6 +11,7 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
@@ -86,6 +87,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("UnlockConnector") { req: UnlockConnectorReq ->
             csmsOperations.unlockConnector(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetConfiguration") { req: GetConfigurationReq ->
+            csmsOperations.getConfiguration(
                 RequestMetadata(chargeStationId),
                 req
             ).response

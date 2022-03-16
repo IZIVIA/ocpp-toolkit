@@ -16,6 +16,17 @@ import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
+import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
@@ -127,6 +138,50 @@ class IntegrationTest {
             req: UnlockConnectorReq
         ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
             val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getAllVariables(
+            meta: RequestMetadata,
+            req: GetAllVariablesReq
+        ): OperationExecution<GetAllVariablesReq, GetAllVariablesResp> {
+            val response = GetAllVariablesResp(
+                listOf(
+                    KeyValue("AllowOfflineTxForUnknownId", true, "true"),
+                    KeyValue("AuthorizationCacheEnabled", false, "true")
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getBaseReport(
+            meta: RequestMetadata,
+            req: GetBaseReportReq
+        ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+            val response = GetBaseReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getReport(
+            meta: RequestMetadata,
+            req: GetReportReq
+        ): OperationExecution<GetReportReq, GetReportResp> {
+            val response = GetReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getVariables(
+            meta: RequestMetadata,
+            req: GetVariablesReq
+        ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+            val response = GetVariablesResp(req.getVariableData.map {
+                GetVariableResultType(
+                    attributeStatus = GetVariableStatusEnumType.Accepted,
+                    component = ComponentType(it.component.name),
+                    variable = VariableType(it.variable.name),
+                    readonly = true
+                )
+            })
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

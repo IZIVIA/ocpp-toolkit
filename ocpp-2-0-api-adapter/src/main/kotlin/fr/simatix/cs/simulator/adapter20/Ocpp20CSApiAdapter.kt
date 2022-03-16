@@ -7,6 +7,12 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
@@ -23,7 +29,7 @@ import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import org.mapstruct.factory.Mappers
 
-class Ocpp20CSApiAdapter(val csApi: CSApi) : CSMSOperations {
+class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
 
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
         val mapper: ResetMapper = Mappers.getMapper(ResetMapper::class.java)
@@ -106,6 +112,42 @@ class Ocpp20CSApiAdapter(val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
         val mapper: UnlockConnectorMapper = Mappers.getMapper(UnlockConnectorMapper::class.java)
         val response = csApi.unlockConnector(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getVariables(
+        meta: RequestMetadata,
+        req: GetVariablesReq
+    ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+        val mapper: GetVariablesMapper = Mappers.getMapper(GetVariablesMapper::class.java)
+        val response = csApi.getVariables(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getBaseReport(
+        meta: RequestMetadata,
+        req: GetBaseReportReq
+    ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+        val mapper: GetBaseReportMapper = Mappers.getMapper(GetBaseReportMapper::class.java)
+        val response = csApi.getBaseReport(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getReport(meta: RequestMetadata, req: GetReportReq): OperationExecution<GetReportReq, GetReportResp> {
+        val mapper: GetReportMapper = Mappers.getMapper(GetReportMapper::class.java)
+        val response = csApi.getReport(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

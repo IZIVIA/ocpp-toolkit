@@ -9,7 +9,19 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.VariableType
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
+import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -52,7 +64,7 @@ class IntegrationTestCSApi {
 
     private lateinit var server: OcppWampServer
     private val port = 12345
-    private lateinit var csApi : CSApi
+    private lateinit var csApi: CSApi
 
     @BeforeEach
     fun init() {
@@ -137,7 +149,55 @@ class IntegrationTestCSApi {
                 req: UnlockConnectorReq
             ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
                 val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
-                return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getAllVariables(
+                meta: RequestMetadata,
+                req: GetAllVariablesReq
+            ): OperationExecution<GetAllVariablesReq, GetAllVariablesResp> {
+                val response = GetAllVariablesResp(
+                    listOf(
+                        KeyValue("AllowOfflineTxForUnknownId", true, "true"),
+                        KeyValue("AuthorizationCacheEnabled", false, "true")
+                    )
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getBaseReport(
+                meta: RequestMetadata,
+                req: GetBaseReportReq
+            ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+                val response = GetBaseReportResp(GenericDeviceModelStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getReport(
+                meta: RequestMetadata,
+                req: GetReportReq
+            ): OperationExecution<GetReportReq, GetReportResp> {
+                val response = GetReportResp(GenericDeviceModelStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getVariables(
+                meta: RequestMetadata,
+                req: GetVariablesReq
+            ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+                val response = GetVariablesResp(req.getVariableData.map {
+                    GetVariableResultType(
+                        attributeStatus = if (it.variable.name == "AllowOfflineTxForUnknownId") {
+                            GetVariableStatusEnumType.Accepted
+                        } else {
+                            GetVariableStatusEnumType.Rejected
+                        },
+                        component = ComponentType(it.component.name),
+                        variable = VariableType(it.variable.name),
+                        readonly = true
+                    )
+                })
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
     }
@@ -153,28 +213,72 @@ class IntegrationTestCSApi {
 
         csmsApi.connect()
 
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "ChangeAvailability", "{\"connectorId\": 1,\"type\": \"Operative\"}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "ChangeConfiguration", "{\"key\": \"key\",\"value\": \"empty\"}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "ClearCache", "{}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "RemoteStartTransaction", "{\"idTag\": \"Tag1\",\"connectorId\": 2}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "RemoteStopTransaction", "{\"transactionId\": 15}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "UnlockConnector", "{\"connectorId\": 2}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "Reset", "{\"type\": \"Hard\"}"))
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ChangeAvailability", "{\"connectorId\": 1,\"type\": \"Operative\"}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ChangeConfiguration", "{\"key\": \"key\",\"value\": \"empty\"}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ClearCache", "{}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "RemoteStartTransaction", "{\"idTag\": \"Tag1\",\"connectorId\": 2}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "RemoteStopTransaction", "{\"transactionId\": 15}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "UnlockConnector", "{\"connectorId\": 2}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "Reset", "{\"type\": \"Hard\"}"
+            )
+        )
 
-        verify(csApiSpy,times(1)).reset(any(),any())
-        verify(csApiSpy,times(1)).changeAvailability(any(),any())
-        verify(csApiSpy,times(1)).setVariables(any(),any())
-        verify(csApiSpy,times(1)).clearCache(any(),any())
-        verify(csApiSpy,times(1)).requestStartTransaction(any(),any())
-        verify(csApiSpy,times(1)).requestStopTransaction(any(),any())
-        verify(csApiSpy,times(1)).unlockConnector(any(),any())
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetConfiguration", "{}"
+            )
+        )
+
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetConfiguration", "{\"key\": [\"AllowOfflineTxForUnknownId\",\"AuthorizationCacheEnabled\"]}"
+            )
+        )
+
+        verify(csApiSpy, times(1)).reset(any(), any())
+        verify(csApiSpy, times(1)).changeAvailability(any(), any())
+        verify(csApiSpy, times(1)).setVariables(any(), any())
+        verify(csApiSpy, times(1)).clearCache(any(), any())
+        verify(csApiSpy, times(1)).requestStartTransaction(any(), any())
+        verify(csApiSpy, times(1)).requestStopTransaction(any(), any())
+        verify(csApiSpy, times(1)).unlockConnector(any(), any())
+        verify(csApiSpy, times(1)).getAllVariables(any(), any())
+        verify(csApiSpy, times(1)).getVariables(any(), any())
 
         csmsApi.close()
     }
@@ -189,30 +293,81 @@ class IntegrationTestCSApi {
 
         csmsApi.connect()
 
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "ChangeAvailability", "{\"operationalStatus\": \"Operative\"}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "SetVariables", "{\"setVariableData\": [ {\"attributeValue\": \"value\", \"component\": {\"name\": \"component1\"}, \"variable\": {\"name\":\"variable1\"}} ]}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "ClearCache", "{}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "RequestStartTransaction", "{\"remoteStartId\": 12,\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "RequestStopTransaction", "{\"transactionId\": \"15\"}"))
-        server.sendBlocking("chargePoint2", WampMessage(WampMessageType.CALL, "1",
-            "UnlockConnector", "{\"connectorId\": 2,\"evseId\": 0}"))
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ChangeAvailability", "{\"operationalStatus\": \"Operative\"}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL,
+                "1",
+                "SetVariables",
+                "{\"setVariableData\": [ {\"attributeValue\": \"value\", \"component\": {\"name\": \"component1\"}, \"variable\": {\"name\":\"variable1\"}} ]}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ClearCache", "{}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL,
+                "1",
+                "RequestStartTransaction",
+                "{\"remoteStartId\": 12,\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "RequestStopTransaction", "{\"transactionId\": \"15\"}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "UnlockConnector", "{\"connectorId\": 2,\"evseId\": 0}"
+            )
+        )
         server.sendBlocking(
             "chargePoint2",
             WampMessage(WampMessageType.CALL, "1", "Reset", "{\"type\": \"OnIdle\"}")
         )
+        server.sendBlocking(
+            "chargePoint2",
+            WampMessage(
+                WampMessageType.CALL, "1", "GetVariables",
+                "{\"getVariableData\": [{\"component\": {\"name\": \"component\"}, \"variable\": {\"name\":\"AllowOfflineTxForUnknownId\"}}]}"
+            )
+        )
+        server.sendBlocking(
+            "chargePoint2",
+            WampMessage(WampMessageType.CALL, "1", "GetReport", "{\"requestId\": 1}")
+        )
+        server.sendBlocking(
+            "chargePoint2",
+            WampMessage(
+                WampMessageType.CALL,
+                "1",
+                "GetBaseReport",
+                "{\"requestId\": 1, \"reportBase\": \"ConfigurationInventory\"}"
+            )
+        )
 
-        verify(csApiSpy,times(1)).reset(any(),any())
-        verify(csApiSpy,times(1)).changeAvailability(any(),any())
-        verify(csApiSpy,times(1)).setVariables(any(),any())
-        verify(csApiSpy,times(1)).clearCache(any(),any())
-        verify(csApiSpy,times(1)).requestStartTransaction(any(),any())
-        verify(csApiSpy,times(1)).requestStopTransaction(any(),any())
-        verify(csApiSpy,times(1)).unlockConnector(any(),any())
+        verify(csApiSpy, times(1)).reset(any(), any())
+        verify(csApiSpy, times(1)).changeAvailability(any(), any())
+        verify(csApiSpy, times(1)).setVariables(any(), any())
+        verify(csApiSpy, times(1)).clearCache(any(), any())
+        verify(csApiSpy, times(1)).requestStartTransaction(any(), any())
+        verify(csApiSpy, times(1)).requestStopTransaction(any(), any())
+        verify(csApiSpy, times(1)).unlockConnector(any(), any())
+        verify(csApiSpy, times(1)).getVariables(any(), any())
+        verify(csApiSpy, times(1)).getBaseReport(any(), any())
+        verify(csApiSpy, times(1)).getReport(any(), any())
 
         csmsApi.close()
     }

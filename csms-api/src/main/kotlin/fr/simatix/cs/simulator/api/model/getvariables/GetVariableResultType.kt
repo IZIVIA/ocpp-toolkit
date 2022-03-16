@@ -11,6 +11,7 @@ data class GetVariableResultType(
     val component: ComponentType,
     val variable: VariableType,
     val attributeType: AttributeEnumType = AttributeEnumType.Actual,
+    val readonly: Boolean? = null,
     val attributeValue: String? = null,
     val attributeStatusInfo: StatusInfoType? = null
 )

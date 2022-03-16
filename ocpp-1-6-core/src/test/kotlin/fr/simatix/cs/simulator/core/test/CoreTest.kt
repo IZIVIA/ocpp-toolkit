@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -51,49 +53,56 @@ class CoreTest {
 
         val csmsOperations: CSMSOperations = object : CSMSOperations {
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun changeAvailability(
                 meta: RequestMetadata,
                 req: ChangeAvailabilityReq
             ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun changeConfiguration(
                 meta: RequestMetadata,
                 req: ChangeConfigurationReq
             ): OperationExecution<ChangeConfigurationReq, ChangeConfigurationResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun clearCache(
                 meta: RequestMetadata,
                 req: ClearCacheReq
             ): OperationExecution<ClearCacheReq, ClearCacheResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun remoteStartTransaction(
                 meta: RequestMetadata,
                 req: RemoteStartTransactionReq
             ): OperationExecution<RemoteStartTransactionReq, RemoteStartTransactionResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun remoteStopTransaction(
                 meta: RequestMetadata,
                 req: RemoteStopTransactionReq
             ): OperationExecution<RemoteStopTransactionReq, RemoteStopTransactionResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
             }
 
             override fun unlockConnector(
                 meta: RequestMetadata,
                 req: UnlockConnectorReq
             ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
-                TODO("Not yet implemented")
+                TODO("Not implemented")
+            }
+
+            override fun getConfiguration(
+                meta: RequestMetadata,
+                req: GetConfigurationReq
+            ): OperationExecution<GetConfigurationReq, GetConfigurationResp> {
+                TODO("Not implemented")
             }
         }
 

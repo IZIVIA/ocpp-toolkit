@@ -9,37 +9,61 @@ import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationRes
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq as GetAllVariablesReqGen
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp as GetAllVariablesRespGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq as GetVariablesReqGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp as GetVariablesRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
 abstract class GetConfigurationMapper {
 
-    fun genToCoreResp(getConfigResp: GetVariablesRespGen): GetConfigurationResp {
+
+    fun genToCoreGetAllVariablesResp(getConfigResp: GetAllVariablesRespGen): GetConfigurationResp =
+        GetConfigurationResp(
+            getConfigResp.configurationKey?.map { KeyValue(it.key, it.readonly, it.value) }
+        )
+
+    fun coreToGenGetAllVariablesReq(): GetAllVariablesReqGen =
+        GetAllVariablesReqGen()
+
+    fun genToCoreGetVariablesResp(getConfigResp: GetVariablesRespGen): GetConfigurationResp {
         val knownKeys = mutableListOf<KeyValue>()
         val unknownKeys = mutableListOf<String>()
         getConfigResp.getVariableResult.map {
+            val instance = if (it.variable.instance == null) {
+                ""
+            } else {
+                it.variable.instance
+            }
             when (it.attributeStatus) {
-                //TODO see how to get readonly value
                 GetVariableStatusEnumType.Accepted -> {
-                    knownKeys.add(KeyValue(it.variable.name + it.variable.instance, true, it.attributeValue))
-                }
-                GetVariableStatusEnumType.Rejected -> {
-                    knownKeys.add(KeyValue(it.variable.name + it.variable.instance, false))
+                    if (it.readonly != null) {
+                        knownKeys.add(
+                            KeyValue(
+                                it.variable.name + instance,
+                                it.readonly!!,
+                                it.attributeValue
+                            )
+                        )
+                    } else {
+                        throw IllegalArgumentException("Readonly attribute is required for every GetVariableResultType in OCPP 1.6")
+                    }
                 }
                 else -> {
-                    unknownKeys.add(it.variable.name + it.variable.instance)
+                    unknownKeys.add(
+                        it.variable.name + instance
+                    )
                 }
             }
         }
         return GetConfigurationResp(knownKeys, unknownKeys)
     }
 
-    fun coreToGenReq(getConfigReq: GetConfigurationReq): GetVariablesReqGen =
-        if (getConfigReq.key != null) {
+    fun coreToGenGetVariablesReq(getConfigReq: GetConfigurationReq): GetVariablesReqGen =
+        if (getConfigReq.key != null && getConfigReq.key!!.isNotEmpty()) {
             GetVariablesReqGen(getConfigReq.key!!.map { GetVariableDataType(ComponentType(it), VariableType(it)) })
         } else {
-            throw IllegalArgumentException("key attribute can't be null")
+            throw IllegalArgumentException("key attribute can't be null or empty")
         }
 
 }

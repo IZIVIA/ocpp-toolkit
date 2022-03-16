@@ -15,22 +15,33 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
+import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
-import fr.simatix.cs.simulator.api.model.reset.ResetReq
-import fr.simatix.cs.simulator.api.model.reset.ResetResp
-import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
-import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
-import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode
-import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
@@ -103,7 +114,7 @@ fun main(args: Array<String>) {
     val csApi: CSApi = object : CSApi {
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(
-                ExecutionMetadata(meta, RequestStatus.SUCCESS),req,
+                ExecutionMetadata(meta, RequestStatus.SUCCESS), req,
                 ResetResp(ResetStatusEnumType.Accepted)
             )
         }
@@ -163,9 +174,57 @@ fun main(args: Array<String>) {
             val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
+
+        override fun getAllVariables(
+            meta: RequestMetadata,
+            req: GetAllVariablesReq
+        ): OperationExecution<GetAllVariablesReq, GetAllVariablesResp> {
+            val response = GetAllVariablesResp(
+                listOf(
+                    KeyValue("AllowOfflineTxForUnknownId", true, "true"),
+                    KeyValue("AuthorizationCacheEnabled", false, "true")
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getBaseReport(
+            meta: RequestMetadata,
+            req: GetBaseReportReq
+        ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+            val response = GetBaseReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getReport(
+            meta: RequestMetadata,
+            req: GetReportReq
+        ): OperationExecution<GetReportReq, GetReportResp> {
+            val response = GetReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getVariables(
+            meta: RequestMetadata,
+            req: GetVariablesReq
+        ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+            val response = GetVariablesResp(req.getVariableData.map {
+                GetVariableResultType(
+                    attributeStatus = if (it.variable.name == "AllowOfflineTxForUnknownId") {
+                        GetVariableStatusEnumType.Accepted
+                    } else {
+                        GetVariableStatusEnumType.Rejected
+                    },
+                    component = ComponentType(it.component.name),
+                    variable = VariableType(it.variable.name),
+                    readonly = true
+                )
+            })
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
     }
 
-    val csmsApi = ApiFactory.getCSMSApi(settings, ocppId,csApi)
+    val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
     csmsApi.connect()
 
@@ -178,6 +237,8 @@ fun main(args: Array<String>) {
     )
 
     authorize(csmsApi, ocppId, AuthorizeReq(idToken = IdTokenType("Tag1", IdTokenEnumType.Central)))
+
+    heartbeat(csmsApi, ocppId, HeartbeatReq())
 
     meterValues(
         csmsApi, ocppId, MeterValuesReq(
@@ -253,7 +314,7 @@ fun main(args: Array<String>) {
             timestamp = Clock.System.now(),
             triggerReason = TriggerReasonEnumType.Authorized,
             seqNo = 0,
-            transactionInfo = TransactionType("2",ChargingStateEnumType.SuspendedEVSE),
+            transactionInfo = TransactionType("2", ChargingStateEnumType.SuspendedEVSE),
             meterValue = listOf(
                 MeterValueType(
                     listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionEnd)),
@@ -266,4 +327,5 @@ fun main(args: Array<String>) {
     )
 
     csmsApi.close()
+
 }
