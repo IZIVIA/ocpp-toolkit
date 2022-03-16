@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
@@ -162,4 +164,12 @@ class RealChargePointOperations(
         request: BootNotificationReq
     ): OperationExecution<BootNotificationReq, BootNotificationResp> =
         sendMessage(meta, "BootNotification", request)
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> =
+        sendMessage(meta, "NotifyReport", request)
+
 }

@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
@@ -72,4 +74,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun bootNotification(meta: RequestMetadata, request: BootNotificationReq): OperationExecution<BootNotificationReq, BootNotificationResp>
+
+    /**
+     * Sends a message to the CSMS after receiving a GetBaseReport or GetReport request
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyReport(meta: RequestMetadata, request: NotifyReportReq): OperationExecution<NotifyReportReq, NotifyReportResp>
 }

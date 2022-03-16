@@ -59,6 +59,9 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransfe
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -457,6 +460,33 @@ class AdapterTest {
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
         )
         val response = operations.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `notifyReport request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyReport(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2,
+            ),
+            NotifyReportResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =  NotifyReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+        )
+        val response = operations.notifyReport(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and {

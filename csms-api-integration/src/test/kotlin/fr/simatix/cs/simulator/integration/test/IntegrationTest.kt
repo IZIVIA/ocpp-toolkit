@@ -29,6 +29,11 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
+import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
+import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
+import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -69,6 +74,7 @@ import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import java.util.*
 
@@ -420,5 +426,63 @@ class IntegrationTest {
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
+
+    @Test
+    fun `notifyReport 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyReport(requestMetadata, request) }
+    }
+
+    @Test
+    fun `notifyReport 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            reportData = listOf(
+                ReportDataType(
+                    ComponentType("component"),
+                    VariableType("variable"),
+                    listOf(VariableAttributeType("value")),
+                    VariableCharacteristicsType(DataEnumType.DECIMAL, true)
+                )
+            )
+        )
+        val response = csmsApi.notifyReport(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
 
 }

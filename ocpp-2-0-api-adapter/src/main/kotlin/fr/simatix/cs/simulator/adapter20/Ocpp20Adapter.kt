@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -110,4 +112,11 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))    }
 
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> {
+        val mapper: NotifyReportMapper = Mappers.getMapper(NotifyReportMapper::class.java)
+        val response = operations.notifyReport(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))     }
 }

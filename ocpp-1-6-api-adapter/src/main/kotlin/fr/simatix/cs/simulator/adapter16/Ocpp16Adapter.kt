@@ -9,6 +9,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -178,5 +180,12 @@ class Ocpp16Adapter(
         val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> {
+        throw IllegalStateException("NotifyReport can't be call in OCPP 1.6")
     }
 }

@@ -39,6 +39,9 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.*
+import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
+import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
@@ -63,6 +66,7 @@ import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -442,6 +446,66 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `notify request response format`() {
+        var errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1,
+                    tbc = true,
+                    reportData = listOf(
+                        ReportDataType(
+                            ComponentType("component"), VariableType("variable"), listOf(VariableAttributeType()),
+                            VariableCharacteristicsType(DataEnumType.DECIMAL, true)
+                        )
+                    )
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1,
+                    tbc = true,
+                    reportData = listOf(
+                        ReportDataType(
+                            ComponentType("component"),
+                            VariableType("variable"),
+                            listOf(
+                                VariableAttributeType(
+                                    "value",
+                                    AttributeEnumType.Actual,
+                                    true,
+                                    MutabilityEnumType.ReadWrite,
+                                    true
+                                )
+                            ),
+                            VariableCharacteristicsType(DataEnumType.DECIMAL, true, "unit", 10.0, 20.0, "valuesList")
+                        )
+                    )
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -744,6 +808,13 @@ class JsonSchemaTest {
             ),
             "GetBaseReportResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notify report response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
