@@ -8,7 +8,7 @@ import org.mapstruct.ReportingPolicy
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp as AuthorizeRespGen
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class AuthorizeMapper {
 
     @Mapping(source = "idToken.idToken", target = "idTag")

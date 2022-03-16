@@ -8,10 +8,10 @@ import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq as GetBa
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp as GetBaseReportRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-abstract class GetBaseReportMapper {
+interface GetBaseReportMapper {
 
-    abstract fun genToCoreResp(getBaseReportResp: GetBaseReportRespGen?): GetBaseReportResp
+    fun genToCoreResp(getBaseReportResp: GetBaseReportRespGen?): GetBaseReportResp
 
-    abstract fun coreToGenReq(getBaseReportReq: GetBaseReportReq): GetBaseReportReqGen
+    fun coreToGenReq(getBaseReportReq: GetBaseReportReq): GetBaseReportReqGen
 
 }

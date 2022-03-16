@@ -7,11 +7,11 @@ import org.mapstruct.ReportingPolicy
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq as GetVariablesReqGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp as GetVariablesRespGen
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
-abstract class GetVariablesMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+interface GetVariablesMapper {
 
-    abstract fun genToCoreResp(getVariablesResp: GetVariablesRespGen?): GetVariablesResp
+    fun genToCoreResp(getVariablesResp: GetVariablesRespGen?): GetVariablesResp
 
-    abstract fun coreToGenReq(getVariablesReq: GetVariablesReq): GetVariablesReqGen
+    fun coreToGenReq(getVariablesReq: GetVariablesReq): GetVariablesReqGen
 
 }

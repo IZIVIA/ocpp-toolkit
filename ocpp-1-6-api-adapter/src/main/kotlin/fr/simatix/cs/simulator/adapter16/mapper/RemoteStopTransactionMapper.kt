@@ -7,11 +7,11 @@ import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
-abstract class RemoteStopTransactionMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+interface RemoteStopTransactionMapper {
 
-    abstract fun genToCoreResp(remoteStopResp: RequestStopTransactionResp?): RemoteStopTransactionResp
+    fun genToCoreResp(remoteStopResp: RequestStopTransactionResp?): RemoteStopTransactionResp
     
-    abstract fun coreToGenReq(remoteStopReq: RemoteStopTransactionReq): RequestStopTransactionReq
+    fun coreToGenReq(remoteStopReq: RemoteStopTransactionReq): RequestStopTransactionReq
 
 }

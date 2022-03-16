@@ -14,9 +14,8 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp as 
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq as GetVariablesReqGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp as GetVariablesRespGen
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class GetConfigurationMapper {
-
 
     fun genToCoreGetAllVariablesResp(getConfigResp: GetAllVariablesRespGen): GetConfigurationResp =
         GetConfigurationResp(

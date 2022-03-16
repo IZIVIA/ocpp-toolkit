@@ -11,8 +11,6 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp as MeterVal
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class MeterValuesMapper {
 
-
-
     @Throws(IllegalStateException::class)
     fun genToCoreReq(meterValuesReq: MeterValuesReqGen): MeterValuesReq {
         val connectorId: Int = meterValuesReq.evseId

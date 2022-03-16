@@ -11,7 +11,7 @@ import org.mapstruct.ReportingPolicy
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq as UnlockConnectorReqGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp as UnlockConnectorRespGen
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class UnlockConnectorMapper {
 
     @Named("convertUnlockStatus")

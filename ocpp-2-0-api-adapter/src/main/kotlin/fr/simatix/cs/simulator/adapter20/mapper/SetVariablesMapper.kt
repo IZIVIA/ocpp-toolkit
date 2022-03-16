@@ -8,9 +8,9 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq as SetVari
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp as SetVariablesRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-abstract class SetVariablesMapper {
+interface SetVariablesMapper {
 
-    abstract fun genToCoreResp(changeConfigResp: SetVariablesRespGen): SetVariablesResp
+    fun genToCoreResp(changeConfigResp: SetVariablesRespGen): SetVariablesResp
 
-    abstract fun coreToGenReq(changeConfigReq: SetVariablesReq): SetVariablesReqGen
+    fun coreToGenReq(changeConfigReq: SetVariablesReq): SetVariablesReqGen
 }

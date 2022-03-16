@@ -7,11 +7,11 @@ import org.mapstruct.ReportingPolicy
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq as ChangeAvailabilityReqGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
-abstract class ChangeAvailabilityMapper {
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+interface ChangeAvailabilityMapper {
 
-    abstract fun genToCoreResp(availabilityResp: ChangeAvailabilityRespGen?): ChangeAvailabilityResp
+    fun genToCoreResp(availabilityResp: ChangeAvailabilityRespGen?): ChangeAvailabilityResp
 
-    abstract fun coreToGenReq(availabilityReq: ChangeAvailabilityReq): ChangeAvailabilityReqGen
+    fun coreToGenReq(availabilityReq: ChangeAvailabilityReq): ChangeAvailabilityReqGen
 
 }

@@ -8,10 +8,10 @@ import fr.simatix.cs.simulator.api.model.reset.ResetReq as ResetReqGen
 import fr.simatix.cs.simulator.api.model.reset.ResetResp as ResetRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
-abstract class ResetMapper {
+interface ResetMapper {
 
-    abstract fun genToCoreResp(resetResp: ResetRespGen): ResetResp
+    fun genToCoreResp(resetResp: ResetRespGen): ResetResp
 
-    abstract fun coreToGenReq(resetReq: ResetReq): ResetReqGen
+    fun coreToGenReq(resetReq: ResetReq): ResetReqGen
 
 }
