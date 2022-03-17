@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter20
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
@@ -10,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -26,13 +29,21 @@ import java.net.ConnectException
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp20Adapter(transport: Transport) : CSMSApi {
+class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, csApi: CSApi) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp20Adapter::class.java)
     }
 
-    private val operations = ChargePointOperations.newChargePointOperations(transport)
+    private val operations = ChargePointOperations.newChargePointOperations(chargingStationId,transport,Ocpp20CSApiAdapter(csApi))
+
+    override fun connect() {
+        transport.connect()
+    }
+
+    override fun close() {
+        transport.close()
+    }
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(
@@ -101,4 +112,11 @@ class Ocpp20Adapter(transport: Transport) : CSMSApi {
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))    }
 
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> {
+        val mapper: NotifyReportMapper = Mappers.getMapper(NotifyReportMapper::class.java)
+        val response = operations.notifyReport(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))     }
 }

@@ -1,16 +1,43 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
-import fr.simatix.cs.simulator.api.model.common.MeterValueType
-import fr.simatix.cs.simulator.api.model.common.SampledValueType
-import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
-import fr.simatix.cs.simulator.api.model.common.enumeration.LocationEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.MeasurandEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.PhaseEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.*
+import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
+import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
@@ -32,6 +59,9 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransfe
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
+import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -67,23 +97,144 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusE
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as TransactionTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
-import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
-import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 
 class AdapterTest {
     private lateinit var transport: Transport
     private lateinit var chargePointOperations: RealChargePointOperations
+
+    private val csApi: CSApi = object : CSApi {
+
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                ResetResp(ResetStatusEnumType.Scheduled)
+            )
+        }
+
+        override fun changeAvailability(
+            meta: RequestMetadata,
+            req: ChangeAvailabilityReq
+        ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> {
+            val response = ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearCache(
+            meta: RequestMetadata,
+            req: ClearCacheReq
+        ): OperationExecution<ClearCacheReq, ClearCacheResp> {
+            val response = ClearCacheResp(ClearCacheStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStartTransaction(
+            meta: RequestMetadata,
+            req: RequestStartTransactionReq
+        ): OperationExecution<RequestStartTransactionReq, RequestStartTransactionResp> {
+            val response = RequestStartTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStopTransaction(
+            meta: RequestMetadata,
+            req: RequestStopTransactionReq
+        ): OperationExecution<RequestStopTransactionReq, RequestStopTransactionResp> {
+            val response = RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setVariables(
+            meta: RequestMetadata,
+            req: SetVariablesReq
+        ): OperationExecution<SetVariablesReq, SetVariablesResp> {
+            val response = SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        SetVariableStatusEnumType.Accepted,
+                        ComponentType("component"),
+                        VariableType("name")
+                    )
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun unlockConnector(
+            meta: RequestMetadata,
+            req: UnlockConnectorReq
+        ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
+            val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getAllVariables(
+            meta: RequestMetadata,
+            req: GetAllVariablesReq
+        ): OperationExecution<GetAllVariablesReq, GetAllVariablesResp> {
+            val response = GetAllVariablesResp(
+                listOf(
+                    KeyValue("AllowOfflineTxForUnknownId", true, "true"),
+                    KeyValue("AuthorizationCacheEnabled", false, "true")
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getBaseReport(
+            meta: RequestMetadata,
+            req: GetBaseReportReq
+        ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+            val response = GetBaseReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getReport(
+            meta: RequestMetadata,
+            req: GetReportReq
+        ): OperationExecution<GetReportReq, GetReportResp> {
+            val response = GetReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getVariables(
+            meta: RequestMetadata,
+            req: GetVariablesReq
+        ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+            val response = GetVariablesResp(req.getVariableData.map {
+                GetVariableResultType(
+                    attributeStatus = if (it.variable.name == "AllowOfflineTxForUnknownId") {
+                        GetVariableStatusEnumType.Accepted
+                    } else {
+                        GetVariableStatusEnumType.Rejected
+                    },
+                    component = ComponentType(it.component.name),
+                    variable = VariableType(it.variable.name),
+                    readonly = true
+                )
+            })
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+    }
 
     @BeforeEach
     fun init() {
         transport = mockk()
         chargePointOperations = mockk()
         mockkObject(ChargePointOperations.Companion)
-        every { ChargePointOperations.Companion.newChargePointOperations(any()) } returns chargePointOperations
+        every {
+            ChargePointOperations.Companion.newChargePointOperations(
+                any(),
+                any(),
+                any()
+            )
+        } returns chargePointOperations
     }
 
     @Test
@@ -97,7 +248,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = HeartbeatReqGen()
         val response = operations.heartbeat(requestMetadata, request)
         expectThat(response)
@@ -118,7 +269,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = AuthorizeReqGen(idToken = IdTokenTypeGen("Tag1", IdTokenEnumTypeGen.Central))
         val response = operations.authorize(requestMetadata, request)
         expectThat(response)
@@ -142,7 +293,7 @@ class AdapterTest {
             MeterValuesResp()
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = MeterValuesReq(
             1, listOf(
                 MeterValueType(
@@ -181,7 +332,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = DataTransferReq(
             vendorId = "vendor1",
             messageId = "ID100",
@@ -211,7 +362,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request =
             BootNotificationReqGen(
                 ChargingStationTypeGen("model", "vendor", "firmware", ModemType("a", "b")),
@@ -252,7 +403,7 @@ class AdapterTest {
             )
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request =
             TransactionEventReqGen(
                 TransactionEventEnumTypeGen.Started,
@@ -301,7 +452,7 @@ class AdapterTest {
             StatusNotificationResp()
         )
 
-        val operations = Ocpp20Adapter(transport)
+        val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = StatusNotificationReqGen(
             connectorId = 1,
             connectorStatus = ConnectorStatusEnumTypeGen.Available,
@@ -309,6 +460,33 @@ class AdapterTest {
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
         )
         val response = operations.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `notifyReport request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyReport(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2,
+            ),
+            NotifyReportResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =  NotifyReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+        )
+        val response = operations.notifyReport(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and {

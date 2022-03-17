@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter16
 
 import fr.simatix.cs.simulator.adapter16.mapper.*
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationResp
@@ -8,6 +9,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -29,13 +32,27 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp as AuthorizeRes
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp16Adapter(transport: Transport, private val transactionIds: TransactionRepository) : CSMSApi {
+class Ocpp16Adapter(
+    chargingStationId: String,
+    private val transport: Transport,
+    csApi: CSApi,
+    private val transactionIds: TransactionRepository
+) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp16Adapter::class.java)
     }
 
-    private val operations = ChargePointOperations.newChargePointOperations(transport)
+    private val operations: ChargePointOperations =
+        ChargePointOperations.newChargePointOperations(chargingStationId, transport, Ocpp16CSApiAdapter(csApi))
+
+    override fun connect() {
+        transport.connect()
+    }
+
+    override fun close() {
+        transport.close()
+    }
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(
@@ -163,5 +180,12 @@ class Ocpp16Adapter(transport: Transport, private val transactionIds: Transactio
         val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> {
+        throw IllegalStateException("NotifyReport can't be call in OCPP 1.6")
     }
 }

@@ -1,26 +1,64 @@
 package fr.simatix.cs.simulator.integration.test
 
+import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
+import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
+import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
+import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
+import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reset.ResetReq
+import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.api.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
-import fr.simatix.cs.simulator.integration.CSMSApiFactory
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
+import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
+import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import io.mockk.every
@@ -36,12 +74,123 @@ import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import java.util.*
 
 class IntegrationTest {
 
     private lateinit var ocppWampClient: OkHttpOcppWampClient
+    private val csApi: CSApi = object : CSApi {
+
+        override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                ResetResp(ResetStatusEnumType.Scheduled)
+            )
+        }
+
+        override fun changeAvailability(
+            meta: RequestMetadata,
+            req: ChangeAvailabilityReq
+        ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> {
+            val response = ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearCache(
+            meta: RequestMetadata,
+            req: ClearCacheReq
+        ): OperationExecution<ClearCacheReq, ClearCacheResp> {
+            val response = ClearCacheResp(ClearCacheStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStartTransaction(
+            meta: RequestMetadata,
+            req: RequestStartTransactionReq
+        ): OperationExecution<RequestStartTransactionReq, RequestStartTransactionResp> {
+            val response = RequestStartTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun requestStopTransaction(
+            meta: RequestMetadata,
+            req: RequestStopTransactionReq
+        ): OperationExecution<RequestStopTransactionReq, RequestStopTransactionResp> {
+            val response = RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setVariables(
+            meta: RequestMetadata,
+            req: SetVariablesReq
+        ): OperationExecution<SetVariablesReq, SetVariablesResp> {
+            val response = SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        SetVariableStatusEnumType.Accepted,
+                        ComponentType("component"),
+                        VariableType("name")
+                    )
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun unlockConnector(
+            meta: RequestMetadata,
+            req: UnlockConnectorReq
+        ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> {
+            val response = UnlockConnectorResp(UnlockStatusEnumType.Unlocked)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getAllVariables(
+            meta: RequestMetadata,
+            req: GetAllVariablesReq
+        ): OperationExecution<GetAllVariablesReq, GetAllVariablesResp> {
+            val response = GetAllVariablesResp(
+                listOf(
+                    KeyValue("AllowOfflineTxForUnknownId", true, "true"),
+                    KeyValue("AuthorizationCacheEnabled", false, "true")
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getBaseReport(
+            meta: RequestMetadata,
+            req: GetBaseReportReq
+        ): OperationExecution<GetBaseReportReq, GetBaseReportResp> {
+            val response = GetBaseReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getReport(
+            meta: RequestMetadata,
+            req: GetReportReq
+        ): OperationExecution<GetReportReq, GetReportResp> {
+            val response = GetReportResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getVariables(
+            meta: RequestMetadata,
+            req: GetVariablesReq
+        ): OperationExecution<GetVariablesReq, GetVariablesResp> {
+            val response = GetVariablesResp(req.getVariableData.map {
+                GetVariableResultType(
+                    attributeStatus = GetVariableStatusEnumType.Accepted,
+                    component = ComponentType(it.component.name),
+                    variable = VariableType(it.variable.name),
+                    readonly = true
+                )
+            })
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+    }
 
     @BeforeEach
     fun init() {
@@ -53,7 +202,7 @@ class IntegrationTest {
         ocppWampClient = mockk()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
-
+        every { ocppWampClient.onAction(any()) } returns Unit
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
     }
@@ -70,7 +219,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = HeartbeatReq()
@@ -91,7 +240,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = AuthorizeReq(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
@@ -114,7 +263,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = MeterValuesReq(
@@ -172,7 +321,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = DataTransferReq("vendor", "msgId12", "Hello")
@@ -196,7 +345,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request =
@@ -221,7 +370,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = TransactionEventReq(
@@ -230,16 +379,28 @@ class IntegrationTest {
             triggerReason = TriggerReasonEnumType.Authorized,
             seqNo = 0,
             transactionInfo = TransactionType("1"),
-            meterValue = listOf(MeterValueType(listOf(SampledValueType(10.0,ReadingContextEnumType.TransactionBegin)), Instant.parse("2022-02-15T00:00:00.000Z"))),
-            idToken = IdTokenType("Tag1",IdTokenEnumType.Central),
-            evse = EVSEType(1,1)
+            meterValue = listOf(
+                MeterValueType(
+                    listOf(SampledValueType(10.0, ReadingContextEnumType.TransactionBegin)),
+                    Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ),
+            idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
+            evse = EVSEType(1, 1)
         )
         val response = csmsApi.transactionEvent(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
             .and { get { this.response.totalCost }.isEqualTo(null) }
             .and { get { this.response.chargingPriority }.isEqualTo(0) }
-            .and { get { this.response.idTokenInfo }.isEqualTo(IdTokenInfoType(AuthorizationStatusEnumType.Accepted, Instant.parse("2022-02-15T00:00:00.000Z"))) }
+            .and {
+                get { this.response.idTokenInfo }.isEqualTo(
+                    IdTokenInfoType(
+                        AuthorizationStatusEnumType.Accepted,
+                        Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            }
             .and { get { this.response.updatedPersonalMessage }.isEqualTo(null) }
     }
 
@@ -255,15 +416,73 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = CSMSApiFactory.getCSMSApi(settings, ocppId)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = StatusNotificationReq(
-            1,ConnectorStatusEnumType.Occupied,1, Instant.parse("2022-02-15T00:00:00.000Z")
+            1, ConnectorStatusEnumType.Occupied, 1, Instant.parse("2022-02-15T00:00:00.000Z")
         )
         val response = csmsApi.statusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
+
+    @Test
+    fun `notifyReport 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyReport(requestMetadata, request) }
+    }
+
+    @Test
+    fun `notifyReport 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            reportData = listOf(
+                ReportDataType(
+                    ComponentType("component"),
+                    VariableType("variable"),
+                    listOf(VariableAttributeType("value")),
+                    VariableCharacteristicsType(DataEnumType.DECIMAL, true)
+                )
+            )
+        )
+        val response = csmsApi.notifyReport(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
 
 }

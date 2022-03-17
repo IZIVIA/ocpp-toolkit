@@ -27,7 +27,8 @@ import java.net.ConnectException
  */
 interface ChargePointOperations {
     companion object {
-        fun newChargePointOperations(transport: Transport) = RealChargePointOperations(transport)
+        fun newChargePointOperations(chargingStationId: String, transport: Transport, csmsOperations: CSMSOperations) =
+            RealChargePointOperations(chargingStationId,transport, csmsOperations)
     }
 
     /**

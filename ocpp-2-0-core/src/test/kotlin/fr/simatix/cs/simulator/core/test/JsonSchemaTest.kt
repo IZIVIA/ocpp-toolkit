@@ -11,28 +11,62 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.core20.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
+import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
-import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.PhaseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableResultType
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
+import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifyreport.*
+import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
+import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.*
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
-import fr.simatix.cs.simulator.core20.model.transactionevent.EVSEType
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TriggerReasonEnumType
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -210,6 +244,268 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `changeAvailability request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityReq(OperationalStatusEnumType.Operative),
+            "ChangeAvailabilityRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityReq(OperationalStatusEnumType.Operative, EVSEType(1, 1)),
+            "ChangeAvailabilityRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearCache request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheReq(),
+            "ClearCacheRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorReq(1, 2),
+            "UnlockConnectorRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `requestStartTransaction request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central)
+            ),
+            "RequestStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central),
+                evseId = 1,
+                chargingProfile = ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                        )
+                    )
+                )
+            ),
+            "RequestStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStartTransactionReq(
+                remoteStartId = 1,
+                idToken = IdTokenType("token", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
+                evseId = 1,
+                chargingProfile = ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            duration = 1,
+                            minChargingRate = 1.0,
+                            salesTariff = SalesTariffType(1, listOf(SalesTariffEntryType(RelativeTimeIntervalType(1))))
+                        )
+                    ),
+                    recurrencyKind = RecurrencyKindEnumType.Daily,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    transactionId = ""
+                )
+            ),
+            "RequestStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `requestStopTransaction request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionReq("tag1"),
+            "RequestStopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getVariables request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesReq(listOf(GetVariableDataType(ComponentType("component"), VariableType("variable")))),
+            "GetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesReq(
+                listOf(
+                    GetVariableDataType(
+                        component = ComponentType(name = "component", instance = "instance", evse = EVSEType(1)),
+                        variable = VariableType(name = "variable", instance = "instance"),
+                        attributeType = AttributeEnumType.Target
+                    )
+                )
+            ),
+            "GetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setVariables request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesReq(
+                listOf(
+                    SetVariableDataType(
+                        attributeValue = "value",
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "SetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesReq(
+                listOf(
+                    SetVariableDataType(
+                        attributeValue = "value",
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.Target
+                    )
+                )
+            ),
+            "SetVariablesRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getReport request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(GetReportReq(1), "GetReportRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportReq(
+                1, listOf(ComponentCriterionEnumType.Active),
+                listOf(ComponentVariableType(ComponentType("component")))
+            ), "GetReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getBaseReport request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
+            "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notify request response format`() {
+        var errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1,
+                    tbc = true,
+                    reportData = listOf(
+                        ReportDataType(
+                            ComponentType("component"), VariableType("variable"), listOf(VariableAttributeType()),
+                            VariableCharacteristicsType(DataEnumType.DECIMAL, true)
+                        )
+                    )
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors =
+            JsonSchemaValidator.isValidObjectV6(
+                NotifyReportReq(
+                    requestId = 1,
+                    generatedAt = Clock.System.now(),
+                    seqNo = 1,
+                    tbc = true,
+                    reportData = listOf(
+                        ReportDataType(
+                            ComponentType("component"),
+                            VariableType("variable"),
+                            listOf(
+                                VariableAttributeType(
+                                    "value",
+                                    AttributeEnumType.Actual,
+                                    true,
+                                    MutabilityEnumType.ReadWrite,
+                                    true
+                                )
+                            ),
+                            VariableCharacteristicsType(DataEnumType.DECIMAL, true, "unit", 10.0, 20.0, "valuesList")
+                        )
+                    )
+                ), "NotifyReportRequest.json"
+            )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -218,7 +514,6 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
-
 
     @Test
     fun `authorize response format`() {
@@ -337,4 +632,191 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `changeAvailability response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted),
+            "ChangeAvailabilityResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted, StatusInfoType("", "")),
+            "ChangeAvailabilityResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearCache response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheResp(ClearCacheStatusEnumType.Accepted),
+            "ClearCacheResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("", "")),
+            "ClearCacheResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorResp(UnlockStatusEnumType.Unlocked),
+            "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            UnlockConnectorResp(UnlockStatusEnumType.Unlocked, StatusInfoType("", "")),
+            "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `requestStopTransaction response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted),
+            "RequestStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted, StatusInfoType("reason", "additional")),
+            "RequestStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getVariables response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "GetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetVariablesResp(
+                listOf(
+                    GetVariableResultType(
+                        attributeStatus = GetVariableStatusEnumType.NotSupportedAttributeType,
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        attributeType = AttributeEnumType.Target,
+                        attributeValue = "value",
+                        attributeStatusInfo = StatusInfoType("reason")
+                    )
+                )
+            ),
+            "GetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setVariables response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumType.Accepted,
+                        component = ComponentType("component"),
+                        variable = VariableType("variable")
+                    )
+                )
+            ),
+            "SetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetVariablesResp(
+                listOf(
+                    SetVariableResultType(
+                        attributeStatus = SetVariableStatusEnumType.Accepted,
+                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                        variable = VariableType("variable", "instance"),
+                        AttributeEnumType.Target,
+                        StatusInfoType("reason", "additional")
+                    )
+                )
+            ),
+            "SetVariablesResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getReport response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportResp(GenericDeviceModelStatusEnumType.Accepted),
+            "GetReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetReportResp(
+                GenericDeviceModelStatusEnumType.EmptyResultSet,
+                StatusInfoType("reason", "additional")
+            ),
+            "GetReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getBaseReport response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportResp(GenericDeviceModelStatusEnumType.Rejected),
+            "GetBaseReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetBaseReportResp(
+                GenericDeviceModelStatusEnumType.Rejected,
+                StatusInfoType("reason", "additional")
+            ),
+            "GetBaseReportResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notify report response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 }

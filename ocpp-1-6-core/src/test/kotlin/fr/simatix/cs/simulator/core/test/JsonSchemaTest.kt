@@ -5,18 +5,39 @@ import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.enumeration.RegistrationStatus
+import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
+import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
+import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
+import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityType
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
+import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.ConfigurationStatus
+import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.AuthorizationStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.Phase
+import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core16.model.remotestart.*
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
+import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
+import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -26,6 +47,9 @@ import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.Charg
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.core16.model.stoptransaction.enumeration.Reason
+import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
@@ -221,6 +245,99 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `changeAvailability request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeAvailabilityReq(1, AvailabilityType.Operative), "ChangeAvailabilityRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearCache request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ClearCacheReq(), "ClearCacheRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UnlockConnectorReq(1), "UnlockConnectorRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStartTransaction request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionReq("Tag1"), "RemoteStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionReq(
+                idTag = "Tag1", connectorId = 1, chargingProfile = ChargingProfile(
+                    chargingProfileId = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeType.ChargePointMaxProfile,
+                    chargingProfileKind = ChargingProfileKindType.Absolute,
+                    chargingSchedule = ChargingSchedule(
+                        chargingRateUnit = ChargingRateUnitType.A,
+                        chargingSchedulePeriod = listOf(ChargingSchedulePeriod(0, 0.1, 2)),
+                        duration = 100,
+                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        minChargingRate = 0.2
+                    ),
+                    recurrencyKind = RecurrencyKindType.Weekly,
+                    transactionId = 10,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ), "RemoteStartTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStopTransaction request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStopTransactionReq(1), "RemoteStopTransactionRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getConfiguration request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationReq(), "GetConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationReq(listOf("key")), "GetConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `changeConfiguration request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeConfigurationReq("key", "value"), "ChangeConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -351,4 +468,80 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `changeAvailability response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeAvailabilityResp(AvailabilityStatus.Accepted), "ChangeAvailabilityResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearCache response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ClearCacheResp(ClearCacheStatus.Accepted), "ClearCacheResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unlockConnector response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UnlockConnectorResp(UnlockStatus.Unlocked), "UnlockConnectorResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStartTransaction response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStartTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStartTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `remoteStopTransaction response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            RemoteStopTransactionResp(RemoteStartStopStatus.Accepted), "RemoteStopTransactionResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getConfiguration response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(), "GetConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(listOf(KeyValue("key", true)), listOf("unknown key")), "GetConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetConfigurationResp(listOf(KeyValue("key", true, "value"))), "GetConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `changeConfiguration response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
 }
