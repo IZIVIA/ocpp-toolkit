@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.api.model.transactionevent
 
+import fr.simatix.cs.simulator.api.model.Request
 import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.common.IdTokenType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
@@ -20,4 +21,4 @@ data class TransactionEventReq(
     val numberOfPhasesUsed: Int? = null,
     val offline: Boolean? = false,
     val reservationId: Int? = null,
-)
+): Request

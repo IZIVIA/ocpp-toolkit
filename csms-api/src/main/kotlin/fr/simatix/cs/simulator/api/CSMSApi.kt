@@ -1,5 +1,7 @@
 package fr.simatix.cs.simulator.api
 
+import fr.simatix.cs.simulator.api.model.Request
+import fr.simatix.cs.simulator.api.model.Response
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
@@ -57,3 +59,20 @@ interface CSMSApi {
     ): OperationExecution<NotifyReportReq, NotifyReportResp>
 
 }
+
+@Suppress("UNCHECKED_CAST")
+fun CSMSApi.send(
+    meta: RequestMetadata,
+    request: Request
+): OperationExecution<Request, Response> =
+    when (request) {
+        is HeartbeatReq -> heartbeat(meta, request)
+        is AuthorizeReq -> authorize(meta, request)
+        is MeterValuesReq -> meterValues(meta, request)
+        is DataTransferReq -> dataTransfer(meta, request)
+        is BootNotificationReq -> bootNotification(meta, request)
+        is TransactionEventReq -> transactionEvent(meta, request)
+        is StatusNotificationReq -> statusNotification(meta, request)
+        is NotifyReportReq -> notifyReport(meta, request)
+        else -> throw IllegalStateException()
+    } as OperationExecution<Request, Response>

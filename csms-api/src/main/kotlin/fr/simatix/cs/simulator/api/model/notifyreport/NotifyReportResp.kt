@@ -1,3 +1,5 @@
 package fr.simatix.cs.simulator.api.model.notifyreport
 
-class NotifyReportResp
+import fr.simatix.cs.simulator.api.model.Response
+
+class NotifyReportResp: Response
