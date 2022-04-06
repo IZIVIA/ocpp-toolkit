@@ -19,6 +19,7 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
@@ -63,6 +64,9 @@ import fr.simatix.cs.simulator.core16.model.common.enumeration.AuthorizationStat
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
@@ -96,6 +100,7 @@ import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqG
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -539,6 +544,29 @@ class AdapterTest {
             errorCode = ChargePointErrorCodeGen.EVCommunicationError
         )
         val response = operations.statusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `firmwareStatusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.firmwareStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            FirmwareStatusNotificationReq(
+                FirmwareStatus.Downloaded
+            ),
+            FirmwareStatusNotificationResp()
+        )
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val request =  FirmwareStatusNotificationReqGen(
+            FirmwareStatusEnumType.Downloaded
+        )
+        val response = operations.firmwareStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and {

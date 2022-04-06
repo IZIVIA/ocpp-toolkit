@@ -26,6 +26,9 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
@@ -458,6 +461,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `firmwareStatusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            FirmwareStatusNotificationReq(FirmwareStatusEnumType.Downloaded),
+            "FirmwareStatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -846,6 +859,13 @@ class JsonSchemaTest {
             ),
             "CancelReservationResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `firmwareStatusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

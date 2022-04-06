@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
@@ -37,6 +39,7 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.Conf
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
@@ -252,4 +255,12 @@ class MapperTest {
             .and { get { reservationId }.isEqualTo(3) }
     }
 
+    @Test
+    fun requestFirmwareStatusNotificationMapper() {
+        val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
+
+        val req = mapper.genToCoreReq(FirmwareStatusNotificationReq(FirmwareStatusEnumType.InstallScheduled))
+        expectThat(req)
+            .and { get { status }.isEqualTo(FirmwareStatus.Idle) }
+    }
 }

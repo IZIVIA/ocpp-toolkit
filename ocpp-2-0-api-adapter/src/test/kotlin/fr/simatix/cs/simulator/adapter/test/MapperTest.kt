@@ -22,6 +22,9 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.AttributeEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericDeviceModelStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
@@ -396,6 +399,15 @@ class MapperTest {
 
         val req = mapper.coreToGenReq(CancelReservationReq(3))
         expectThat(req).and { get { req.reservationId }.isEqualTo(3) }
+    }
+
+    @Test
+    fun requestFirmwareStatusNotificationMapper() {
+        val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
+
+        val req = mapper.genToCoreReq(FirmwareStatusNotificationReqGen(FirmwareStatusEnumTypeGen.InstallRebooting))
+        expectThat(req)
+            .and { get { status }.isEqualTo(FirmwareStatusEnumType.InstallRebooting) }
     }
 
 }

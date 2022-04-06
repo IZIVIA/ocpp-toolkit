@@ -59,6 +59,11 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
@@ -498,6 +503,29 @@ class AdapterTest {
             seqNo = 2,
         )
         val response = operations.notifyReport(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `firmwareStatusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.firmwareStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            FirmwareStatusNotificationReq(
+                FirmwareStatusEnumType.Downloaded
+            ),
+            FirmwareStatusNotificationResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =  FirmwareStatusNotificationReqGen(
+            FirmwareStatusEnumTypeGen.Downloaded
+        )
+        val response = operations.firmwareStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and {

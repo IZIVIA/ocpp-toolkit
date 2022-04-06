@@ -27,6 +27,9 @@ import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopSt
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
@@ -350,6 +353,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `firmwareStatusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            FirmwareStatusNotificationReq(FirmwareStatus.Downloaded),
+            "FirmwareStatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -552,6 +565,13 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `firmwareStatusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
