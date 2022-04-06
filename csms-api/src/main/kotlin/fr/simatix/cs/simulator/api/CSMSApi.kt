@@ -20,6 +20,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 
 interface CSMSApi {
 
@@ -58,6 +60,10 @@ interface CSMSApi {
         request: NotifyReportReq
     ): OperationExecution<NotifyReportReq, NotifyReportResp>
 
+    fun firmwareStatusNotification(
+            meta: RequestMetadata,
+            request: FirmwareStatusNotificationReq
+    ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp>
 }
 
 @Suppress("UNCHECKED_CAST")
