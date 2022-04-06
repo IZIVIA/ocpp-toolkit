@@ -58,6 +58,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerRea
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.send
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
@@ -518,5 +520,49 @@ class IntegrationTest {
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 
+    @Test
+    fun `firmwareStatusNotification 1-6 request`() {
 
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "FirmwareStatusNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = FirmwareStatusNotificationReq(
+            status = FirmwareStatusEnumType.InstallScheduled
+        )
+        val response = csmsApi.firmwareStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `firmwareStatusNotification 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "FirmwareStatusNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = FirmwareStatusNotificationReq(
+            status = FirmwareStatusEnumType.InstallScheduled
+        )
+        val response = csmsApi.firmwareStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
 }
