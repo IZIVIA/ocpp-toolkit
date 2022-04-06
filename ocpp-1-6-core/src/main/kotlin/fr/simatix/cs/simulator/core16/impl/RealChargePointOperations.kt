@@ -12,6 +12,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
@@ -166,5 +168,12 @@ class RealChargePointOperations(
         request: BootNotificationReq
     ): OperationExecution<BootNotificationReq, BootNotificationResp> =
         sendMessage(meta, "BootNotification", request)
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun firmwareStatusNotification(
+        meta: RequestMetadata,
+        request: FirmwareStatusNotificationReq
+    ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> =
+            sendMessage(meta, "FirmwareStatusNotification", request)
 }
 
