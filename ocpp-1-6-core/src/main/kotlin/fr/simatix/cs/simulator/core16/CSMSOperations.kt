@@ -1,5 +1,7 @@
 package fr.simatix.cs.simulator.core16
 
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
@@ -36,4 +38,6 @@ interface CSMSOperations {
     fun unlockConnector(meta: RequestMetadata,  req: UnlockConnectorReq): OperationExecution<UnlockConnectorReq, UnlockConnectorResp>
 
     fun getConfiguration(meta: RequestMetadata,  req: GetConfigurationReq): OperationExecution<GetConfigurationReq, GetConfigurationResp>
+
+    fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
 }

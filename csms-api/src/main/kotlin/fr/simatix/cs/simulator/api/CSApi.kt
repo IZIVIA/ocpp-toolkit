@@ -1,5 +1,7 @@
 package fr.simatix.cs.simulator.api
 
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
@@ -48,4 +50,6 @@ interface CSApi {
     fun getVariables(meta: RequestMetadata, req : GetVariablesReq): OperationExecution<GetVariablesReq,GetVariablesResp>
 
     fun getAllVariables(meta: RequestMetadata, req: GetAllVariablesReq): OperationExecution<GetAllVariablesReq, GetAllVariablesResp>
+
+    fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
 }

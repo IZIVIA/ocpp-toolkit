@@ -3,6 +3,8 @@ package fr.simatix.cs.simulator.adapter20
 import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.core20.CSMSOperations
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
@@ -148,6 +150,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     override fun getReport(meta: RequestMetadata, req: GetReportReq): OperationExecution<GetReportReq, GetReportResp> {
         val mapper: GetReportMapper = Mappers.getMapper(GetReportMapper::class.java)
         val response = csApi.getReport(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun cancelReservation(
+        meta: RequestMetadata,
+        req: CancelReservationReq
+    ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+        val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
+        val response = csApi.cancelReservation(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

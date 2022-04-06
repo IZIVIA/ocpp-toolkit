@@ -6,6 +6,9 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -220,6 +223,14 @@ fun main(args: Array<String>) {
                     readonly = true
                 )
             })
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun cancelReservation(
+            meta: RequestMetadata,
+            req: CancelReservationReq
+        ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+            val response = CancelReservationResp(CancelReservationStatusEnumType.Rejected)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

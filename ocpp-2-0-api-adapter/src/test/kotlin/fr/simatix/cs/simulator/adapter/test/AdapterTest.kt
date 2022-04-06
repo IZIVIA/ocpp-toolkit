@@ -3,6 +3,9 @@ package fr.simatix.cs.simulator.adapter.test
 import fr.simatix.cs.simulator.adapter20.Ocpp20Adapter
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.ModemType
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -219,6 +222,14 @@ class AdapterTest {
                     readonly = true
                 )
             })
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun cancelReservation(
+            meta: RequestMetadata,
+            req: CancelReservationReq
+        ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+            val response = CancelReservationResp(CancelReservationStatusEnumType.Rejected)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

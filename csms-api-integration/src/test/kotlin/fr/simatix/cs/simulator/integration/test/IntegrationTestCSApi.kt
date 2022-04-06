@@ -1,6 +1,9 @@
 package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.CSApi
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -199,6 +202,14 @@ class IntegrationTestCSApi {
                 })
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun cancelReservation(
+                meta: RequestMetadata,
+                req: CancelReservationReq
+            ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+                val response = CancelReservationResp(CancelReservationStatusEnumType.Rejected)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -269,6 +280,12 @@ class IntegrationTestCSApi {
                 "GetConfiguration", "{\"key\": [\"AllowOfflineTxForUnknownId\",\"AuthorizationCacheEnabled\"]}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "CancelReservation", "{\"reservationId\": 3}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -279,6 +296,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).unlockConnector(any(), any())
         verify(csApiSpy, times(1)).getAllVariables(any(), any())
         verify(csApiSpy, times(1)).getVariables(any(), any())
+        verify(csApiSpy, times(1)).cancelReservation(any(), any())
 
         csmsApi.close()
     }
@@ -357,6 +375,10 @@ class IntegrationTestCSApi {
                 "{\"requestId\": 1, \"reportBase\": \"ConfigurationInventory\"}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2",
+            WampMessage(WampMessageType.CALL, "1", "CancelReservation", "{\"reservationId\": 3}")
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -368,6 +390,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getVariables(any(), any())
         verify(csApiSpy, times(1)).getBaseReport(any(), any())
         verify(csApiSpy, times(1)).getReport(any(), any())
+        verify(csApiSpy, times(1)).cancelReservation(any(), any())
 
         csmsApi.close()
     }

@@ -11,6 +11,9 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.core20.model.bootnotification.ModemType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -446,6 +449,15 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `cancelReservation request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            CancelReservationReq(3), "CancelReservationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -815,6 +827,25 @@ class JsonSchemaTest {
     @Test
     fun `notify report response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `cancelReservation response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            CancelReservationResp(CancelReservationStatusEnumType.Rejected), "CancelReservationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            CancelReservationResp(
+                CancelReservationStatusEnumType.Rejected,
+                StatusInfoType("reason", "additional")
+            ),
+            "CancelReservationResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

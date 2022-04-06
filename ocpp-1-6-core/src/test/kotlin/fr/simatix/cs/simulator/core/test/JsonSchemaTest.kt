@@ -5,6 +5,9 @@ import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core16.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core16.model.bootnotification.enumeration.RegistrationStatus
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.core16.model.cancelreservation.enumeration.CancelReservationStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
@@ -338,6 +341,15 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `cancelReservation request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            CancelReservationReq(3), "CancelReservationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -539,6 +551,15 @@ class JsonSchemaTest {
     fun `changeConfiguration response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `cancelReservation response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            CancelReservationResp(CancelReservationStatus.Rejected), "CancelReservationResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

@@ -2,6 +2,8 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.core16.CSMSOperations
 import fr.simatix.cs.simulator.core16.ChargePointOperations
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
@@ -102,6 +104,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: GetConfigurationReq
             ): OperationExecution<GetConfigurationReq, GetConfigurationResp> {
+                TODO("Not implemented")
+            }
+
+            override fun cancelReservation(
+                meta: RequestMetadata,
+                req: CancelReservationReq
+            ): OperationExecution<CancelReservationReq, CancelReservationResp> {
                 TODO("Not implemented")
             }
         }

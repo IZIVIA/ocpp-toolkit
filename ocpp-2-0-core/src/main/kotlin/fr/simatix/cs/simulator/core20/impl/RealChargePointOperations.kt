@@ -6,6 +6,7 @@ import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
@@ -110,6 +111,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetBaseReport") { req: GetBaseReportReq ->
             csmsOperations.getBaseReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("CancelReservation") { req: CancelReservationReq ->
+            csmsOperations.cancelReservation(
                 RequestMetadata(chargeStationId),
                 req
             ).response

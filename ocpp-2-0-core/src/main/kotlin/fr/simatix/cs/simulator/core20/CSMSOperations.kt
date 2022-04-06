@@ -1,5 +1,7 @@
 package fr.simatix.cs.simulator.core20
 
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
@@ -44,4 +46,6 @@ interface CSMSOperations {
     fun getBaseReport(meta: RequestMetadata,  req: GetBaseReportReq): OperationExecution<GetBaseReportReq, GetBaseReportResp>
 
     fun getVariables(meta: RequestMetadata, req : GetVariablesReq): OperationExecution<GetVariablesReq, GetVariablesResp>
+
+    fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
 }

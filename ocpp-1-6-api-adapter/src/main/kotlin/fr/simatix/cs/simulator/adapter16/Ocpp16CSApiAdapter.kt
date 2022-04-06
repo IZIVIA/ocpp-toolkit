@@ -3,6 +3,8 @@ package fr.simatix.cs.simulator.adapter16
 import fr.simatix.cs.simulator.adapter16.mapper.*
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.core16.CSMSOperations
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
@@ -138,5 +140,18 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             )
 
         }
+    }
+
+    override fun cancelReservation(
+        meta: RequestMetadata,
+        req: CancelReservationReq
+    ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+        val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
+        val response = csApi.cancelReservation(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
     }
 }

@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator
 
 import fr.simatix.cs.simulator.adapter16.mapper.*
+import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
@@ -26,6 +27,8 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core16.model.cancelreservation.enumeration.CancelReservationStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.enumeration.AvailabilityType
@@ -52,6 +55,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp as CancelReservationRespGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
@@ -234,6 +238,18 @@ class MapperTest {
             .and { get { getVariableData[1].variable.name }.isEqualTo("variable2") }
             .and { get { getVariableData[0].component.name }.isEqualTo("variable1") }
             .and { get { getVariableData[1].component.name }.isEqualTo("variable2") }
+    }
+
+    @Test
+    fun cancelReservationMapper() {
+        val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
+        val resp = mapper.genToCoreResp(CancelReservationRespGen(CancelReservationStatusEnumType.Rejected))
+        expectThat(resp)
+            .and { get { status }.isEqualTo(CancelReservationStatus.Rejected) }
+
+        val req = mapper.coreToGenReq(CancelReservationReq(3))
+        expectThat(req)
+            .and { get { reservationId }.isEqualTo(3) }
     }
 
 }
