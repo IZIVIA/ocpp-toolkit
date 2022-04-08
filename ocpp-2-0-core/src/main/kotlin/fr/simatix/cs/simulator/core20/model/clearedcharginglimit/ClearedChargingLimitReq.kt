@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model.clearedcharginglimit
+package fr.simatix.cs.simulator.core20.model.clearedcharginglimit
 
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSourceEnumType
 

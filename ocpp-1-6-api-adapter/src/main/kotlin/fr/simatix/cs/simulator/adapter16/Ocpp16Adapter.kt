@@ -5,6 +5,8 @@ import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.CSMSApi
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -198,5 +200,12 @@ class Ocpp16Adapter(
         val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
         val response = operations.firmwareStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun clearedChargingLimit(
+        meta: RequestMetadata,
+        request: ClearedChargingLimitReq
+    ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> {
+        throw IllegalStateException("clearedChargingLimit can't be call in OCPP 1.6")
     }
 }

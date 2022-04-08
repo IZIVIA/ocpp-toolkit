@@ -9,7 +9,8 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationRes
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
-import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -196,5 +197,11 @@ class RealChargePointOperations(
         request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> =
             sendMessage(meta, "FirmwareStatusNotification", request)
+
+    override fun clearedChargingLimit(
+        meta: RequestMetadata,
+        request: ClearedChargingLimitReq
+    ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> =
+        sendMessage(meta, "ClearedChargingLimit", request)
 
 }

@@ -7,6 +7,8 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
@@ -128,6 +130,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> {
         val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
         val response = operations.firmwareStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun clearedChargingLimit(
+        meta: RequestMetadata,
+        request: ClearedChargingLimitReq
+    ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> {
+        val mapper: ClearedChargingLimitMapper = Mappers.getMapper(ClearedChargingLimitMapper::class.java)
+        val response = operations.clearedChargingLimit(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

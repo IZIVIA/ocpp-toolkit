@@ -1,3 +1,3 @@
-package fr.simatix.cs.simulator.api.model.clearedcharginglimit
+package fr.simatix.cs.simulator.core20.model.clearedcharginglimit
 
 class ClearedChargingLimitResp
