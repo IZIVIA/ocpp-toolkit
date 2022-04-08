@@ -36,6 +36,7 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
@@ -152,7 +153,7 @@ class RealChargePointOperations(
         }
 
         client.receiveMessage("UpdateFirmware") { req: UpdateFirmwareReq ->
-            csmsOperations.getBaseReport(
+            csmsOperations.updateFirmware(
                 RequestMetadata(chargeStationId),
                 req
             ).response
