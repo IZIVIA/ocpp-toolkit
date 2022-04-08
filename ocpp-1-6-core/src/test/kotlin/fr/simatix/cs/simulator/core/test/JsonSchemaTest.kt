@@ -354,7 +354,7 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObjectV4(
             FirmwareStatusNotificationReq(FirmwareStatus.Downloaded),
             "FirmwareStatusNotificationRequest.json"
         )
@@ -571,7 +571,7 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
+        val errors = JsonSchemaValidator.isValidObjectV4(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
