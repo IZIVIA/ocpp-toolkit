@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -148,6 +150,19 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<CancelReservationReq, CancelReservationResp> {
         val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
         val response = csApi.cancelReservation(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun clearChargingProfile(
+        meta: RequestMetadata,
+        req: ClearChargingProfileReq
+    ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
+        val mapper: ClearChargingProfileMapper = Mappers.getMapper(ClearChargingProfileMapper::class.java)
+        val response = csApi.clearChargingProfile(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

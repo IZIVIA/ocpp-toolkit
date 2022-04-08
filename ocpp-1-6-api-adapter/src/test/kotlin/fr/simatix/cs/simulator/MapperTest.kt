@@ -5,6 +5,8 @@ import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelRes
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
@@ -21,7 +23,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
@@ -38,6 +40,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.ConfigurationStatus
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.enumeration.ClearChargingProfileStatus
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
@@ -47,7 +51,7 @@ import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
-import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
@@ -263,4 +267,25 @@ class MapperTest {
         expectThat(req)
             .and { get { status }.isEqualTo(FirmwareStatus.Idle) }
     }
+    @Test
+    fun clearChargingProfileMapper() {
+        val mapper: ClearChargingProfileMapper = Mappers.getMapper(ClearChargingProfileMapper::class.java)
+        val req = mapper.genToCoreResp(
+            ClearChargingProfileResp(
+                ClearChargingProfileStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(req)
+            .and { get { status }.isEqualTo(ClearChargingProfileStatus.Accepted) }
+
+        val resp =
+            mapper.coreToGenReq(ClearChargingProfileReq(1, 1, ChargingProfilePurposeType.ChargePointMaxProfile, 1))
+        expectThat(resp)
+            .and { get { chargingProfileId }.isEqualTo(1) }
+            .and { get { chargingProfileCriteria?.evseId }.isEqualTo(1) }
+            .and { get { chargingProfileCriteria?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumType.ChargingStationMaxProfile) }
+            .and { get { chargingProfileCriteria?.stackLevel }.isEqualTo(1) }
+    }
+
 }

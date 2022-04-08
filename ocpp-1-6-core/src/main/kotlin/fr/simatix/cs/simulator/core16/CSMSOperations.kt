@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -40,4 +42,6 @@ interface CSMSOperations {
     fun getConfiguration(meta: RequestMetadata,  req: GetConfigurationReq): OperationExecution<GetConfigurationReq, GetConfigurationResp>
 
     fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
+
+    fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp>
 }

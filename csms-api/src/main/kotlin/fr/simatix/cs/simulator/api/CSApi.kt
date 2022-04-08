@@ -6,6 +6,8 @@ import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityRe
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
@@ -52,4 +54,6 @@ interface CSApi {
     fun getAllVariables(meta: RequestMetadata, req: GetAllVariablesReq): OperationExecution<GetAllVariablesReq, GetAllVariablesResp>
 
     fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
+
+    fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp>
 }

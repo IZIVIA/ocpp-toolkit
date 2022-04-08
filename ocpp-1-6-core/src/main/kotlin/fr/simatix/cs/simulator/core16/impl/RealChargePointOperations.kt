@@ -10,6 +10,7 @@ import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationR
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -104,6 +105,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("CancelReservation") { req: CancelReservationReq ->
             csmsOperations.cancelReservation(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("ClearChargingProfile") { req: ClearChargingProfileReq ->
+            csmsOperations.clearChargingProfile(
                 RequestMetadata(chargeStationId),
                 req
             ).response

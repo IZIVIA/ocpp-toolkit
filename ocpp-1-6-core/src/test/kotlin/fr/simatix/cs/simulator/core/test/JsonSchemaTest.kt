@@ -18,6 +18,9 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.Conf
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.enumeration.ClearChargingProfileStatus
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
@@ -39,7 +42,7 @@ import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.remotestart.*
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
-import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
@@ -363,6 +366,23 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `clearChargingProfile request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ClearChargingProfileReq(), "ClearChargingProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ClearChargingProfileReq(
+                1, 1, ChargingProfilePurposeType.ChargePointMaxProfile, 1
+            ), "ClearChargingProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -580,6 +600,15 @@ class JsonSchemaTest {
     fun `cancelReservation response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             CancelReservationResp(CancelReservationStatus.Rejected), "CancelReservationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearChargingProfile response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ClearChargingProfileResp(ClearChargingProfileStatus.Accepted), "ClearChargingProfileResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

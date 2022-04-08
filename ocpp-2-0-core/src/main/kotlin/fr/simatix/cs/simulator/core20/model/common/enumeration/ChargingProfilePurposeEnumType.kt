@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20.model.remotestart.enumeration
+package fr.simatix.cs.simulator.core20.model.common.enumeration
 
 enum class ChargingProfilePurposeEnumType(val value: String) {
     ChargingStationExternalConstraints("ChargingStationExternalConstraints"),

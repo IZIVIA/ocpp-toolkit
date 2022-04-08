@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core16.model.remotestart.enumeration
+package fr.simatix.cs.simulator.core16.model.common.enumeration
 
 enum class ChargingProfilePurposeType(val value: String) {
     ChargePointMaxProfile("ChargePointMaxProfile"),

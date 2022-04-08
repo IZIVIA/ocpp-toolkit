@@ -10,6 +10,9 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAv
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType
@@ -210,6 +213,14 @@ class IntegrationTestCSApi {
                 val response = CancelReservationResp(CancelReservationStatusEnumType.Rejected)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun clearChargingProfile(
+                meta: RequestMetadata,
+                req: ClearChargingProfileReq
+            ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
+                val response = ClearChargingProfileResp(ClearChargingProfileStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -286,6 +297,12 @@ class IntegrationTestCSApi {
                 "CancelReservation", "{\"reservationId\": 3}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ClearChargingProfile", "{\"id\": 4}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -297,6 +314,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getAllVariables(any(), any())
         verify(csApiSpy, times(1)).getVariables(any(), any())
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
+        verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
 
         csmsApi.close()
     }
@@ -379,6 +397,12 @@ class IntegrationTestCSApi {
             "chargePoint2",
             WampMessage(WampMessageType.CALL, "1", "CancelReservation", "{\"reservationId\": 3}")
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ClearChargingProfile", "{\"chargingProfileId\": 4}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -391,6 +415,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getBaseReport(any(), any())
         verify(csApiSpy, times(1)).getReport(any(), any())
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
+        verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
 
         csmsApi.close()
     }

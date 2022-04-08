@@ -1,7 +1,7 @@
 package fr.simatix.cs.simulator.api.model.remotestart
 
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType
 import kotlinx.datetime.Instant
 

@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
@@ -111,6 +113,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: CancelReservationReq
             ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+                TODO("Not implemented")
+            }
+
+            override fun clearChargingProfile(
+                meta: RequestMetadata,
+                req: ClearChargingProfileReq
+            ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
                 TODO("Not implemented")
             }
         }

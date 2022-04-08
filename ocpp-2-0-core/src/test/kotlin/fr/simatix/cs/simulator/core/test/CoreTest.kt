@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
@@ -128,6 +130,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: CancelReservationReq
             ): OperationExecution<CancelReservationReq, CancelReservationResp> {
+                TODO("Not implemented")
+            }
+
+            override fun clearChargingProfile(
+                meta: RequestMetadata,
+                req: ClearChargingProfileReq
+            ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
                 TODO("Not implemented")
             }
         }

@@ -9,6 +9,8 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilit
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
@@ -163,6 +165,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<CancelReservationReq, CancelReservationResp> {
         val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
         val response = csApi.cancelReservation(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun clearChargingProfile(
+        meta: RequestMetadata,
+        req: ClearChargingProfileReq
+    ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
+        val mapper: ClearChargingProfileMapper = Mappers.getMapper(ClearChargingProfileMapper::class.java)
+        val response = csApi.clearChargingProfile(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

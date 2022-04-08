@@ -12,6 +12,9 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAv
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
@@ -235,6 +238,14 @@ class AdapterTest {
             req: CancelReservationReq
         ): OperationExecution<CancelReservationReq, CancelReservationResp> {
             val response = CancelReservationResp(CancelReservationStatusEnumType.Rejected)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearChargingProfile(
+            meta: RequestMetadata,
+            req: ClearChargingProfileReq
+        ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
+            val response = ClearChargingProfileResp(ClearChargingProfileStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

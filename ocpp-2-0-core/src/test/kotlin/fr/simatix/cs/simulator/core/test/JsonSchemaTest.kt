@@ -21,6 +21,10 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.Opera
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
+import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
@@ -50,7 +54,7 @@ import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumTyp
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
@@ -471,6 +475,28 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `clearChargingProfile request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearChargingProfileReq(), "ClearChargingProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearChargingProfileReq(
+                1,
+                ClearChargingProfileType(
+                    1,
+                    ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    1
+                )
+            ), "ClearChargingProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -866,6 +892,24 @@ class JsonSchemaTest {
     @Test
     fun `firmwareStatusNotification response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearChargingProfile response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearChargingProfileResp(ClearChargingProfileEnumType.Accepted), "ClearChargingProfileResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearChargingProfileResp(
+                ClearChargingProfileEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ), "ClearChargingProfileResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "ClearChargingProfileResponse",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "additionalProperties": false,
+      "enum": [
+        "Accepted",
+        "Unknown"
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "required": [
+    "status"
+  ]
+}
