@@ -151,6 +151,13 @@ class RealChargePointOperations(
             ).response
         }
 
+        client.receiveMessage("UpdateFirmware") { req: UpdateFirmwareReq ->
+            csmsOperations.getBaseReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
     }
 
     private inline fun <T, reified P> sendMessage(
