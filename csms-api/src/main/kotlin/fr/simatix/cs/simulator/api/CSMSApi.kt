@@ -6,6 +6,8 @@ import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationResp
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
@@ -64,6 +66,12 @@ interface CSMSApi {
             meta: RequestMetadata,
             request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp>
+
+    fun clearedChargingLimit(
+        meta: RequestMetadata,
+        request: ClearedChargingLimitReq
+    ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp>
+
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -81,5 +89,6 @@ fun CSMSApi.send(
         is StatusNotificationReq -> statusNotification(meta, request)
         is NotifyReportReq -> notifyReport(meta, request)
         is FirmwareStatusNotificationReq -> firmwareStatusNotification(meta, request)
+        is ClearedChargingLimitReq -> clearedChargingLimit(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>

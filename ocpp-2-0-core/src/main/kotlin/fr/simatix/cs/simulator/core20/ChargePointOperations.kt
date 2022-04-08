@@ -1,5 +1,7 @@
 package fr.simatix.cs.simulator.core20
 
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
@@ -88,4 +90,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun firmwareStatusNotification(meta: RequestMetadata, request: FirmwareStatusNotificationReq): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp>
+
+    /**
+     * Sends a message to the CSMS to notify it that the charge limit has been removed
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun clearedChargingLimit(meta: RequestMetadata, request: ClearedChargingLimitReq): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp>
 }
