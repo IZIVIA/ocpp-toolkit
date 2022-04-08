@@ -53,11 +53,15 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationRes
 import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootReasonEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.common.IdTokenInfoType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
 import fr.simatix.cs.simulator.core20.model.common.MessageContentType
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSourceEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingLimitSourceEnumType as ChargingLimitSourceEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
@@ -114,6 +118,7 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as TransactionTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
+import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq as ClearedChargingLimitReqGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -544,4 +549,25 @@ class AdapterTest {
             }
     }
 
+    @Test
+    fun `clearedChargingLimit request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.clearedChargingLimit(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            ClearedChargingLimitReq(ChargingLimitSourceEnumType.CSO),
+            ClearedChargingLimitResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = ClearedChargingLimitReqGen(
+            chargingLimitSource = ChargingLimitSourceEnumTypeGen.CSO,
+            evseId = 1
+        )
+        val response = operations.clearedChargingLimit(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
 }

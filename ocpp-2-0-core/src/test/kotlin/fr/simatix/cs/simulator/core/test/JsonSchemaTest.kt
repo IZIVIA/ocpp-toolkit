@@ -21,6 +21,8 @@ import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.Opera
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
@@ -450,6 +452,24 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
             GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
             "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearedChargingLimit request format`() {
+
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearedChargingLimitReq(ChargingLimitSourceEnumType.CSO),
+            "ClearedChargingLimitRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearedChargingLimitReq(ChargingLimitSourceEnumType.EMS, 1),
+            "ClearedChargingLimitRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -910,6 +930,13 @@ class JsonSchemaTest {
                 StatusInfoType("reason", "additional")
             ), "ClearChargingProfileResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearedChargingLimit response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
