@@ -1,3 +1,5 @@
 package fr.simatix.cs.simulator.api.model.firmwarestatusnotification
 
-class FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.Response
+
+class FirmwareStatusNotificationResp: Response

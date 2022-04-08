@@ -80,5 +80,6 @@ fun CSMSApi.send(
         is TransactionEventReq -> transactionEvent(meta, request)
         is StatusNotificationReq -> statusNotification(meta, request)
         is NotifyReportReq -> notifyReport(meta, request)
+        is FirmwareStatusNotificationReq -> firmwareStatusNotification(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>
