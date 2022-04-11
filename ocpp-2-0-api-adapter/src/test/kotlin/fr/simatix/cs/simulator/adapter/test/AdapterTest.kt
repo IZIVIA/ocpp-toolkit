@@ -49,6 +49,9 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
@@ -220,6 +223,17 @@ class AdapterTest {
         ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
             val response = UpdateFirmwareResp(
                 status = UpdateFirmwareStatusEnumType.Accepted,
+                statusInfo = StatusInfoTypeGen("reason", "additional")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun triggerMessage(
+            meta: RequestMetadata,
+            req: TriggerMessageReq
+        ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
+            val response = TriggerMessageResp(
+                status = TriggerMessageStatusEnumType.Accepted,
                 statusInfo = StatusInfoTypeGen("reason", "additional")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)

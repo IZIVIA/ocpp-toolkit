@@ -32,6 +32,9 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumTyp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType
@@ -61,6 +64,9 @@ import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
+import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.MessageTrigger
+import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.TriggerMessageStatus
 import fr.simatix.cs.simulator.core16.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateStatus
@@ -396,6 +402,32 @@ class MapperTest {
                     listOf(AuthorizationDataGen(IdTokenType("", IdTokenEnumType.Central)))
                 )
             }
+    }
+
+
+    @Test
+    fun triggerMessage() {
+        val mapper: TriggerMessageMapper = Mappers.getMapper(TriggerMessageMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            TriggerMessageResp(
+                status = TriggerMessageStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(TriggerMessageStatus.Accepted)
+        }
+
+        val req = mapper.coreToGenReq(
+            TriggerMessageReq(
+                requestedMessage = MessageTrigger.Heartbeat,
+                connectorId = 1
+            )
+        )
+        expectThat(req) {
+            get { requestedMessage }.isEqualTo(MessageTriggerEnumType.Heartbeat)
+            get { evse }.isEqualTo(EVSEType(1, 1))
+        }
     }
 
 }

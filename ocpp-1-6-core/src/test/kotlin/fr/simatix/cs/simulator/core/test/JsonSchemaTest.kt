@@ -67,6 +67,10 @@ import fr.simatix.cs.simulator.core16.model.statusnotification.enumeration.Charg
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionReq
 import fr.simatix.cs.simulator.core16.model.stoptransaction.StopTransactionResp
 import fr.simatix.cs.simulator.core16.model.stoptransaction.enumeration.Reason
+import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageResp
+import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.MessageTrigger
+import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.TriggerMessageStatus
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
@@ -447,6 +451,31 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+
+    @Test
+    fun `triggerMessage request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            TriggerMessageReq(
+                MessageTrigger.BootNotification
+            ),
+            "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            TriggerMessageReq(
+                MessageTrigger.Heartbeat,
+                1
+            ),
+            "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
     @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
@@ -722,6 +751,20 @@ class JsonSchemaTest {
             JsonSchemaValidator.isValidObjectV4(SendLocalListResp(UpdateStatus.Accepted), "SendLocalListResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+
+    @Test
+    fun `triggerMessage response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            TriggerMessageResp(
+                TriggerMessageStatus.Accepted
+            ),
+            "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
     }
 
 }

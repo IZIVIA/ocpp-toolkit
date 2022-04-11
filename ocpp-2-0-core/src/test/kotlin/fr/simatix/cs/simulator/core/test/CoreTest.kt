@@ -32,6 +32,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
@@ -173,6 +175,10 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: SendLocalListReq
             ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+                TODO("Not implemented")
+            }
+
+            override fun triggerMessage(meta: RequestMetadata, req: TriggerMessageReq): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
                 TODO("Not implemented")
             }
         }

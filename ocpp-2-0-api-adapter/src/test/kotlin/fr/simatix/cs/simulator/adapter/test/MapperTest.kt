@@ -13,6 +13,7 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
@@ -59,6 +60,9 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnum
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
+import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
@@ -104,6 +108,8 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as Auth
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType as SendLocalListStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
 
 class MapperTest {
@@ -592,5 +598,30 @@ class MapperTest {
             }
     }
 
+    @Test
+    fun triggerMessage() {
+        val mapper: TriggerMessageMapper = Mappers.getMapper(TriggerMessageMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            TriggerMessageResp(
+                status = TriggerMessageStatusEnumTypeGen.Accepted,
+                statusInfo = StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(TriggerMessageStatusEnumType.Accepted)
+            get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+        val req = mapper.coreToGenReq(
+            TriggerMessageReq(
+                MessageTriggerEnumType.Heartbeat,
+                EVSEType(1, 1)
+            )
+        )
+        expectThat(req) {
+            get { requestedMessage }.isEqualTo(MessageTriggerEnumTypeGen.Heartbeat)
+            get { evse }.isEqualTo(EVSETypeGen(1, 1))
+        }
+    }
 }
 

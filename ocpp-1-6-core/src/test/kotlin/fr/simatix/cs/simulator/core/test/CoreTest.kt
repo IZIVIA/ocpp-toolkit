@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
 import fr.simatix.cs.simulator.core16.model.reset.ResetReq
 import fr.simatix.cs.simulator.core16.model.reset.ResetResp
+import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
@@ -153,6 +155,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: SendLocalListReq
             ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+                TODO("Not implemented")
+            }
+
+            override fun triggerMessage(
+                meta: RequestMetadata,
+                req: TriggerMessageReq
+            ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
                 TODO("Not implemented")
             }
         }

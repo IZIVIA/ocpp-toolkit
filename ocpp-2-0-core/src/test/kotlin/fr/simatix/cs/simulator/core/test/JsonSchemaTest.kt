@@ -83,6 +83,10 @@ import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventRes
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.TriggerReasonEnumType
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
+import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
+import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
@@ -621,6 +625,30 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `triggerMessage request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            TriggerMessageReq(
+                MessageTriggerEnumType.BootNotification
+            ),
+            "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            TriggerMessageReq(
+                MessageTriggerEnumType.Heartbeat,
+                EVSEType(1,1)
+            ),
+            "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -1118,4 +1146,28 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
     }
+    @Test
+    fun `triggerMessage response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            TriggerMessageResp(
+                TriggerMessageStatusEnumType.Accepted
+            ),
+            "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            TriggerMessageResp(
+                TriggerMessageStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ),
+            "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
 }
