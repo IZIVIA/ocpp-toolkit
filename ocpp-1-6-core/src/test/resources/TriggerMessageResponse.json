@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "TriggerMessageResponse",
+    "type": "object",
+    "properties": {
+        "status": {
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Accepted",
+                "Rejected",
+                "NotImplemented"
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "status"
+    ]
+}

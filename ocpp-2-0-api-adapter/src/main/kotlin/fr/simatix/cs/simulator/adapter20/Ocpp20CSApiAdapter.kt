@@ -31,6 +31,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
@@ -147,6 +149,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
         val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
         val response = csApi.updateFirmware(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun triggerMessage(
+        meta: RequestMetadata,
+        req: TriggerMessageReq
+    ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
+        val mapper: TriggerMessageMapper = Mappers.getMapper(TriggerMessageMapper::class.java)
+        val response = csApi.triggerMessage(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
