@@ -16,6 +16,8 @@ import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -129,6 +131,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: GetCompositeScheduleReq
             ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getLocalListVersion(
+                meta: RequestMetadata,
+                req: GetLocalListVersionReq
+            ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
                 TODO("Not implemented")
             }
         }

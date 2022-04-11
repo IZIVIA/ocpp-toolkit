@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionResp
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
@@ -48,4 +50,6 @@ interface CSMSOperations {
     fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp>
 
     fun getCompositeSchedule(meta: RequestMetadata, req: GetCompositeScheduleReq): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp>
+
+    fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp>
 }

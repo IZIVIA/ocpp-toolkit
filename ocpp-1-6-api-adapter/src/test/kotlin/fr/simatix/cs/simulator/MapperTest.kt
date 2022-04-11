@@ -16,6 +16,7 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStat
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
@@ -51,6 +52,7 @@ import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopSt
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
@@ -76,6 +78,7 @@ import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
 
 class MapperTest {
     @Test
@@ -328,6 +331,16 @@ class MapperTest {
             .and { get { evseId }.isEqualTo(1) }
             .and { get { duration }.isEqualTo(2) }
             .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A) }
+    }
+
+    @Test
+    fun getLocalListVersionMapper() {
+        val mapper: GetLocalListVersionMapper = Mappers.getMapper(GetLocalListVersionMapper::class.java)
+        val resp = mapper.genToCoreResp(GetLocalListVersionResp(1))
+        expectThat(resp).and { get { listVersion }.isEqualTo(1) }
+
+        val req = mapper.coreToGenReq(GetLocalListVersionReq())
+        expectThat(req).and { get { req }.isA<GetLocalListVersionReqGen>() }
     }
 
 }

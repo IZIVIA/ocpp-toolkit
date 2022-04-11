@@ -5,6 +5,7 @@ import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -32,6 +33,7 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
@@ -80,6 +82,7 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelSt
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
@@ -490,6 +493,17 @@ class MapperTest {
             .and { get { evseId }.isEqualTo(1) }
             .and { get { duration }.isEqualTo(3) }
             .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumTypeGen.A) }
+    }
+
+    @Test
+    fun getLocalListVersionMapper() {
+        val mapper: GetLocalListVersionMapper = Mappers.getMapper(GetLocalListVersionMapper::class.java)
+        val resp = mapper.genToCoreResp(GetLocalListVersionResp(1))
+        expectThat(resp).and { get { versionNumber }.isEqualTo(1) }
+
+        val req = mapper.coreToGenReq(GetLocalListVersionReq())
+        expectThat(req)
+            .and { get { req }.isA<GetLocalListVersionReqGen>() }
     }
 
 }

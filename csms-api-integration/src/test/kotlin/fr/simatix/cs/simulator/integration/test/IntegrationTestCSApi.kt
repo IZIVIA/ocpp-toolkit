@@ -22,6 +22,8 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType
@@ -232,6 +234,14 @@ class IntegrationTestCSApi {
                 val response = GetCompositeScheduleResp(GenericStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun getLocalListVersion(
+                meta: RequestMetadata,
+                req: GetLocalListVersionReq
+            ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
+                val response = GetLocalListVersionResp(1)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -320,6 +330,12 @@ class IntegrationTestCSApi {
                 "GetCompositeSchedule", "{\"connectorId\": 1, \"duration\": 2}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetLocalListVersion", "{}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -333,6 +349,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
+        verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
 
         csmsApi.close()
     }
@@ -427,6 +444,12 @@ class IntegrationTestCSApi {
                 "GetCompositeSchedule", "{\"evseId\": 1, \"duration\": 2}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetLocalListVersion", "{}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -441,6 +464,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
+        verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
 
         csmsApi.close()
     }

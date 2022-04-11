@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
@@ -56,4 +58,6 @@ interface CSMSOperations {
     fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp>
 
     fun getCompositeSchedule(meta: RequestMetadata, req: GetCompositeScheduleReq): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp>
+
+    fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp>
 }

@@ -17,6 +17,7 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
@@ -120,6 +121,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetCompositeSchedule") { req: GetCompositeScheduleReq ->
             csmsOperations.getCompositeSchedule(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetLocalListVersion") { req: GetLocalListVersionReq ->
+            csmsOperations.getLocalListVersion(
                 RequestMetadata(chargeStationId),
                 req
             ).response

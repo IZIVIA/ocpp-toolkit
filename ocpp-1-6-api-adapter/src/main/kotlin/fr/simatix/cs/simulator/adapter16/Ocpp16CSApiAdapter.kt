@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionResp
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
@@ -178,6 +180,19 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
         val mapper: GetCompositeScheduleMapper = Mappers.getMapper(GetCompositeScheduleMapper::class.java)
         val response = csApi.getCompositeSchedule(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getLocalListVersion(
+        meta: RequestMetadata,
+        req: GetLocalListVersionReq
+    ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
+        val mapper: GetLocalListVersionMapper = Mappers.getMapper(GetLocalListVersionMapper::class.java)
+        val response = csApi.getLocalListVersion(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

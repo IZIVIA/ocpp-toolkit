@@ -17,6 +17,7 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -117,6 +118,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetBaseReport") { req: GetBaseReportReq ->
             csmsOperations.getBaseReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetLocalListVersion") { req: GetLocalListVersionReq ->
+            csmsOperations.getLocalListVersion(
                 RequestMetadata(chargeStationId),
                 req
             ).response

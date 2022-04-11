@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
@@ -353,6 +355,13 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getLocalListVersion request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(GetLocalListVersionReq(), "GetLocalListVersionRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `cancelReservation request format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             CancelReservationReq(3), "CancelReservationRequest.json"
@@ -606,6 +615,13 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getLocalListVersion response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(GetLocalListVersionResp(1), "GetLocalListVersionResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

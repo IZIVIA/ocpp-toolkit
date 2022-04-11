@@ -38,6 +38,8 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
@@ -538,6 +540,13 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getLocalListVersion request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(GetLocalListVersionReq(), "GetLocalListVersionRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -984,6 +993,13 @@ class JsonSchemaTest {
             ),
             "GetCompositeScheduleResponse.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getLocalListVersion response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(GetLocalListVersionResp(1), "GetLocalListVersionResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

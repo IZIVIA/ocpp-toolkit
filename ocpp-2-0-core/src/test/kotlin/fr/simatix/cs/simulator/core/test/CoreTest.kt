@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -146,6 +148,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: GetCompositeScheduleReq
             ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getLocalListVersion(
+                meta: RequestMetadata,
+                req: GetLocalListVersionReq
+            ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
                 TODO("Not implemented")
             }
         }
