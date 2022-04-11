@@ -37,6 +37,7 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType
 import fr.simatix.cs.simulator.core16.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core16.model.cancelreservation.enumeration.CancelReservationStatus
 import fr.simatix.cs.simulator.core16.model.changeavailability.ChangeAvailabilityReq
@@ -67,6 +68,8 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.Get
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
+import kotlinx.datetime.Instant
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
@@ -341,6 +344,35 @@ class MapperTest {
 
         val req = mapper.coreToGenReq(GetLocalListVersionReq())
         expectThat(req).and { get { req }.isA<GetLocalListVersionReqGen>() }
+    }
+
+
+    @Test
+    fun updateFirmwareMapper() {
+        val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
+
+        val req = mapper.coreToGenReq(
+            UpdateFirmwareReq(
+                location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                retries = 3,
+                retrieveDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                retryInterval = 1
+            )
+        )
+        expectThat(req) {
+            get { req.retries }.isEqualTo(3)
+            get { req.retryInterval }.isEqualTo(1)
+            get { req.requestId }.isEqualTo(0)
+            get { req.firmware }.isEqualTo(
+                FirmwareType(
+                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    installDateTime = null,
+                    signingCertificate = null,
+                    signature = null
+                )
+            )
+        }
     }
 
 }

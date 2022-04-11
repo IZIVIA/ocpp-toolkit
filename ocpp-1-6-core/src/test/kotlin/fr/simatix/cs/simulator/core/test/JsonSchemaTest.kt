@@ -67,6 +67,8 @@ import fr.simatix.cs.simulator.core16.model.stoptransaction.enumeration.Reason
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
@@ -413,6 +415,21 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `updateFirmware request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UpdateFirmwareReq(
+                location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                retries = 2,
+                retrieveDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                retryInterval = 3
+            ), "UpdateFirmwareRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -671,4 +688,14 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+    @Test
+    fun `updateFirmware response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            UpdateFirmwareResp(), "UpdateFirmwareResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
 }

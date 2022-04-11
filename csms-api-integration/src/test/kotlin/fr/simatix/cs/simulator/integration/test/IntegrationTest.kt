@@ -71,6 +71,9 @@ import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.send
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
@@ -179,7 +182,11 @@ class IntegrationTest {
         }
 
         override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
-            TODO("Not yet implemented")
+            val response = UpdateFirmwareResp(
+                status = UpdateFirmwareStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getBaseReport(

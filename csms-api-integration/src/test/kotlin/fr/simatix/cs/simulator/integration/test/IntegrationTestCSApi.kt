@@ -14,6 +14,7 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfi
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
+import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
@@ -48,8 +49,9 @@ import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableSta
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
-import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
-import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -179,7 +181,11 @@ class IntegrationTestCSApi {
             }
 
             override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
-                TODO("Not yet implemented")
+                val response = UpdateFirmwareResp(
+                    status = UpdateFirmwareStatusEnumType.Accepted,
+                    statusInfo = StatusInfoType("reason", "additional")
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
 
             override fun getBaseReport(

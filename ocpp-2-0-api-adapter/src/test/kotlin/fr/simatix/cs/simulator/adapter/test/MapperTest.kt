@@ -13,6 +13,9 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
@@ -55,12 +58,15 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType as CancelReservationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType as ChangeAvailabilityStatusEnumTypeGen
@@ -504,6 +510,50 @@ class MapperTest {
         val req = mapper.coreToGenReq(GetLocalListVersionReq())
         expectThat(req)
             .and { get { req }.isA<GetLocalListVersionReqGen>() }
+    }
+
+    @Test
+    fun updateFirmwareMapper() {
+        val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            UpdateFirmwareResp(
+                status = UpdateFirmwareStatusEnumTypeGen.Accepted,
+                statusInfo = StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp) {
+            get { resp.status }.isEqualTo(UpdateFirmwareStatusEnumType.Accepted)
+            get { resp.statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+        val req = mapper.coreToGenReq(
+            UpdateFirmwareReq(
+                retries = 3,
+                retryInterval = 1,
+                requestId = 2,
+                firmware = FirmwareType(
+                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    signingCertificate = "signingCertificate",
+                    signature = "signature"
+                )
+            )
+        )
+        expectThat(req) {
+            get { req.retries }.isEqualTo(3)
+            get { req.retryInterval }.isEqualTo(1)
+            get { req.requestId }.isEqualTo(2)
+            get { req.firmware }.isEqualTo(
+                FirmwareTypeGen(
+                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    signingCertificate = "signingCertificate",
+                    signature = "signature"
+                )
+            )
+        }
     }
 
 }

@@ -87,6 +87,8 @@ import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -469,17 +471,38 @@ class JsonSchemaTest {
 
     @Test
     fun `updatefirmware request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObjectV6(
             UpdateFirmwareReq(
                 requestId = 2,
                 firmware = FirmwareType(
-                    // TODO: 11/04/2022
+                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z")
                 )
             ),
             "UpdateFirmwareRequest.json"
         )
-        expectThat(errors)
-            .and { get { this.size }.isEqualTo(0) }
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            UpdateFirmwareReq(
+                retries = 3,
+                retryInterval = 1,
+                requestId = 2,
+                firmware = FirmwareType(
+                    location = "location",
+                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    signingCertificate = "signingCertificate",
+                    signature = "signature"
+                )
+            ),
+            "UpdateFirmwareRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
     }
 
     @Test
@@ -1021,4 +1044,27 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `updatefirmware response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            UpdateFirmwareResp(
+                status = UpdateFirmwareStatusEnumType.Accepted
+            ),
+            "UpdateFirmwareResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            UpdateFirmwareResp(
+                status = UpdateFirmwareStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            ),
+            "UpdateFirmwareResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
 }

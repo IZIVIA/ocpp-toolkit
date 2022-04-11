@@ -60,6 +60,9 @@ import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerRea
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core16.ChargePointOperations
 import fr.simatix.cs.simulator.core16.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core16.model.authorize.AuthorizeReq
@@ -189,6 +192,17 @@ class AdapterTest {
                     KeyValue("AllowOfflineTxForUnknownId", true, "true"),
                     KeyValue("AuthorizationCacheEnabled", false, "true")
                 )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun updateFirmware(
+            meta: RequestMetadata,
+            req: UpdateFirmwareReq
+        ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
+            val response = UpdateFirmwareResp(
+                status = UpdateFirmwareStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
