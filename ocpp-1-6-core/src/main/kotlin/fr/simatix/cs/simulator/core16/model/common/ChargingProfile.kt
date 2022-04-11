@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core16.model.remotestart
+package fr.simatix.cs.simulator.core16.model.common
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize

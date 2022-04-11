@@ -30,6 +30,8 @@ import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
@@ -162,6 +164,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: TriggerMessageReq
             ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
+                TODO("Not implemented")
+            }
+
+            override fun setChargingProfile(
+                meta: RequestMetadata,
+                req: SetChargingProfileReq
+            ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
                 TODO("Not implemented")
             }
         }

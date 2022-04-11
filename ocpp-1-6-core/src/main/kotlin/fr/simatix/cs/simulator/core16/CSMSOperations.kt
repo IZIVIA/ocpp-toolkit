@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
@@ -64,4 +66,6 @@ interface CSMSOperations {
     fun sendLocalList(meta: RequestMetadata, req: SendLocalListReq): OperationExecution<SendLocalListReq, SendLocalListResp>
 
     fun triggerMessage(meta: RequestMetadata,  req: TriggerMessageReq): OperationExecution<TriggerMessageReq, TriggerMessageResp>
+
+    fun setChargingProfile(meta: RequestMetadata, req: SetChargingProfileReq): OperationExecution<SetChargingProfileReq, SetChargingProfileResp>
 }

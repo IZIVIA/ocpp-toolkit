@@ -1,5 +1,6 @@
-package fr.simatix.cs.simulator.api.model.remotestart
+package fr.simatix.cs.simulator.api.model.common
 
+import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType

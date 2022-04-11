@@ -70,6 +70,9 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnumType
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -469,6 +472,31 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
             GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
             "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setChargingProfile request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            SetChargingProfileReq(
+                1, ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                        )
+                    )
+                )
+            ),
+            "SetChargingProfileRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -1018,6 +1046,25 @@ class JsonSchemaTest {
     @Test
     fun `notify report response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setChargingProfile response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted), "SetChargingProfileResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetChargingProfileResp(
+                ChargingProfileStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ),
+            "SetChargingProfileResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

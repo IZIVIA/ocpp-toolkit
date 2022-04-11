@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.core20.model.remotestart
 
+import fr.simatix.cs.simulator.core20.model.common.ChargingProfileType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
 
 data class RequestStartTransactionReq(

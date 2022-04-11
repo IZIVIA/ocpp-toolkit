@@ -1,7 +1,8 @@
-package fr.simatix.cs.simulator.core20.model.remotestart
+package fr.simatix.cs.simulator.core20.model.common
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import fr.simatix.cs.simulator.core20.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType

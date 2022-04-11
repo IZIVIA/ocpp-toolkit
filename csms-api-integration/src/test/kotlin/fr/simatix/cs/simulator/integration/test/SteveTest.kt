@@ -49,6 +49,9 @@ import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -302,6 +305,14 @@ fun main(args: Array<String>) {
             req: SendLocalListReq
         ): OperationExecution<SendLocalListReq, SendLocalListResp> {
             val response = SendLocalListResp(SendLocalListStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setChargingProfile(
+            meta: RequestMetadata,
+            req: SetChargingProfileReq
+        ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
+            val response = SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

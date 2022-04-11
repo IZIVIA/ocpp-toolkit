@@ -45,6 +45,9 @@ import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -279,6 +282,14 @@ class IntegrationTestCSApi {
                 val response = SendLocalListResp(SendLocalListStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun setChargingProfile(
+                meta: RequestMetadata,
+                req: SetChargingProfileReq
+            ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
+                val response = SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -392,6 +403,14 @@ class IntegrationTestCSApi {
             "TriggerMessage", "{\"requestedMessage\": \"BootNotification\"}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL,
+                "1",
+                "SetChargingProfile",
+                "{\"connectorId\": 1, \"csChargingProfiles\": {\"chargingProfileId\": 1, \"stackLevel\": 1, \"chargingProfilePurpose\": \"ChargePointMaxProfile\", \"chargingProfileKind\": \"Absolute\", \"chargingSchedule\": {\"chargingRateUnit\": \"W\", \"chargingSchedulePeriod\": [{\"startPeriod\": 1, \"limit\": 1.5}]}}}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -409,6 +428,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
+        verify(csApiSpy, times(1)).setChargingProfile(any(), any())
 
         csmsApi.close()
     }
@@ -527,6 +547,15 @@ class IntegrationTestCSApi {
             "TriggerMessage", "{\"requestedMessage\": \"BootNotification\"}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2",
+            WampMessage(
+                WampMessageType.CALL,
+                "1",
+                "SetChargingProfile",
+                "{\"evseId\": 1, \"chargingProfile\": {\"id\": 1, \"stackLevel\": 1, \"chargingProfilePurpose\": \"TxProfile\", \"chargingProfileKind\": \"Absolute\", \"chargingSchedule\": [{\"id\": 1, \"chargingRateUnit\": \"W\", \"chargingSchedulePeriod\": [{\"startPeriod\": 1, \"limit\": 1.5}]}]}}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -545,6 +574,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
+        verify(csApiSpy, times(1)).setChargingProfile(any(), any())
 
         csmsApi.close()
     }

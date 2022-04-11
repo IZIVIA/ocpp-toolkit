@@ -11,6 +11,7 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
@@ -57,6 +58,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnumType
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
@@ -107,6 +110,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindE
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType as SendLocalListStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType as ChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
@@ -623,5 +627,52 @@ class MapperTest {
             get { evse }.isEqualTo(EVSETypeGen(1, 1))
         }
     }
+    @Test
+    fun setChargingProfileMapper() {
+        val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SetChargingProfileResp(ChargingProfileStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(ChargingProfileStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            SetChargingProfileReq(
+                1, ChargingProfileType(
+                    id = 3,
+                    stackLevel = 4,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 5,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            duration = 6,
+                            minChargingRate = 7.0,
+                            salesTariff = SalesTariffType(8, listOf())
+                        )
+                    ),
+                    recurrencyKind = RecurrencyKindEnumType.Daily,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
+                    transactionId = "transaction"
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { evseId }.isEqualTo(1) }
+            .and { get { chargingProfile.id }.isEqualTo(3) }
+            .and { get { chargingProfile.stackLevel }.isEqualTo(4) }
+            .and { get { chargingProfile.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+            .and { get { chargingProfile.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
+            .and { get { chargingProfile.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
+            .and { get { chargingProfile.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+            .and { get { chargingProfile.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
+            .and { get { chargingProfile.transactionId }.isEqualTo("transaction") }
+    }
+
 }
 

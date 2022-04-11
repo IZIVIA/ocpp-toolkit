@@ -29,6 +29,8 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType
+import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
@@ -58,12 +60,16 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
+import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
+import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.enumeration.ChargingProfileStatus
 import fr.simatix.cs.simulator.core16.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.MessageTrigger
 import fr.simatix.cs.simulator.core16.model.triggermessage.enumeration.TriggerMessageStatus
@@ -428,6 +434,44 @@ class MapperTest {
             get { requestedMessage }.isEqualTo(MessageTriggerEnumType.Heartbeat)
             get { evse }.isEqualTo(EVSEType(1, 1))
         }
+    }
+
+    @Test
+    fun setChargingProfileMapper() {
+        val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted, StatusInfoType("reason", "additional"))
+        )
+        expectThat(resp).and { get { status }.isEqualTo(ChargingProfileStatus.Accepted) }
+
+        val req = mapper.coreToGenReq(
+            SetChargingProfileReq(
+                1, ChargingProfile(
+                    chargingProfileId = 1,
+                    stackLevel = 2,
+                    chargingProfilePurpose = ChargingProfilePurposeType.ChargePointMaxProfile,
+                    chargingProfileKind = ChargingProfileKindType.Absolute,
+                    chargingSchedule = ChargingSchedule(ChargingRateUnitType.A, listOf(ChargingSchedulePeriod(1, 1.3)))
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { evseId }.isEqualTo(1) }
+            .and { get { chargingProfile.id }.isEqualTo(1) }
+            .and { get { chargingProfile.stackLevel }.isEqualTo(2) }
+            .and { get { chargingProfile.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumType.ChargingStationMaxProfile) }
+            .and { get { chargingProfile.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumType.Absolute) }
+            .and {
+                get { chargingProfile.chargingSchedule }.isEqualTo(
+                    listOf(
+                        ChargingScheduleType(
+                            null,
+                            ChargingRateUnitEnumType.A,
+                            listOf(ChargingSchedulePeriodType(1, 1.3))
+                        )
+                    )
+                )
+            }
     }
 
 }

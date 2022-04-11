@@ -31,6 +31,7 @@ import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionR
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
@@ -121,6 +122,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetBaseReport") { req: GetBaseReportReq ->
             csmsOperations.getBaseReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("SetChargingProfile") { req: SetChargingProfileReq ->
+            csmsOperations.setChargingProfile(
                 RequestMetadata(chargeStationId),
                 req
             ).response

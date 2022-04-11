@@ -22,6 +22,7 @@ import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.enumeration.ClearChargingProfileStatus
+import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.MeterValue
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
@@ -58,6 +59,9 @@ import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateStatus
 import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateType
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core16.model.setchargingprofile.enumeration.ChargingProfileStatus
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -358,6 +362,34 @@ class JsonSchemaTest {
     fun `changeConfiguration request format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ChangeConfigurationReq("key", "value"), "ChangeConfigurationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setChargingProfile request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            SetChargingProfileReq(
+                1, ChargingProfile(
+                    chargingProfileId = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeType.ChargePointMaxProfile,
+                    chargingProfileKind = ChargingProfileKindType.Absolute,
+                    chargingSchedule = ChargingSchedule(
+                        chargingRateUnit = ChargingRateUnitType.A,
+                        chargingSchedulePeriod = listOf(ChargingSchedulePeriod(0, 0.1, 2)),
+                        duration = 100,
+                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        minChargingRate = 0.2
+                    ),
+                    recurrencyKind = RecurrencyKindType.Weekly,
+                    transactionId = 10,
+                    validFrom = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    validTo = Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ),
+            "SetChargingProfileRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -678,6 +710,15 @@ class JsonSchemaTest {
     fun `changeConfiguration response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ChangeConfigurationResp(ConfigurationStatus.Accepted), "ChangeConfigurationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setChargingProfile response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            SetChargingProfileResp(ChargingProfileStatus.Accepted), "SetChargingProfileResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

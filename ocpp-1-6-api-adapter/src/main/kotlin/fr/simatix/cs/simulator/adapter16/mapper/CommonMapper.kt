@@ -4,10 +4,16 @@ import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.common.EVSEType
+import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.*
+import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import org.mapstruct.Named
 
 @Mapper
@@ -122,5 +128,32 @@ abstract class CommonMapper {
 
     @Named("convertIdTag")
     fun convertIdTag(idTag: String): IdTokenType = IdTokenType(idTag, IdTokenEnumType.Central)
+
+    @Named("convertChargingProfilePurpose")
+    fun convertChargingProfilePurpose(profilePurpose: ChargingProfilePurposeType): ChargingProfilePurposeEnumType =
+        when (profilePurpose) {
+            ChargingProfilePurposeType.ChargePointMaxProfile -> ChargingProfilePurposeEnumType.ChargingStationMaxProfile
+            else -> ChargingProfilePurposeEnumType.valueOf(profilePurpose.name)
+        }
+
+    abstract fun convertChargingSchedule(chargingSchedule: ChargingSchedule): ChargingScheduleType
+
+    @Named("convertChargingScheduleList")
+    fun convertChargingScheduleList(chargingSchedule: ChargingSchedule): List<ChargingScheduleType> =
+        listOf(convertChargingSchedule(chargingSchedule))
+
+    @Named("convertChargingProfile")
+    @Mapping(target = "id", source = "chargingProfileId")
+    @Mapping(
+        target = "chargingProfilePurpose",
+        source = "chargingProfilePurpose",
+        qualifiedByName = ["convertChargingProfilePurpose"]
+    )
+    @Mapping(
+        target = "chargingSchedule",
+        source = "chargingSchedule",
+        qualifiedByName = ["convertChargingScheduleList"]
+    )
+    abstract fun convertChargingProfile(profile: ChargingProfile): ChargingProfileType
 
 }
