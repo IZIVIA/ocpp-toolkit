@@ -32,6 +32,8 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.transport.Transport
@@ -155,6 +157,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: GetLocalListVersionReq
             ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
+                TODO("Not implemented")
+            }
+
+            override fun updateFirmware(
+                meta: RequestMetadata,
+                req: UpdateFirmwareReq
+            ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
                 TODO("Not implemented")
             }
         }

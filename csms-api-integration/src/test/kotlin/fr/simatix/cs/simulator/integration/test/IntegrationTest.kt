@@ -67,6 +67,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerRea
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.send
@@ -174,6 +176,10 @@ class IntegrationTest {
                 )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
+            TODO("Not yet implemented")
         }
 
         override fun getBaseReport(

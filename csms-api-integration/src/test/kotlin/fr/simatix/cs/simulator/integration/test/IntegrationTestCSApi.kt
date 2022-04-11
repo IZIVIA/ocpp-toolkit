@@ -48,6 +48,8 @@ import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableSta
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -174,6 +176,10 @@ class IntegrationTestCSApi {
                     )
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
+                TODO("Not yet implemented")
             }
 
             override fun getBaseReport(

@@ -85,6 +85,8 @@ import fr.simatix.cs.simulator.core20.model.transactionevent.enumeration.Trigger
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
+import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.utils.JsonSchemaValidator
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -460,6 +462,21 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
             GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
             "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `updatefirmware request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            UpdateFirmwareReq(
+                requestId = 2,
+                firmware = FirmwareType(
+                    // TODO: 11/04/2022
+                )
+            ),
+            "UpdateFirmwareRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
