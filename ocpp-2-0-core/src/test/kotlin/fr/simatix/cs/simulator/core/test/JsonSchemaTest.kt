@@ -58,6 +58,12 @@ import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
@@ -517,6 +523,21 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getCompositeSchedule request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetCompositeScheduleReq(1, 2), "GetCompositeScheduleRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetCompositeScheduleReq(1, 2, ChargingRateUnitEnumType.A), "GetCompositeScheduleRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -937,6 +958,32 @@ class JsonSchemaTest {
     @Test
     fun `clearedChargingLimit response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getCompositeSchedule response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetCompositeScheduleResp(GenericStatusEnumType.Accepted), "GetCompositeScheduleResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetCompositeScheduleResp(
+                GenericStatusEnumType.Accepted,
+                CompositeScheduleType(
+                    evseId = 1,
+                    duration = 2,
+                    scheduleStart = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    chargingRateUnit = ChargingRateUnitEnumType.A,
+                    chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0))
+                ),
+                StatusInfoType("reason", "additional")
+            ),
+            "GetCompositeScheduleResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

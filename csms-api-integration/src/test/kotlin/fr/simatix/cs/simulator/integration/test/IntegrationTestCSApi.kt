@@ -22,6 +22,9 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
@@ -221,6 +224,14 @@ class IntegrationTestCSApi {
                 val response = ClearChargingProfileResp(ClearChargingProfileStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun getCompositeSchedule(
+                meta: RequestMetadata,
+                req: GetCompositeScheduleReq
+            ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
+                val response = GetCompositeScheduleResp(GenericStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -303,6 +314,12 @@ class IntegrationTestCSApi {
                 "ClearChargingProfile", "{\"id\": 4}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetCompositeSchedule", "{\"connectorId\": 1, \"duration\": 2}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -315,6 +332,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getVariables(any(), any())
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
+        verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
 
         csmsApi.close()
     }
@@ -403,6 +421,12 @@ class IntegrationTestCSApi {
                 "ClearChargingProfile", "{\"chargingProfileId\": 4}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetCompositeSchedule", "{\"evseId\": 1, \"duration\": 2}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -416,6 +440,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getReport(any(), any())
         verify(csApiSpy, times(1)).cancelReservation(any(), any())
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
+        verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
 
         csmsApi.close()
     }

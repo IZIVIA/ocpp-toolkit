@@ -4,6 +4,7 @@ import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -39,6 +40,10 @@ import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
@@ -61,6 +66,7 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.Operatio
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType as ClearChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
@@ -69,10 +75,13 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType as GenericDeviceModelStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
@@ -443,6 +452,44 @@ class MapperTest {
             .and { get { chargingProfileCriteria?.evseId }.isEqualTo(1) }
             .and { get { chargingProfileCriteria?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
             .and { get { chargingProfileCriteria?.stackLevel }.isEqualTo(1) }
+    }
+
+    @Test
+    fun getCompositeScheduleMapper() {
+        val mapper: GetCompositeScheduleMapper = Mappers.getMapper(GetCompositeScheduleMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetCompositeScheduleResp(
+                GenericStatusEnumTypeGen.Accepted,
+                CompositeScheduleTypeGen(
+                    1,
+                    3,
+                    Instant.parse("2022-02-15T00:00:00.001Z"),
+                    ChargingRateUnitEnumTypeGen.A,
+                    listOf(ChargingSchedulePeriodTypeGen(9, 10.0))
+                ),
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GenericStatusEnumType.Accepted) }
+            .and { get { schedule?.evseId }.isEqualTo(1) }
+            .and { get { schedule?.duration }.isEqualTo(3) }
+            .and { get { schedule?.scheduleStart }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+            .and { get { schedule?.chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A) }
+            .and { get { schedule?.chargingSchedulePeriod }.isEqualTo(listOf(ChargingSchedulePeriodType(9, 10.0))) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            GetCompositeScheduleReq(
+                1,
+                3,
+                ChargingRateUnitEnumType.A
+            )
+        )
+        expectThat(req)
+            .and { get { evseId }.isEqualTo(1) }
+            .and { get { duration }.isEqualTo(3) }
+            .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumTypeGen.A) }
     }
 
 }

@@ -18,6 +18,7 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.enumeration.Conf
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core16.model.clearcache.enumeration.ClearCacheStatus
+import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.enumeration.ClearChargingProfileStatus
@@ -44,6 +45,11 @@ import fr.simatix.cs.simulator.core16.model.remotestart.*
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
@@ -383,6 +389,21 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getCompositeSchedule request format`() {
+        var errors =
+            JsonSchemaValidator.isValidObjectV4(GetCompositeScheduleReq(1, 3), "GetCompositeScheduleRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetCompositeScheduleReq(1, 3, ChargingRateUnitType.A),
+            "GetCompositeScheduleRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -614,4 +635,24 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `getCompositeSchedule response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetCompositeScheduleResp(GetCompositeScheduleStatus.Accepted), "GetCompositeScheduleResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetCompositeScheduleResp(
+                GetCompositeScheduleStatus.Accepted,
+                1,
+                Instant.parse("2022-02-15T00:00:00.000Z"),
+                ChargingSchedule(ChargingRateUnitType.A, listOf(ChargingSchedulePeriod(1, 10.0)))
+            ),
+            "GetCompositeScheduleResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 }

@@ -19,12 +19,17 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.ChargingSchedulePeriodType
+import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -47,15 +52,20 @@ import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
-import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
+import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
+import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
@@ -286,6 +296,38 @@ class MapperTest {
             .and { get { chargingProfileCriteria?.evseId }.isEqualTo(1) }
             .and { get { chargingProfileCriteria?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumType.ChargingStationMaxProfile) }
             .and { get { chargingProfileCriteria?.stackLevel }.isEqualTo(1) }
+    }
+
+    @Test
+    fun getCompositeScheduleMapper() {
+        val mapper: GetCompositeScheduleMapper = Mappers.getMapper(GetCompositeScheduleMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetCompositeScheduleResp(
+                GenericStatusEnumType.Accepted,
+                CompositeScheduleType(
+                    evseId = 1,
+                    duration = 2,
+                    scheduleStart = Instant.parse("2022-02-15T00:00:00.001Z"),
+                    chargingRateUnit = ChargingRateUnitEnumType.A,
+                    chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 3.0))
+                ),
+                StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GetCompositeScheduleStatus.Accepted) }
+            .and { get { connectorId }.isEqualTo(1) }
+            .and { get { scheduleStart }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+            .and { get { chargingSchedule?.duration }.isEqualTo(2) }
+            .and { get { chargingSchedule?.startSchedule }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+            .and { get { chargingSchedule?.chargingRateUnit }.isEqualTo(ChargingRateUnitType.A) }
+            .and { get { chargingSchedule?.chargingSchedulePeriod }.isEqualTo(listOf(ChargingSchedulePeriod(1, 3.0))) }
+
+        val req = mapper.coreToGenReq(GetCompositeScheduleReq(1, 2, ChargingRateUnitType.A))
+        expectThat(req)
+            .and { get { evseId }.isEqualTo(1) }
+            .and { get { duration }.isEqualTo(2) }
+            .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A) }
     }
 
 }

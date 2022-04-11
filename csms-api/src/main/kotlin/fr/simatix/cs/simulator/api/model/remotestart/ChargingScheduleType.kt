@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.api.model.remotestart
 
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType
 import kotlinx.datetime.Instant
 
 data class ChargingScheduleType(

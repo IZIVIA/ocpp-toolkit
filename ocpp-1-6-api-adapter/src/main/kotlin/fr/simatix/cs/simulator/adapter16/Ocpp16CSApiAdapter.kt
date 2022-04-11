@@ -13,6 +13,8 @@ import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -163,6 +165,19 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
         val mapper: ClearChargingProfileMapper = Mappers.getMapper(ClearChargingProfileMapper::class.java)
         val response = csApi.clearChargingProfile(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getCompositeSchedule(
+        meta: RequestMetadata,
+        req: GetCompositeScheduleReq
+    ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
+        val mapper: GetCompositeScheduleMapper = Mappers.getMapper(GetCompositeScheduleMapper::class.java)
+        val response = csApi.getCompositeSchedule(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

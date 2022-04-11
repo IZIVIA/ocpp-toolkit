@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -44,4 +46,6 @@ interface CSMSOperations {
     fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp>
 
     fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp>
+
+    fun getCompositeSchedule(meta: RequestMetadata, req: GetCompositeScheduleReq): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp>
 }

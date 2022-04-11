@@ -17,6 +17,7 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
@@ -130,6 +131,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("ClearChargingProfile") { req: ClearChargingProfileReq ->
             csmsOperations.clearChargingProfile(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetCompositeSchedule") { req: GetCompositeScheduleReq ->
+            csmsOperations.getCompositeSchedule(
                 RequestMetadata(chargeStationId),
                 req
             ).response

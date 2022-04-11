@@ -8,7 +8,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
-import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
+import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionResp
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType

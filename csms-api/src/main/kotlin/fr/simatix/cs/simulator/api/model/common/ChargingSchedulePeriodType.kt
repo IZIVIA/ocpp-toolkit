@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model.remotestart
+package fr.simatix.cs.simulator.api.model.common
 
 data class ChargingSchedulePeriodType(
     val startPeriod: Int,

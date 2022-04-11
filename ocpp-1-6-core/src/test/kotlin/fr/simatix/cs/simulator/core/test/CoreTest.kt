@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurat
 import fr.simatix.cs.simulator.core16.model.changeconfiguration.ChangeConfigurationResp
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheResp
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
@@ -120,6 +122,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: ClearChargingProfileReq
             ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getCompositeSchedule(
+                meta: RequestMetadata,
+                req: GetCompositeScheduleReq
+            ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> {
                 TODO("Not implemented")
             }
         }
