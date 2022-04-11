@@ -10,6 +10,7 @@ import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
@@ -51,6 +52,10 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.Gen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalListStatusEnumType
+import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
@@ -95,6 +100,9 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as G
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
+import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
+import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType as SendLocalListStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
 
@@ -552,6 +560,36 @@ class MapperTest {
                 )
             )
         }
+    }
+
+    @Test
+    fun sendLocalListMapper() {
+        val mapper: SendLocalListMapper = Mappers.getMapper(SendLocalListMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SendLocalListResp(
+                SendLocalListStatusEnumTypeGen.Accepted,
+                StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(SendLocalListStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            SendLocalListReq(
+                1,
+                UpdateEnumType.Full,
+                listOf(AuthorizationData(IdTokenType("", IdTokenEnumType.Local)))
+            )
+        )
+        expectThat(req)
+            .and { get { versionNumber }.isEqualTo(1) }
+            .and { get { updateType }.isEqualTo(UpdateEnumTypeGen.Full) }
+            .and {
+                get { localAuthorizationList }.isEqualTo(
+                    listOf(AuthorizationDataGen(IdTokenTypeGen("", IdTokenEnumTypeGen.Local)))
+                )
+            }
     }
 
 }

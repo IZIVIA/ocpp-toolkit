@@ -42,6 +42,9 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -286,6 +289,14 @@ class AdapterTest {
             req: GetLocalListVersionReq
         ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
             val response = GetLocalListVersionResp(1)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun sendLocalList(
+            meta: RequestMetadata,
+            req: SendLocalListReq
+        ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+            val response = SendLocalListResp(SendLocalListStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

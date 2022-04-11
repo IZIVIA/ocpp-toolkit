@@ -53,6 +53,11 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.Get
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
+import fr.simatix.cs.simulator.core16.model.sendlocallist.AuthorizationData
+import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateStatus
+import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateType
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -428,6 +433,21 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `sendLocalList request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            SendLocalListReq(1, UpdateType.Differential), "SendLocalListRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            SendLocalListReq(1, UpdateType.Differential, listOf(AuthorizationData(""))), "SendLocalListRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -694,6 +714,14 @@ class JsonSchemaTest {
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `sendLocalList response format`() {
+        val errors =
+            JsonSchemaValidator.isValidObjectV4(SendLocalListResp(UpdateStatus.Accepted), "SendLocalListResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
 }

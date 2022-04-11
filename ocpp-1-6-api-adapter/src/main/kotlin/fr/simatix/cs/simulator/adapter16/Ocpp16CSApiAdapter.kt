@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
 import fr.simatix.cs.simulator.core16.model.reset.ResetReq
 import fr.simatix.cs.simulator.core16.model.reset.ResetResp
+import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
@@ -208,6 +210,19 @@ class Ocpp16CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
         val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
         val response = csApi.updateFirmware(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun sendLocalList(
+        meta: RequestMetadata,
+        req: SendLocalListReq
+    ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+        val mapper: SendLocalListMapper = Mappers.getMapper(SendLocalListMapper::class.java)
+        val response = csApi.sendLocalList(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

@@ -120,4 +120,7 @@ abstract class CommonMapper {
             throw IllegalArgumentException("Argument evse is required in OCPP 1.6 to start a transaction")
         }
 
+    @Named("convertIdTag")
+    fun convertIdTag(idTag: String): IdTokenType = IdTokenType(idTag, IdTokenEnumType.Central)
+
 }

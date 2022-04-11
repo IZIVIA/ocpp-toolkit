@@ -24,6 +24,8 @@ import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
@@ -64,4 +66,6 @@ interface CSMSOperations {
     fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp>
 
     fun updateFirmware(meta: RequestMetadata, req : UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp>
+
+    fun sendLocalList(meta: RequestMetadata, req: SendLocalListReq): OperationExecution<SendLocalListReq, SendLocalListResp>
 }

@@ -42,6 +42,9 @@ import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetEnumType
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -254,6 +257,14 @@ class IntegrationTestCSApi {
                 val response = GetLocalListVersionResp(1)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun sendLocalList(
+                meta: RequestMetadata,
+                req: SendLocalListReq
+            ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+                val response = SendLocalListResp(SendLocalListStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -354,6 +365,12 @@ class IntegrationTestCSApi {
                 "UpdateFirmware", "{\"location\": \"http://www.ietf.org/rfc/rfc2396.txt\",\"retrieveDate\": \"2022-02-15T00:00:00.000Z\"}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SendLocalList", "{\"listVersion\": 1, \"updateType\": \"Full\"}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -369,6 +386,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
+        verify(csApiSpy, times(1)).sendLocalList(any(), any())
 
         csmsApi.close()
     }
@@ -475,6 +493,12 @@ class IntegrationTestCSApi {
             "UpdateFirmware", "{\"requestId\": 1, \"firmware\": { \"location\": \"http://www.ietf.org/rfc/rfc2396.txt\", \"retrieveDateTime\": \"2022-02-15T00:00:00.000Z\"}}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SendLocalList", "{\"versionNumber\": 1, \"updateType\": \"Full\"}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -491,6 +515,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
+        verify(csApiSpy, times(1)).sendLocalList(any(), any())
 
         csmsApi.close()
     }

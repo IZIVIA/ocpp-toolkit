@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
@@ -68,4 +70,6 @@ interface CSApi {
     fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp>
 
     fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp>
+
+    fun sendLocalList(meta: RequestMetadata, req: SendLocalListReq): OperationExecution<SendLocalListReq, SendLocalListResp>
 }

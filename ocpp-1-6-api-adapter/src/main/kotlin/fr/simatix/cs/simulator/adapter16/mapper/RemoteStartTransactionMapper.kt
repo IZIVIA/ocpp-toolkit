@@ -1,7 +1,5 @@
 package fr.simatix.cs.simulator.adapter16.mapper
 
-import fr.simatix.cs.simulator.api.model.common.IdTokenType
-import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingProfileType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
@@ -21,9 +19,6 @@ import org.mapstruct.ReportingPolicy
 abstract class RemoteStartTransactionMapper {
 
     abstract fun genToCoreResp(remoteStartResp: RequestStartTransactionResp?): RemoteStartTransactionResp
-
-    @Named("convertIdTag")
-    fun convertIdTag(idTag: String): IdTokenType = IdTokenType(idTag, IdTokenEnumType.Central)
 
     @Named("convertChargingProfilePurpose")
     fun convertChargingProfilePurpose(profilePurpose: ChargingProfilePurposeType): ChargingProfilePurposeEnumType =

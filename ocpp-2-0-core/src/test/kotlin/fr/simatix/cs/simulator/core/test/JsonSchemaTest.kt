@@ -65,6 +65,11 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProf
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalListStatusEnumType
+import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -460,6 +465,39 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
             GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
             "GetBaseReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `sendLocalList request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SendLocalListReq(1, UpdateEnumType.Full), "SendLocalListRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SendLocalListReq(
+                1, UpdateEnumType.Full, listOf(
+                    AuthorizationData(
+                        IdTokenType("", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
+                        IdTokenInfoType(
+                            AuthorizationStatusEnumType.Accepted,
+                            Instant.parse("2022-02-15T00:00:00.000Z"),
+                            9,
+                            "",
+                            listOf(2, 4),
+                            "",
+                            IdTokenType(
+                                "", IdTokenEnumType.Central,
+                                listOf(AdditionalInfoType("", ""))
+                            ), MessageContentType(MessageFormatEnumType.ASCII, "", "")
+                        )
+                    )
+                )
+            ), "SendLocalListRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -952,6 +990,23 @@ class JsonSchemaTest {
     @Test
     fun `notify report response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `sendLocalList response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SendLocalListResp(SendLocalListStatusEnumType.Accepted),
+            "SendLocalListResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SendLocalListResp(SendLocalListStatusEnumType.Accepted, StatusInfoType("reason", "additional")),
+            "SendLocalListResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

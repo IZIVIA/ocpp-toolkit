@@ -27,6 +27,8 @@ import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
+import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
@@ -220,6 +222,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> {
         val mapper: GetLocalListVersionMapper = Mappers.getMapper(GetLocalListVersionMapper::class.java)
         val response = csApi.getLocalListVersion(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun sendLocalList(
+        meta: RequestMetadata,
+        req: SendLocalListReq
+    ): OperationExecution<SendLocalListReq, SendLocalListResp> {
+        val mapper: SendLocalListMapper = Mappers.getMapper(SendLocalListMapper::class.java)
+        val response = csApi.sendLocalList(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
