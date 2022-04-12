@@ -36,6 +36,7 @@ import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificatio
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
+import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
@@ -120,6 +121,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetBaseReport") { req: GetBaseReportReq ->
             csmsOperations.getBaseReport(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("TriggerMessage") { req: TriggerMessageReq ->
+            csmsOperations.triggerMessage(
                 RequestMetadata(chargeStationId),
                 req
             ).response

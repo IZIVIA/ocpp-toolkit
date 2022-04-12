@@ -386,6 +386,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "TriggerMessage", "{\"requestedMessage\": \"BootNotification\"}"
+        )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -401,6 +408,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
+        verify(csApiSpy, times(1)).triggerMessage(any(), any())
 
         csmsApi.close()
     }
@@ -513,6 +521,12 @@ class IntegrationTestCSApi {
                 "SendLocalList", "{\"versionNumber\": 1, \"updateType\": \"Full\"}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "TriggerMessage", "{\"requestedMessage\": \"BootNotification\"}"
+        )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -530,6 +544,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
         verify(csApiSpy, times(1)).updateFirmware(any(), any())
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
+        verify(csApiSpy, times(1)).triggerMessage(any(), any())
 
         csmsApi.close()
     }

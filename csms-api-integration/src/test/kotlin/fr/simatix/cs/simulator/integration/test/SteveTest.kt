@@ -61,6 +61,9 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.ChargingStateEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageReq
+import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
+import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
@@ -211,6 +214,17 @@ fun main(args: Array<String>) {
         ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
             val response = UpdateFirmwareResp(
                 status = UpdateFirmwareStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun triggerMessage(
+            meta: RequestMetadata,
+            req: TriggerMessageReq
+        ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
+            val response = TriggerMessageResp(
+                status = TriggerMessageStatusEnumType.Accepted,
                 statusInfo = StatusInfoType("reason", "additional")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
