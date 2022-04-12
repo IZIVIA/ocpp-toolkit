@@ -348,6 +348,12 @@ class IntegrationTestCSApi {
                 "GetLocalListVersion", "{}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "UpdateFirmware", "{\"location\": \"http://www.ietf.org/rfc/rfc2396.txt\",\"retrieveDate\": \"2022-02-15T00:00:00.000Z\"}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -362,6 +368,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
+        verify(csApiSpy, times(1)).updateFirmware(any(), any())
 
         csmsApi.close()
     }
@@ -462,6 +469,12 @@ class IntegrationTestCSApi {
                 "GetLocalListVersion", "{}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "UpdateFirmware", "{\"requestId\": 1, \"firmware\": { \"location\": \"http://www.ietf.org/rfc/rfc2396.txt\", \"retrieveDateTime\": \"2022-02-15T00:00:00.000Z\"}}"
+        )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -477,6 +490,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).clearChargingProfile(any(), any())
         verify(csApiSpy, times(1)).getCompositeSchedule(any(), any())
         verify(csApiSpy, times(1)).getLocalListVersion(any(), any())
+        verify(csApiSpy, times(1)).updateFirmware(any(), any())
 
         csmsApi.close()
     }
