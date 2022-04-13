@@ -22,6 +22,8 @@ import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionR
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
@@ -76,4 +78,6 @@ interface CSMSOperations {
     fun triggerMessage(meta: RequestMetadata, req: TriggerMessageReq): OperationExecution<TriggerMessageReq, TriggerMessageResp>
 
     fun setChargingProfile(meta: RequestMetadata, req: SetChargingProfileReq): OperationExecution<SetChargingProfileReq, SetChargingProfileResp>
+
+    fun reserveNow(meta: RequestMetadata, req : ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
 }

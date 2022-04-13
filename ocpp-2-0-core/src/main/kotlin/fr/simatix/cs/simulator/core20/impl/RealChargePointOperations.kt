@@ -31,6 +31,7 @@ import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
@@ -185,6 +186,12 @@ class RealChargePointOperations(
             ).response
         }
 
+        client.receiveMessage("ReserverNow") { req: ReserveNowReq ->
+            csmsOperations.reserveNow(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
     }
 
     private inline fun <T, reified P> sendMessage(
