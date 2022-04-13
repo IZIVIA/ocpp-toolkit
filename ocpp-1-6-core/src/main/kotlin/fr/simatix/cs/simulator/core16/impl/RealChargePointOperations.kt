@@ -24,6 +24,7 @@ import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
+import fr.simatix.cs.simulator.core16.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core16.model.reset.ResetReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
@@ -104,6 +105,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetConfiguration") { req: GetConfigurationReq ->
             csmsOperations.getConfiguration(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("ReserveNow") { req: ReserveNowReq ->
+            csmsOperations.reserveNow(
                 RequestMetadata(chargeStationId),
                 req
             ).response
