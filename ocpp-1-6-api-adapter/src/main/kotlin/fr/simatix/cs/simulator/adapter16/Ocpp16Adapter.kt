@@ -15,6 +15,8 @@ import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStat
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
@@ -252,5 +254,12 @@ class Ocpp16Adapter(
         request: NotifyChargingLimitReq
     ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp> {
         throw IllegalStateException("NotifyChargingLimit can't be call in OCPP 1.6")
+    }
+
+    override fun notifyDisplayMessages(
+        meta: RequestMetadata,
+        request: NotifyDisplayMessagesReq
+    ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> {
+        throw IllegalStateException("notifyDisplayMessages can't be call in OCPP 1.6")
     }
 }

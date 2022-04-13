@@ -19,6 +19,8 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
@@ -136,4 +138,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun notifyChargingLimit(meta: RequestMetadata, request: NotifyChargingLimitReq): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp>
+
+    /**
+     * Sends display messages to the CSMS
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyDisplayMessages(meta: RequestMetadata, request: NotifyDisplayMessagesReq): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp>
 }

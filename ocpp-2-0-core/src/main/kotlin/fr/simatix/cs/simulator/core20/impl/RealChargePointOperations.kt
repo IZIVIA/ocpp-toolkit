@@ -29,6 +29,8 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
@@ -301,5 +303,11 @@ class RealChargePointOperations(
         request: NotifyChargingLimitReq
     ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp> =
         sendMessage(meta, "NotifyChargingLimit", request)
+
+    override fun notifyDisplayMessages(
+        meta: RequestMetadata,
+        request: NotifyDisplayMessagesReq
+    ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> =
+        sendMessage(meta, "NotifyDisplayMessages", request)
 
 }

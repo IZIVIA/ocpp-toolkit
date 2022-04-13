@@ -32,6 +32,14 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
 
@@ -107,6 +115,10 @@ interface CSMSApi {
         request: NotifyChargingLimitReq
     ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp>
 
+    fun notifyDisplayMessages(
+        meta: RequestMetadata,
+        request: NotifyDisplayMessagesReq
+    ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp>
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -130,5 +142,6 @@ fun CSMSApi.send(
         is NotifyEventReq -> notifyEvent(meta, request)
         is NotifyEVChargingScheduleReq -> notifyEVChargingSchedule(meta, request)
         is NotifyChargingLimitReq -> notifyChargingLimit(meta, request)
+        is NotifyDisplayMessagesReq -> notifyDisplayMessages(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>
