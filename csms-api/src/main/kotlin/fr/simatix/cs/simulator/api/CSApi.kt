@@ -24,6 +24,8 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
@@ -80,4 +82,6 @@ interface CSApi {
     fun triggerMessage(meta: RequestMetadata, req: TriggerMessageReq): OperationExecution<TriggerMessageReq, TriggerMessageResp>
 
     fun setChargingProfile(meta: RequestMetadata, req: SetChargingProfileReq): OperationExecution<SetChargingProfileReq, SetChargingProfileResp>
+
+    fun reserveNow(meta: RequestMetadata, req: ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
 }

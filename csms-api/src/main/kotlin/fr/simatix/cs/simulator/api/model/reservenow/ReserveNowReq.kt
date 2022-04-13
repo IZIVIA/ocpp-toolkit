@@ -11,5 +11,5 @@ data class ReserveNowReq(
     val connectorType: ConnectorEnumType? = null,
     val evseId: Int? = null,
     val idToken: IdTokenType,
-    val groupIdToken: IdTokenType
+    val groupIdToken: IdTokenType? =null
 ): Request

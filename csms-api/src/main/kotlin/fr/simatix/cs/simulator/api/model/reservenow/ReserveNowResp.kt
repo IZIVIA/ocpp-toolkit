@@ -6,5 +6,5 @@ import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatus
 
 data class ReserveNowResp(
     val status: ReserveNowStatusEnumType,
-    val statusInfo: StatusInfoType
+    val statusInfo: StatusInfoType? =null
 ): Response
