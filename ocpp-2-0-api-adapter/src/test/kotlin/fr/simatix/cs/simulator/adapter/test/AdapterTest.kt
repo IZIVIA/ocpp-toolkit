@@ -99,6 +99,9 @@ import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq as NotifyCustomerInformationReqGen
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
@@ -687,5 +690,35 @@ class AdapterTest {
             .and { get { this.response.status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
             .and { get { this.response.ocspResult }.isEqualTo("") }
+    }
+
+    @Test
+    fun `notifyCustomerInformation request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyCustomerInformation(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyCustomerInformationReq(
+                data = "Some data",
+                tbc = true,
+                seqNo = 0,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                requestId = 1
+            ),
+            NotifyCustomerInformationResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = NotifyCustomerInformationReqGen(
+            data = "Some data",
+            tbc = true,
+            seqNo = 0,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            requestId = 1
+        )
+        val response = operations.notifyCustomerInformation(requestMetadata, request)
+        expectThat(response) {
+            get { this.request }.isEqualTo(request)
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
     }
 }

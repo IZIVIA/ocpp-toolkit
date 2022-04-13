@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
@@ -104,4 +106,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun getCertificateStatus(meta: RequestMetadata, request: GetCertificateStatusReq): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp>
+
+    /**
+     * Sends a message to the CSMS to transfer customer informations
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyCustomerInformation(meta: RequestMetadata, request: NotifyCustomerInformationReq): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
 }

@@ -47,6 +47,7 @@ import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableSta
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -729,6 +730,61 @@ class IntegrationTest {
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
             .and { get { this.response.status }.isEqualTo(GetCertificateStatusEnumType.Accepted) }
+    }
+
+    @Test
+    fun `notifyCustomerInformation 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyCustomerInformation"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyCustomerInformationReq(
+            data = "Some data",
+            tbc = true,
+            seqNo = 0,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            requestId = 1
+        )
+        expectThrows<IllegalStateException> {
+            csmsApi.notifyCustomerInformation(requestMetadata, request)
+        }
+    }
+
+    @Test
+    fun `notifyCustomerInformation 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyCustomerInformation"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyCustomerInformationReq(
+            data = "Some data",
+            tbc = true,
+            seqNo = 0,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            requestId = 1
+        )
+        val response = csmsApi.notifyCustomerInformation(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
     }
 
 }

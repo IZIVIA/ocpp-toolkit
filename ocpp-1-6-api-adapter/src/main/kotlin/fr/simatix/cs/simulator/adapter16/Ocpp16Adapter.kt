@@ -15,6 +15,8 @@ import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStat
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
@@ -216,5 +218,12 @@ class Ocpp16Adapter(
         request: GetCertificateStatusReq
     ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> {
         throw IllegalStateException("GetCertificateStatus can't be call in OCPP 1.6")
+    }
+
+    override fun notifyCustomerInformation(
+        meta: RequestMetadata,
+        request: NotifyCustomerInformationReq
+    ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> {
+        throw IllegalStateException("notifyCustomerInformation can't be call in OCPP 1.6")
     }
 }

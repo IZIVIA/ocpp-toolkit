@@ -27,6 +27,8 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -268,5 +270,11 @@ class RealChargePointOperations(
         request: GetCertificateStatusReq
     ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> =
         sendMessage(meta, "GetCertificateStatus", request)
+
+    override fun notifyCustomerInformation(
+        meta: RequestMetadata,
+        request: NotifyCustomerInformationReq
+    ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> =
+        sendMessage(meta, "NotifyCustomerInformation", request)
 
 }

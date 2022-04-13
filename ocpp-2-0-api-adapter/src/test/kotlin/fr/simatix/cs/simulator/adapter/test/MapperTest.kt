@@ -8,6 +8,7 @@ import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeSchedu
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
@@ -55,6 +56,8 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.Gen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
@@ -721,5 +724,32 @@ class MapperTest {
             .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 
+    @Test
+    fun notifyCustomerInformation() {
+        val mapper: NotifyCustomerInformationMapper = Mappers.getMapper(NotifyCustomerInformationMapper::class.java)
+        val resp = mapper.coreToGenResp(
+            NotifyCustomerInformationResp()
+        )
+        expectThat(resp) {
+            get { resp }.isA<NotifyCustomerInformationRespGen>()
+        }
+
+        val req = mapper.genToCoreReq(
+            NotifyCustomerInformationReq(
+                data = "Some data",
+                tbc = true,
+                seqNo = 0,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                requestId = 1
+            )
+        )
+        expectThat(req) {
+            get { req.data }.isEqualTo("Some data")
+            get { req.tbc }.isEqualTo(true)
+            get { req.seqNo }.isEqualTo(0)
+            get { req.generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { req.requestId }.isEqualTo(1)
+        }
+    }
 }
 

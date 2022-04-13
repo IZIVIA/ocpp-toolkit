@@ -60,6 +60,7 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -720,6 +721,35 @@ class JsonSchemaTest {
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `notifyCustomerInformation request format`() {
+
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyCustomerInformationReq(
+                data = "Some data",
+                seqNo = 0,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                requestId = 1
+            ),
+            "NotifyCustomerInformationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyCustomerInformationReq(
+                data = "Some data",
+                tbc = true,
+                seqNo = 0,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                requestId = 1
+            ),
+            "NotifyCustomerInformationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test

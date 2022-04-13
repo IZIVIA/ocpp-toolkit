@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStat
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 
 interface CSMSApi {
 
@@ -79,6 +81,11 @@ interface CSMSApi {
         request: GetCertificateStatusReq
     ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp>
 
+    fun notifyCustomerInformation(
+        meta: RequestMetadata,
+        request: NotifyCustomerInformationReq
+    ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
+
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -98,5 +105,6 @@ fun CSMSApi.send(
         is FirmwareStatusNotificationReq -> firmwareStatusNotification(meta, request)
         is ClearedChargingLimitReq -> clearedChargingLimit(meta, request)
         is GetCertificateStatusReq -> getCertificateStatus(meta, request)
+        is NotifyCustomerInformationReq -> notifyCustomerInformation(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>
