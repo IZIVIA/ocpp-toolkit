@@ -1,9 +1,9 @@
-package fr.simatix.cs.simulator.core20.model.remotestart
+package fr.simatix.cs.simulator.core20.model.common
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import fr.simatix.cs.simulator.core20.model.common.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffType
 import fr.simatix.cs.simulator.utils.InstantDeserializer
 import fr.simatix.cs.simulator.utils.InstantSerializer
 import kotlinx.datetime.Instant

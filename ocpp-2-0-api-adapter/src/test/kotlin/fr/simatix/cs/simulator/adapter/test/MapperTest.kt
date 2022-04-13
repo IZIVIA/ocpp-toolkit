@@ -33,10 +33,7 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
-import fr.simatix.cs.simulator.core20.model.common.enumeration.AttributeEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericDeviceModelStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
@@ -51,7 +48,6 @@ import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
@@ -66,6 +62,7 @@ import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificati
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType as EventTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
@@ -91,6 +88,7 @@ import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
+import strikt.assertions.isTrue
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType as CancelReservationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
@@ -101,6 +99,7 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCache
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType as ClearChargingProfileStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
@@ -109,6 +108,7 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingLimitSourceEnumType as ChargingLimitSourceEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType as GenericDeviceModelStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
@@ -123,6 +123,9 @@ import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as Comp
 import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp as NotifyChargingLimitRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
@@ -645,7 +648,6 @@ class MapperTest {
             get { evse }.isEqualTo(EVSETypeGen(1, 1))
         }
     }
-
     @Test
     fun setChargingProfileMapper() {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
@@ -808,6 +810,51 @@ class MapperTest {
             get { req.eventData[0].transactionId }.isEqualTo("transaction")
             get { req.eventData[0].variableMonitoringId }.isEqualTo(3)
         }
+    }
+
+    @Test
+    fun notifyChargingLimitMapper() {
+        val mapper: NotifyChargingLimitMapper = Mappers.getMapper(NotifyChargingLimitMapper::class.java)
+        val resp = mapper.coreToGenResp(NotifyChargingLimitResp())
+        expectThat(resp).and { get { resp }.isA<NotifyChargingLimitRespGen>() }
+
+        val req = mapper.genToCoreReq(
+            NotifyChargingLimitReqGen(
+                ChargingLimitTypeGen(
+                    chargingLimitSource = ChargingLimitSourceEnumTypeGen.CSO,
+                    isGridCritical = true
+                ),
+                1,
+                listOf(
+                    ChargingScheduleTypeGen(
+                        id = 5,
+                        chargingRateUnit = ChargingRateUnitEnumTypeGen.A,
+                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodTypeGen(9, 10.0)),
+                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        duration = 6,
+                        minChargingRate = 7.0
+                    )
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { chargingLimit.chargingLimitSource }.isEqualTo(ChargingLimitSourceEnumType.CSO) }
+            .and { get { chargingLimit.isGridCritical }.isTrue() }
+            .and { get { evseId }.isEqualTo(1) }
+            .and {
+                get { chargingSchedule }.isEqualTo(
+                    listOf(
+                        ChargingScheduleType(
+                            id = 5,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            duration = 6,
+                            minChargingRate = 7.0
+                        )
+                    )
+                )
+            }
     }
 
 }

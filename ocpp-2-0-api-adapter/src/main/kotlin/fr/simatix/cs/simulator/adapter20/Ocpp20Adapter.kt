@@ -29,6 +29,8 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargi
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -183,6 +185,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> {
         val mapper: NotifyEVChargingScheduleMapper = Mappers.getMapper(NotifyEVChargingScheduleMapper::class.java)
         val response = operations.notifyEVChargingSchedule(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyChargingLimit(
+        meta: RequestMetadata,
+        request: NotifyChargingLimitReq
+    ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp> {
+        val mapper: NotifyChargingLimitMapper = Mappers.getMapper(NotifyChargingLimitMapper::class.java)
+        val response = operations.notifyChargingLimit(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

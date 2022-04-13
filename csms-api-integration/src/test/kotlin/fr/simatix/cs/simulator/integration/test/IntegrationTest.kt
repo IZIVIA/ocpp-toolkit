@@ -53,6 +53,8 @@ import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -902,6 +904,29 @@ class IntegrationTest {
         expectThat(response) {
             get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
         }
+    }
+
+    fun `notifyChargingLimit 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyChargingLimit"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyChargingLimitReq(
+            chargingLimit = ChargingLimitType(ChargingLimitSourceEnumType.CSO),
+            evseId = 1
+        )
+        val response = csmsApi.notifyChargingLimit(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 
 }

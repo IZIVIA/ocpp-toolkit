@@ -4,7 +4,7 @@ import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.common.EVSEType
-import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule

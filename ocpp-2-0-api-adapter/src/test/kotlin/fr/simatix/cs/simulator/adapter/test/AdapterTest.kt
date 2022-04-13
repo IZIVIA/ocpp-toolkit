@@ -101,6 +101,9 @@ import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCust
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.ChargingScheduleType
@@ -153,6 +156,9 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq as NotifyEVChargingScheduleReqGen
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType as ChargingScheduleTypeGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -778,5 +784,25 @@ class AdapterTest {
             get { this.response.status }.isEqualTo(GenericStatusEnumTypeGen.Accepted)
             get { this.response.statusInfo }.isEqualTo(StatusInfoTypeGen("123"))
         }
+    }
+
+    @Test
+    fun `notifyChargingLimit request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyChargingLimit(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyChargingLimitReq(ChargingLimitType(ChargingLimitSourceEnumType.CSO, true)),
+            NotifyChargingLimitResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = NotifyChargingLimitReqGen(
+            chargingLimit = ChargingLimitTypeGen(ChargingLimitSourceEnumTypeGen.CSO, true),
+            evseId = 1
+        )
+        val response = operations.notifyChargingLimit(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 }

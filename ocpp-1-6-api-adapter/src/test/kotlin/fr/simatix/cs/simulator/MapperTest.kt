@@ -22,7 +22,7 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
-import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp

@@ -68,6 +68,9 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -682,9 +685,36 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             TriggerMessageReq(
                 MessageTriggerEnumType.Heartbeat,
-                EVSEType(1, 1)
+                EVSEType(1,1)
             ),
             "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `notifyChargingLimit request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyChargingLimitReq(ChargingLimitType(ChargingLimitSourceEnumType.CSO)),
+            "NotifyChargingLimitRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyChargingLimitReq(
+                ChargingLimitType(ChargingLimitSourceEnumType.CSO, true), 1, listOf(
+                    ChargingScheduleType(
+                        id = 1,
+                        chargingRateUnit = ChargingRateUnitEnumType.A,
+                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                    )
+                )
+            ), "NotifyChargingLimitRequest.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
@@ -1276,10 +1306,7 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
-            FirmwareStatusNotificationResp(),
-            "FirmwareStatusNotificationResponse.json"
-        )
+        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1304,8 +1331,7 @@ class JsonSchemaTest {
 
     @Test
     fun `clearedChargingLimit response format`() {
-        val errors =
-            JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
+        val errors = JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1366,7 +1392,6 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
     }
-
     @Test
     fun `triggerMessage response format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
@@ -1385,6 +1410,16 @@ class JsonSchemaTest {
                 StatusInfoType("reason", "additional")
             ),
             "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `notifyChargingLimit response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyChargingLimitResp(), "NotifyChargingLimitResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
