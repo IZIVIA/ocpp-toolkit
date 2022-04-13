@@ -17,6 +17,7 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
+import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
@@ -52,6 +53,8 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitE
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
@@ -76,6 +79,7 @@ import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType as CancelReservationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
@@ -89,6 +93,7 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearC
 import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
+import fr.simatix.cs.simulator.api.model.common.OCSPRequestDataType as OCSPRequestDataTypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
@@ -99,6 +104,8 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as I
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
@@ -627,6 +634,7 @@ class MapperTest {
             get { evse }.isEqualTo(EVSETypeGen(1, 1))
         }
     }
+
     @Test
     fun setChargingProfileMapper() {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
@@ -672,6 +680,45 @@ class MapperTest {
             .and { get { chargingProfile.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
             .and { get { chargingProfile.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
             .and { get { chargingProfile.transactionId }.isEqualTo("transaction") }
+    }
+
+    @Test
+    fun getCertificateStatusMapper() {
+        val mapper: GetCertificateStatusMapper = Mappers.getMapper(GetCertificateStatusMapper::class.java)
+        val req = mapper.genToCoreReq(
+            GetCertificateStatusReqGen(
+                OCSPRequestDataTypeGen(
+                    hashAlgorithm = HashAlgorithmEnumTypeGen.SHA256,
+                    issuerNameHash = "",
+                    issuerKeyHash = "",
+                    serialNumber = "",
+                    responderURL = ""
+                )
+            )
+        )
+        expectThat(req).and {
+            get { ocspRequestData }.isEqualTo(
+                OCSPRequestDataType(
+                    hashAlgorithm = HashAlgorithmEnumType.SHA256,
+                    issuerNameHash = "",
+                    issuerKeyHash = "",
+                    serialNumber = "",
+                    responderURL = ""
+                )
+            )
+        }
+
+        val resp = mapper.coreToGenResp(
+            GetCertificateStatusResp(
+                GetCertificateStatusEnumType.Accepted,
+                "",
+                StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
+            .and { get { ocspResult }.isEqualTo("") }
+            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 
 }

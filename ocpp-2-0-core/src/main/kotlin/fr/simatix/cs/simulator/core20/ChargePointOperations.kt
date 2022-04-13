@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
@@ -96,4 +98,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun clearedChargingLimit(meta: RequestMetadata, request: ClearedChargingLimitReq): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp>
+
+    /**
+     * Sends a request to the Central System to obtain the certificate status information
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun getCertificateStatus(meta: RequestMetadata, request: GetCertificateStatusReq): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp>
 }

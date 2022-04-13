@@ -21,6 +21,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -139,6 +141,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> {
         val mapper: ClearedChargingLimitMapper = Mappers.getMapper(ClearedChargingLimitMapper::class.java)
         val response = operations.clearedChargingLimit(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun getCertificateStatus(
+        meta: RequestMetadata,
+        request: GetCertificateStatusReq
+    ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> {
+        val mapper: GetCertificateStatusMapper = Mappers.getMapper(GetCertificateStatusMapper::class.java)
+        val response = operations.getCertificateStatus(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

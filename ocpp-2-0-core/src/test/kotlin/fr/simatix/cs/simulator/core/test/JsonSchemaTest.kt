@@ -2,7 +2,7 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
-import fr.simatix.cs.simulator.core20.model.authorize.OCSPRequestDataType
+import fr.simatix.cs.simulator.core20.model.common.OCSPRequestDataType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.AuthorizeCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
@@ -38,6 +38,9 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
@@ -667,9 +670,20 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             TriggerMessageReq(
                 MessageTriggerEnumType.Heartbeat,
-                EVSEType(1,1)
+                EVSEType(1, 1)
             ),
             "TriggerMessageRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `getCertificateStatus request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            GetCertificateStatusReq(OCSPRequestDataType(HashAlgorithmEnumType.SHA256, "", "", "", "")),
+            "GetCertificateStatusRequest.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
@@ -1107,7 +1121,10 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            FirmwareStatusNotificationResp(),
+            "FirmwareStatusNotificationResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1132,7 +1149,8 @@ class JsonSchemaTest {
 
     @Test
     fun `clearedChargingLimit response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
+        val errors =
+            JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1193,6 +1211,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
     }
+
     @Test
     fun `triggerMessage response format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
@@ -1211,6 +1230,24 @@ class JsonSchemaTest {
                 StatusInfoType("reason", "additional")
             ),
             "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `getCertificateStatus response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted), "GetCertificateStatusResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted, "", StatusInfoType("reason", "additional")),
+            "GetCertificateStatusResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

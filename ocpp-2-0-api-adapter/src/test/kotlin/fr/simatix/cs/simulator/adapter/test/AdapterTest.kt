@@ -65,6 +65,7 @@ import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
+import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
@@ -75,6 +76,7 @@ import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedCharging
 import fr.simatix.cs.simulator.core20.model.common.IdTokenInfoType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
 import fr.simatix.cs.simulator.core20.model.common.MessageContentType
+import fr.simatix.cs.simulator.core20.model.common.OCSPRequestDataType
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSourceEnumType
@@ -87,6 +89,9 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareS
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
@@ -117,6 +122,7 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType as ChargingStationTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType as BootReasonEnumTypeGen
@@ -124,11 +130,14 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.Registrati
 import fr.simatix.cs.simulator.api.model.common.IdTokenInfoType as IdTokenInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
 import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
+import fr.simatix.cs.simulator.api.model.common.OCSPRequestDataType as OCSPRequestDataTypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusEnumType as AuthorizationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -584,7 +593,7 @@ class AdapterTest {
         )
 
         val operations = Ocpp20Adapter("c1", transport, csApi)
-        val request =  NotifyReportReqGen(
+        val request = NotifyReportReqGen(
             requestId = 1,
             generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
             seqNo = 2,
@@ -609,7 +618,7 @@ class AdapterTest {
         )
 
         val operations = Ocpp20Adapter("c1", transport, csApi)
-        val request =  FirmwareStatusNotificationReqGen(
+        val request = FirmwareStatusNotificationReqGen(
             FirmwareStatusEnumTypeGen.Downloaded
         )
         val response = operations.firmwareStatusNotification(requestMetadata, request)
@@ -640,5 +649,30 @@ class AdapterTest {
             .and {
                 get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
             }
+    }
+
+    @Test
+    fun `getCertificateStatus request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.getCertificateStatus(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            GetCertificateStatusReq(OCSPRequestDataType(HashAlgorithmEnumType.SHA256, "", "", "", "")),
+            GetCertificateStatusResp(
+                GetCertificateStatusEnumType.Accepted,
+                "",
+                StatusInfoType("reason", "additional")
+            )
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =
+            GetCertificateStatusReqGen(OCSPRequestDataTypeGen(HashAlgorithmEnumTypeGen.SHA256, "", "", "", ""))
+        val response = operations.getCertificateStatus(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+            .and { get { this.response.ocspResult }.isEqualTo("") }
     }
 }

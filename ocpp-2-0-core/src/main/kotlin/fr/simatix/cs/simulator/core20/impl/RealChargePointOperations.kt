@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
@@ -252,5 +254,12 @@ class RealChargePointOperations(
         request: ClearedChargingLimitReq
     ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> =
         sendMessage(meta, "ClearedChargingLimit", request)
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun getCertificateStatus(
+        meta: RequestMetadata,
+        request: GetCertificateStatusReq
+    ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> =
+        sendMessage(meta, "GetCertificateStatus", request)
 
 }

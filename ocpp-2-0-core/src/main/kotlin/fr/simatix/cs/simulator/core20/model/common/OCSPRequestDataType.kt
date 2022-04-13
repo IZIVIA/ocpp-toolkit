@@ -1,6 +1,6 @@
-package fr.simatix.cs.simulator.api.model.authorize
+package fr.simatix.cs.simulator.core20.model.common
 
-import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
 
 data class OCSPRequestDataType(
     val hashAlgorithm: HashAlgorithmEnumType,

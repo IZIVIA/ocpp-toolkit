@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
@@ -207,5 +209,12 @@ class Ocpp16Adapter(
         request: ClearedChargingLimitReq
     ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> {
         throw IllegalStateException("clearedChargingLimit can't be call in OCPP 1.6")
+    }
+
+    override fun getCertificateStatus(
+        meta: RequestMetadata,
+        request: GetCertificateStatusReq
+    ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> {
+        throw IllegalStateException("GetCertificateStatus can't be call in OCPP 1.6")
     }
 }
