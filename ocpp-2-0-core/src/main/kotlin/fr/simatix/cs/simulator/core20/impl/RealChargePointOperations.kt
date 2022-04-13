@@ -186,7 +186,7 @@ class RealChargePointOperations(
             ).response
         }
 
-        client.receiveMessage("ReserverNow") { req: ReserveNowReq ->
+        client.receiveMessage("ReserveNow") { req: ReserveNowReq ->
             csmsOperations.reserveNow(
                 RequestMetadata(chargeStationId),
                 req

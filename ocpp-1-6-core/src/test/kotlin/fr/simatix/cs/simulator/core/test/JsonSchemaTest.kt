@@ -62,6 +62,9 @@ import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateType
 import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core16.model.setchargingprofile.enumeration.ChargingProfileStatus
+import fr.simatix.cs.simulator.core16.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core16.model.reservenow.ReserveNowResp
+import fr.simatix.cs.simulator.core16.model.reservenow.enumeration.ReservationStatus
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionReq
 import fr.simatix.cs.simulator.core16.model.starttransaction.StartTransactionResp
 import fr.simatix.cs.simulator.core16.model.statusnotification.StatusNotificationReq
@@ -509,6 +512,34 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `reserveNow request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ReserveNowReq(
+                connectorId = 1,
+                expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                idTag = "idTag",
+                reservationId = 2
+            ), "ReserveNowRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ReserveNowReq(
+                connectorId = 1,
+                expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+                idTag = "idTag",
+                reservationId = 2,
+                parentIdTag = "partentIdTag"
+            ), "ReserveNowRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -802,6 +833,16 @@ class JsonSchemaTest {
                 TriggerMessageStatus.Accepted
             ),
             "TriggerMessageResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `reserveNow response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            ReserveNowResp(ReservationStatus.Accepted), "ReserveNowResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

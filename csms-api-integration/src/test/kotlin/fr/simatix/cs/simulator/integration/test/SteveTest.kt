@@ -43,6 +43,9 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
+import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
@@ -229,6 +232,16 @@ fun main(args: Array<String>) {
             val response = TriggerMessageResp(
                 status = TriggerMessageStatusEnumType.Accepted,
                 statusInfo = StatusInfoType("reason", "additional")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun reserveNow(
+            meta: RequestMetadata,
+            req: ReserveNowReq
+        ): OperationExecution<ReserveNowReq, ReserveNowResp> {
+            val response = ReserveNowResp(
+                ReserveNowStatusEnumType.Accepted
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }

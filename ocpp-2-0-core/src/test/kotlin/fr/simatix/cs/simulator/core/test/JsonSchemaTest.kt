@@ -76,6 +76,10 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnum
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
+import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ConnectorEnumType
+import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ReserveNowStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -691,6 +695,34 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `reserveNow request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ReserveNowReq(
+                id = 1,
+                expiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                idToken = IdTokenType("token", IdTokenEnumType.Central)
+            ), "ReserveNowRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ReserveNowReq(
+                id = 1,
+                expiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                connectorType = ConnectorEnumType.cTesla,
+                evseId = 2,
+                idToken = IdTokenType("token1", IdTokenEnumType.Central),
+                groupIdToken = IdTokenType("token2", IdTokenEnumType.Central)
+            ), "ReserveNowRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -1248,6 +1280,16 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted, "", StatusInfoType("reason", "additional")),
             "GetCertificateStatusResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `reserveNow response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ReserveNowResp(ReserveNowStatusEnumType.Accepted), "ReserveNowResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

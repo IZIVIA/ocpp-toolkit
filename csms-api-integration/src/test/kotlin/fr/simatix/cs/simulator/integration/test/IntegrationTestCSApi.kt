@@ -38,6 +38,9 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
+import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetEnumType
@@ -185,6 +188,16 @@ class IntegrationTestCSApi {
                         KeyValue("AllowOfflineTxForUnknownId", true, "true"),
                         KeyValue("AuthorizationCacheEnabled", false, "true")
                     )
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun reserveNow(
+                meta: RequestMetadata,
+                req: ReserveNowReq
+            ): OperationExecution<ReserveNowReq, ReserveNowResp> {
+                val response = ReserveNowResp(
+                    ReserveNowStatusEnumType.Accepted
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
@@ -412,6 +425,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "ReserveNow", "{\"connectorId\": 1, \"expiryDate\": \"2022-02-15T00:00:00.000Z\", \"idTag\": \"Tag1\", \"parentIdTag\": \"Tag2\", \"reservationId\": 2}"
+        )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -429,6 +449,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
+        verify(csApiSpy, times(1)).reserveNow(any(), any())
 
         csmsApi.close()
     }
@@ -556,6 +577,12 @@ class IntegrationTestCSApi {
                 "{\"evseId\": 1, \"chargingProfile\": {\"id\": 1, \"stackLevel\": 1, \"chargingProfilePurpose\": \"TxProfile\", \"chargingProfileKind\": \"Absolute\", \"chargingSchedule\": [{\"id\": 1, \"chargingRateUnit\": \"W\", \"chargingSchedulePeriod\": [{\"startPeriod\": 1, \"limit\": 1.5}]}]}}"
             )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "ReserveNow", "{\"id\": 1, \"expiryDateTime\": \"2022-02-15T00:00:00.000Z\", \"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"
+        )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -575,6 +602,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).sendLocalList(any(), any())
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
+        verify(csApiSpy, times(1)).reserveNow(any(), any())
 
         csmsApi.close()
     }

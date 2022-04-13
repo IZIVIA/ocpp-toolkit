@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionR
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
@@ -188,6 +190,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: SetChargingProfileReq
             ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
+                TODO("Not implemented")
+            }
+
+            override fun reserveNow(
+                meta: RequestMetadata,
+                req: ReserveNowReq
+            ): OperationExecution<ReserveNowReq, ReserveNowResp> {
                 TODO("Not implemented")
             }
         }

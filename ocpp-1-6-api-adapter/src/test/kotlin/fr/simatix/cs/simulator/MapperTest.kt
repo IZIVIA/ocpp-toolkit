@@ -5,6 +5,7 @@ import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelRes
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
@@ -26,6 +27,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType
@@ -75,8 +77,12 @@ import fr.simatix.cs.simulator.core16.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core16.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateStatus
 import fr.simatix.cs.simulator.core16.model.sendlocallist.enumeration.UpdateType
+import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
+import fr.simatix.cs.simulator.core16.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core16.model.reservenow.enumeration.ReservationStatus
 import fr.simatix.cs.simulator.core16.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core16.model.unlockconnector.enumeration.UnlockStatus
+import kotlinx.datetime.Instant
 import fr.simatix.cs.simulator.core16.model.updatefirmware.UpdateFirmwareReq
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
@@ -470,6 +476,35 @@ class MapperTest {
                     )
                 )
             }
+    }
+
+    @Test
+    fun reserveNowMapper() {
+        val mapper: ReserveNowMapper = Mappers.getMapper(ReserveNowMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            ReserveNowResp(
+                status = ReserveNowStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(ReservationStatus.Accepted)
+        }
+
+        val req = mapper.coreToGenReq(ReserveNowReq(
+            connectorId = 1,
+            expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
+            idTag = "idTag",
+            parentIdTag = "idTagParent",
+            reservationId = 2
+        ))
+        expectThat(req) {
+            get { id }.isEqualTo(2)
+            get { expiryDateTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { idToken }.isEqualTo(IdTokenType("idTag", IdTokenEnumType.Central))
+            get { evseId }.isEqualTo(1)
+            get { groupIdToken }.isEqualTo(IdTokenType("idTagParent", IdTokenEnumType.Central))
+        }
     }
 
 }
