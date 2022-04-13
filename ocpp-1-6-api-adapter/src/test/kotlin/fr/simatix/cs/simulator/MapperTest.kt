@@ -7,6 +7,7 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.Operatio
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
