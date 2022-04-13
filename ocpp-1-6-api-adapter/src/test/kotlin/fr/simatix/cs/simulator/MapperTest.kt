@@ -61,9 +61,7 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.Get
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
 import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
-import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
-import fr.simatix.cs.simulator.core16.model.remotestart.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType

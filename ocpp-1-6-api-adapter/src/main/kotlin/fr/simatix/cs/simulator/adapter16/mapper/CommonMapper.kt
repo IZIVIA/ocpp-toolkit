@@ -5,13 +5,13 @@ import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGe
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.common.EVSEType
 import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType
-import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
+import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.*
-import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedule
-import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
+import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
