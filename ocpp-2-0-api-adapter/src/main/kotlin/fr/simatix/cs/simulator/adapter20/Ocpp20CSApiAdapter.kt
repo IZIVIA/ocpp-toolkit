@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionR
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
@@ -164,6 +166,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<TriggerMessageReq, TriggerMessageResp> {
         val mapper: TriggerMessageMapper = Mappers.getMapper(TriggerMessageMapper::class.java)
         val response = csApi.triggerMessage(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun reserveNow(
+        meta: RequestMetadata,
+        req: ReserveNowReq
+    ): OperationExecution<ReserveNowReq, ReserveNowResp> {
+        val mapper: ReserveNowMapper = Mappers.getMapper(ReserveNowMapper::class.java)
+        val response = csApi.reserveNow(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
