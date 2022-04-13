@@ -46,8 +46,6 @@ import fr.simatix.cs.simulator.core16.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core16.model.remotestart.*
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
-import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingRateUnitType
-import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
