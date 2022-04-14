@@ -3,11 +3,21 @@ package fr.simatix.cs.simulator.adapter.test
 import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -63,6 +73,8 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTrigger
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType as EventTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
@@ -648,6 +660,7 @@ class MapperTest {
             get { evse }.isEqualTo(EVSETypeGen(1, 1))
         }
     }
+
     @Test
     fun setChargingProfileMapper() {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
@@ -857,5 +870,60 @@ class MapperTest {
             }
     }
 
+
+    @Test
+    fun notifyDisplayMessagesMapper() {
+        val mapper: NotifyDisplayMessagesMapper = Mappers.getMapper(NotifyDisplayMessagesMapper::class.java)
+        val resp = mapper.coreToGenResp(NotifyDisplayMessagesResp())
+        expectThat(resp).and { get { resp }.isA<NotifyDisplayMessagesRespGen>() }
+
+        val req = mapper.genToCoreReq(
+            NotifyDisplayMessagesReqGen(
+                requestId = 1,
+                tbc = false,
+                messageInfo = listOf(
+                    MessageInfoTypeGen(
+                        id = 2,
+                        priority = MessagePriorityEnumTypeGen.InFront,
+                        state = MessageStateEnumTypeGen.Charging,
+                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        endDateTime = Instant.parse("2022-02-15T00:00:00.001Z"),
+                        transactionId = "2",
+                        message = MessageContentTypeGen(
+                            format = MessageFormatEnumTypeGen.URI,
+                            language = "language",
+                            content = "Message content"
+                        ),
+                        display = ComponentTypeGen(
+                            name = "name",
+                            instance = "instance",
+                            evse = EVSETypeGen(
+                                id = 1,
+                                connectorId = 2
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        expectThat(req) {
+            get { req }.isA<NotifyDisplayMessagesReq>()
+            get { requestId }.isEqualTo(1)
+            get { tbc }.isEqualTo(false)
+            get { messageInfo?.get(0)?.id }.isEqualTo(2)
+            get { messageInfo?.get(0)?.priority }.isEqualTo(MessagePriorityEnumType.InFront)
+            get { messageInfo?.get(0)?.state }.isEqualTo(MessageStateEnumType.Charging)
+            get { messageInfo?.get(0)?.startDateTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { messageInfo?.get(0)?.endDateTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z"))
+            get { messageInfo?.get(0)?.transactionId }.isEqualTo("2")
+            get { messageInfo?.get(0)?.message?.format }.isEqualTo(MessageFormatEnumType.URI)
+            get { messageInfo?.get(0)?.message?.language }.isEqualTo("language")
+            get { messageInfo?.get(0)?.message?.content }.isEqualTo("Message content")
+            get { messageInfo?.get(0)?.display?.name }.isEqualTo("name")
+            get { messageInfo?.get(0)?.display?.instance }.isEqualTo("instance")
+            get { messageInfo?.get(0)?.display?.evse?.id }.isEqualTo(1)
+            get { messageInfo?.get(0)?.display?.evse?.connectorId }.isEqualTo(2)
+        }
+    }
 }
 

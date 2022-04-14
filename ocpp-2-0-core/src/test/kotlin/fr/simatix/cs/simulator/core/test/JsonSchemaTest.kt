@@ -60,6 +60,11 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
@@ -685,7 +690,7 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             TriggerMessageReq(
                 MessageTriggerEnumType.Heartbeat,
-                EVSEType(1,1)
+                EVSEType(1, 1)
             ),
             "TriggerMessageRequest.json"
         )
@@ -787,6 +792,53 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notifyDisplayMessage request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyDisplayMessagesReq(
+                requestId = 1
+            ),
+            "NotifyDisplayMessagesRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyDisplayMessagesReq(
+                requestId = 1,
+                tbc = false,
+                messageInfo = listOf(
+                        MessageInfoType(
+                        id = 2,
+                        priority = MessagePriorityEnumType.InFront,
+                        state = MessageStateEnumType.Charging,
+                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        endDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        transactionId = "2",
+                        message = MessageContentType(
+                            format = MessageFormatEnumType.URI,
+                            language = "language",
+                            content = "Message content"
+                        ),
+                        display = ComponentType(
+                            name = "name",
+                            instance = "instance",
+                            evse = EVSEType(
+                                id = 1,
+                                connectorId = 2
+                            )
+                        )
+                    )
+                )
+            ),
+            "NotifyDisplayMessagesRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
     }
 
     @Test
@@ -1306,7 +1358,10 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(FirmwareStatusNotificationResp(), "FirmwareStatusNotificationResponse.json")
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            FirmwareStatusNotificationResp(),
+            "FirmwareStatusNotificationResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1331,7 +1386,9 @@ class JsonSchemaTest {
 
     @Test
     fun `clearedChargingLimit response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json")
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1392,6 +1449,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
     }
+
     @Test
     fun `triggerMessage response format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
@@ -1448,6 +1506,17 @@ class JsonSchemaTest {
     fun `reserveNow response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             ReserveNowResp(ReserveNowStatusEnumType.Accepted), "ReserveNowResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `notifyDisplayMessages response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyDisplayMessagesResp(),
+            "NotifyDisplayMessagesResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

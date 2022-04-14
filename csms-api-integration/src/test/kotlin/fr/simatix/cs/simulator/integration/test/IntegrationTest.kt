@@ -48,6 +48,10 @@ import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
@@ -952,4 +956,51 @@ class IntegrationTest {
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 
+    @Test
+    fun `notifyDisplayMessages 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyDisplayMessages"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyDisplayMessagesReq(
+            requestId = 1,
+            tbc = false,
+            messageInfo = listOf(
+                MessageInfoType(
+                    id = 2,
+                    priority = MessagePriorityEnumType.InFront,
+                    state = MessageStateEnumType.Charging,
+                    startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    endDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    transactionId = "2",
+                    message = MessageContentType(
+                        format = MessageFormatEnumType.URI,
+                        language = "language",
+                        content = "Message content"
+                    ),
+                    display = ComponentType(
+                        name = "name",
+                        instance = "instance",
+                        evse = EVSEType(
+                            id = 1,
+                            connectorId = 2
+                        )
+                    )
+                )
+            )
+        )
+        val response = csmsApi.notifyDisplayMessages(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
+    }
 }

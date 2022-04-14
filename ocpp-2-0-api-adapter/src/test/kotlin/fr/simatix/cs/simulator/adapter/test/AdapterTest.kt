@@ -75,6 +75,8 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.BootRea
 import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.common.EVSEType
+import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
 import fr.simatix.cs.simulator.core20.model.common.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenInfoType
 import fr.simatix.cs.simulator.core20.model.common.IdTokenType
@@ -97,6 +99,15 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.Gen
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
@@ -803,5 +814,75 @@ class AdapterTest {
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `notifyDisplayMessages request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyDisplayMessages(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyDisplayMessagesReq(
+                requestId = 1,
+                tbc = false,
+                messageInfo = listOf(
+                    MessageInfoType(
+                        id = 2,
+                        priority = MessagePriorityEnumType.InFront,
+                        state = MessageStateEnumType.Charging,
+                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        endDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        transactionId = "2",
+                        message = MessageContentType(
+                            format = MessageFormatEnumType.URI,
+                            language = "language",
+                            content = "Message content"
+                        ),
+                        display = fr.simatix.cs.simulator.core20.model.common.ComponentType(
+                            name = "name",
+                            instance = "instance",
+                            evse = EVSEType(
+                                id = 1,
+                                connectorId = 2
+                            )
+                        )
+                    )
+                )
+            ),
+            NotifyDisplayMessagesResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = NotifyDisplayMessagesReqGen(
+            requestId = 1,
+            tbc = false,
+            messageInfo = listOf(
+                MessageInfoTypeGen(
+                    id = 2,
+                    priority = MessagePriorityEnumTypeGen.InFront,
+                    state = MessageStateEnumTypeGen.Charging,
+                    startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    endDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    transactionId = "2",
+                    message = MessageContentTypeGen(
+                        format = MessageFormatEnumTypeGen.URI,
+                        language = "language",
+                        content = "Message content"
+                    ),
+                    display = ComponentType(
+                        name = "name",
+                        instance = "instance",
+                        evse = EVSETypeGen(
+                            id = 1,
+                            connectorId = 2
+                        )
+                    )
+                )
+            )
+        )
+        val response = operations.notifyDisplayMessages(requestMetadata, request)
+        expectThat(response) {
+            get { this.request }.isEqualTo(request)
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
     }
 }
