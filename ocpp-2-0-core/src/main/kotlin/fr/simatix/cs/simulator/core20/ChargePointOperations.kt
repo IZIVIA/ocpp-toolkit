@@ -19,6 +19,8 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
@@ -112,4 +114,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun notifyCustomerInformation(meta: RequestMetadata, request: NotifyCustomerInformationReq): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
+
+    /**
+     * Sends a message to the CSMS to notify the charging schedule as calculated by the EV
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyEVChargingSchedule(meta: RequestMetadata, request: NotifyEVChargingScheduleReq): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp>
 }

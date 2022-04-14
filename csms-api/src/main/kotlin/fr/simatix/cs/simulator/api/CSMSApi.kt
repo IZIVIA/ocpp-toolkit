@@ -28,6 +28,8 @@ import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStat
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 
 interface CSMSApi {
 
@@ -86,6 +88,10 @@ interface CSMSApi {
         request: NotifyCustomerInformationReq
     ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
 
+    fun notifyEVChargingSchedule(
+        meta: RequestMetadata,
+        request: NotifyEVChargingScheduleReq
+    ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp>
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -106,5 +112,6 @@ fun CSMSApi.send(
         is ClearedChargingLimitReq -> clearedChargingLimit(meta, request)
         is GetCertificateStatusReq -> getCertificateStatus(meta, request)
         is NotifyCustomerInformationReq -> notifyCustomerInformation(meta, request)
+        is NotifyEVChargingScheduleReq -> notifyEVChargingSchedule(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>

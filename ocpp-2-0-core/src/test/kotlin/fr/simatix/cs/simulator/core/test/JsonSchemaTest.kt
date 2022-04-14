@@ -61,6 +61,8 @@ import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -808,6 +810,42 @@ class JsonSchemaTest {
                     )
                 ), "NotifyReportRequest.json"
             )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notifyEVChargingSchedule request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingScheduleReq(
+                timeBase = Instant.parse("2022-02-15T00:00:00.000Z"),
+                evseId = 123,
+                chargingSchedule = ChargingScheduleType(
+                    id = 1,
+                    chargingRateUnit = ChargingRateUnitEnumType.A,
+                    chargingSchedulePeriod = listOf(
+                        ChargingSchedulePeriodType(
+                            startPeriod = 0,
+                            limit = 1.0
+                        )
+                    )
+                )
+            ),
+            "NotifyEVChargingScheduleRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notifyEVChargingSchedule response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingScheduleResp(
+                status = GenericStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("123")
+            ),
+            "NotifyEVChargingScheduleResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
