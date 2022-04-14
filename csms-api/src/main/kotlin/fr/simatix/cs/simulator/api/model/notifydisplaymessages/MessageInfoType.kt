@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.api.model.notifydisplaymessages
 
 import fr.simatix.cs.simulator.api.model.common.ComponentType
+import fr.simatix.cs.simulator.api.model.common.MessageContentType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType
 import kotlinx.datetime.Instant
