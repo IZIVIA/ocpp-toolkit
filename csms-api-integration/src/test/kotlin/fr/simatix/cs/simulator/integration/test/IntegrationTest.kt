@@ -49,6 +49,10 @@ import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -790,6 +794,116 @@ class IntegrationTest {
     }
 
     @Test
+    fun `notifyEvent 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyEvent"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyEventReq(
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 0,
+            eventData = listOf(
+                EventDataType(
+                    eventId = 1,
+                    timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    trigger = EventTriggerEnumType.Delta,
+                    actualValue = "actualValue",
+                    eventNotificationType = EventNotificationEnumType.HardWiredNotification,
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    cause = 2,
+                    techCode = "techCode",
+                    techInfo = "techInfo",
+                    cleared = true,
+                    transactionId = "transaction",
+                    variableMonitoringId = 3
+                )
+            ),
+            tbc = true
+        )
+
+        val response = csmsApi.notifyEvent(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
+    }
+
+    @Test
+    fun `notifyEVChargingSchedule 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\": \"Accepted\", \"statusInfo\": {\"reasonCode\": \"123\"}}",
+            action = "NotifyEVChargingSchedule"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyEVChargingScheduleReq(
+            timeBase = Instant.parse("2022-02-15T00:00:00.000Z"),
+            evseId = 123,
+            chargingSchedule = ChargingScheduleType(
+                chargingRateUnit = ChargingRateUnitEnumType.A,
+                chargingSchedulePeriod = listOf(
+                    ChargingSchedulePeriodType(
+                        startPeriod = 0,
+                        limit = 1.0
+                    )
+                )
+            )
+        )
+        expectThrows<IllegalStateException> {
+            csmsApi.notifyEVChargingSchedule(requestMetadata, request)
+        }
+    }
+
+    @Test
+    fun `notifyEVChargingSchedule 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\": \"Accepted\", \"statusInfo\": {\"reasonCode\": \"123\"}}",
+            action = "NotifyEVChargingSchedule"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyEVChargingScheduleReq(
+            timeBase = Instant.parse("2022-02-15T00:00:00.000Z"),
+            evseId = 123,
+            chargingSchedule = ChargingScheduleType(
+                chargingRateUnit = ChargingRateUnitEnumType.A,
+                chargingSchedulePeriod = listOf(
+                    ChargingSchedulePeriodType(
+                        startPeriod = 0,
+                        limit = 1.0
+                    )
+                )
+            )
+        )
+        val response = csmsApi.notifyEVChargingSchedule(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
+
+    @Test
     fun `notifyEVChargingSchedule 1-6 request`() {
 
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
@@ -855,5 +969,5 @@ class IntegrationTest {
             get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
         }
     }
-
+    }
 }

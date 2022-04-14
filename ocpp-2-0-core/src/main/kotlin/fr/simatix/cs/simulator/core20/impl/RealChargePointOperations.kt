@@ -31,6 +31,8 @@ import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCust
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -278,6 +280,12 @@ class RealChargePointOperations(
         request: NotifyCustomerInformationReq
     ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> =
         sendMessage(meta, "NotifyCustomerInformation", request)
+
+    override fun notifyEvent(
+        meta: RequestMetadata,
+        request: NotifyEventReq
+    ): OperationExecution<NotifyEventReq, NotifyEventResp> =
+        sendMessage(meta, "NotifyEvent", request)
 
     override fun notifyEVChargingSchedule(
         meta: RequestMetadata,
