@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
@@ -261,5 +263,12 @@ class Ocpp16Adapter(
         request: NotifyDisplayMessagesReq
     ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> {
         throw IllegalStateException("notifyDisplayMessages can't be call in OCPP 1.6")
+    }
+
+    override fun notifyEVChargingNeeds(
+        meta: RequestMetadata,
+        request: NotifyEVChargingNeedsReq
+    ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> {
+        throw IllegalStateException("NotifyEVChargingNeeds can't be call in OCPP 1.6")
     }
 }

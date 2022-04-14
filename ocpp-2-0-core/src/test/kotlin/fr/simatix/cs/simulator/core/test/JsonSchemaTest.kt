@@ -76,6 +76,9 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTrigger
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.*
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -842,6 +845,31 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `notifyEVChargingNeeds request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingNeedsReq(1, ChargingNeedsType(EnergyTransferModeEnumType.AC_single_phase)),
+            "NotifyEVChargingNeedsRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingNeedsReq(
+                1, ChargingNeedsType(
+                    requestedEnergyTransfer = EnergyTransferModeEnumType.AC_single_phase,
+                    departureTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    ACChargingParametersType(2, 3, 4, 5),
+                    DCChargingParametersType(2, 3, 4, 5, 6, 7, 8, 9)
+                ), 1
+            ), "NotifyEVChargingNeedsRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `notify request response format`() {
         var errors =
             JsonSchemaValidator.isValidObjectV6(
@@ -1496,6 +1524,27 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV6(
             GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted, "", StatusInfoType("reason", "additional")),
             "GetCertificateStatusResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `notifyEVChargingNeeds response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingNeedsResp(NotifyEVChargingNeedsStatusEnumType.Accepted),
+            "NotifyEVChargingNeedsResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEVChargingNeedsResp(
+                NotifyEVChargingNeedsStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ), "NotifyEVChargingNeedsResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

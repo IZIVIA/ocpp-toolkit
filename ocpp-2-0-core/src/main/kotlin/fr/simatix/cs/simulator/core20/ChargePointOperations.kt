@@ -27,6 +27,8 @@ import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVCha
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
@@ -144,4 +146,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun notifyDisplayMessages(meta: RequestMetadata, request: NotifyDisplayMessagesReq): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp>
+
+    /**
+     * Sends information to the Central System about the ev charging needs
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyEVChargingNeeds(meta: RequestMetadata, request: NotifyEVChargingNeedsReq): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp>
 }

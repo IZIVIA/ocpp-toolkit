@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -309,5 +311,12 @@ class RealChargePointOperations(
         request: NotifyDisplayMessagesReq
     ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> =
         sendMessage(meta, "NotifyDisplayMessages", request)
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun notifyEVChargingNeeds(
+        meta: RequestMetadata,
+        request: NotifyEVChargingNeedsReq
+    ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> =
+        sendMessage(meta, "NotifyEVChargingNeeds", request)
 
 }

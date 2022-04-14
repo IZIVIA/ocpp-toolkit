@@ -75,6 +75,9 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
@@ -138,6 +141,12 @@ import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableSta
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp as NotifyChargingLimitRespGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ACChargingParametersType as ACChargingParametersTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType as ChargingNeedsTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType as EnergyTransferModeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
@@ -744,6 +753,64 @@ class MapperTest {
         expectThat(resp)
             .and { get { status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
             .and { get { ocspResult }.isEqualTo("") }
+            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+    }
+
+    @Test
+    fun notifyEVChargingNeedsMapper() {
+        val mapper: NotifyEVChargingNeedsMapper = Mappers.getMapper(NotifyEVChargingNeedsMapper::class.java)
+        val req = mapper.genToCoreReq(
+            NotifyEVChargingNeedsReqGen(
+                evseId = 1,
+                maxScheduleTuples = 3,
+                chargingNeeds = ChargingNeedsTypeGen(
+                    requestedEnergyTransfer = EnergyTransferModeEnumTypeGen.DC,
+                    departureTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    acChargingParameters = ACChargingParametersTypeGen(
+                        energyAmount = 1,
+                        evMinCurrent = 2,
+                        evMaxCurrent = 3,
+                        evMaxVoltage = 4
+                    ),
+                    dcChargingParameters = DCChargingParametersTypeGen(
+                        evMaxCurrent = 1,
+                        evMaxVoltage = 2,
+                        energyAmount = 3,
+                        evMaxPower = 4,
+                        stateOfCharge = 5,
+                        evEnergyCapacity = 6,
+                        fullSoC = 7,
+                        bulkSoC = 8
+                    )
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { evseId }.isEqualTo(1) }
+            .and { get { maxScheduleTuples }.isEqualTo(3) }
+            .and { get { chargingNeeds.requestedEnergyTransfer }.isEqualTo(EnergyTransferModeEnumType.DC) }
+            .and { get { chargingNeeds.departureTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { chargingNeeds.acChargingParameters?.energyAmount }.isEqualTo(1) }
+            .and { get { chargingNeeds.acChargingParameters?.evMinCurrent }.isEqualTo(2) }
+            .and { get { chargingNeeds.acChargingParameters?.evMaxCurrent }.isEqualTo(3) }
+            .and { get { chargingNeeds.acChargingParameters?.evMaxVoltage }.isEqualTo(4) }
+            .and { get { chargingNeeds.dcChargingParameters?.evMaxCurrent }.isEqualTo(1) }
+            .and { get { chargingNeeds.dcChargingParameters?.evMaxVoltage }.isEqualTo(2) }
+            .and { get { chargingNeeds.dcChargingParameters?.energyAmount }.isEqualTo(3) }
+            .and { get { chargingNeeds.dcChargingParameters?.evMaxPower }.isEqualTo(4) }
+            .and { get { chargingNeeds.dcChargingParameters?.stateOfCharge }.isEqualTo(5) }
+            .and { get { chargingNeeds.dcChargingParameters?.evEnergyCapacity }.isEqualTo(6) }
+            .and { get { chargingNeeds.dcChargingParameters?.fullSoC }.isEqualTo(7) }
+            .and { get { chargingNeeds.dcChargingParameters?.bulkSoC }.isEqualTo(8) }
+
+        val resp = mapper.coreToGenResp(
+            NotifyEVChargingNeedsResp(
+                NotifyEVChargingNeedsStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(NotifyEVChargingNeedsStatusEnumTypeGen.Accepted) }
             .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 

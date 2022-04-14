@@ -33,6 +33,8 @@ import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -206,5 +208,23 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
         val mapper: NotifyDisplayMessagesMapper = Mappers.getMapper(NotifyDisplayMessagesMapper::class.java)
         val response = operations.notifyDisplayMessages(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun notifyEVChargingNeeds(
+        meta: RequestMetadata,
+        request: NotifyEVChargingNeedsReq
+    ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> {
+        val stateOfCharge = request.chargingNeeds.dcChargingParameters?.stateOfCharge
+        val fullSoC = request.chargingNeeds.dcChargingParameters?.fullSoC
+        val bulkSoC = request.chargingNeeds.dcChargingParameters?.bulkSoC
+        if ((stateOfCharge == null || stateOfCharge in 0..100) &&
+            (fullSoC == null || fullSoC in 0..100) &&
+            (bulkSoC == null || bulkSoC in 0..100)
+        ) {
+            val mapper: NotifyEVChargingNeedsMapper = Mappers.getMapper(NotifyEVChargingNeedsMapper::class.java)
+            val response = operations.notifyEVChargingNeeds(meta, mapper.genToCoreReq(request))
+            return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        } else throw IllegalStateException()
     }
 }

@@ -115,6 +115,11 @@ import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVCha
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.ChargingNeedsType
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
@@ -138,8 +143,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import strikt.api.expectCatching
 import strikt.api.expectThat
+import strikt.api.expectThrows
+import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isFailure
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
 import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
@@ -169,6 +178,11 @@ import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyR
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType as ChargingNeedsTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType as EnergyTransferModeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -884,5 +898,61 @@ class AdapterTest {
             get { this.request }.isEqualTo(request)
             get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
         }
+    }
+
+    @Test
+    fun `notifyEVChargingNeeds request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyEVChargingNeeds(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyEVChargingNeedsReq(1, ChargingNeedsType(EnergyTransferModeEnumType.DC)),
+            NotifyEVChargingNeedsResp(
+                NotifyEVChargingNeedsStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            )
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+
+        var request = NotifyEVChargingNeedsReqGen(1, ChargingNeedsTypeGen(EnergyTransferModeEnumTypeGen.DC))
+        var response = operations.notifyEVChargingNeeds(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(NotifyEVChargingNeedsStatusEnumTypeGen.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+
+        request = NotifyEVChargingNeedsReqGen(
+            1,
+            ChargingNeedsTypeGen(
+                EnergyTransferModeEnumTypeGen.DC,
+                dcChargingParameters = DCChargingParametersTypeGen(
+                    evMaxCurrent = 1,
+                    evMaxVoltage = 1,
+                    stateOfCharge = 5,
+                    fullSoC = 5
+                )
+            )
+        )
+        response = operations.notifyEVChargingNeeds(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(NotifyEVChargingNeedsStatusEnumTypeGen.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+
+        request = NotifyEVChargingNeedsReqGen(
+            1,
+            ChargingNeedsTypeGen(
+                EnergyTransferModeEnumTypeGen.DC,
+                dcChargingParameters = DCChargingParametersTypeGen(
+                    evMaxCurrent = 1,
+                    evMaxVoltage = 1,
+                    stateOfCharge = -5,
+                    fullSoC = 5
+                )
+            )
+        )
+        expectThrows<IllegalStateException> { operations.notifyEVChargingNeeds(requestMetadata, request) }
     }
 }

@@ -59,6 +59,11 @@ import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificati
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -721,6 +726,27 @@ class IntegrationTest {
     }
 
     @Test
+    fun `getCertificateStatus 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\": \"Accepted\"}",
+            action = "GetCertificateStatus"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = GetCertificateStatusReq(
+            ocspRequestData = OCSPRequestDataType(HashAlgorithmEnumType.SHA256, "", "", "", "")
+        )
+        expectThrows<IllegalStateException> { csmsApi.getCertificateStatus(requestMetadata, request) }
+    }
+
+    @Test
     fun `getCertificateStatus 2-0 request`() {
 
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
@@ -1003,4 +1029,61 @@ class IntegrationTest {
             get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
         }
     }
+    @Test
+    fun `notifyEVChargingNeeds 1-6 request`() {
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyEVChargingNeeds"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyEVChargingNeedsReq(
+            evseId = 1,
+            chargingNeeds = ChargingNeedsType(EnergyTransferModeEnumType.DC)
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyEVChargingNeeds(requestMetadata, request) }
+    }
+
+    @Test
+    fun `notifyEVChargingNeeds 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\": \"Accepted\"}",
+            action = "NotifyEVChargingNeeds"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        var request = NotifyEVChargingNeedsReq(
+            evseId = 1,
+            chargingNeeds = ChargingNeedsType(EnergyTransferModeEnumType.DC),
+            maxScheduleTuples = 2
+        )
+        val response = csmsApi.notifyEVChargingNeeds(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(NotifyEVChargingNeedsStatusEnumType.Accepted) }
+
+        request = NotifyEVChargingNeedsReq(
+            evseId = 1,
+            chargingNeeds = ChargingNeedsType(
+                EnergyTransferModeEnumType.DC,
+                dcChargingParameters = DCChargingParametersType(evMaxVoltage = 2, evMaxCurrent = 1, stateOfCharge = -5)
+            ),
+            maxScheduleTuples = 2
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyEVChargingNeeds(requestMetadata, request) }
+    }
+
 }
