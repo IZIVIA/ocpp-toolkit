@@ -19,6 +19,8 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
@@ -112,4 +114,11 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun notifyCustomerInformation(meta: RequestMetadata, request: NotifyCustomerInformationReq): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
+
+    /**
+     * NotifyEventRequest reports every Component/Variable for which a VariableMonitoring setting was triggered.
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyEvent(meta: RequestMetadata, request: NotifyEventReq): OperationExecution<NotifyEventReq, NotifyEventResp>
+
 }

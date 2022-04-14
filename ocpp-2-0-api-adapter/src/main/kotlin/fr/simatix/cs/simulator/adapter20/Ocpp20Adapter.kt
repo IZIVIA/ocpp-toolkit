@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -161,6 +163,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> {
         val mapper: NotifyCustomerInformationMapper = Mappers.getMapper(NotifyCustomerInformationMapper::class.java)
         val response = operations.notifyCustomerInformation(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyEvent(
+        meta: RequestMetadata,
+        request: NotifyEventReq
+    ): OperationExecution<NotifyEventReq, NotifyEventResp> {
+        val mapper: NotifyEventMapper = Mappers.getMapper(NotifyEventMapper::class.java)
+        val response = operations.notifyEvent(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }
