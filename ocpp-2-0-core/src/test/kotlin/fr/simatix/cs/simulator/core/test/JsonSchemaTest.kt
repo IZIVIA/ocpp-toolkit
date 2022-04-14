@@ -63,6 +63,11 @@ import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.EventDataType
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -815,6 +820,56 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `notifyEvent request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEventReq(
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 0,
+                eventData = listOf(
+                    EventDataType(
+                        eventId = 0,
+                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        trigger = EventTriggerEnumType.Delta,
+                        actualValue = "value",
+                        eventNotificationType = EventNotificationEnumType.HardWiredNotification,
+                        component = ComponentType("name"),
+                        variable = VariableType("name")
+                    )
+                )
+            ), "NotifyEventRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyEventReq(
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 0,
+                eventData = listOf(
+                    EventDataType(
+                        eventId = 0,
+                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        trigger = EventTriggerEnumType.Delta,
+                        actualValue = "value",
+                        eventNotificationType = EventNotificationEnumType.HardWiredNotification,
+                        component = ComponentType("name"),
+                        variable = VariableType("name"),
+                        cause = 1,
+                        techCode = "techCode",
+                        techInfo = "techInfo",
+                        cleared = false,
+                        transactionId = "transaction",
+                        variableMonitoringId = 2
+                    )
+                ),
+                tbc = true
+            ), "NotifyEventRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyEVChargingSchedule request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleReq(
@@ -1362,6 +1417,13 @@ class JsonSchemaTest {
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `notifyEvent response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
 }
