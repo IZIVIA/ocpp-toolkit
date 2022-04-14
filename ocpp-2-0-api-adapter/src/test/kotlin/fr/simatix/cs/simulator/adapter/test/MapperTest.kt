@@ -9,6 +9,7 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
@@ -57,6 +58,13 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePu
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType as EventDataTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq as NotifyEventReqGen
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType as EventNotificationEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType as EventTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
@@ -751,5 +759,56 @@ class MapperTest {
             get { req.requestId }.isEqualTo(1)
         }
     }
+
+    @Test
+    fun notifyEventMapper() {
+        val mapper: NotifyEventMapper = Mappers.getMapper(NotifyEventMapper::class.java)
+        val resp = mapper.coreToGenResp(NotifyEventResp())
+        expectThat(resp).isA<NotifyEventRespGen>()
+
+        val req = mapper.genToCoreReq(
+            NotifyEventReqGen(
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 0,
+                eventData = listOf(
+                    EventDataTypeGen(
+                        eventId = 1,
+                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        trigger = EventTriggerEnumTypeGen.Delta,
+                        actualValue = "actualValue",
+                        eventNotificationType = EventNotificationEnumTypeGen.HardWiredNotification,
+                        component = ComponentTypeGen("component"),
+                        variable = VariableTypeGen("variable"),
+                        cause = 2,
+                        techCode = "techCode",
+                        techInfo = "techInfo",
+                        cleared = true,
+                        transactionId = "transaction",
+                        variableMonitoringId = 3
+                    )
+                ),
+                tbc = true
+            )
+        )
+        expectThat(req) {
+            get { req.generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { req.seqNo }.isEqualTo(0)
+            get { req.tbc }.isEqualTo(true)
+            get { req.eventData[0].eventId }.isEqualTo(1)
+            get { req.eventData[0].timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { req.eventData[0].trigger }.isEqualTo(EventTriggerEnumType.Delta)
+            get { req.eventData[0].actualValue }.isEqualTo("actualValue")
+            get { req.eventData[0].eventNotificationType }.isEqualTo(EventNotificationEnumType.HardWiredNotification)
+            get { req.eventData[0].component }.isEqualTo(ComponentType("component"))
+            get { req.eventData[0].variable }.isEqualTo(VariableType("variable"))
+            get { req.eventData[0].cause }.isEqualTo(2)
+            get { req.eventData[0].techCode }.isEqualTo("techCode")
+            get { req.eventData[0].techInfo }.isEqualTo("techInfo")
+            get { req.eventData[0].cleared }.isEqualTo(true)
+            get { req.eventData[0].transactionId }.isEqualTo("transaction")
+            get { req.eventData[0].variableMonitoringId }.isEqualTo(3)
+        }
+    }
+
 }
 
