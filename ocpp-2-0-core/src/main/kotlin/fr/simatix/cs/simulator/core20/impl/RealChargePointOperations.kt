@@ -51,6 +51,8 @@ import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationS
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -348,4 +350,9 @@ class RealChargePointOperations(
         request: ReservationStatusUpdateReq
     ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> =
         sendMessage(meta, "ReservationStatusUpdate", request)
+    override fun securityEventNotification(
+        meta: RequestMetadata,
+        request: SecurityEventNotificationReq
+    ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> =
+        sendMessage(meta, "SecurityEventNotification", request)
 }

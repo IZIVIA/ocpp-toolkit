@@ -36,6 +36,8 @@ import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -142,6 +144,11 @@ interface CSMSApi {
         meta: RequestMetadata,
         request: ReservationStatusUpdateReq
     ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp>
+
+    fun securityEventNotification(
+        meta: RequestMetadata,
+        request: SecurityEventNotificationReq
+    ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp>
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -170,5 +177,6 @@ fun CSMSApi.send(
         is LogStatusNotificationReq -> logStatusNotification(meta, request)
         is NotifyMonitoringReportReq -> notifyMonitoringReport(meta, request)
         is ReservationStatusUpdateReq -> reservationStatusUpdate(meta, request)
+        is SecurityEventNotificationReq -> securityEventNotification(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>

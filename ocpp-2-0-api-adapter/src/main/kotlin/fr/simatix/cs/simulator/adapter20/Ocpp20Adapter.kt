@@ -41,6 +41,8 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoring
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -263,6 +265,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> {
         val mapper: ReservationStatusUpdateMapper = Mappers.getMapper(ReservationStatusUpdateMapper::class.java)
         val response = operations.reservationStatusUpdate(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun securityEventNotification(
+        meta: RequestMetadata,
+        request: SecurityEventNotificationReq
+    ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
+        val mapper: SecurityEventNotificationMapper = Mappers.getMapper(SecurityEventNotificationMapper::class.java)
+        val response = operations.securityEventNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

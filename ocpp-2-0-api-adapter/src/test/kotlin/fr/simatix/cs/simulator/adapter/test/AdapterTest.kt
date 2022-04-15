@@ -137,6 +137,8 @@ import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -203,6 +205,7 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataTy
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq as ReservationStatusUpdateReqGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq as SecurityEventNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -1152,6 +1155,31 @@ class AdapterTest {
             reservationUpdateStatus = ReservationUpdateStatusEnumTypeGen.Expired
         )
         val response = operations.reservationStatusUpdate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `securityEventNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.securityEventNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            SecurityEventNotificationReq(
+                type = "type",
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                techInfo = "techInfo"
+            ),
+            SecurityEventNotificationResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = SecurityEventNotificationReqGen(
+            type = "type",
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            techInfo = "techInfo"
+        )
+        val response = operations.securityEventNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }

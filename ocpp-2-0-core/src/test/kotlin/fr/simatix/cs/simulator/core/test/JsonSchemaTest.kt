@@ -110,6 +110,8 @@ import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ConnectorEnumType
 import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ReserveNowStatusEnumType
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -1014,6 +1016,27 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `securityEventNotification request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SecurityEventNotificationReq("type", Instant.parse("2022-02-15T00:00:00.000Z")),
+            "SecurityEventNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SecurityEventNotificationReq(
+                type = "type",
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                techInfo = "techInfo"
+            ),
+            "SecurityEventNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `logStatusNotification request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             LogStatusNotificationReq(
@@ -1650,6 +1673,16 @@ class JsonSchemaTest {
     @Test
     fun `notifyEvent response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `securityEventNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            SecurityEventNotificationResp(),
+            "SecurityEventNotificationResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

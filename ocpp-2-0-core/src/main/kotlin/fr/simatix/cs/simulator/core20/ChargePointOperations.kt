@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
@@ -176,4 +178,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun reservationStatusUpdate(meta: RequestMetadata, request: ReservationStatusUpdateReq): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp>
+
+    /**
+     * Sends message to the CSMS in case of a security event
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun securityEventNotification(meta: RequestMetadata, request: SecurityEventNotificationReq): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp>
 }

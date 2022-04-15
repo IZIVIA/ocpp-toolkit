@@ -89,6 +89,7 @@ import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatus
 import fr.simatix.cs.simulator.api.model.reset.ResetReq
 import fr.simatix.cs.simulator.api.model.reset.ResetResp
 import fr.simatix.cs.simulator.api.model.reset.enumeration.ResetStatusEnumType
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType
@@ -1290,6 +1291,54 @@ class IntegrationTest {
             reservationUpdateStatus = ReservationUpdateStatusEnumType.Expired
         )
         val response = csmsApi.reservationStatusUpdate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `securityEventNotification 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "SecurityEventNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = SecurityEventNotificationReq(
+            type = "type",
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            techInfo = "techInfo"
+        )
+        expectThrows<IllegalStateException> { csmsApi.securityEventNotification(requestMetadata, request) }
+    }
+
+    @Test
+    fun `securityEventNotification 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "SecurityEventNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = SecurityEventNotificationReq(
+            type = "type",
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            techInfo = "techInfo"
+        )
+        val response = csmsApi.securityEventNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }

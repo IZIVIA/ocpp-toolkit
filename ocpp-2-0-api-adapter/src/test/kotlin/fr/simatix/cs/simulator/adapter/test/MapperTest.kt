@@ -32,6 +32,7 @@ import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEv
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
@@ -97,6 +98,7 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKi
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalListStatusEnumType
@@ -172,6 +174,7 @@ import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfile
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp as ReservationStatusUpdateRespGen
+import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp as SecurityEventNotificationRespGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType as SendLocalListStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
@@ -1130,6 +1133,25 @@ class MapperTest {
         expectThat(req)
             .and { get { reservationId }.isEqualTo(1) }
             .and { get { reservationUpdateStatus }.isEqualTo(ReservationUpdateStatusEnumType.Expired) }
+    }
+
+    @Test
+    fun securityEventNotificationMapper() {
+        val mapper: SecurityEventNotificationMapper = Mappers.getMapper(SecurityEventNotificationMapper::class.java)
+        val resp = mapper.coreToGenResp(SecurityEventNotificationResp())
+        expectThat(resp).and { get { resp }.isA<SecurityEventNotificationRespGen>() }
+
+        val req = mapper.genToCoreReq(
+            SecurityEventNotificationReq(
+                type = "type",
+                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                techInfo = "techInfo"
+            )
+        )
+        expectThat(req)
+            .and { get { type }.isEqualTo("type") }
+            .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { techInfo }.isEqualTo("techInfo") }
     }
 }
 
