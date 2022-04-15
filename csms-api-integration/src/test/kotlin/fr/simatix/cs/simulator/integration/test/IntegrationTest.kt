@@ -53,7 +53,6 @@ import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
-import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType

@@ -21,8 +21,6 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargi
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
-import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
-import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
