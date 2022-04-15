@@ -13,6 +13,8 @@ import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStat
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
@@ -270,5 +272,14 @@ class Ocpp16Adapter(
         request: NotifyEVChargingNeedsReq
     ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> {
         throw IllegalStateException("NotifyEVChargingNeeds can't be call in OCPP 1.6")
+    }
+
+    override fun logStatusNotification(
+        meta: RequestMetadata,
+        request: LogStatusNotificationReq
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
+        val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+        val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

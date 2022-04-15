@@ -48,6 +48,9 @@ import fr.simatix.cs.simulator.core16.model.remotestart.*
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.ChargingProfileKindType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
@@ -540,6 +543,18 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `diagnosticsStatusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            DiagnosticsStatusNotificationReq(
+                status = DiagnosticsStatus.Uploaded
+            ), "DiagnosticsStatusNotificationRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -843,6 +858,16 @@ class JsonSchemaTest {
     fun `reserveNow response format`() {
         val errors = JsonSchemaValidator.isValidObjectV4(
             ReserveNowResp(ReservationStatus.Accepted), "ReserveNowResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `diagnosticsStatusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV4(
+            DiagnosticsStatusNotificationResp(), "DiagnosticsStatusNotificationResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)

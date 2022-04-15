@@ -13,6 +13,8 @@ import fr.simatix.cs.simulator.core16.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.FirmwareStatusNotificationResp
@@ -246,5 +248,11 @@ class RealChargePointOperations(
         request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> =
             sendMessage(meta, "FirmwareStatusNotification", request)
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> =
+        sendMessage(meta, "DiagnosticsStatusNotification", request)
 }
 

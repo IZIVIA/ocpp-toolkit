@@ -21,6 +21,11 @@ import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.Me
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp as LogStatusNotificationRespGen
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -1031,6 +1036,26 @@ class MapperTest {
             get { req.messageId }.isEqualTo("messageId")
             get { req.data }.isEqualTo("Some data")
             get { req.vendorId }.isEqualTo("vendorId")
+        }
+    }
+
+    @Test
+    fun diagnosticsStatusNotificationMapper() {
+        val mapper: LogStatusNotificationMapper = Mappers.getMapper(LogStatusNotificationMapper::class.java)
+        val resp = mapper.coreToGenResp(
+            LogStatusNotificationResp()
+        )
+        expectThat(resp) {
+            get { resp }.isA<LogStatusNotificationRespGen>()
+        }
+
+        val req = mapper.genToCoreReq(LogStatusNotificationReqGen(
+            status = UploadLogStatusEnumTypeGen.Uploaded,
+            requestId = 1
+        ))
+        expectThat(req) {
+            get { status }.isEqualTo(UploadLogStatusEnumType.Uploaded)
+            get { requestId }.isEqualTo(1)
         }
     }
 

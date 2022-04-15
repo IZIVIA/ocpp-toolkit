@@ -63,6 +63,11 @@ import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatu
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
@@ -970,5 +975,30 @@ class AdapterTest {
             )
         )
         expectThrows<IllegalStateException> { operations.notifyEVChargingNeeds(requestMetadata, request) }
+    }
+
+    @Test
+    fun `logStatusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.logStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            LogStatusNotificationReq(
+                status = UploadLogStatusEnumType.Uploaded,
+                requestId = 1
+            ),
+            LogStatusNotificationResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =  LogStatusNotificationReqGen(
+            status = UploadLogStatusEnumTypeGen.Uploaded,
+            requestId = 1
+        )
+        val response = operations.logStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
     }
 }

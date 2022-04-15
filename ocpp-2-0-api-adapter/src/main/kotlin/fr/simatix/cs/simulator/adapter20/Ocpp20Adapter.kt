@@ -27,6 +27,8 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
@@ -226,5 +228,14 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
             val response = operations.notifyEVChargingNeeds(meta, mapper.genToCoreReq(request))
             return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
         } else throw IllegalStateException("State of charge should be contained between 0 and 100")
+    }
+
+    override fun logStatusNotification(
+        meta: RequestMetadata,
+        request: LogStatusNotificationReq
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
+        val mapper: LogStatusNotificationMapper = Mappers.getMapper(LogStatusNotificationMapper::class.java)
+        val response = operations.logStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

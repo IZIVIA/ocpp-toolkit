@@ -28,6 +28,9 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
@@ -64,6 +67,8 @@ import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePu
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
 import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
+import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
@@ -542,6 +547,25 @@ class MapperTest {
             get { req.messageId }.isEqualTo("messageId")
             get { req.data }.isEqualTo("Some data")
             get { req.vendorId }.isEqualTo("vendorId")
+        }
+    }
+
+    @Test
+    fun diagnosticsStatusNotificationMapper() {
+        val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+        val resp = mapper.coreToGenResp(
+            DiagnosticsStatusNotificationResp()
+        )
+        expectThat(resp) {
+            get { resp }.isA<LogStatusNotificationResp>()
+        }
+
+        val req = mapper.genToCoreReq(LogStatusNotificationReq(
+            status = UploadLogStatusEnumType.Uploaded,
+            requestId = 1
+        ))
+        expectThat(req) {
+            get { status }.isEqualTo(DiagnosticsStatus.Uploaded)
         }
     }
 

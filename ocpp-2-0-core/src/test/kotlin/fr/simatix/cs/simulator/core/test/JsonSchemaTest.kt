@@ -58,6 +58,9 @@ import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
@@ -1003,6 +1006,19 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `logStatusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            LogStatusNotificationReq(
+                status = UploadLogStatusEnumType.Uploaded,
+                requestId = 1
+            ),
+            "LogStatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyEVChargingSchedule response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleResp(
@@ -1579,4 +1595,12 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+    @Test
+    fun `logStatusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            LogStatusNotificationResp(),  "LogStatusNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 }

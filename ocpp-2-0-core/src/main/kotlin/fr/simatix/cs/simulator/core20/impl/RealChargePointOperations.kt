@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
@@ -325,5 +327,11 @@ class RealChargePointOperations(
         request: NotifyEVChargingNeedsReq
     ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> =
         sendMessage(meta, "NotifyEVChargingNeeds", request)
+
+    override fun logStatusNotification(
+        meta: RequestMetadata,
+        request: LogStatusNotificationReq
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
+        sendMessage(meta, "LogStatusNotification", request)
 
 }
