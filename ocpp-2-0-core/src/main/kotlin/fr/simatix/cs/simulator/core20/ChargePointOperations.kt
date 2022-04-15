@@ -31,6 +31,8 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLi
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
@@ -160,4 +162,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun logStatusNotification(meta: RequestMetadata, request: LogStatusNotificationReq): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp>
+
+    /**
+     * Sends a message to the CSMS to notify the monitoring report
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun notifyMonitoringReport(meta: RequestMetadata, request: NotifyMonitoringReportReq): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp>
 }

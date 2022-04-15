@@ -30,6 +30,8 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargi
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
@@ -128,6 +130,11 @@ interface CSMSApi {
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp>
 
+
+    fun notifyMonitoringReport(
+        meta: RequestMetadata,
+        request: NotifyMonitoringReportReq
+    ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp>
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -154,5 +161,6 @@ fun CSMSApi.send(
         is NotifyDisplayMessagesReq -> notifyDisplayMessages(meta, request)
         is NotifyEVChargingNeedsReq -> notifyEVChargingNeeds(meta, request)
         is LogStatusNotificationReq -> logStatusNotification(meta, request)
+        is NotifyMonitoringReportReq -> notifyMonitoringReport(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>

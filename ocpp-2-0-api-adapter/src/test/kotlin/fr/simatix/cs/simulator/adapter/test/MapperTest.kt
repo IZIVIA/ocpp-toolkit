@@ -27,6 +27,7 @@ import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotifica
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
@@ -85,6 +86,8 @@ import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnu
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
@@ -158,6 +161,10 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType as EnergyTransferModeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType as MonitorEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp as NotifyMonitoringReportRespGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
@@ -1059,5 +1066,48 @@ class MapperTest {
         }
     }
 
+
+    @Test
+    fun notifyMonitoringReportMapper() {
+        val mapper: NotifyMonitoringReportMapper = Mappers.getMapper(NotifyMonitoringReportMapper::class.java)
+        val resp = mapper.coreToGenResp(NotifyMonitoringReportResp())
+        expectThat(resp).and { get { resp }.isA<NotifyMonitoringReportRespGen>() }
+
+        val req = mapper.genToCoreReq(
+            NotifyMonitoringReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2,
+                tbc = true,
+                monitor = listOf(
+                    MonitoringDataTypeGen(
+                        component = ComponentTypeGen("component"),
+                        variable = VariableTypeGen("variable"),
+                        variableMonitoring = listOf(
+                            VariableMonitoringTypeGen(
+                                id = 3,
+                                transaction = true,
+                                value = 10.0,
+                                type = MonitorEnumTypeGen.Periodic,
+                                severity = 3
+                            )
+                        )
+                    )
+                )
+            )
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(1) }
+            .and { get { seqNo }.isEqualTo(2) }
+            .and { get { tbc }.isEqualTo(true) }
+            .and { get { generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { monitor?.get(0)?.component }.isEqualTo(ComponentType("component")) }
+            .and { get { monitor?.get(0)?.variable }.isEqualTo(VariableType("variable")) }
+            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.id }.isEqualTo(3) }
+            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.transaction }.isEqualTo(true) }
+            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.value }.isEqualTo(10.0) }
+            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.type }.isEqualTo(MonitorEnumType.Periodic) }
+            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.severity }.isEqualTo(3) }
+    }
 }
 

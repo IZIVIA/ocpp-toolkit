@@ -126,6 +126,11 @@ import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargi
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
@@ -189,6 +194,10 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.Energ
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType as MonitorEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq as NotifyMonitoringReportReqGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -196,6 +205,7 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as Tra
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
+import strikt.api.expectThrows
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 
 class AdapterTest {
@@ -1000,5 +1010,125 @@ class AdapterTest {
             .and {
                 get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
             }
+    }
+
+    @Test
+    fun `notifyMonitoringReport request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.notifyMonitoringReport(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            NotifyMonitoringReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2,
+                tbc = true,
+                monitor = listOf(
+                    MonitoringDataType(
+                        component = fr.simatix.cs.simulator.core20.model.common.ComponentType("component"),
+                        variable = fr.simatix.cs.simulator.core20.model.common.VariableType("variable"),
+                        variableMonitoring = listOf(
+                            VariableMonitoringType(
+                                id = 3,
+                                transaction = true,
+                                value = 10.0,
+                                type = MonitorEnumType.Periodic,
+                                severity = 3
+                            )
+                        )
+                    )
+                )
+            ),
+            NotifyMonitoringReportResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        var request = NotifyMonitoringReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            monitor = listOf(
+                MonitoringDataTypeGen(
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    variableMonitoring = listOf(
+                        VariableMonitoringTypeGen(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumTypeGen.Periodic,
+                            severity = 3
+                        )
+                    )
+                )
+            )
+        )
+        var response = operations.notifyMonitoringReport(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+
+        request = NotifyMonitoringReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2
+        )
+        response = operations.notifyMonitoringReport(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+
+        request = NotifyMonitoringReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            monitor = listOf(
+                MonitoringDataTypeGen(
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    variableMonitoring = listOf(
+                        VariableMonitoringTypeGen(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumTypeGen.Periodic,
+                            severity = 10
+                        )
+                    )
+                )
+            )
+        )
+        expectThrows<IllegalStateException> { operations.notifyMonitoringReport(requestMetadata, request) }
+
+        request = NotifyMonitoringReportReqGen(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            monitor = listOf(
+                MonitoringDataTypeGen(
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    variableMonitoring = listOf(
+                        VariableMonitoringTypeGen(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumTypeGen.Periodic,
+                            severity = 3
+                        ),
+                        VariableMonitoringTypeGen(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumTypeGen.Periodic,
+                            severity = 12
+                        )
+                    )
+                )
+            )
+        )
+        expectThrows<IllegalStateException> { operations.notifyMonitoringReport(requestMetadata, request) }
     }
 }

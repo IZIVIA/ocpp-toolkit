@@ -82,6 +82,11 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLi
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.*
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonitoringType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -1019,6 +1024,47 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `notifyMonitoringReport request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyMonitoringReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2
+            ),
+            "NotifyMonitoringReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            NotifyMonitoringReportReq(
+                requestId = 1,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                seqNo = 2,
+                tbc = true,
+                monitor = listOf(
+                    MonitoringDataType(
+                        component = ComponentType("component"),
+                        variable = VariableType("variable"),
+                        variableMonitoring = listOf(
+                            VariableMonitoringType(
+                                id = 3,
+                                transaction = true,
+                                value = 10.0,
+                                type = MonitorEnumType.Periodic,
+                                severity = 3
+                            )
+                        )
+                    )
+                )
+            ),
+            "NotifyMonitoringReportRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyEVChargingSchedule response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleResp(
@@ -1591,6 +1637,14 @@ class JsonSchemaTest {
     @Test
     fun `notifyEvent response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `notifyMonitoringReport response format`() {
+        val errors =
+            JsonSchemaValidator.isValidObjectV6(NotifyMonitoringReportResp(), "NotifyMonitoringReportResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

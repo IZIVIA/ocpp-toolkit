@@ -29,6 +29,8 @@ import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimit
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
@@ -281,5 +283,12 @@ class Ocpp16Adapter(
         val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
         val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyMonitoringReport(
+        meta: RequestMetadata,
+        request: NotifyMonitoringReportReq
+    ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> {
+        throw IllegalStateException("NotifyMonitoringReport can't be call in OCPP 1.6")
     }
 }

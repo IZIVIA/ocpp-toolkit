@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimit
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -237,5 +239,19 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
         val mapper: LogStatusNotificationMapper = Mappers.getMapper(LogStatusNotificationMapper::class.java)
         val response = operations.logStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun notifyMonitoringReport(
+        meta: RequestMetadata,
+        request: NotifyMonitoringReportReq
+    ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> {
+        val severityChecked =
+            request.monitor?.all { it.variableMonitoring.all { variableMonitoringType -> variableMonitoringType.severity in 0..9 } }
+        if (severityChecked == null || severityChecked) {
+            val mapper: NotifyMonitoringReportMapper = Mappers.getMapper(NotifyMonitoringReportMapper::class.java)
+            val response = operations.notifyMonitoringReport(meta, mapper.genToCoreReq(request))
+            return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        } else throw IllegalStateException()
     }
 }

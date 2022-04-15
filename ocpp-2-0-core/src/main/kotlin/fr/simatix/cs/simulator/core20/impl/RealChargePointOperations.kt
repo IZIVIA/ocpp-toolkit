@@ -41,6 +41,8 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLi
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -334,4 +336,9 @@ class RealChargePointOperations(
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
         sendMessage(meta, "LogStatusNotification", request)
 
+    override fun notifyMonitoringReport(
+        meta: RequestMetadata,
+        request: NotifyMonitoringReportReq
+    ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> =
+        sendMessage(meta, "NotifyMonitoringReport", request)
 }

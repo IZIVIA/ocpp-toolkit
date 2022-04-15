@@ -73,6 +73,10 @@ import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -1150,6 +1154,95 @@ class IntegrationTest {
             maxScheduleTuples = 2
         )
         expectThrows<IllegalStateException> { csmsApi.notifyEVChargingNeeds(requestMetadata, request) }
+    }
+
+
+    @Test
+    fun `notifyMonitoringReport 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyMonitoringReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = NotifyMonitoringReportReq(
+            requestId = 1,
+            seqNo = 2,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z")
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyMonitoringReport(requestMetadata, request) }
+    }
+
+    @Test
+    fun `notifyMonitoringReport 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "NotifyMonitoringReport"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        var request = NotifyMonitoringReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            monitor = listOf(
+                MonitoringDataType(
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    variableMonitoring = listOf(
+                        VariableMonitoringType(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumType.Periodic,
+                            severity = 3
+                        )
+                    )
+                )
+            )
+        )
+        val response = csmsApi.notifyMonitoringReport(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
+
+        request = NotifyMonitoringReportReq(
+            requestId = 1,
+            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+            seqNo = 2,
+            tbc = true,
+            monitor = listOf(
+                MonitoringDataType(
+                    component = ComponentType("component"),
+                    variable = VariableType("variable"),
+                    variableMonitoring = listOf(
+                        VariableMonitoringType(
+                            id = 3,
+                            transaction = true,
+                            value = 10.0,
+                            type = MonitorEnumType.Periodic,
+                            severity = 10
+                        )
+                    )
+                )
+            )
+        )
+        expectThrows<IllegalStateException> { csmsApi.notifyMonitoringReport(requestMetadata, request) }
     }
 
 }
