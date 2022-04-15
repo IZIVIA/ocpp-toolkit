@@ -32,14 +32,6 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
 

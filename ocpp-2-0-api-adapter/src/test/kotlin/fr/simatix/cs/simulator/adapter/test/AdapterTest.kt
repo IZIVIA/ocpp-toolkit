@@ -106,7 +106,7 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLi
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
-import fr.simatix.cs.simulator.core20.model.remotestart.ChargingScheduleType
+import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -155,8 +155,7 @@ import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqG
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq as NotifyCustomerInformationReqGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq as NotifyEVChargingScheduleReqGen
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
-import fr.simatix.cs.simulator.api.model.remotestart.ChargingScheduleType as ChargingScheduleTypeGen
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
+import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
