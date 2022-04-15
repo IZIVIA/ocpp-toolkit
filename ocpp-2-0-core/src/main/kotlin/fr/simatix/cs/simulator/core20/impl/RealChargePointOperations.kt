@@ -21,6 +21,7 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateS
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
@@ -217,6 +218,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("DataTransfer") { req: DataTransferReq ->
             csmsOperations.dataTransfer(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("GetLog") { req: GetLogReq ->
+            csmsOperations.getLog(
                 RequestMetadata(chargeStationId),
                 req
             ).response

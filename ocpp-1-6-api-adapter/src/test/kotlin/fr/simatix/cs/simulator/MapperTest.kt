@@ -24,6 +24,9 @@ import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleT
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
+import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogEnumType
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
@@ -74,6 +77,7 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.KeyValue
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsReq
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.remotestart.ChargingSchedulePeriod
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -567,6 +571,38 @@ class MapperTest {
         expectThat(req) {
             get { status }.isEqualTo(DiagnosticsStatus.Uploaded)
         }
+    }
+
+    @Test
+    fun getDiagnosticsMapper() {
+        val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetLogResp(
+                status = LogStatusEnumType.Accepted,
+                filename = "filename",
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { fileName }.isEqualTo("filename") }
+
+        val req = mapper.coreToGenReq(
+            GetDiagnosticsReq(
+                location = "http://www.ietf.org/rfc/rfc2396.txt",
+                retries = 2,
+                retryInterval = 3,
+                startTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                stopTime = Instant.parse("2022-02-15T00:00:00.000Z")
+            )
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(1) }
+            .and { get { logType }.isEqualTo(LogEnumType.DiagnosticsLog) }
+            .and { get { log.remoteLocation }.isEqualTo("http://www.ietf.org/rfc/rfc2396.txt") }
+            .and { get { log.oldestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { log.latestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { retries }.isEqualTo(2) }
+            .and { get { retryInterval }.isEqualTo(3) }
     }
 
 }

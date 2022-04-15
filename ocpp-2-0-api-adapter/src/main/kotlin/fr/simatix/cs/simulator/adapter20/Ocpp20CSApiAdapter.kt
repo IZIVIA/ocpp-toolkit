@@ -19,6 +19,8 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -295,6 +297,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
         val response = csApi.setChargingProfile(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getLog(
+        meta: RequestMetadata,
+        req: GetLogReq
+    ): OperationExecution<GetLogReq, GetLogResp> {
+        val mapper: GetLogMapper = Mappers.getMapper(GetLogMapper::class.java)
+        val response = csApi.getLog(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

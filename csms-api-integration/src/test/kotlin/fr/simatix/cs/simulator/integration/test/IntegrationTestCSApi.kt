@@ -31,6 +31,9 @@ import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeSchedu
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
+import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
@@ -321,6 +324,14 @@ class IntegrationTestCSApi {
                 val response = SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun getLog(
+                meta: RequestMetadata,
+                req: GetLogReq
+            ): OperationExecution<GetLogReq, GetLogResp> {
+                val response = GetLogResp(LogStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -449,6 +460,12 @@ class IntegrationTestCSApi {
             "ReserveNow", "{\"connectorId\": 1, \"expiryDate\": \"2022-02-15T00:00:00.000Z\", \"idTag\": \"Tag1\", \"parentIdTag\": \"Tag2\", \"reservationId\": 2}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetDiagnostics", "{\"location\": \"http://www.ietf.org/rfc/rfc2396.txt\"}"
+            )
+        )
 
         server.sendBlocking(
             "chargePoint2", WampMessage(
@@ -475,6 +492,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
+        verify(csApiSpy, times(1)).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
         csmsApi.close()
@@ -609,6 +627,12 @@ class IntegrationTestCSApi {
             "ReserveNow", "{\"id\": 1, \"expiryDateTime\": \"2022-02-15T00:00:00.000Z\", \"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetLog", "{\"requestId\": 1, \"logType\": \"DiagnosticsLog\", \"log\": {\"remoteLocation\": \"http://www.ietf.org/rfc/rfc2396.txt\"}}"
+            )
+        )
 
         server.sendBlocking(
             "chargePoint2", WampMessage(
@@ -636,6 +660,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
+        verify(csApiSpy, times(1)).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
         csmsApi.close()

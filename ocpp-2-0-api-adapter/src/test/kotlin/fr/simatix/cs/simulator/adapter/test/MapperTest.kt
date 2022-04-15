@@ -12,6 +12,7 @@ import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferSt
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
+import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
@@ -78,6 +79,10 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType as EventDataTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq as NotifyEventReqGen
@@ -152,6 +157,8 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as I
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogEnumType as LogEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType as LogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
@@ -1181,5 +1188,43 @@ class MapperTest {
             .and { get { status }.isEqualTo(GenericStatusEnumTypeGen.Accepted) }
             .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
+    @Test
+    fun getLogMapper() {
+        val mapper: GetLogMapper = Mappers.getMapper(GetLogMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetLogResp(
+                status = LogStatusEnumTypeGen.Accepted,
+                filename = "filename",
+                statusInfo = StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(LogStatusEnumType.Accepted) }
+            .and { get { filename }.isEqualTo("filename") }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            GetLogReq(
+                requestId = 1,
+                logType = LogEnumType.DiagnosticsLog,
+                log = LogParametersType(
+                    remoteLocation = "remoteLocation",
+                    oldestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    latestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+                ),
+                retries = 2,
+                retryInterval = 3
+            )
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(1) }
+            .and { get { logType }.isEqualTo(LogEnumTypeGen.DiagnosticsLog) }
+            .and { get { log.remoteLocation }.isEqualTo("remoteLocation") }
+            .and { get { log.oldestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { log.latestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { retries }.isEqualTo(2) }
+            .and { get { retryInterval }.isEqualTo(3) }
+    }
+
 }
 

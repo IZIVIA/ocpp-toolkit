@@ -33,6 +33,9 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
@@ -341,6 +344,14 @@ class AdapterTest {
             req: SetChargingProfileReq
         ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
             val response = SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getLog(
+            meta: RequestMetadata,
+            req: GetLogReq
+        ): OperationExecution<GetLogReq, GetLogResp> {
+            val response = GetLogResp(LogStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

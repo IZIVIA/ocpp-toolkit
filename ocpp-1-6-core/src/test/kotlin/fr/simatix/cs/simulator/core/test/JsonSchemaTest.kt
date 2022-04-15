@@ -54,6 +54,8 @@ import fr.simatix.cs.simulator.core16.model.diagnosticsstatusnotification.enumer
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsReq
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsResp
 import fr.simatix.cs.simulator.core16.model.remotestart.enumeration.RecurrencyKindType
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionReq
 import fr.simatix.cs.simulator.core16.model.remotestop.RemoteStopTransactionResp
@@ -555,6 +557,28 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getDiagnostics request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            GetDiagnosticsReq("http://www.ietf.org/rfc/rfc2396.txt"),
+            "GetDiagnosticsRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            GetDiagnosticsReq(
+                location = "http://www.ietf.org/rfc/rfc2396.txt",
+                retries = 3,
+                retryInterval = 2,
+                startTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                stopTime = Instant.parse("2022-02-15T00:00:00.000Z")
+            ), "GetDiagnosticsRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -872,6 +896,17 @@ class JsonSchemaTest {
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
+    }
+
+    @Test
+    fun `getDiagnostics response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(GetDiagnosticsResp(), "GetDiagnosticsResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV4(GetDiagnosticsResp("fileName"), "GetDiagnosticsResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
 }

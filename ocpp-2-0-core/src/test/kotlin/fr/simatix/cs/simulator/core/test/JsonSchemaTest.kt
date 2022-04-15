@@ -47,6 +47,11 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
@@ -1133,6 +1138,41 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getLog request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            GetLogReq(
+                requestId = 1,
+                logType = LogEnumType.DiagnosticsLog,
+                log = LogParametersType(
+                    remoteLocation = "remoteLocation",
+                    oldestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    latestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+                )
+            ),
+            "GetLogRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetLogReq(
+                requestId = 1,
+                logType = LogEnumType.DiagnosticsLog,
+                log = LogParametersType(
+                    remoteLocation = "remoteLocation",
+                    oldestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                    latestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+                ),
+                retries = 3,
+                retryInterval = 5
+            ),
+            "GetLogRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -1692,6 +1732,23 @@ class JsonSchemaTest {
     @Test
     fun `notifyEvent response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getLog response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(GetLogResp(LogStatusEnumType.Accepted), "GetLogResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            GetLogResp(
+                status = LogStatusEnumType.Accepted,
+                filename = "filename",
+                statusInfo = StatusInfoType("reason", "additional")
+            ), "GetLogResponse.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

@@ -16,6 +16,8 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsReq
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsResp
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.remotestart.RemoteStartTransactionReq
@@ -76,4 +78,6 @@ interface CSMSOperations {
     fun reserveNow(meta: RequestMetadata,  req: ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
 
     fun dataTransfer(meta: RequestMetadata,  req: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
+
+    fun getDiagnostics(meta: RequestMetadata, req: GetDiagnosticsReq): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp>
 }

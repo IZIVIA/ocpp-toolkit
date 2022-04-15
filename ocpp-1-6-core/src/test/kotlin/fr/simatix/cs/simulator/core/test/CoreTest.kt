@@ -18,6 +18,8 @@ import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsReq
+import fr.simatix.cs.simulator.core16.model.getdiagnostics.GetDiagnosticsResp
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core16.model.heartbeat.HeartbeatReq
@@ -189,6 +191,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: DataTransferReq
             ): OperationExecution<DataTransferReq, DataTransferResp> {
+                TODO("Not implemented")
+            }
+
+            override fun getDiagnostics(
+                meta: RequestMetadata,
+                req: GetDiagnosticsReq
+            ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> {
                 TODO("Not implemented")
             }
         }
