@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
@@ -234,5 +236,12 @@ class Ocpp16Adapter(
         request: NotifyEventReq
     ): OperationExecution<NotifyEventReq, NotifyEventResp> {
         throw IllegalStateException("NotifyEvent can't be call in OCPP 1.6")
+    }
+
+    override fun notifyEVChargingSchedule(
+        meta: RequestMetadata,
+        request: NotifyEVChargingScheduleReq
+    ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> {
+        throw IllegalStateException("notifyCustomerInformation can't be called in OCPP 1.6")
     }
 }

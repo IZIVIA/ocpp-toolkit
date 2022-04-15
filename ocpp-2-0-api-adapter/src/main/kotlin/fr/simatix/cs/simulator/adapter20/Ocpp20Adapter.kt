@@ -25,6 +25,8 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
@@ -172,6 +174,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<NotifyEventReq, NotifyEventResp> {
         val mapper: NotifyEventMapper = Mappers.getMapper(NotifyEventMapper::class.java)
         val response = operations.notifyEvent(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyEVChargingSchedule(
+        meta: RequestMetadata,
+        request: NotifyEVChargingScheduleReq
+    ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> {
+        val mapper: NotifyEVChargingScheduleMapper = Mappers.getMapper(NotifyEVChargingScheduleMapper::class.java)
+        val response = operations.notifyEVChargingSchedule(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

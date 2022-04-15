@@ -10,10 +10,20 @@ import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLim
 import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
@@ -22,14 +32,6 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
 
 interface CSMSApi {
 
@@ -88,11 +90,15 @@ interface CSMSApi {
         request: NotifyCustomerInformationReq
     ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp>
 
+    fun notifyEVChargingSchedule(
+        meta: RequestMetadata,
+        request: NotifyEVChargingScheduleReq
+    ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp>
+
     fun notifyEvent(
         meta: RequestMetadata,
         request: NotifyEventReq
     ): OperationExecution<NotifyEventReq, NotifyEventResp>
-
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -114,5 +120,6 @@ fun CSMSApi.send(
         is GetCertificateStatusReq -> getCertificateStatus(meta, request)
         is NotifyCustomerInformationReq -> notifyCustomerInformation(meta, request)
         is NotifyEventReq -> notifyEvent(meta, request)
+        is NotifyEVChargingScheduleReq -> notifyEVChargingSchedule(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>
