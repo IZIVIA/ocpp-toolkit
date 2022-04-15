@@ -81,6 +81,8 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
@@ -1245,4 +1247,50 @@ class IntegrationTest {
         expectThrows<IllegalStateException> { csmsApi.notifyMonitoringReport(requestMetadata, request) }
     }
 
+
+    @Test
+    fun `reservationStatusUpdate 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "ReservationStatusUpdate"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = ReservationStatusUpdateReq(
+            reservationId = 1,
+            reservationUpdateStatus = ReservationUpdateStatusEnumType.Expired
+        )
+        expectThrows<IllegalStateException> { csmsApi.reservationStatusUpdate(requestMetadata, request) }
+    }
+
+    @Test
+    fun `reservationStatusUpdate 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "ReservationStatusUpdate"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = ReservationStatusUpdateReq(
+            reservationId = 1,
+            reservationUpdateStatus = ReservationUpdateStatusEnumType.Expired
+        )
+        val response = csmsApi.reservationStatusUpdate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
 }

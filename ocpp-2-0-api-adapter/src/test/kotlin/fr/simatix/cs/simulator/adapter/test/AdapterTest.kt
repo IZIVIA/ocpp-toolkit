@@ -134,6 +134,9 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonit
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -198,6 +201,8 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.Moni
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq as NotifyMonitoringReportReqGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq as ReservationStatusUpdateReqGen
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -1130,5 +1135,25 @@ class AdapterTest {
             )
         )
         expectThrows<IllegalStateException> { operations.notifyMonitoringReport(requestMetadata, request) }
+    }
+
+    @Test
+    fun `reservationStatusUpdate request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.reservationStatusUpdate(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            ReservationStatusUpdateReq(1, ReservationUpdateStatusEnumType.Expired),
+            ReservationStatusUpdateResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = ReservationStatusUpdateReqGen(
+            reservationId = 1,
+            reservationUpdateStatus = ReservationUpdateStatusEnumTypeGen.Expired
+        )
+        val response = operations.reservationStatusUpdate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 }

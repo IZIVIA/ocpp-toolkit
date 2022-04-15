@@ -47,6 +47,8 @@ import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
@@ -341,4 +343,9 @@ class RealChargePointOperations(
         request: NotifyMonitoringReportReq
     ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> =
         sendMessage(meta, "NotifyMonitoringReport", request)
+    override fun reservationStatusUpdate(
+        meta: RequestMetadata,
+        request: ReservationStatusUpdateReq
+    ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> =
+        sendMessage(meta, "ReservationStatusUpdate", request)
 }

@@ -39,6 +39,8 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingN
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -253,5 +255,14 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
             val response = operations.notifyMonitoringReport(meta, mapper.genToCoreReq(request))
             return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
         } else throw IllegalStateException("Severity should be contained between 0 and 9")
+    }
+
+    override fun reservationStatusUpdate(
+        meta: RequestMetadata,
+        request: ReservationStatusUpdateReq
+    ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> {
+        val mapper: ReservationStatusUpdateMapper = Mappers.getMapper(ReservationStatusUpdateMapper::class.java)
+        val response = operations.reservationStatusUpdate(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

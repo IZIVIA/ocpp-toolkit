@@ -35,6 +35,8 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
@@ -168,4 +170,10 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun notifyMonitoringReport(meta: RequestMetadata, request: NotifyMonitoringReportReq): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp>
+
+    /**
+     * Sends the field definition of a reservation status update to the CSMS
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun reservationStatusUpdate(meta: RequestMetadata, request: ReservationStatusUpdateReq): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp>
 }

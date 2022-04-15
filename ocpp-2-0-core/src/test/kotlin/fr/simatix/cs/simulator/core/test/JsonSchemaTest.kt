@@ -95,6 +95,9 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProf
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
+import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
@@ -1065,6 +1068,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `reservationStatusUpdate request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ReservationStatusUpdateReq(1, ReservationUpdateStatusEnumType.Expired),
+            "ReservationStatusUpdateRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyEVChargingSchedule response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleResp(
@@ -1637,6 +1650,14 @@ class JsonSchemaTest {
     @Test
     fun `notifyEvent response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `reservationStatusUpdate response format`() {
+        val errors =
+            JsonSchemaValidator.isValidObjectV6(ReservationStatusUpdateResp(), "ReservationStatusUpdateResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }

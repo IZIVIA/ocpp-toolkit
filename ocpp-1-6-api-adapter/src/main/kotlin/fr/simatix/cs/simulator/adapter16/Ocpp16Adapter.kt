@@ -33,6 +33,8 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoring
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -290,5 +292,12 @@ class Ocpp16Adapter(
         request: NotifyMonitoringReportReq
     ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> {
         throw IllegalStateException("NotifyMonitoringReport can't be call in OCPP 1.6")
+    }
+
+    override fun reservationStatusUpdate(
+        meta: RequestMetadata,
+        request: ReservationStatusUpdateReq
+    ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> {
+        throw IllegalStateException("ReservationStatusUpdate can't be call in OCPP 1.6")
     }
 }
