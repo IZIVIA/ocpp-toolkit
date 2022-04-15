@@ -173,6 +173,13 @@ class RealChargePointOperations(
             ).response
         }
 
+        client.receiveMessage("DataTransfer") { req: DataTransferReq ->
+            csmsOperations.dataTransfer(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
     }
 
     private inline fun <T, reified P> sendMessage(

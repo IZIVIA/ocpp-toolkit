@@ -15,4 +15,7 @@ interface DataTransferMapper {
 
     fun coreToGenResp(dataTransferResp: DataTransferResp?): DataTransferRespGen
 
+    fun coreToGenReq(dataTransferReq: DataTransferReq?): DataTransferReqGen
+
+    fun genToCoreResp(dataTransferResp: DataTransferRespGen?): DataTransferResp
 }

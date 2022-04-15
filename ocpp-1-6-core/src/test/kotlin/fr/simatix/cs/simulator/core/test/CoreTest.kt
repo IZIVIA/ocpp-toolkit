@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core16.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationReq
 import fr.simatix.cs.simulator.core16.model.getconfiguration.GetConfigurationResp
 import fr.simatix.cs.simulator.core16.model.getlocallistversion.GetLocalListVersionReq
@@ -180,6 +182,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: ReserveNowReq
             ): OperationExecution<ReserveNowReq, ReserveNowResp> {
+                TODO("Not implemented")
+            }
+
+            override fun dataTransfer(
+                meta: RequestMetadata,
+                req: DataTransferReq
+            ): OperationExecution<DataTransferReq, DataTransferResp> {
                 TODO("Not implemented")
             }
         }

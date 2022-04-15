@@ -22,4 +22,9 @@ abstract class DataTransferMapper {
 
     abstract fun coreToGenResp(dataTransferResp: DataTransferResp?): DataTransferRespGen
 
+    abstract fun coreToGenReq(dataTransferReq: DataTransferReq?): DataTransferReqGen
+
+    @Mapping(target = "data", source = "data", qualifiedByName = ["dataToString"])
+    abstract fun genToCoreResp(dataTransferResp: DataTransferRespGen?): DataTransferResp
+
 }

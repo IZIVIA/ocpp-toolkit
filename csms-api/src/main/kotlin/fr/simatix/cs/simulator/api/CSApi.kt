@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
@@ -84,4 +86,6 @@ interface CSApi {
     fun setChargingProfile(meta: RequestMetadata, req: SetChargingProfileReq): OperationExecution<SetChargingProfileReq, SetChargingProfileResp>
 
     fun reserveNow(meta: RequestMetadata, req: ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
+
+    fun dataTransfer(meta: RequestMetadata, req: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
 }

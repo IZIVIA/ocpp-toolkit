@@ -124,6 +124,7 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValu
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -236,6 +237,21 @@ class AdapterTest {
         ): OperationExecution<ReserveNowReq, ReserveNowResp> {
             val response = ReserveNowResp(
                 ReserveNowStatusEnumType.Accepted
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun dataTransfer(
+            meta: RequestMetadata,
+            req: DataTransferReqGen
+        ): OperationExecution<DataTransferReqGen, DataTransferRespGen> {
+            val response = DataTransferRespGen(
+                status = DataTransferStatusEnumType.Accepted,
+                data = "Some data",
+                statusInfo = StatusInfoType(
+                    reasonCode = "reasonCode",
+                    additionalInfo = "additionalInfo"
+                )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }

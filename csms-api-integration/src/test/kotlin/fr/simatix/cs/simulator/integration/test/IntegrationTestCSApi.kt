@@ -18,6 +18,9 @@ import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
@@ -198,6 +201,21 @@ class IntegrationTestCSApi {
             ): OperationExecution<ReserveNowReq, ReserveNowResp> {
                 val response = ReserveNowResp(
                     ReserveNowStatusEnumType.Accepted
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun dataTransfer(
+                meta: RequestMetadata,
+                req: DataTransferReq
+            ): OperationExecution<DataTransferReq, DataTransferResp> {
+                val response = DataTransferResp(
+                    status = DataTransferStatusEnumType.Accepted,
+                    data = "Some data",
+                    statusInfo = StatusInfoType(
+                        reasonCode = "reasonCode",
+                        additionalInfo = "additionalInfo"
+                    )
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
@@ -432,6 +450,13 @@ class IntegrationTestCSApi {
         )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "DataTransfer", "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -450,6 +475,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
+        verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
         csmsApi.close()
     }
@@ -584,6 +610,13 @@ class IntegrationTestCSApi {
         )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "DataTransfer", "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
+        )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -603,6 +636,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
+        verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
         csmsApi.close()
     }

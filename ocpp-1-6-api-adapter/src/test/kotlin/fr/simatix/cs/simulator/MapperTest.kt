@@ -12,6 +12,11 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurpo
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
+import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
+import fr.simatix.cs.simulator.core16.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
@@ -58,6 +63,7 @@ import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.common.enumeration.RemoteStartStopStatus
+import fr.simatix.cs.simulator.core16.model.datatransfer.enumeration.DataTransferStatus
 import fr.simatix.cs.simulator.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
@@ -502,6 +508,40 @@ class MapperTest {
             get { idToken }.isEqualTo(IdTokenType("idTag", IdTokenEnumType.Central))
             get { evseId }.isEqualTo(1)
             get { groupIdToken }.isEqualTo(IdTokenType("idTagParent", IdTokenEnumType.Central))
+        }
+    }
+
+    @Test
+    fun dataTransferMapper() {
+        val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            DataTransferRespGen(
+                status = DataTransferStatusEnumType.Accepted,
+                data = "Some data",
+                statusInfo = StatusInfoType(
+                    reasonCode = "reasonCode",
+                    additionalInfo = "additionalInfo"
+                )
+            )
+        )
+        expectThat(resp) {
+            isA<DataTransferResp>()
+            get { resp.status }.isEqualTo(DataTransferStatus.Accepted)
+            get { resp.data }.isEqualTo("Some data")
+        }
+
+        val req = mapper.coreToGenReq(
+            DataTransferReq(
+                messageId = "messageId",
+                data = "Some data",
+                vendorId = "vendorId"
+            )
+        )
+        expectThat(req) {
+            isA<DataTransferReqGen>()
+            get { req.messageId }.isEqualTo("messageId")
+            get { req.data }.isEqualTo("Some data")
+            get { req.vendorId }.isEqualTo("vendorId")
         }
     }
 

@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
@@ -197,6 +199,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: ReserveNowReq
             ): OperationExecution<ReserveNowReq, ReserveNowResp> {
+                TODO("Not implemented")
+            }
+
+            override fun dataTransfer(
+                meta: RequestMetadata,
+                req: DataTransferReq
+            ): OperationExecution<DataTransferReq, DataTransferResp> {
                 TODO("Not implemented")
             }
         }

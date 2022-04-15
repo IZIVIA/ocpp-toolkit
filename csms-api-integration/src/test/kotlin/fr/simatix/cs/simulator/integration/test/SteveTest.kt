@@ -21,6 +21,8 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearC
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
@@ -242,6 +244,21 @@ fun main(args: Array<String>) {
         ): OperationExecution<ReserveNowReq, ReserveNowResp> {
             val response = ReserveNowResp(
                 ReserveNowStatusEnumType.Accepted
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun dataTransfer(
+            meta: RequestMetadata,
+            req: DataTransferReq
+        ): OperationExecution<DataTransferReq, DataTransferResp> {
+            val response = DataTransferResp(
+                status = DataTransferStatusEnumType.Accepted,
+                data = "Some data",
+                statusInfo = StatusInfoType(
+                    reasonCode = "reasonCode",
+                    additionalInfo = "additionalInfo"
+                )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }

@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
@@ -179,6 +181,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<ReserveNowReq, ReserveNowResp> {
         val mapper: ReserveNowMapper = Mappers.getMapper(ReserveNowMapper::class.java)
         val response = csApi.reserveNow(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun dataTransfer(
+        meta: RequestMetadata,
+        req: DataTransferReq
+    ): OperationExecution<DataTransferReq, DataTransferResp> {
+        val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
+        val response = csApi.dataTransfer(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

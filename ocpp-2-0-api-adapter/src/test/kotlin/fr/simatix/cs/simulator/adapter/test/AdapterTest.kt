@@ -88,6 +88,7 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSour
 import fr.simatix.cs.simulator.core20.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
@@ -303,6 +304,21 @@ class AdapterTest {
         ): OperationExecution<ReserveNowReq, ReserveNowResp> {
             val response = ReserveNowResp(
                 ReserveNowStatusEnumType.Accepted
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun dataTransfer(
+            meta: RequestMetadata,
+            req: DataTransferReq
+        ): OperationExecution<DataTransferReq, DataTransferRespGen> {
+            val response = DataTransferRespGen(
+                status = fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType.Accepted,
+                data = "Some data",
+                statusInfo = fr.simatix.cs.simulator.api.model.common.StatusInfoType(
+                    reasonCode = "reasonCode",
+                    additionalInfo = "additionalInfo"
+                )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }

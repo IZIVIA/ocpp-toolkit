@@ -6,6 +6,9 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfi
 import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
+import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
@@ -44,6 +47,7 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
@@ -61,6 +65,8 @@ import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProf
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
@@ -992,5 +998,41 @@ class MapperTest {
             get { messageInfo?.get(0)?.display?.evse?.connectorId }.isEqualTo(2)
         }
     }
+    @Test
+    fun dataTransferMapper() {
+        val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            DataTransferRespGen(
+                status = DataTransferStatusEnumTypeGen.Accepted,
+                data = "Some data",
+                statusInfo = StatusInfoTypeGen(
+                    reasonCode = "reasonCode",
+                    additionalInfo = "additionalInfo"
+                )
+            )
+        )
+        expectThat(resp) {
+            isA<DataTransferResp>()
+            get { resp.status }.isEqualTo(DataTransferStatusEnumType.Accepted)
+            get { resp.data }.isEqualTo("Some data")
+            get { resp.statusInfo?.reasonCode }.isEqualTo("reasonCode")
+            get { resp.statusInfo?.additionalInfo }.isEqualTo("additionalInfo")
+        }
+
+        val req = mapper.coreToGenReq(
+            DataTransferReq(
+                messageId = "messageId",
+                data = "Some data",
+                vendorId = "vendorId"
+            )
+        )
+        expectThat(req) {
+            isA<DataTransferReqGen>()
+            get { req.messageId }.isEqualTo("messageId")
+            get { req.data }.isEqualTo("Some data")
+            get { req.vendorId }.isEqualTo("vendorId")
+        }
+    }
+
 }
 
