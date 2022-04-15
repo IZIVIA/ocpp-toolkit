@@ -39,11 +39,6 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -133,18 +128,6 @@ fun statusNotification(csmsApi: CSMSApi, ocppId: String, request: StatusNotifica
     val requestMetadata = RequestMetadata(ocppId)
     val response = csmsApi.statusNotification(requestMetadata, request)
     println("StatusNotification: $response\n")
-}
-
-fun notifyCustomerInformation(csmsApi: CSMSApi, ocppId: String, request: NotifyCustomerInformationReq) {
-    val requestMetadata = RequestMetadata(ocppId)
-    val response = csmsApi.notifyCustomerInformation(requestMetadata, request)
-    println("NotifyCustomerInformation: $response\n")
-}
-
-fun notifyDisplayMessages(csmsApi: CSMSApi, ocppId: String, request: NotifyDisplayMessagesReq) {
-    val requestMetadata = RequestMetadata(ocppId)
-    val response = csmsApi.notifyDisplayMessages(requestMetadata, request)
-    println("NotifyDisplayMessages: $response\n")
 }
 
 fun main(args: Array<String>) {
@@ -446,54 +429,6 @@ fun main(args: Array<String>) {
             ),
             idToken = IdTokenType("Tag1", IdTokenEnumType.Central),
             evse = EVSEType(1, 1)
-        )
-    )
-
-    sleep(8000)
-
-    notifyCustomerInformation(
-        csmsApi,
-        ocppId,
-        NotifyCustomerInformationReq(
-            data = "Some data",
-            tbc = true,
-            seqNo = 0,
-            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
-            requestId = 1
-        )
-    )
-
-    sleep(8000)
-
-    notifyDisplayMessages(
-        csmsApi,
-        ocppId,
-        NotifyDisplayMessagesReq(
-            requestId = 1,
-            tbc = false,
-            messageInfo = listOf(
-                MessageInfoType(
-                    id = 2,
-                    priority = MessagePriorityEnumType.InFront,
-                    state = MessageStateEnumType.Charging,
-                    startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    endDateTime = Instant.parse("2022-02-15T00:00:00.001Z"),
-                    transactionId = "2",
-                    message = MessageContentType(
-                        format = MessageFormatEnumType.URI,
-                        language = "language",
-                        content = "Message content"
-                    ),
-                    display = ComponentType(
-                        name = "name",
-                        instance = "instance",
-                        evse = EVSEType(
-                            id = 1,
-                            connectorId = 2
-                        )
-                    )
-                )
-            )
         )
     )
 
