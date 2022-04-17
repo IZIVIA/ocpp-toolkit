@@ -225,6 +225,6 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
             val mapper: NotifyEVChargingNeedsMapper = Mappers.getMapper(NotifyEVChargingNeedsMapper::class.java)
             val response = operations.notifyEVChargingNeeds(meta, mapper.genToCoreReq(request))
             return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-        } else throw IllegalStateException()
+        } else throw IllegalStateException("State of charge should be contained between 0 and 100")
     }
 }
