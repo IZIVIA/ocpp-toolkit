@@ -252,6 +252,6 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
             val mapper: NotifyMonitoringReportMapper = Mappers.getMapper(NotifyMonitoringReportMapper::class.java)
             val response = operations.notifyMonitoringReport(meta, mapper.genToCoreReq(request))
             return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-        } else throw IllegalStateException()
+        } else throw IllegalStateException("Severity should be contained between 0 and 9")
     }
 }
