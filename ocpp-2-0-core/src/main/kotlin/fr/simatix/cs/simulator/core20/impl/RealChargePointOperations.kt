@@ -46,6 +46,8 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
@@ -349,6 +351,12 @@ class RealChargePointOperations(
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
         sendMessage(meta, "LogStatusNotification", request)
+
+    override fun publishFirmwareStatusNotification(
+        meta: RequestMetadata,
+        request: PublishFirmwareStatusNotificationReq
+    ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> =
+        sendMessage(meta, "PublishFirmwareStatusNotification", request)
 
     override fun notifyMonitoringReport(
         meta: RequestMetadata,

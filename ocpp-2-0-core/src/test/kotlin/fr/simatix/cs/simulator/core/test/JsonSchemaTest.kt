@@ -95,6 +95,9 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.M
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
@@ -1058,6 +1061,20 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `publishFirmwareStatusNotification request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            PublishFirmwareStatusNotificationReq(
+                status = PublishFirmwareStatusEnumType.Published,
+                location = "location",
+                requestId = 1
+            ),
+            "PublishFirmwareStatusNotificationRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyMonitoringReport request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
             NotifyMonitoringReportReq(
@@ -1783,6 +1800,16 @@ class JsonSchemaTest {
     fun `logStatusNotification response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             LogStatusNotificationResp(),  "LogStatusNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `publishFirmwareStatusNotification response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            PublishFirmwareStatusNotificationResp(),
+            "PublishFirmwareStatusNotificationResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

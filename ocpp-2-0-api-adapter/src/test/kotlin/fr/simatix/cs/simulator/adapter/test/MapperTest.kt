@@ -29,6 +29,9 @@ import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.Up
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
@@ -100,6 +103,8 @@ import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMess
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp as PublishFirmwareStatusNotificationRespGen
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
@@ -974,7 +979,6 @@ class MapperTest {
             }
     }
 
-
     @Test
     fun notifyDisplayMessagesMapper() {
         val mapper: NotifyDisplayMessagesMapper = Mappers.getMapper(NotifyDisplayMessagesMapper::class.java)
@@ -1029,6 +1033,7 @@ class MapperTest {
             get { messageInfo?.get(0)?.display?.evse?.connectorId }.isEqualTo(2)
         }
     }
+
     @Test
     fun dataTransferMapper() {
         val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
@@ -1085,6 +1090,27 @@ class MapperTest {
         }
     }
 
+    @Test
+    fun publishFirmwareStatusNotificationMapper() {
+        val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
+        val resp = mapper.coreToGenResp(
+            PublishFirmwareStatusNotificationResp()
+        )
+        expectThat(resp) {
+            get { resp }.isA<PublishFirmwareStatusNotificationRespGen>()
+        }
+
+        val req = mapper.genToCoreReq(PublishFirmwareStatusNotificationReqGen(
+            status = PublishFirmwareStatusEnumTypeGen.PublishFailed,
+            location = "location",
+            requestId = 1
+        ))
+        expectThat(req) {
+            get { status }.isEqualTo(PublishFirmwareStatusEnumType.PublishFailed)
+            get { location }.isEqualTo("location")
+            get { requestId }.isEqualTo(1)
+        }
+    }
 
     @Test
     fun notifyMonitoringReportMapper() {

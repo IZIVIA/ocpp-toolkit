@@ -39,6 +39,8 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingN
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
@@ -244,6 +246,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
         val mapper: LogStatusNotificationMapper = Mappers.getMapper(LogStatusNotificationMapper::class.java)
         val response = operations.logStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun publishFirmwareStatusNotification(
+        meta: RequestMetadata,
+        request: PublishFirmwareStatusNotificationReq
+    ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> {
+        val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
+        val response = operations.publishFirmwareStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 

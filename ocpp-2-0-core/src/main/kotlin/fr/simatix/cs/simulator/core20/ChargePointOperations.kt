@@ -35,6 +35,8 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
@@ -168,6 +170,12 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun logStatusNotification(meta: RequestMetadata, request: LogStatusNotificationReq): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp>
+
+    /**
+     * Sends a message to the CSMS to notify the progress status of the publishfirmware installation
+     */
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun publishFirmwareStatusNotification(meta: RequestMetadata, request: PublishFirmwareStatusNotificationReq): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp>
 
     /**
      * Sends a message to the CSMS to notify the monitoring report

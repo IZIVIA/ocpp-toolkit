@@ -80,6 +80,7 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataTy
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -121,6 +122,7 @@ import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.send
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -1066,6 +1068,55 @@ class IntegrationTest {
         val response = csmsApi.logStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `publishFirmwareStatusNotification 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "PublishFirmwareStatusNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = PublishFirmwareStatusNotificationReq(
+            status = PublishFirmwareStatusEnumTypeGen.Published,
+            location = "location",
+            requestId = 1
+        )
+        expectThrows<IllegalStateException> { csmsApi.publishFirmwareStatusNotification(requestMetadata, request) }
+    }
+
+    @Test
+    fun `publishFirmwareStatusNotification 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "PublishFirmwareStatusNotification"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = PublishFirmwareStatusNotificationReq(
+            status = PublishFirmwareStatusEnumTypeGen.Published,
+            location = "location",
+            requestId = 1
+        )
+        val response = csmsApi.publishFirmwareStatusNotification(requestMetadata, request)
+        expectThat(response) {
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        }
     }
 
     @Test

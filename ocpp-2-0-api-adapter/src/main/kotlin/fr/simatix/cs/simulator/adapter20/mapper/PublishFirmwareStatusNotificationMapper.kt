@@ -1,0 +1,16 @@
+package fr.simatix.cs.simulator.adapter20.mapper
+
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import org.mapstruct.Mapper
+import org.mapstruct.ReportingPolicy
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp as PublishFirmwareStatusNotificationRespGen
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+interface PublishFirmwareStatusNotificationMapper {
+
+    fun genToCoreReq(statusReq: PublishFirmwareStatusNotificationReqGen?): PublishFirmwareStatusNotificationReq
+
+    fun coreToGenResp(statusResp: PublishFirmwareStatusNotificationResp?): PublishFirmwareStatusNotificationRespGen
+}

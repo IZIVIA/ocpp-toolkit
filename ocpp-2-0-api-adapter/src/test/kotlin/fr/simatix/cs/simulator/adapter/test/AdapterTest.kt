@@ -218,6 +218,12 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as Tra
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
+import strikt.api.expectThrows
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 
 class AdapterTest {
@@ -1025,6 +1031,33 @@ class AdapterTest {
             requestId = 1
         )
         val response = operations.logStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `publishFirmwareStatusNotification request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.publishFirmwareStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            PublishFirmwareStatusNotificationReq(
+                status = PublishFirmwareStatusEnumType.Published,
+                location = "location",
+                requestId = 1
+            ),
+            PublishFirmwareStatusNotificationResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request =  PublishFirmwareStatusNotificationReqGen(
+            status = PublishFirmwareStatusEnumTypeGen.Published,
+            location = "location",
+            requestId = 1
+        )
+        val response = operations.publishFirmwareStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and {

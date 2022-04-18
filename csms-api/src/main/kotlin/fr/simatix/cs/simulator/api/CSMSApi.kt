@@ -44,6 +44,8 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
@@ -136,6 +138,10 @@ interface CSMSApi {
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp>
 
+    fun publishFirmwareStatusNotification(
+        meta: RequestMetadata,
+        request: PublishFirmwareStatusNotificationReq
+    ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp>
 
     fun notifyMonitoringReport(
         meta: RequestMetadata,
@@ -182,6 +188,7 @@ fun CSMSApi.send(
         is NotifyDisplayMessagesReq -> notifyDisplayMessages(meta, request)
         is NotifyEVChargingNeedsReq -> notifyEVChargingNeeds(meta, request)
         is LogStatusNotificationReq -> logStatusNotification(meta, request)
+        is PublishFirmwareStatusNotificationReq -> publishFirmwareStatusNotification(meta, request)
         is NotifyMonitoringReportReq -> notifyMonitoringReport(meta, request)
         is ReservationStatusUpdateReq -> reservationStatusUpdate(meta, request)
         is SecurityEventNotificationReq -> securityEventNotification(meta, request)

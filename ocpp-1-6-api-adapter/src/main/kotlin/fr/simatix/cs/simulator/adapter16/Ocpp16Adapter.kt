@@ -33,6 +33,8 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoring
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
@@ -289,6 +291,13 @@ class Ocpp16Adapter(
         val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
         val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun publishFirmwareStatusNotification(
+        meta: RequestMetadata,
+        request: PublishFirmwareStatusNotificationReq
+    ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> {
+        throw IllegalStateException("PublishFirmwareStatusNotification can't be call in OCPP 1.6")
     }
 
     override fun notifyMonitoringReport(
