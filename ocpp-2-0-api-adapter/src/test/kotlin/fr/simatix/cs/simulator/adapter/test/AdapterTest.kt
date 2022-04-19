@@ -1045,7 +1045,7 @@ class AdapterTest {
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
             PublishFirmwareStatusNotificationReq(
                 status = PublishFirmwareStatusEnumType.Published,
-                location = "location",
+                location = listOf("location"),
                 requestId = 1
             ),
             PublishFirmwareStatusNotificationResp()
@@ -1054,7 +1054,7 @@ class AdapterTest {
         val operations = Ocpp20Adapter("c1", transport, csApi)
         val request =  PublishFirmwareStatusNotificationReqGen(
             status = PublishFirmwareStatusEnumTypeGen.Published,
-            location = "location",
+            location = listOf("location"),
             requestId = 1
         )
         val response = operations.publishFirmwareStatusNotification(requestMetadata, request)

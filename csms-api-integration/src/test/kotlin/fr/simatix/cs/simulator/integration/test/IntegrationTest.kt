@@ -1087,7 +1087,7 @@ class IntegrationTest {
         val requestMetadata = RequestMetadata(ocppId)
         val request = PublishFirmwareStatusNotificationReq(
             status = PublishFirmwareStatusEnumTypeGen.Published,
-            location = "location",
+            location = listOf("location"),
             requestId = 1
         )
         expectThrows<IllegalStateException> { csmsApi.publishFirmwareStatusNotification(requestMetadata, request) }
@@ -1110,7 +1110,7 @@ class IntegrationTest {
         val requestMetadata = RequestMetadata(ocppId)
         val request = PublishFirmwareStatusNotificationReq(
             status = PublishFirmwareStatusEnumTypeGen.Published,
-            location = "location",
+            location = listOf("location"),
             requestId = 1
         )
         val response = csmsApi.publishFirmwareStatusNotification(requestMetadata, request)

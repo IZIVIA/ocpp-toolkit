@@ -1102,12 +1102,12 @@ class MapperTest {
 
         val req = mapper.genToCoreReq(PublishFirmwareStatusNotificationReqGen(
             status = PublishFirmwareStatusEnumTypeGen.PublishFailed,
-            location = "location",
+            location = listOf("location"),
             requestId = 1
         ))
         expectThat(req) {
             get { status }.isEqualTo(PublishFirmwareStatusEnumType.PublishFailed)
-            get { location }.isEqualTo("location")
+            get { location }.isEqualTo(listOf("location"))
             get { requestId }.isEqualTo(1)
         }
     }

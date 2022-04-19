@@ -1065,7 +1065,7 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
             PublishFirmwareStatusNotificationReq(
                 status = PublishFirmwareStatusEnumType.Published,
-                location = "location",
+                location = listOf("location"),
                 requestId = 1
             ),
             "PublishFirmwareStatusNotificationRequest.json"

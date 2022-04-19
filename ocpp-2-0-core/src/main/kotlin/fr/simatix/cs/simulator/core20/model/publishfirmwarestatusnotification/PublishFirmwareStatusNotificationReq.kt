@@ -4,6 +4,6 @@ import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.en
 
 data class PublishFirmwareStatusNotificationReq(
     val status: PublishFirmwareStatusEnumType,
-    val location: String? = null,
+    val location: List<String>? = null,
     val requestId: Int? = null
 )
