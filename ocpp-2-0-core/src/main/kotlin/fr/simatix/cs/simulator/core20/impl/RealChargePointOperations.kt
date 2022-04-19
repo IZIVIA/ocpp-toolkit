@@ -7,6 +7,7 @@ import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
@@ -226,6 +227,13 @@ class RealChargePointOperations(
             ).response
         }
 
+        client.receiveMessage("CertificateSigned") { req: CertificateSignedReq ->
+            csmsOperations.certificateSigned(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
         client.receiveMessage("GetLog") { req: GetLogReq ->
             csmsOperations.getLog(
                 RequestMetadata(chargeStationId),
@@ -371,11 +379,13 @@ class RealChargePointOperations(
         request: NotifyMonitoringReportReq
     ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> =
         sendMessage(meta, "NotifyMonitoringReport", request)
+
     override fun reservationStatusUpdate(
         meta: RequestMetadata,
         request: ReservationStatusUpdateReq
     ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> =
         sendMessage(meta, "ReservationStatusUpdate", request)
+
     override fun securityEventNotification(
         meta: RequestMetadata,
         request: SecurityEventNotificationReq

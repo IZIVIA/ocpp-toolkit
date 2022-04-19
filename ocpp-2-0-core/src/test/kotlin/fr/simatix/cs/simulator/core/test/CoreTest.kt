@@ -4,6 +4,8 @@ import fr.simatix.cs.simulator.core20.CSMSOperations
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
@@ -212,6 +214,14 @@ class CoreTest {
             ): OperationExecution<DataTransferReq, DataTransferResp> {
                 TODO("Not implemented")
             }
+
+            override fun certificateSigned(
+                meta: RequestMetadata,
+                req: CertificateSignedReq
+            ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
+                TODO("Not yet implemented")
+            }
+
 
             override fun getLog(
                 meta: RequestMetadata,

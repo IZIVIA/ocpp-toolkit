@@ -5,6 +5,8 @@ import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.core20.CSMSOperations
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
@@ -156,7 +158,10 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
         )
     }
 
-    override fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
+    override fun updateFirmware(
+        meta: RequestMetadata,
+        req: UpdateFirmwareReq
+    ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> {
         val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
         val response = csApi.updateFirmware(meta, mapper.coreToGenReq(req))
         return OperationExecution(
@@ -303,6 +308,17 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun certificateSigned(
+        meta: RequestMetadata,
+        req: CertificateSignedReq
+    ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
+        val mapper: CertificateSignedMapper = Mappers.getMapper(CertificateSignedMapper::class.java)
+        val response = csApi.certificateSigned(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS), req, mapper.genToCoreResp(response.response)
         )
     }
 

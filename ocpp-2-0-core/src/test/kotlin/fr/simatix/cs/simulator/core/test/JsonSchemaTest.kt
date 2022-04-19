@@ -2,7 +2,6 @@ package fr.simatix.cs.simulator.core.test
 
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
-import fr.simatix.cs.simulator.core20.model.common.OCSPRequestDataType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.AuthorizeCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
@@ -14,6 +13,8 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.Registr
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -32,6 +33,7 @@ import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedCharging
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
@@ -47,7 +49,6 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.Get
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -71,12 +72,18 @@ import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotif
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
-import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.*
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.EventDataType
@@ -84,12 +91,6 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitType
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
-import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.*
-import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
-import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.MonitoringDataType
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
@@ -109,6 +110,12 @@ import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionRes
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
+import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
+import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ConnectorEnumType
+import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ReserveNowStatusEnumType
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
+import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.AuthorizationData
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
@@ -117,20 +124,12 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnum
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
-import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
-import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
-import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ConnectorEnumType
-import fr.simatix.cs.simulator.core20.model.reservenow.enumeration.ReserveNowStatusEnumType
-import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
-import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
-import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -841,7 +840,7 @@ class JsonSchemaTest {
                 requestId = 1,
                 tbc = false,
                 messageInfo = listOf(
-                        MessageInfoType(
+                    MessageInfoType(
                         id = 2,
                         priority = MessagePriorityEnumType.InFront,
                         state = MessageStateEnumType.Charging,
@@ -1131,6 +1130,22 @@ class JsonSchemaTest {
     @Test
     fun `clearDisplayMessage request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(ClearDisplayMessageReq(1), "ClearDisplayMessageRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `certificateSigned request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            CertificateSignedReq("certificateChain"), "CertificateSignedRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            CertificateSignedReq("certificateChain", CertificateSigningUseEnumType.V2GCertificate),
+            "CertificateSignedRequest.json"
+        )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1810,6 +1825,25 @@ class JsonSchemaTest {
     fun `logStatusNotification response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             LogStatusNotificationResp(),  "LogStatusNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `certificateSigned response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            CertificateSignedResp(CertificateSignedStatusEnumType.Accepted), "CertificateSignedResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            CertificateSignedResp(
+                CertificateSignedStatusEnumType.Accepted,
+                StatusInfoType("reason", "info")
+            ),
+            "CertificateSignedResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

@@ -10,6 +10,8 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.Registrati
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -352,6 +354,13 @@ class IntegrationTest {
                 )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun certificateSigned(
+            meta: RequestMetadata,
+            req: CertificateSignedReq
+        ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
+            throw NotImplementedError()
         }
 
         override fun getLog(

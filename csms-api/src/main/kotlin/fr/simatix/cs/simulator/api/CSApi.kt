@@ -2,6 +2,8 @@ package fr.simatix.cs.simulator.api
 
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
@@ -92,6 +94,8 @@ interface CSApi {
     fun reserveNow(meta: RequestMetadata, req: ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
 
     fun dataTransfer(meta: RequestMetadata, req: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
+
+    fun certificateSigned(meta: RequestMetadata, req: CertificateSignedReq): OperationExecution<CertificateSignedReq,CertificateSignedResp>
 
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
 

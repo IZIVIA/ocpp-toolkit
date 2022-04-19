@@ -2,6 +2,8 @@ package fr.simatix.cs.simulator.core20
 
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
@@ -88,6 +90,8 @@ interface CSMSOperations {
     fun reserveNow(meta: RequestMetadata, req : ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp>
 
     fun dataTransfer(meta: RequestMetadata, req : DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
+
+    fun certificateSigned(meta: RequestMetadata, req: CertificateSignedReq): OperationExecution<CertificateSignedReq, CertificateSignedResp>
 
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
 

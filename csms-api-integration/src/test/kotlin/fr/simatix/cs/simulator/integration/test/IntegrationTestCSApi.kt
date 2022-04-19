@@ -4,6 +4,9 @@ import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp
+import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -328,6 +331,14 @@ class IntegrationTestCSApi {
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
 
+            override fun certificateSigned(
+                meta: RequestMetadata,
+                req: CertificateSignedReq
+            ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
+                val response = CertificateSignedResp(CertificateSignedStatusEnumType.Accepted, StatusInfoType("reason"))
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
             override fun getLog(
                 meta: RequestMetadata,
                 req: GetLogReq
@@ -482,6 +493,13 @@ class IntegrationTestCSApi {
             "chargePoint2", WampMessage(
             WampMessageType.CALL, "1",
             "DataTransfer", "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
+            )
+        )
+
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "CertificateSigned", "{\"certificateChain\": \"certificateChain\", \"certificateType\": \"ChargingStationCertificate\"}"
             )
         )
 
@@ -658,6 +676,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "CertificateSigned", "{\"certificateChain\": \"certificateChain\", \"certificateType\": \"ChargingStationCertificate\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -680,6 +705,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
         verify(csApiSpy, times(1)).clearDisplayMessage(any(), any())
+        verify(csApiSpy, times(1)).certificateSigned(any(), any())
 
         csmsApi.close()
     }

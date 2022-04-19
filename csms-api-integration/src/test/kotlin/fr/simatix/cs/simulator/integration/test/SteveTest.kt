@@ -9,6 +9,8 @@ import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReason
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -366,6 +368,13 @@ fun main(args: Array<String>) {
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
+        override fun certificateSigned(
+            meta: RequestMetadata,
+            req: CertificateSignedReq
+        ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
+            throw NotImplementedError()
+        }
+
         override fun getLog(
             meta: RequestMetadata,
             req: GetLogReq
@@ -485,20 +494,21 @@ fun main(args: Array<String>) {
     )
 
     sleep(8000)
-
-    notifyCustomerInformation(
-        csmsApi,
-        ocppId,
-        NotifyCustomerInformationReq(
-            data = "Some data",
-            tbc = true,
-            seqNo = 0,
-            generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
-            requestId = 1
+    try {
+        notifyCustomerInformation(
+            csmsApi,
+            ocppId,
+            NotifyCustomerInformationReq(
+                data = "Some data",
+                tbc = true,
+                seqNo = 0,
+                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                requestId = 1
+            )
         )
-    )
-
-    sleep(8000)
+    } catch (e: Exception) {
+        println(e)
+    }
 
     logStatusNotification(
         csmsApi,

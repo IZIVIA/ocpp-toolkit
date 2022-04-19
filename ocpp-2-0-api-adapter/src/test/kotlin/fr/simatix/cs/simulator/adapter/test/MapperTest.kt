@@ -51,6 +51,12 @@ import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwa
 import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
+import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSignedStatusEnumType
+import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType as CertificateSignedStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp as CertificateSignedRespGen
+import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
@@ -1193,6 +1199,21 @@ class MapperTest {
             .and { get { type }.isEqualTo("type") }
             .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
             .and { get { techInfo }.isEqualTo("techInfo") }
+    }
+
+    @Test
+    fun certificateSignedMapper() {
+        val mapper: CertificateSignedMapper = Mappers.getMapper(CertificateSignedMapper::class.java)
+        val resp = mapper.genToCoreResp(CertificateSignedRespGen(CertificateSignedStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason","info")))
+        expectThat(resp)
+            .and { get { status }.isEqualTo(CertificateSignedStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason","info")) }
+
+        val req = mapper.coreToGenReq(CertificateSignedReq("certificateChain",CertificateSigningUseEnumType.V2GCertificate))
+        expectThat(req) {
+            get { certificateChain }.isEqualTo("certificateChain")
+            get { certificateType }.isEqualTo(CertificateSigningUseEnumTypeGen.V2GCertificate)
+        }
     }
 
     @Test
