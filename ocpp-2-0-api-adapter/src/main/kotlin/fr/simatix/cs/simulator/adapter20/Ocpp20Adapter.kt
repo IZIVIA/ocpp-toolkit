@@ -41,6 +41,7 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoring
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
@@ -59,13 +60,13 @@ import java.net.ConnectException
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, csApi: CSApi) : CSMSApi {
+class Ocpp20Adapter(chargingStationId: String, private val transport: Transport, csApi: CSApi) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp20Adapter::class.java)
     }
 
-    private val operations = ChargePointOperations.newChargePointOperations(chargingStationId,transport,Ocpp20CSApiAdapter(csApi))
+    private val operations = ChargePointOperations.newChargePointOperations(chargingStationId, transport, Ocpp20CSApiAdapter(csApi))
 
     override fun connect() {
         transport.connect()
@@ -140,7 +141,8 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<StatusNotificationReq, StatusNotificationResp> {
         val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))    }
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 
     override fun notifyReport(
         meta: RequestMetadata,
@@ -148,7 +150,8 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<NotifyReportReq, NotifyReportResp> {
         val mapper: NotifyReportMapper = Mappers.getMapper(NotifyReportMapper::class.java)
         val response = operations.notifyReport(meta, mapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))     }
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 
     override fun firmwareStatusNotification(
         meta: RequestMetadata,
@@ -253,9 +256,12 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
         meta: RequestMetadata,
         request: PublishFirmwareStatusNotificationReq
     ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> {
-        val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
-        val response = operations.publishFirmwareStatusNotification(meta, mapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        val status = request.status
+        if (status == PublishFirmwareStatusEnumType.Published) {
+            val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
+            val response = operations.publishFirmwareStatusNotification(meta, mapper.genToCoreReq(request))
+            return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        } else throw IllegalStateException("Location is required if status is Published")
     }
 
     @Throws(IllegalStateException::class, ConnectException::class)
