@@ -11,34 +11,30 @@ import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLim
 import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
-import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
-import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
-import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
-import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
-import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
-import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
-import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
-import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp
-import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
-import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp
-import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
-import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
+import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
@@ -48,6 +44,10 @@ import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEvent
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateResp
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
+import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
+import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -256,12 +256,10 @@ class Ocpp20Adapter(chargingStationId: String, private val transport: Transport,
         meta: RequestMetadata,
         request: PublishFirmwareStatusNotificationReq
     ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> {
-        val status = request.status
-        if (status == PublishFirmwareStatusEnumType.Published) {
-            val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
-            val response = operations.publishFirmwareStatusNotification(meta, mapper.genToCoreReq(request))
-            return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-        } else throw IllegalStateException("Location is required if status is Published")
+        request.checkBusinessPublishFirmwareStatusNotificationRequest()
+        val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
+        val response = operations.publishFirmwareStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 
     @Throws(IllegalStateException::class, ConnectException::class)
@@ -304,4 +302,11 @@ class Ocpp20Adapter(chargingStationId: String, private val transport: Transport,
         val response = operations.signCertificate(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
+}
+
+private fun PublishFirmwareStatusNotificationReq.checkBusinessPublishFirmwareStatusNotificationRequest(): Boolean {
+    if (status == PublishFirmwareStatusEnumType.Published && location.isNullOrEmpty()) {
+        throw IllegalStateException("Location is required if status is Published")
+    }
+    return true
 }
