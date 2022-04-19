@@ -36,7 +36,7 @@ import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStat
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
-import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
@@ -100,6 +100,8 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -1341,5 +1343,53 @@ class IntegrationTest {
         val response = csmsApi.securityEventNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `signCertificate 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "SignCertificate"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = SignCertificateReq(
+            csr = "csr",
+            certificateType = CertificateSigningUseEnumType.V2GCertificate
+        )
+        expectThrows<IllegalStateException> { csmsApi.signCertificate(requestMetadata, request) }
+    }
+
+    @Test
+    fun `signCertificate 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{\"status\": \"Accepted\"}",
+            action = "SignCertificate"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = SignCertificateReq(
+            csr = "csr",
+            certificateType = CertificateSigningUseEnumType.V2GCertificate
+        )
+        val response = csmsApi.signCertificate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(GenericStatusEnumType.Accepted) }
+            .and { get { this.response.statusInfo }.isEqualTo(null) }
     }
 }

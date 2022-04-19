@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStat
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq
@@ -308,5 +310,12 @@ class Ocpp16Adapter(
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
         throw IllegalStateException("SecurityEventNotification can't be call in OCPP 1.6")
+    }
+
+    override fun signCertificate(
+        meta: RequestMetadata,
+        request: SignCertificateReq
+    ): OperationExecution<SignCertificateReq, SignCertificateResp> {
+        throw IllegalStateException("SignCertificate can't be call in OCPP 1.6")
     }
 }

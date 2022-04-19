@@ -101,7 +101,7 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumerati
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
@@ -139,6 +139,9 @@ import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationS
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
+import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -159,12 +162,9 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.api.expectThrows
-import strikt.assertions.isA
 import strikt.assertions.isEqualTo
-import strikt.assertions.isFailure
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
 import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
@@ -186,7 +186,7 @@ import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStat
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq as NotifyCustomerInformationReqGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq as NotifyEVChargingScheduleReqGen
@@ -206,6 +206,8 @@ import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitori
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq as ReservationStatusUpdateReqGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq as SecurityEventNotificationReqGen
+import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq as SignCertificateReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen
@@ -213,7 +215,6 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as Tra
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
-import strikt.api.expectThrows
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 
 class AdapterTest {
@@ -1180,6 +1181,29 @@ class AdapterTest {
             techInfo = "techInfo"
         )
         val response = operations.securityEventNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `signCertificate request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.signCertificate(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            SignCertificateReq(
+                csr = "csr",
+                certificateType = CertificateSigningUseEnumType.V2GCertificate
+            ),
+            SignCertificateResp(GenericStatusEnumType.Accepted, StatusInfoType("reason", "additional"))
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = SignCertificateReqGen(
+            csr = "csr",
+            certificateType = CertificateSigningUseEnumTypeGen.V2GCertificate
+        )
+        val response = operations.signCertificate(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }

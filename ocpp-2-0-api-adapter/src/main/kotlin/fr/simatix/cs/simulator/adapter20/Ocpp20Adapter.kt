@@ -43,6 +43,8 @@ import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStat
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -274,6 +276,15 @@ class Ocpp20Adapter(chargingStationId: String,private val transport: Transport, 
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
         val mapper: SecurityEventNotificationMapper = Mappers.getMapper(SecurityEventNotificationMapper::class.java)
         val response = operations.securityEventNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun signCertificate(
+        meta: RequestMetadata,
+        request: SignCertificateReq
+    ): OperationExecution<SignCertificateReq, SignCertificateResp> {
+        val mapper: SignCertificateMapper = Mappers.getMapper(SignCertificateMapper::class.java)
+        val response = operations.signCertificate(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

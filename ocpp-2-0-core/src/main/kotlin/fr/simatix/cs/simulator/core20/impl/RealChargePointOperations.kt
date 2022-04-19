@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEv
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
@@ -355,4 +357,10 @@ class RealChargePointOperations(
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> =
         sendMessage(meta, "SecurityEventNotification", request)
+
+    override fun signCertificate(
+        meta: RequestMetadata,
+        request: SignCertificateReq
+    ): OperationExecution<SignCertificateReq, SignCertificateResp> =
+        sendMessage(meta, "SignCertificate", request)
 }

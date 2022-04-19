@@ -2,7 +2,7 @@ package fr.simatix.cs.simulator.adapter16.mapper
 
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType
-import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingRateUnitType
 import fr.simatix.cs.simulator.core16.model.getcompositeschedule.GetCompositeScheduleReq

@@ -37,6 +37,7 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
@@ -71,7 +72,7 @@ import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariable
 import fr.simatix.cs.simulator.core20.model.remotestart.*
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
-import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
@@ -108,6 +109,8 @@ import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.Charg
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
+import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -151,7 +154,7 @@ import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnu
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
-import fr.simatix.cs.simulator.api.model.getcompositeschedule.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
@@ -180,6 +183,7 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType as ChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
@@ -1152,6 +1156,30 @@ class MapperTest {
             .and { get { type }.isEqualTo("type") }
             .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
             .and { get { techInfo }.isEqualTo("techInfo") }
+    }
+
+    @Test
+    fun signCertificateMapper() {
+        val mapper: SignCertificateMapper = Mappers.getMapper(SignCertificateMapper::class.java)
+        val req = mapper.genToCoreReq(
+            SignCertificateReq(
+                csr = "csr",
+                certificateType = CertificateSigningUseEnumTypeGen.V2GCertificate
+            )
+        )
+        expectThat(req)
+            .and { get { csr }.isEqualTo("csr") }
+            .and { get { certificateType }.isEqualTo(CertificateSigningUseEnumType.V2GCertificate) }
+
+        val resp = mapper.coreToGenResp(
+            SignCertificateResp(
+                status = GenericStatusEnumType.Accepted,
+                statusInfo = StatusInfoType("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GenericStatusEnumTypeGen.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 }
 

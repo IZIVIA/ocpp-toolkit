@@ -44,7 +44,7 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.Get
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
-import fr.simatix.cs.simulator.core20.model.getcompositeschedule.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
@@ -117,6 +117,9 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
+import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -1101,6 +1104,22 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `signCertificate request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(SignCertificateReq("csr"), "SignCertificateRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SignCertificateReq(
+                "csr",
+                CertificateSigningUseEnumType.ChargingStationCertificate
+            ), "SignCertificateRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `notifyEVChargingSchedule response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleResp(
@@ -1707,6 +1726,25 @@ class JsonSchemaTest {
     fun `logStatusNotification response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             LogStatusNotificationResp(),  "LogStatusNotificationResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `signCertificate response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            SignCertificateResp(GenericStatusEnumType.Accepted),
+            "SignCertificateResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SignCertificateResp(
+                GenericStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ), "SignCertificateResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
