@@ -3,6 +3,7 @@ package fr.simatix.cs.simulator.adapter.test
 import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
@@ -58,6 +59,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheSta
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
@@ -144,6 +147,7 @@ import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.Operatio
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType as ClearMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType as ClearChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
@@ -1252,5 +1256,23 @@ class MapperTest {
             .and { get { retryInterval }.isEqualTo(3) }
     }
 
+
+    @Test
+    fun clearDisplayMessageMapper() {
+        val mapper: ClearDisplayMessageMapper = Mappers.getMapper(ClearDisplayMessageMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            ClearDisplayMessageResp(
+                status = ClearMessageStatusEnumTypeGen.Accepted,
+                statusInfo = StatusInfoTypeGen("reason", "additional")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(ClearMessageStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
+        expectThat(req)
+            .and { get { id }.isEqualTo(2) }
+    }
 }
 

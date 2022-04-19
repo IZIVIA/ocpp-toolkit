@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -88,4 +90,6 @@ interface CSMSOperations {
     fun dataTransfer(meta: RequestMetadata, req : DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
 
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
+
+    fun clearDisplayMessage(meta: RequestMetadata, req: ClearDisplayMessageReq): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp>
 }

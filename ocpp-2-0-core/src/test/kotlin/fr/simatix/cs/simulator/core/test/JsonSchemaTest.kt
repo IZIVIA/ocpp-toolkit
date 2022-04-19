@@ -25,6 +25,9 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.common.*
@@ -1126,6 +1129,13 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `clearDisplayMessage request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(ClearDisplayMessageReq(1), "ClearDisplayMessageRequest.json")
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `signCertificate request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(SignCertificateReq("csr"), "SignCertificateRequest.json")
         expectThat(errors)
@@ -1829,6 +1839,25 @@ class JsonSchemaTest {
                 GenericStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
             ), "SignCertificateResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearDisplayMessage response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted),
+            "ClearDisplayMessageResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearDisplayMessageResp(
+                ClearMessageStatusEnumType.Accepted,
+                StatusInfoType("reason", "additional")
+            ), "ClearDisplayMessageResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }

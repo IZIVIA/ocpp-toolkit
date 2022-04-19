@@ -13,6 +13,9 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
@@ -332,6 +335,14 @@ class IntegrationTestCSApi {
                 val response = GetLogResp(LogStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun clearDisplayMessage(
+                meta: RequestMetadata,
+                req: ClearDisplayMessageReq
+            ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+                val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -640,6 +651,12 @@ class IntegrationTestCSApi {
             "DataTransfer", "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
         )
         )
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "ClearDisplayMessage", "{\"id\": 1}"
+            )
+        )
 
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
@@ -662,6 +679,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).reserveNow(any(), any())
         verify(csApiSpy, times(1)).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
+        verify(csApiSpy, times(1)).clearDisplayMessage(any(), any())
 
         csmsApi.close()
     }
