@@ -145,7 +145,8 @@ import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEv
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -222,7 +223,6 @@ import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStat
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq as SecurityEventNotificationReqGen
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq as SignCertificateReqGen
-import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType as ConnectorStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as TransactionEventReqGen

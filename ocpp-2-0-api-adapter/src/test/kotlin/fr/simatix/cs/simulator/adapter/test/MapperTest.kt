@@ -55,8 +55,7 @@ import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedR
 import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSignedStatusEnumType
 import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType as CertificateSignedStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp as CertificateSignedRespGen
-import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSigningUseEnumType
-import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
@@ -129,7 +128,7 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -205,7 +204,6 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType as ChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen

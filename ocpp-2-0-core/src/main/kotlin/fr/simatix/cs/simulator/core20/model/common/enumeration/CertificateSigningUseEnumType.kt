@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20.model.signcertificate.enumeration
+package fr.simatix.cs.simulator.core20.model.common.enumeration
 
 enum class CertificateSigningUseEnumType(val value: String) {
     ChargingStationCertificate("ChargingStationCertificate"),

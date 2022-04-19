@@ -1,6 +1,6 @@
 package fr.simatix.cs.simulator.core20.model.signcertificate
 
-import fr.simatix.cs.simulator.core20.model.signcertificate.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 
 data class SignCertificateReq(
     val csr: String,

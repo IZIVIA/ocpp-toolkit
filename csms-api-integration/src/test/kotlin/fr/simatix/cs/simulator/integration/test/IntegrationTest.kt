@@ -109,7 +109,6 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
-import fr.simatix.cs.simulator.api.model.signcertificate.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq

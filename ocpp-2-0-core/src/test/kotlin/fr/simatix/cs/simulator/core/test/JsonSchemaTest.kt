@@ -14,7 +14,8 @@ import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationR
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
-import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedResp
+import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSignedStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityResp
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -130,6 +131,7 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
+import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.statusnotification.enumeration.ConnectorStatusEnumType
