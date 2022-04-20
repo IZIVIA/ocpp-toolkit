@@ -11,6 +11,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -310,6 +312,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<GetLogReq, GetLogResp> {
         val mapper: GetLogMapper = Mappers.getMapper(GetLogMapper::class.java)
         val response = csApi.getLog(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun clearDisplayMessage(
+        meta: RequestMetadata,
+        req: ClearDisplayMessageReq
+    ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+        val mapper: ClearDisplayMessageMapper = Mappers.getMapper(ClearDisplayMessageMapper::class.java)
+        val response = csApi.clearDisplayMessage(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,

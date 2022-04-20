@@ -8,6 +8,8 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
@@ -92,4 +94,6 @@ interface CSApi {
     fun dataTransfer(meta: RequestMetadata, req: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp>
 
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
+
+    fun clearDisplayMessage(meta: RequestMetadata, req: ClearDisplayMessageReq): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp>
 }

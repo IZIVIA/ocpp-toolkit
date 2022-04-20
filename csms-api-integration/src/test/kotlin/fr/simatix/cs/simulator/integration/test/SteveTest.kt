@@ -18,6 +18,8 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
@@ -370,6 +372,13 @@ fun main(args: Array<String>) {
         ): OperationExecution<GetLogReq, GetLogResp> {
             val response = GetLogResp(LogStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearDisplayMessage(
+            meta: RequestMetadata,
+            req: ClearDisplayMessageReq
+        ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+            throw NotImplementedError()
         }
     }
 

@@ -10,6 +10,7 @@ import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationR
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
@@ -227,6 +228,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetLog") { req: GetLogReq ->
             csmsOperations.getLog(
+                RequestMetadata(chargeStationId),
+                req
+            ).response
+        }
+
+        client.receiveMessage("ClearDisplayMessage") { req: ClearDisplayMessageReq ->
+            csmsOperations.clearDisplayMessage(
                 RequestMetadata(chargeStationId),
                 req
             ).response
