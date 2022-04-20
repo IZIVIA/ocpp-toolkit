@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.adapter16.mapper
 
+import fr.simatix.cs.simulator.api.model.common.IdTokenType
 import fr.simatix.cs.simulator.api.model.common.MeterValueType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MeasurandEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
@@ -59,13 +60,17 @@ abstract class StopTransactionMapper {
             )
         }?.filter { it.sampledValue.isNotEmpty() }
 
+    @Named("convertIdTokenTypeOrNull")
+    fun convertIdTokenTypeOrNull(idToken: IdTokenType?): String? =
+        idToken?.idToken
+
     @Mapping(target = "transactionId", source = "transactionId")
     @Mapping(
         target = "reason",
         source = "transactionReq",
         qualifiedByName = ["convertStopReason"]
     )
-    @Mapping(target = "idTag", source = "transactionReq.idToken", qualifiedByName = ["convertIdTokenType"])
+    @Mapping(target = "idTag", source = "transactionReq.idToken", qualifiedByName = ["convertIdTokenTypeOrNull"])
     @Mapping(
         target = "meterStop",
         source = "transactionReq.meterValue",
