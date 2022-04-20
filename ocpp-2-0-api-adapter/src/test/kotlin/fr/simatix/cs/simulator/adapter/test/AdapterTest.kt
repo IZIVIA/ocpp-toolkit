@@ -227,8 +227,6 @@ import fr.simatix.cs.simulator.api.model.transactionevent.TransactionEventReq as
 import fr.simatix.cs.simulator.api.model.transactionevent.TransactionType as TransactionTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TransactionEventEnumType as TransactionEventEnumTypeGen
 import fr.simatix.cs.simulator.api.model.transactionevent.enumeration.TriggerReasonEnumType as TriggerReasonEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 
 class AdapterTest {
     private lateinit var transport: Transport
