@@ -20,6 +20,8 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -243,6 +245,10 @@ class CoreTest {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 TODO("Not implemented")
+            }
+
+            override fun getChargingProfiles(meta: RequestMetadata, req: GetChargingProfilesReq): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
+                TODO("Not yet implemented")
             }
 
             override fun installCertificate(

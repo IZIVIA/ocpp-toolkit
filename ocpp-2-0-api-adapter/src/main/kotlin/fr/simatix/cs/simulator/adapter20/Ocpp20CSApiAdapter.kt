@@ -21,6 +21,8 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -353,6 +355,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getChargingProfiles(
+            meta: RequestMetadata,
+            req: GetChargingProfilesReq
+    ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
+        val mapper: GetChargingProfilesMapper = Mappers.getMapper(GetChargingProfilesMapper::class.java)
+        val response = csApi.getChargingProfiles(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
         )
     }
 

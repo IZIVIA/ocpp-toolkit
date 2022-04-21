@@ -22,6 +22,7 @@ import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareS
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -277,6 +278,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("UnpublishFirmware") { req: UnpublishFirmwareReq ->
             csmsOperations.unpublishFirmware(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("GetChargingProfiles") { req: GetChargingProfilesReq ->
+            csmsOperations.getChargingProfiles(
                     RequestMetadata(chargeStationId),
                     req
             ).response

@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
+import fr.simatix.cs.simulator.api.model.common.ChargingProfileCriterionType as ChargingProfileCriterionTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
@@ -14,6 +15,8 @@ import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTr
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType as GetChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
@@ -143,6 +146,8 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
@@ -1529,6 +1534,42 @@ class MapperTest {
         val req = mapper.coreToGenReq(UnpublishFirmwareReq("checksum"))
         expectThat(req)
                 .and { get { checksum }.isEqualTo("checksum") }
+    }
+
+    @Test
+    fun getChargingProfilesMapper() {
+        val mapper: GetChargingProfilesMapper = Mappers.getMapper(GetChargingProfilesMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                GetChargingProfilesResp(
+                    status = GetChargingProfileStatusEnumTypeGen.Accepted,
+                    statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(GetChargingProfileStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            GetChargingProfilesReq(
+                requestId=3233,
+                evseId=2323,
+                chargingProfile = ChargingProfileCriterionType(
+                        chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                        stackLevel = 23,
+                        chargingProfileId = listOf(1,2),
+                        chargingLimitSource = listOf(ChargingLimitSourceEnumType.CSO,ChargingLimitSourceEnumType.EMS)
+
+                )
+            )
+        )
+
+        expectThat(req)
+                .and { get { requestId }.isEqualTo(3233) }
+                .and { get { evseId }.isEqualTo(2323) }
+                .and { get { chargingProfile.chargingProfilePurpose}.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+                .and { get { chargingProfile.stackLevel}.isEqualTo(23) }
+                .and { get { chargingProfile.chargingProfileId}.isEqualTo(listOf(1,2)) }
+                .and { get { chargingProfile.chargingLimitSource}.isEqualTo(listOf(ChargingLimitSourceEnumTypeGen.CSO,ChargingLimitSourceEnumTypeGen.EMS)) }
     }
 }
 

@@ -36,5 +36,4 @@ abstract class ClearChargingProfileMapper {
             chargingProfileCriteria(clearChargingProfileReq.chargingProfileCriteria)
         )
     }
-
 }
