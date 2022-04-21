@@ -31,6 +31,9 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -489,6 +492,16 @@ class AdapterTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getChargingProfiles(
+                meta: RequestMetadata,
+                req: GetChargingProfilesReq
+        ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
+            val response = GetChargingProfilesResp(
+                    GetChargingProfileStatusEnumType.Accepted,
+            );
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 

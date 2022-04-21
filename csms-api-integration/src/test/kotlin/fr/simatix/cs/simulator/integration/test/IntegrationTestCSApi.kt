@@ -37,6 +37,9 @@ import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
@@ -368,6 +371,17 @@ class IntegrationTestCSApi {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getChargingProfiles(
+                    meta: RequestMetadata,
+                    req: GetChargingProfilesReq
+            ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
+                val response = GetChargingProfilesResp (
+                        GetChargingProfileStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
 
@@ -764,6 +778,22 @@ class IntegrationTestCSApi {
         )
 
         server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "GetChargingProfiles",
+            "{\"requestId\": \"00\"," +
+                    " \"evseId\": \"243\"," +
+                    "\"chargingProfile\": " +
+                        "{\"chargingProfilePurpose\": \"TxProfile\", " +
+                        "\"stackLevel\" : \"243\"," +
+                        "\"chargingProfileId\" : [23]," +
+                        "\"chargingLimitSource\" : [\"CSO\"]" +
+                        "}" +
+                    "}"
+            )
+        )
+
+        server.sendBlocking(
                 "chargePoint2", WampMessage(
                 WampMessageType.CALL, "1",
                 "GetInstalledCertificateIds",
@@ -841,6 +871,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).installCertificate(any(), any())
         verify(csApiSpy, times(1)).getInstalledCertificateIds(any(), any())
         verify(csApiSpy, times(1)).unpublishFirmware(any(), any())
+        verify(csApiSpy, times(1)).getChargingProfiles(any(), any())
 
         csmsApi.close()
     }

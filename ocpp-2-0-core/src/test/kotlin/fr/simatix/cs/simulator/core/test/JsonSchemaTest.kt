@@ -50,6 +50,9 @@ import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBase
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusReq
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesResp
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
@@ -1186,6 +1189,38 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getChargingProfiles request format`() {
+        //without optionnal parameters
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetChargingProfilesReq(
+                        78687,
+                        chargingProfile = ChargingProfileCriterionType()
+                ),
+                "GetChargingProfilesRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        //with all parameters
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetChargingProfilesReq(
+                        78687,
+                        ChargingProfileCriterionType(
+                            ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                            675,
+                            listOf(768),
+                            listOf(ChargingLimitSourceEnumType.CSO)
+                        ),
+                        6778
+                ),
+                "GetChargingProfilesRequest.json"
+        )
+
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `unpublishFirmware request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
                 UnpublishFirmwareReq("checksum"),
@@ -2067,6 +2102,26 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getChargingProfiles response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetChargingProfilesResp(
+                        GetChargingProfileStatusEnumType.NoProfiles,
+                        StatusInfoType("reason","additionnal")),
+                "GetChargingProfilesResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetChargingProfilesResp(
+                        GetChargingProfileStatusEnumType.NoProfiles),
+                "GetChargingProfilesResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test

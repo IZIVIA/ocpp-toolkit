@@ -20,6 +20,8 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
@@ -108,6 +110,8 @@ interface CSApi {
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
 
     fun clearDisplayMessage(meta: RequestMetadata, req: ClearDisplayMessageReq): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp>
+
+    fun getChargingProfiles(meta: RequestMetadata, req: GetChargingProfilesReq): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp>
 
     fun getInstalledCertificateIds(meta: RequestMetadata, req: GetInstalledCertificateIdsReq): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp>
 

@@ -83,6 +83,9 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
@@ -390,6 +393,17 @@ class IntegrationTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             throw NotImplementedError()
+        }
+
+        override fun getChargingProfiles(
+                meta: RequestMetadata,
+                req: GetChargingProfilesReq
+        ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
+            val response = GetChargingProfilesResp (
+                    GetChargingProfileStatusEnumType.Accepted,
+                    StatusInfoType("reason","info")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getInstalledCertificateIds(

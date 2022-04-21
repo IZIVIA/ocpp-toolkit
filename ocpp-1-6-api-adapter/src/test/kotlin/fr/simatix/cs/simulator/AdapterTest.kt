@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
@@ -378,6 +380,13 @@ class AdapterTest {
             meta: RequestMetadata,
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+            throw NotImplementedError()
+        }
+
+        override fun getChargingProfiles(
+                meta: RequestMetadata,
+                req: GetChargingProfilesReq
+        ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
             throw NotImplementedError()
         }
 

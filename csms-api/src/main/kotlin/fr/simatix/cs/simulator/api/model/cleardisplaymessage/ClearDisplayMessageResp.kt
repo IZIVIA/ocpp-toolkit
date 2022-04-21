@@ -5,6 +5,6 @@ import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMe
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 
 data class ClearDisplayMessageResp(
-    val status: ClearMessageStatusEnumType,
-    val statusInfo: StatusInfoType? = null
+        val status: ClearMessageStatusEnumType,
+        val statusInfo: StatusInfoType? = null
 ): Response
