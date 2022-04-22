@@ -22,6 +22,8 @@ import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -252,6 +254,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: CustomerInformationReq
             ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getInstalledCertificateIds(
+                    meta: RequestMetadata,
+                    req: GetInstalledCertificateIdsReq
+            ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
                 TODO("Not yet implemented")
             }
         }
