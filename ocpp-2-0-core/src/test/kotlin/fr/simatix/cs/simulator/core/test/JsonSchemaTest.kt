@@ -53,6 +53,9 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.Get
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -1176,6 +1179,26 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getInstalledCertificatesIds request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetInstalledCertificateIdsReq(
+                        GetCertificateIdUseEnumType.CSMSRootCertificate
+                ),
+                "GetInstalledCertificateIdsRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetInstalledCertificateIdsReq(
+                ),
+                "GetInstalledCertificateIdsRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `installCertificate request format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
                 InstallCertificateReq(
@@ -1970,6 +1993,28 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getInstalledCertificateIds response format`() {
+        TODO("after merge dev into")
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetInstalledCertificateIdsResp(
+
+                ),
+                "GetInstalledCertificateIdsResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetInstalledCertificateIdsResp(
+
+                ),
+                "ClearDisplayMessageResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test

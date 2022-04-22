@@ -24,6 +24,7 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateS
 import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -247,6 +248,13 @@ class RealChargePointOperations(
             csmsOperations.clearDisplayMessage(
                 RequestMetadata(chargeStationId),
                 req
+            ).response
+        }
+
+        client.receiveMessage("GetInstalledCertificateIds") { req: GetInstalledCertificateIdsReq ->
+            csmsOperations.getInstalledCertificateIds(
+                    RequestMetadata(chargeStationId),
+                    req
             ).response
         }
 
