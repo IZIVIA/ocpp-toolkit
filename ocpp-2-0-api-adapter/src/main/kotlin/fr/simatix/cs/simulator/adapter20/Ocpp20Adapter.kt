@@ -38,6 +38,8 @@ import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
@@ -300,6 +302,15 @@ class Ocpp20Adapter(chargingStationId: String, private val transport: Transport,
     ): OperationExecution<SignCertificateReq, SignCertificateResp> {
         val mapper: SignCertificateMapper = Mappers.getMapper(SignCertificateMapper::class.java)
         val response = operations.signCertificate(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun reportChargingProfiles(
+            meta: RequestMetadata,
+            request: ReportChargingProfilesReq
+    ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> {
+        val mapper: ReportChargingProfilesMapper = Mappers.getMapper(ReportChargingProfilesMapper::class.java)
+        val response = operations.reportChargingProfiles(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 }

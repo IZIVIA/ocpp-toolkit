@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationReq
@@ -200,4 +202,7 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun signCertificate(meta: RequestMetadata, request: SignCertificateReq): OperationExecution<SignCertificateReq, SignCertificateResp>
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun reportChargingProfiles(meta: RequestMetadata, request: ReportChargingProfilesReq): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp>
 }
