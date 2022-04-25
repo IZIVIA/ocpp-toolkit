@@ -40,7 +40,6 @@ import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStat
 import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
-import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -54,24 +53,30 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
+import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType
-import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
-import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
-import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
-import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
-import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
-import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
+import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -89,17 +94,13 @@ import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.Custome
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
-import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
-import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
@@ -136,7 +137,6 @@ import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.send
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -160,6 +160,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import java.util.*
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
 
 class IntegrationTest {
 
@@ -1538,5 +1539,88 @@ class IntegrationTest {
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
             .and { get { this.response.status }.isEqualTo(GenericStatusEnumType.Accepted) }
             .and { get { this.response.statusInfo }.isEqualTo(null) }
+    }
+
+    @Test
+    fun `reportChargingProfiles 1-6 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgType = WampMessageType.CALL_RESULT,
+            payload = "{}",
+            action = "ReportChargingProfiles"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = ReportChargingProfilesReq(
+            requestId = 2,
+            chargingLimitSource = ChargingLimitSourceEnumType.CSO,
+            tbc = false,
+            evseId = 2,
+            chargingProfile = listOf(
+                ChargingProfileType(
+                    id = 1,
+                    stackLevel = 1,
+                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                    chargingSchedule = listOf(
+                        ChargingScheduleType(
+                            id = 1,
+                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                        )
+                    )
+                )
+            )
+        )
+        expectThrows<IllegalStateException> { csmsApi.reportChargingProfiles(requestMetadata, request) }
+    }
+
+
+    @Test
+    fun `reportChargingProfiles 2-0 request`() {
+
+        every { ocppWampClient.sendBlocking(any()) } returns WampMessage(
+                msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+                msgType = WampMessageType.CALL_RESULT,
+                payload = "{}",
+                action = "ReportChargingProfiles"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = ReportChargingProfilesReq(
+                requestId = 2,
+                chargingLimitSource = ChargingLimitSourceEnumType.CSO,
+                tbc = false,
+                evseId = 2,
+                chargingProfile = listOf(
+                        ChargingProfileType(
+                                id = 1,
+                                stackLevel = 1,
+                                chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                                chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                                chargingSchedule = listOf(
+                                        ChargingScheduleType(
+                                                id = 1,
+                                                chargingRateUnit = ChargingRateUnitEnumType.A,
+                                                chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                                                startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                                        )
+                                )
+                        )
+                )
+        )
+        val response = csmsApi.reportChargingProfiles(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 }

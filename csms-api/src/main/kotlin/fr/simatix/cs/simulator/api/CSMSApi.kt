@@ -48,6 +48,8 @@ import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.Publi
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateResp
 
@@ -162,6 +164,11 @@ interface CSMSApi {
         meta: RequestMetadata,
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp>
+
+    fun reportChargingProfiles(
+            meta: RequestMetadata,
+            request: ReportChargingProfilesReq
+    ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp>
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -193,5 +200,6 @@ fun CSMSApi.send(
         is ReservationStatusUpdateReq -> reservationStatusUpdate(meta, request)
         is SecurityEventNotificationReq -> securityEventNotification(meta, request)
         is SignCertificateReq -> signCertificate(meta, request)
+        is ReportChargingProfilesReq -> reportChargingProfiles(meta, request)
         else -> throw IllegalStateException()
     } as OperationExecution<Request, Response>

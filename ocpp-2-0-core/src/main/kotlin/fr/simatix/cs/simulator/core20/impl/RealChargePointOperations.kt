@@ -55,6 +55,8 @@ import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.Pu
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
@@ -421,4 +423,11 @@ class RealChargePointOperations(
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> =
         sendMessage(meta, "SignCertificate", request)
+
+    override fun reportChargingProfiles(
+            meta: RequestMetadata,
+            request: ReportChargingProfilesReq
+    ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> =
+        sendMessage(meta,"ReportChargingProfiles",request)
+
 }

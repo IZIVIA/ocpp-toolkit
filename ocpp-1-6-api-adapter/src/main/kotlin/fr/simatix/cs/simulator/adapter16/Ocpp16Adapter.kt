@@ -35,6 +35,8 @@ import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
@@ -326,5 +328,12 @@ class Ocpp16Adapter(
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> {
         throw IllegalStateException("SignCertificate can't be call in OCPP 1.6")
+    }
+
+    override fun reportChargingProfiles(
+            meta: RequestMetadata,
+            request: ReportChargingProfilesReq
+    ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> {
+        throw IllegalStateException("ReportChargingProfiles can't be call in OCPP 1.6")
     }
 }

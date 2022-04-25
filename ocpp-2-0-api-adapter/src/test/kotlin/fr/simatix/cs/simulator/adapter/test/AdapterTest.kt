@@ -56,6 +56,10 @@ import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq as ReportChargingProfilesReqGen
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
@@ -94,6 +98,8 @@ import fr.simatix.cs.simulator.core20.model.bootnotification.enumeration.Registr
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType
+import fr.simatix.cs.simulator.core20.model.common.ChargingProfileType
+import fr.simatix.cs.simulator.api.model.common.ChargingProfileType as ChargingProfileTypeGen
 import fr.simatix.cs.simulator.core20.model.common.ChargingSchedulePeriodType
 import fr.simatix.cs.simulator.core20.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.core20.model.common.EVSEType
@@ -159,6 +165,10 @@ import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
@@ -1324,5 +1334,64 @@ class AdapterTest {
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `reportChargingProfiles request`() {
+        val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.reportChargingProfiles(any(), any()) } returns OperationExecution(
+                ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+                ReportChargingProfilesReq(
+                        2,
+                        ChargingLimitSourceEnumType.CSO,
+                        2,
+                        listOf(
+                                ChargingProfileType(
+                                        id = 1,
+                                        stackLevel = 1,
+                                        chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                                        chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                                        chargingSchedule = listOf(
+                                                ChargingScheduleType(
+                                                        id = 1,
+                                                        chargingRateUnit = ChargingRateUnitEnumType.A,
+                                                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(1, 1.0)),
+                                                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                                                )
+                                        )
+                                )
+                        ),
+                    false
+                ),
+                ReportChargingProfilesResp()
+        )
+
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+        val request = ReportChargingProfilesReqGen(
+                2,
+                ChargingLimitSourceEnumTypeGen.CSO,
+                2,
+                listOf(
+                        ChargingProfileTypeGen(
+                                id = 1,
+                                stackLevel = 1,
+                                chargingProfilePurpose = ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile,
+                                chargingProfileKind = ChargingProfileKindEnumTypeGen.Absolute,
+                                chargingSchedule = listOf(
+                                        ChargingScheduleTypeGen(
+                                                id = 1,
+                                                chargingRateUnit = ChargingRateUnitEnumTypeGen.A,
+                                                chargingSchedulePeriod = listOf(ChargingSchedulePeriodTypeGen(1, 1.0)),
+                                                startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                                        )
+                                )
+                        )
+                ),
+                false
+        )
+        val response = operations.reportChargingProfiles(requestMetadata, request)
+        expectThat(response)
+                .and { get { this.request }.isEqualTo(request) }
+                .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 }

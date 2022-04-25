@@ -74,6 +74,7 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
+import fr.simatix.cs.simulator.api.model.common.ChargingProfileType as ChargingProfileTypeGen
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
@@ -147,6 +148,9 @@ import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformat
 import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -1310,6 +1314,53 @@ class MapperTest {
         val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
         expectThat(req)
             .and { get { id }.isEqualTo(2) }
+    }
+    @Test
+    fun reportChargingProfilesMapper() {
+        val mapper: ReportChargingProfilesMapper = Mappers.getMapper(ReportChargingProfilesMapper::class.java)
+        val req = mapper.genToCoreReq(
+                ReportChargingProfilesReq(
+                        2,
+                        ChargingLimitSourceEnumTypeGen.CSO,
+                        2,
+                        listOf(
+                                ChargingProfileTypeGen(
+                                        id = 1,
+                                        stackLevel = 1,
+                                        chargingProfilePurpose = ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile,
+                                        chargingProfileKind = ChargingProfileKindEnumTypeGen.Absolute,
+                                        chargingSchedule = listOf(
+                                                ChargingScheduleTypeGen(
+                                                        id = 1,
+                                                        chargingRateUnit = ChargingRateUnitEnumTypeGen.A,
+                                                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodTypeGen(1, 1.0)),
+                                                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z")
+                                                )
+                                        )
+                                )
+                        ),
+                    false
+                )
+        )
+        expectThat(req) {
+            get { requestId }.isEqualTo(2)
+            get { chargingLimitSource }.isEqualTo(ChargingLimitSourceEnumType.CSO)
+            get { tbc }.isEqualTo(false)
+            get { evseId }.isEqualTo(2)
+            get { chargingProfile[0] }.and {
+                get { id }.isEqualTo(1)
+                get { stackLevel }.isEqualTo(1)
+                get { chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumType.ChargingStationMaxProfile)
+                get { chargingProfileKind }.isEqualTo(ChargingProfileKindEnumType.Absolute)
+                get { chargingSchedule[0].id }.isEqualTo(1)
+                get { chargingSchedule[0].chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A)
+            }
+        }
+
+        val resp = mapper.coreToGenResp(ReportChargingProfilesResp())
+
+        expectThat(resp).isA<ReportChargingProfilesRespGen>()
+
     }
 
     @Test
