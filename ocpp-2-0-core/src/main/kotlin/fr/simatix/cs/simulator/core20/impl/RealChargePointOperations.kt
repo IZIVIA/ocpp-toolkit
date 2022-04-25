@@ -74,6 +74,7 @@ import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventReq
 import fr.simatix.cs.simulator.core20.model.transactionevent.TransactionEventResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -269,6 +270,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("CustomerInformation") { req: CustomerInformationReq ->
             csmsOperations.customerInformation(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("UnpublishFirmware") { req: UnpublishFirmwareReq ->
+            csmsOperations.unpublishFirmware(
                     RequestMetadata(chargeStationId),
                     req
             ).response

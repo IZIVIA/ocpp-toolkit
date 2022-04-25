@@ -97,6 +97,9 @@ import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessa
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareResp
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
@@ -436,6 +439,14 @@ fun main(args: Array<String>) {
                     ),
                     StatusInfoType("reason", "info")
             )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun unpublishFirmware(
+                meta: RequestMetadata,
+                req: UnpublishFirmwareReq
+        ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
+            val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

@@ -50,6 +50,8 @@ import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -108,5 +110,8 @@ interface CSMSOperations {
     fun installCertificate(meta: RequestMetadata, req: InstallCertificateReq): OperationExecution<InstallCertificateReq, InstallCertificateResp>
 
     fun customerInformation(meta: RequestMetadata, req: CustomerInformationReq): OperationExecution<CustomerInformationReq, CustomerInformationResp>
+
+
+    fun unpublishFirmware(meta: RequestMetadata, req: UnpublishFirmwareReq): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp>
 
 }

@@ -86,6 +86,9 @@ import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessa
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareResp
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
@@ -421,6 +424,14 @@ class IntegrationTestCSApi {
                         ),
                         StatusInfoType("reason", "info")
                 )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun unpublishFirmware(
+                    meta: RequestMetadata,
+                    req: UnpublishFirmwareReq
+            ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
+                val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -796,6 +807,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "UnpublishFirmware", "{\"checksum\": \"value\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -822,6 +840,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).customerInformation(any(), any())
         verify(csApiSpy, times(1)).installCertificate(any(), any())
         verify(csApiSpy, times(1)).getInstalledCertificateIds(any(), any())
+        verify(csApiSpy, times(1)).unpublishFirmware(any(), any())
 
         csmsApi.close()
     }

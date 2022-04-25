@@ -54,6 +54,8 @@ import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.operation.information.OperationExecution
@@ -261,6 +263,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: GetInstalledCertificateIdsReq
             ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun unpublishFirmware(
+                    meta: RequestMetadata,
+                    req: UnpublishFirmwareReq
+            ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
                 TODO("Not yet implemented")
             }
         }
