@@ -66,6 +66,7 @@ import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEv
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
@@ -285,6 +286,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetChargingProfiles") { req: GetChargingProfilesReq ->
             csmsOperations.getChargingProfiles(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("SetVariableMonitoring") { req: SetVariableMonitoringReq ->
+            csmsOperations.setVariableMonitoring(
                     RequestMetadata(chargeStationId),
                     req
             ).response

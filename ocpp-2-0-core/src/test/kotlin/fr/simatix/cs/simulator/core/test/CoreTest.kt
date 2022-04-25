@@ -50,6 +50,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -276,6 +278,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: UnpublishFirmwareReq
             ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun setVariableMonitoring(
+                    meta: RequestMetadata,
+                    req: SetVariableMonitoringReq
+            ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
                 TODO("Not yet implemented")
             }
         }

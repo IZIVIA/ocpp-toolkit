@@ -49,6 +49,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -416,6 +418,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
         val mapper: UnpublishFirmwareMapper = Mappers.getMapper(UnpublishFirmwareMapper::class.java)
         val response = csApi.unpublishFirmware(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun setVariableMonitoring(
+            meta: RequestMetadata,
+            req: SetVariableMonitoringReq
+    ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
+        val mapper: SetVariableMonitoringMapper = Mappers.getMapper(SetVariableMonitoringMapper::class.java)
+        val response = csApi.setVariableMonitoring(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,

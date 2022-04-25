@@ -54,6 +54,8 @@ import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStat
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType as SetMonitoringResultTypeGen
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
@@ -123,7 +125,7 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
-import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
@@ -158,6 +160,10 @@ import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.Insta
 import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
 import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringDataType
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType as SetMonitoringStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -221,7 +227,7 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType as EnergyTransferModeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType as MonitorEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType as MonitorEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp as NotifyMonitoringReportRespGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
@@ -1571,5 +1577,64 @@ class MapperTest {
                 .and { get { chargingProfile.chargingProfileId}.isEqualTo(listOf(1,2)) }
                 .and { get { chargingProfile.chargingLimitSource}.isEqualTo(listOf(ChargingLimitSourceEnumTypeGen.CSO,ChargingLimitSourceEnumTypeGen.EMS)) }
     }
-}
 
+    @Test
+    fun setVariableMonitoringMapper() {
+        val mapper: SetVariableMonitoringMapper = Mappers.getMapper(SetVariableMonitoringMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            SetVariableMonitoringResp(
+                listOf(
+                    SetMonitoringResultTypeGen(
+                        id = 23,
+                        status = SetMonitoringStatusEnumTypeGen.Accepted,
+                        type = MonitorEnumTypeGen.Delta,
+                        severity = 213,
+                        component = ComponentTypeGen("name"),
+                        variable = VariableTypeGen("name"),
+                        statusInfo = StatusInfoTypeGen("reason", "info")
+                    )
+                )
+            )
+        )
+        expectThat(resp) {
+            get { setMonitoringResult[0] }.and {
+                get { id }.isEqualTo(23)
+                get { status }.isEqualTo(SetMonitoringStatusEnumType.Accepted)
+                get { type }.isEqualTo(MonitorEnumType.Delta)
+                get { severity }.isEqualTo(213)
+                get { component }.isEqualTo(ComponentType("name"))
+                get { variable }.isEqualTo(VariableType("name"))
+                get { statusInfo }.isEqualTo(StatusInfoType("reason", "info"))
+            }
+        }
+
+        val req = mapper.coreToGenReq(
+            SetVariableMonitoringReq(
+                setMonitoringData = listOf(
+                    SetMonitoringDataType(
+                        id = 231,
+                        transaction = false,
+                        value = 78.3,
+                        type = MonitorEnumType.Delta,
+                        severity = 5,
+                        component = ComponentType("name"),
+                        variable = VariableType("name")
+                    )
+                )
+            )
+        )
+
+        expectThat(req)
+        {
+            get { setMonitoringData[0] }.and {
+                get { id }.isEqualTo(231)
+                get { transaction }.isEqualTo(false)
+                get { value }.isEqualTo(78.3)
+                get { type }.isEqualTo(MonitorEnumTypeGen.Delta)
+                get { severity }.isEqualTo(5)
+                get { component }.isEqualTo(ComponentTypeGen("name"))
+                get { variable }.isEqualTo(VariableTypeGen("name"))
+            }
+        }
+    }
+}

@@ -72,6 +72,8 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -415,6 +417,13 @@ class AdapterTest {
                 meta: RequestMetadata,
                 req: UnpublishFirmwareReq
         ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
+            throw NotImplementedError()
+        }
+
+        override fun setVariableMonitoring(
+                meta: RequestMetadata,
+                req: SetVariableMonitoringReq
+        ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
             throw NotImplementedError()
         }
     }

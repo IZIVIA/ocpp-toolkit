@@ -82,6 +82,9 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -106,6 +109,7 @@ import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.Unpublish
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -462,6 +466,26 @@ fun main(args: Array<String>) {
                 StatusInfoType("reason","info")
             )
 
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setVariableMonitoring(
+                meta: RequestMetadata,
+                req: SetVariableMonitoringReq
+        ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
+            val response = SetVariableMonitoringResp(
+                listOf(
+                    SetMonitoringResultType (
+                            id = 23,
+                            status = SetMonitoringStatusEnumType.Accepted,
+                            type = MonitorEnumType.Delta,
+                            severity = 3,
+                            component = ComponentType("name"),
+                            variable = VariableType("name"),
+                            statusInfo = StatusInfoType("reason", "info")
+                    )
+                )
+            )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

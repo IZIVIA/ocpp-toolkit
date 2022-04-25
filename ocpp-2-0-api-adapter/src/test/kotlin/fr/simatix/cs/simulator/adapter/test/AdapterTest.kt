@@ -75,6 +75,9 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -155,7 +158,7 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.MonitoringDat
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonitoringType
-import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
@@ -175,6 +178,7 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePu
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.statusnotification.StatusNotificationResp
@@ -244,7 +248,7 @@ import fr.simatix.cs.simulator.api.model.notifyevchargingschedule.NotifyEVChargi
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq as NotifyMonitoringReportReqGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType as MonitorEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType as MonitorEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq as NotifyReportReqGen
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
@@ -545,6 +549,26 @@ class AdapterTest {
                 req: UnpublishFirmwareReq
         ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
             val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setVariableMonitoring(
+                meta: RequestMetadata,
+                req: SetVariableMonitoringReq
+        ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
+            val response = SetVariableMonitoringResp(
+                listOf(
+                    SetMonitoringResultType(
+                            type= MonitorEnumTypeGen.Delta,
+                            id=213,
+                            component = ComponentType("name"),
+                            variable=VariableType("name"),
+                            statusInfo=StatusInfoTypeGen("reason","info"),
+                            severity=3,
+                            status = SetMonitoringStatusEnumType.Accepted,
+                    )
+                )
+            )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
