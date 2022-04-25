@@ -54,6 +54,8 @@ import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonito
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageReq
@@ -135,5 +137,8 @@ interface CSApi {
 
 
     fun setMonitoringLevel(meta: RequestMetadata, req: SetMonitoringLevelReq): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp>
+
+
+    fun setNetworkProfile(meta: RequestMetadata, req: SetNetworkProfileReq): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp>
 
 }

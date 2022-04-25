@@ -151,6 +151,8 @@ import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMon
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.*
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -1257,6 +1259,23 @@ class JsonSchemaTest {
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetNetworkProfileReq(
+                2,
+                NetworkConnectionProfileType(
+                    OCPPVersionEnumType.OCPP12,
+                    OCPPTransportEnumType.JSON,
+                    "url",
+                    312,
+                    123,
+                    OCPPInterfaceEnumType.Wired0
+                )
+            ),
+            "SetNetworkProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
@@ -1381,6 +1400,60 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
     }
 
+
+    @Test
+    fun `setNetworkProfile request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetNetworkProfileReq(
+                        2,
+                        NetworkConnectionProfileType(
+                                OCPPVersionEnumType.OCPP12,
+                                OCPPTransportEnumType.JSON,
+                                "url",
+                                312,
+                                123,
+                                OCPPInterfaceEnumType.Wired0,
+                                VPNType(
+                                    "server",
+                                    "user",
+                                    "pass",
+                                    "key",
+                                    VPNEnumType.IKEv2,
+                                    "group"
+                                ),
+                                APNType(
+                                    "APN",
+                                    APNAuthenticationEnumType.AUTO,
+                                    "userName",
+                                    "pass",
+                                    3,
+                                    "pref",
+                                    false
+                                )
+                        )
+                ),
+                "SetNetworkProfileRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            SetNetworkProfileReq(
+                2,
+                NetworkConnectionProfileType(
+                    OCPPVersionEnumType.OCPP12,
+                    OCPPTransportEnumType.JSON,
+                    "url",
+                    312,
+                    123,
+                    OCPPInterfaceEnumType.Wired0
+                )
+            ),
+            "SetNetworkProfileRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
 
     @Test
     fun `notifyEVChargingSchedule response format`() {
@@ -2190,6 +2263,29 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setNetworkProfile response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetNetworkProfileResp(
+                        SetNetworkProfileStatusEnumType.Accepted
+                ),
+                "SetNetworkProfileResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetNetworkProfileResp(
+                        SetNetworkProfileStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "SetNetworkProfileResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
     }
 
     @Test

@@ -87,6 +87,9 @@ import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonito
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -494,6 +497,14 @@ class IntegrationTestCSApi {
                         GenericStatusEnumType.Accepted,
                         StatusInfoType("reason","additionnal")
                 )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun setNetworkProfile(
+                    meta: RequestMetadata,
+                    req: SetNetworkProfileReq
+            ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
+                val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -937,6 +948,44 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SetNetworkProfile",
+                "{\"configurationSlot\": 2," +
+                        " \"connectionData\": " +
+                            "{" +
+                                "\"ocppVersion\":\"OCPP12\"," +
+                                "\"ocppTransport\":\"JSON\"," +
+                                "\"ocppCsmsUrl\":\"url\"," +
+                                "\"messageTimeout\": 3," +
+                                "\"securityProfile\": 56," +
+                                "\"ocppInterface\":\"Wired0\"," +
+                                "\"vpn\":" +
+                                    "{" +
+                                        "\"server\":\"server\"," +
+                                        "\"user\":\"user\"," +
+                                        "\"group\":\"group\"," +
+                                        "\"password\":\"pass\"," +
+                                        "\"key\":\"key\"," +
+                                        "\"type\":\"IKEv2\"" +
+                                    "}" +
+                                "," +
+                                "\"apn\": " +
+                                    "{" +
+                                        "\"apn\":\"IKEv2\"," +
+                                        "\"apnUserName\":\"username\"," +
+                                        "\"apnPassword\":\"pass\"," +
+                                        "\"simPin\":43," +
+                                        "\"preferredNetwork\":\"pref\"," +
+                                        "\"useOnlyPreferredNetwork\":false," +
+                                        "\"apnAuthentication\":\"AUTO\"" +
+                                    "}" +
+                            "}" +
+                        "}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -968,6 +1017,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).setVariableMonitoring(any(), any())
         verify(csApiSpy, times(1)).setMonitoringLevel(any(), any())
         verify(csApiSpy, times(1)).publishFirmware(any(), any())
+        verify(csApiSpy, times(1)).setNetworkProfile(any(), any())
 
         csmsApi.close()
     }

@@ -89,6 +89,9 @@ import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonito
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -509,6 +512,14 @@ fun main(args: Array<String>) {
                 GenericStatusEnumType.Accepted,
                 StatusInfoType("reason","additionnal")
             )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setNetworkProfile(
+                meta: RequestMetadata,
+                req: SetNetworkProfileReq
+        ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
+            val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
