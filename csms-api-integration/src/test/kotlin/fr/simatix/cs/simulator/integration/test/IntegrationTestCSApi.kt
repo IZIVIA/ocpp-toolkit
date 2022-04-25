@@ -83,6 +83,8 @@ import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.Charging
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -470,6 +472,17 @@ class IntegrationTestCSApi {
                                 statusInfo = StatusInfoType("reason", "info")
                         )
                     )
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun setMonitoringLevel(
+                    meta: RequestMetadata,
+                    req: SetMonitoringLevelReq
+            ): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp> {
+                val response = SetMonitoringLevelResp(
+                        GenericStatusEnumType.Accepted,
+                        StatusInfoType("reason","additionnal")
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
@@ -893,6 +906,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SetMonitoringLevel", "{\"severity\": 3}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -922,6 +942,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).unpublishFirmware(any(), any())
         verify(csApiSpy, times(1)).getChargingProfiles(any(), any())
         verify(csApiSpy, times(1)).setVariableMonitoring(any(), any())
+        verify(csApiSpy, times(1)).setMonitoringLevel(any(), any())
 
         csmsApi.close()
     }
