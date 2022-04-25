@@ -19,20 +19,24 @@ import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustome
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.VPNEnumType as VPNEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType as SetNetworkProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.APNAuthenticationEnumType as APNAuthenticationEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.OCPPVersionEnumType as OCPPVersionEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.OCPPTransportEnumType as OCPPTransportEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.OCPPInterfaceEnumType as OCPPInterfaceEnumTypeGen
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
@@ -106,7 +110,6 @@ import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotific
 import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
-import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
@@ -130,20 +133,12 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
-import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
-import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
-import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
-import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
-import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
-import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
-import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
-import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
 import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.APNType
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.NetworkConnectionProfileType
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.VPNType
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -1478,6 +1473,77 @@ class MapperTest {
     }
 
     @Test
+    fun setNetworkProfileMapper() {
+        val mapper: SetNetworkProfileMapper = Mappers.getMapper(SetNetworkProfileMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                SetNetworkProfileResp(
+                        status = SetNetworkProfileStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(SetNetworkProfileStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+            SetNetworkProfileReq(
+                2,
+                NetworkConnectionProfileType(
+                    OCPPVersionEnumType.OCPP12,
+                    OCPPTransportEnumType.JSON,
+                    "url",
+                    312,
+                    123,
+                    OCPPInterfaceEnumType.Wired0,
+                    VPNType(
+                        "server",
+                        "user",
+                        "pass",
+                        "key",
+                        VPNEnumType.IKEv2,
+                        "group"
+                    ),
+                    APNType(
+                        "APN",
+                        APNAuthenticationEnumType.AUTO,
+                        "userName",
+                        "pass",
+                        3,
+                        "pref",
+                        false
+                    )
+                )
+            )
+        )
+        expectThat(req) {
+            get { configurationSlot }.isEqualTo(2)
+            get { connectionData.ocppVersion }.isEqualTo(OCPPVersionEnumTypeGen.OCPP12)
+            get { connectionData.ocppTransport }.isEqualTo(OCPPTransportEnumTypeGen.JSON)
+            get { connectionData.ocppCsmsUrl }.isEqualTo("url")
+            get { connectionData.messageTimeout }.isEqualTo(312)
+            get { connectionData.securityProfile }.isEqualTo(123)
+            get { connectionData.ocppInterface }.isEqualTo(OCPPInterfaceEnumTypeGen.Wired0)
+            get { connectionData.vpn }.and {
+                get { this?.server  }.isEqualTo("server")
+                get { this?.user }.isEqualTo("user")
+                get { this?.password }.isEqualTo("pass")
+                get { this?.group }.isEqualTo("group")
+                get { this?.key }.isEqualTo("key")
+                get { this?.type }.isEqualTo(VPNEnumTypeGen.IKEv2)
+            }
+            get { connectionData.apn }.and {
+                get { this?.apn  }.isEqualTo("APN")
+                get { this?.apnUserName }.isEqualTo("userName")
+                get { this?.apnPassword }.isEqualTo("pass")
+                get { this?.simPin }.isEqualTo(3)
+                get { this?.preferredNetwork }.isEqualTo("pref")
+                get { this?.useOnlyPreferredNetwork }.isEqualTo(false)
+                get { this?.apnAuthentication }.isEqualTo(APNAuthenticationEnumTypeGen.AUTO)
+            }
+        }
+    }
+
+    @Test
     fun setMonitoringLevelMapper() {
         val mapper: SetMonitoringLevelMapper = Mappers.getMapper(SetMonitoringLevelMapper::class.java)
         val resp = mapper.genToCoreResp(
@@ -1649,7 +1715,6 @@ class MapperTest {
             get { retryInterval }.isEqualTo(4)
         }
     }
-}
 
     @Test
     fun setVariableMonitoringMapper() {

@@ -79,12 +79,9 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
-import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
-import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
@@ -101,9 +98,6 @@ import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.Custome
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
@@ -132,6 +126,9 @@ import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonito
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
+import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -522,6 +519,14 @@ class IntegrationTest {
                     GenericStatusEnumType.Accepted,
                     StatusInfoType("reason","additionnal")
             )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setNetworkProfile(
+                meta: RequestMetadata,
+                req: SetNetworkProfileReq
+        ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
+            val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

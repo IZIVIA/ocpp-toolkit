@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMon
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -303,6 +305,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: SetMonitoringLevelReq
             ): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun setNetworkProfile(
+                    meta: RequestMetadata,
+                    req: SetNetworkProfileReq
+            ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
                 TODO("Not yet implemented")
             }
         }
