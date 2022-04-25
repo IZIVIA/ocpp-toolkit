@@ -78,6 +78,8 @@ import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.Charging
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -569,6 +571,14 @@ class AdapterTest {
                     )
                 )
             )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setMonitoringLevel(
+                meta: RequestMetadata,
+                req: SetMonitoringLevelReq
+        ): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp> {
+            val response = SetMonitoringLevelResp(GenericStatusEnumTypeGen.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

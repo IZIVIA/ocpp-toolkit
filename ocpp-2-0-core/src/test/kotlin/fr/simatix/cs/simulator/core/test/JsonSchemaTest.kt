@@ -147,6 +147,8 @@ import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringR
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
+import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -1427,6 +1429,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `setMonitoringLevel request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringLevelReq(2),
+                "SetMonitoringLevelRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `setVariableMonitoring request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
                 SetVariableMonitoringReq(
@@ -1476,6 +1488,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
 
     @Test
     fun `authorize response format`() {
@@ -2148,6 +2161,29 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setMonitoringLevel response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringLevelResp(
+                        GenericStatusEnumType.Accepted,
+                        StatusInfoType("reason","additionnal")
+                ),
+                "SetMonitoringLevelResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringLevelResp(
+                        GenericStatusEnumType.Accepted
+                ),
+                "SetMonitoringLevelResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
     }
 
     @Test

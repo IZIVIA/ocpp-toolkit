@@ -1,60 +1,30 @@
 package fr.simatix.cs.simulator.adapter.test
 
 import fr.simatix.cs.simulator.adapter20.mapper.*
-import fr.simatix.cs.simulator.api.model.common.ChargingProfileCriterionType as ChargingProfileCriterionTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
-import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType as CertificateHashDataTypeGen
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
-import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType as CustomerInformationStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
-import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
-import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
-import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
-import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
-import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType as GetChargingProfileStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
-import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType as GetCertificateIdUseEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType as GetInstalledCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
-import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType as InstallCertificateStatusEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
-import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateUseEnumType as InstallCertificateUseEnumTypeGen
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
-import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
-import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
-import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp as LogStatusNotificationRespGen
-import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
-import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
-import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateReq
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
-import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType as SetMonitoringResultTypeGen
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -62,18 +32,11 @@ import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareResp
-import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
-import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.core20.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.certificateSigned.CertificateSignedReq
 import fr.simatix.cs.simulator.core20.model.certificateSigned.enumeration.CertificateSignedStatusEnumType
-import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType as CertificateSignedStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp as CertificateSignedRespGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.changeavailability.ChangeAvailabilityReq
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
 import fr.simatix.cs.simulator.core20.model.changeavailability.enumeration.OperationalStatusEnumType
@@ -81,59 +44,70 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.enumeration.ClearCacheStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileType
-import fr.simatix.cs.simulator.api.model.common.ChargingProfileType as ChargingProfileTypeGen
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.enumeration.ReportBaseEnumType
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
+import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
+import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
-import fr.simatix.cs.simulator.core20.model.remotestart.*
-import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
-import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
-import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
-import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
-import fr.simatix.cs.simulator.core20.model.getcertificatestatus.GetCertificateStatusResp
-import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
-import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
-import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
-import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
-import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
-import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType as EventDataTypeGen
-import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq as NotifyEventReqGen
-import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
-import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
-import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType as EventNotificationEnumTypeGen
-import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
-import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType as EventTriggerEnumTypeGen
-import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
+import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
-import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventNotificationEnumType
+import fr.simatix.cs.simulator.core20.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
-import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp as PublishFirmwareStatusNotificationRespGen
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.ReservationStatusUpdateResp
 import fr.simatix.cs.simulator.core20.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
@@ -143,27 +117,14 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.SendLocalL
 import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnumType
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringDataType
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
-import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
-import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
-import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
-import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
-import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
-import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
-import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
-import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
-import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
-import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringDataType
-import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
-import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
-import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType as SetMonitoringStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -173,77 +134,118 @@ import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareR
 import fr.simatix.cs.simulator.core20.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
+import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
-import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import strikt.assertions.isTrue
-import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType as CancelReservationStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.certificateSigned.CertificateSignedResp as CertificateSignedRespGen
+import fr.simatix.cs.simulator.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType as CertificateSignedStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.changeavailability.ChangeAvailabilityResp as ChangeAvailabilityRespGen
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType as ChangeAvailabilityStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.changeavailability.enumeration.OperationalStatusEnumType as OperationalStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheReqGen
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType as ClearMessageStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType as ClearChargingProfileStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType as ClearMessageStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType as CertificateHashDataTypeGen
+import fr.simatix.cs.simulator.api.model.common.ChargingProfileType as ChargingProfileTypeGen
+import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
 import fr.simatix.cs.simulator.api.model.common.IdTokenType as IdTokenTypeGen
+import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
 import fr.simatix.cs.simulator.api.model.common.OCSPRequestDataType as OCSPRequestDataTypeGen
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType as StatusInfoTypeGen
 import fr.simatix.cs.simulator.api.model.common.VariableType as VariableTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.AttributeEnumType as AttributeEnumTypeGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.CertificateSigningUseEnumType as CertificateSigningUseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingLimitSourceEnumType as ChargingLimitSourceEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingRateUnitEnumType as ChargingRateUnitEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType as GenericDeviceModelStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType as IdTokenEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType as MonitorEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType as CustomerInformationStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
+import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType as FirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.enumeration.ReportBaseEnumType as ReportBaseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
+import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType as GetChargingProfileStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType as GetCertificateIdUseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType as GetInstalledCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogEnumType as LogEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType as LogStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getcertificatestatus.GetCertificateStatusReq as GetCertificateStatusReqGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType as GenericStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getcompositeschedule.CompositeScheduleType as CompositeScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType as InstallCertificateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateUseEnumType as InstallCertificateUseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationResp as LogStatusNotificationRespGen
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitResp as NotifyChargingLimitRespGen
+import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationResp as NotifyCustomerInformationRespGen
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesResp as NotifyDisplayMessagesRespGen
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ACChargingParametersType as ACChargingParametersTypeGen
-import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType as ChargingNeedsTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType as EnergyTransferModeEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType as NotifyEVChargingNeedsStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType as MonitorEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType as EventDataTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq as NotifyEventReqGen
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType as EventNotificationEnumTypeGen
+import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType as EventTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType as MonitoringDataTypeGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportResp as NotifyMonitoringReportRespGen
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType as VariableMonitoringTypeGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp as PublishFirmwareStatusNotificationRespGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.ChargingProfileKindEnumType as ChargingProfileKindEnumTypeGen
 import fr.simatix.cs.simulator.api.model.remotestart.enumeration.RecurrencyKindEnumType as RecurrencyKindEnumTypeGen
-import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
 import fr.simatix.cs.simulator.api.model.reservationstatusupdate.ReservationStatusUpdateResp as ReservationStatusUpdateRespGen
+import fr.simatix.cs.simulator.api.model.reservationstatusupdate.enumeration.ReservationUpdateStatusEnumType as ReservationUpdateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEventNotificationResp as SecurityEventNotificationRespGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.AuthorizationData as AuthorizationDataGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalListStatusEnumType as SendLocalListStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.UpdateEnumType as UpdateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType as ChargingProfileStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType as SetMonitoringResultTypeGen
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType as SetMonitoringStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableStatusEnumType as SetVariableStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
+import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
 
 class MapperTest {
     @Test
@@ -1454,6 +1456,24 @@ class MapperTest {
         expectThat(req)
             .and { get { certificateType?.get(0) }.isEqualTo(GetCertificateIdUseEnumTypeGen.CSMSRootCertificate) }
             .and { get { certificateType?.get(1) }.isEqualTo(GetCertificateIdUseEnumTypeGen.MORootCertificate) }
+    }
+
+    @Test
+    fun setMonitoringLevelMapper() {
+        val mapper: SetMonitoringLevelMapper = Mappers.getMapper(SetMonitoringLevelMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                SetMonitoringLevelResp(
+                        status = GenericStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(GenericStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(SetMonitoringLevelReq(severity = 2))
+        expectThat(req)
+                .and { get { severity }.isEqualTo(2) }
     }
 
     @Test

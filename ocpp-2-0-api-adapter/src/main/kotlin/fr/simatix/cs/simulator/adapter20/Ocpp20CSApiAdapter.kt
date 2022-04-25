@@ -51,6 +51,8 @@ import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfil
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -66,6 +68,7 @@ import fr.simatix.cs.simulator.operation.information.OperationExecution
 import fr.simatix.cs.simulator.operation.information.RequestMetadata
 import fr.simatix.cs.simulator.operation.information.RequestStatus
 import org.mapstruct.factory.Mappers
+import java.net.ConnectException
 
 class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
 
@@ -436,5 +439,23 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
                 req,
                 mapper.genToCoreResp(response.response)
         )
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun setMonitoringLevel(
+            meta: RequestMetadata,
+            req: SetMonitoringLevelReq
+    ): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp> {
+        if(req.severity  < 0 || req.severity > 9) {
+            throw IllegalStateException("Severity should be an integer between 0 and 9")
+        } else {
+            val mapper: SetMonitoringLevelMapper = Mappers.getMapper(SetMonitoringLevelMapper::class.java)
+            val response = csApi.setMonitoringLevel(meta, mapper.coreToGenReq(req))
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+            )
+        }
     }
 }

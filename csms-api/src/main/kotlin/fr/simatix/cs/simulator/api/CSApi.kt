@@ -50,6 +50,8 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
+import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageReq
@@ -126,5 +128,8 @@ interface CSApi {
 
 
     fun setVariableMonitoring(meta: RequestMetadata, req: SetVariableMonitoringReq): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp>
+
+
+    fun setMonitoringLevel(meta: RequestMetadata, req: SetMonitoringLevelReq): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp>
 
 }
