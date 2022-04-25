@@ -111,7 +111,7 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.MonitoringDat
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonitoringType
-import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -142,6 +142,11 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnum
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringDataType
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringResultType
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
+import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -1422,6 +1427,47 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `setVariableMonitoring request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetVariableMonitoringReq(
+                        listOf (
+                                SetMonitoringDataType(
+                                    id=0,
+                                    transaction = false,
+                                    value = 432.4,
+                                    type = MonitorEnumType.Periodic,
+                                    severity =3,
+                                    component= ComponentType("name"),
+                                    variable = VariableType("name")
+
+                                )
+                        )
+                ),
+                "SetVariableMonitoringRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetVariableMonitoringReq(
+                        listOf(
+                            SetMonitoringDataType(
+                                    value = 432.4,
+                                    type = MonitorEnumType.Periodic,
+                                    severity =3,
+                                    component=ComponentType("name"),
+                                    variable = VariableType("name")
+                            )
+                        )
+                ),
+                "SetVariableMonitoringRequest.json"
+        )
+
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -2212,6 +2258,47 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
                 UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.Unpublished),
                 "UnpublishFirmwareResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setVariableMonitoring response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetVariableMonitoringResp
+                (
+                    setMonitoringResult =listOf(
+                         SetMonitoringResultType(
+                                id=23,
+                                status=SetMonitoringStatusEnumType.Accepted,
+                                type=MonitorEnumType.Delta,
+                                severity=3,
+                                component=ComponentType("name"),
+                                variable=VariableType("name"),
+                                statusInfo=StatusInfoType("reason","info")
+                        )
+                    )
+                ),
+                "SetVariableMonitoringResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetVariableMonitoringResp
+                (
+                        setMonitoringResult =listOf(
+                                SetMonitoringResultType(
+                                        status=SetMonitoringStatusEnumType.Accepted,
+                                        type=MonitorEnumType.Delta,
+                                        severity=3,
+                                        component=ComponentType("name"),
+                                        variable=VariableType("name"),
+                                )
+                        )
+                ),
+                "SetVariableMonitoringResponse.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }

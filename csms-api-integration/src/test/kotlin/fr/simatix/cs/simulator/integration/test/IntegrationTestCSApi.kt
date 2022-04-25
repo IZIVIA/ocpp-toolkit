@@ -48,6 +48,7 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -79,6 +80,9 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -95,6 +99,7 @@ import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.Unpublish
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import fr.simatix.cs.simulator.integration.ApiFactory
 import fr.simatix.cs.simulator.integration.model.Settings
 import fr.simatix.cs.simulator.integration.model.TransportEnum
@@ -446,6 +451,26 @@ class IntegrationTestCSApi {
                     req: UnpublishFirmwareReq
             ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
                 val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun setVariableMonitoring(
+                    meta: RequestMetadata,
+                    req: SetVariableMonitoringReq
+            ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
+                val response = SetVariableMonitoringResp(
+                    listOf(
+                        SetMonitoringResultType (
+                                id = 23,
+                                status = SetMonitoringStatusEnumType.Accepted,
+                                type = MonitorEnumType.Delta,
+                                severity = 3,
+                                component = ComponentType("name"),
+                                variable = VariableType("name"),
+                                statusInfo = StatusInfoType("reason", "info")
+                        )
+                    )
+                )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -844,6 +869,30 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SetVariableMonitoring",
+                "{\"setMonitoringData\": " +
+                            "[{" +
+                                "\"id\": 32," +
+                                "\"transaction\": false," +
+                                "\"value\": 45.3," +
+                                "\"type\": \"UpperThreshold\"," +
+                                "\"severity\": 2," +
+                                "\"component\": " +
+                                    "{" +
+                                        "\"name\": \"name\"" +
+                                    "}," +
+                                "\"variable\":" +
+                                    "{" +
+                                        "\"name\": \"name\"" +
+                                    "}" +
+                            "}]" +
+                        "}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -872,6 +921,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getInstalledCertificateIds(any(), any())
         verify(csApiSpy, times(1)).unpublishFirmware(any(), any())
         verify(csApiSpy, times(1)).getChargingProfiles(any(), any())
+        verify(csApiSpy, times(1)).setVariableMonitoring(any(), any())
 
         csmsApi.close()
     }

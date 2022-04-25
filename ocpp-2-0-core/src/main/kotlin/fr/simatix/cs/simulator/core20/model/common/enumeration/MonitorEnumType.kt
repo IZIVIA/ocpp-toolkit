@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration
+package fr.simatix.cs.simulator.core20.model.common.enumeration
 
 enum class MonitorEnumType(val value: String) {
     UpperThreshold("UpperThreshold"),
