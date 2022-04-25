@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareResp
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
@@ -156,6 +158,8 @@ import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTr
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import kotlinx.datetime.Instant
@@ -1509,6 +1513,22 @@ class MapperTest {
                 .and { get { customerCertificate?.issuerNameHash }.isEqualTo("issuerNameHash") }
                 .and { get { customerCertificate?.issuerKeyHash }.isEqualTo("issuerKeyHash") }
                 .and { get { customerCertificate?.serialNumber }.isEqualTo("serial") }
+    }
+
+    @Test
+    fun unpublishFirmwareMapper() {
+        val mapper: UnpublishFirmwareMapper = Mappers.getMapper(UnpublishFirmwareMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                UnpublishFirmwareResp(
+                    UnpublishFirmwareStatusEnumTypeGen.DownloadOngoing
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(UnpublishFirmwareStatusEnumType.DownloadOngoing) }
+
+        val req = mapper.coreToGenReq(UnpublishFirmwareReq("checksum"))
+        expectThat(req)
+                .and { get { checksum }.isEqualTo("checksum") }
     }
 }
 

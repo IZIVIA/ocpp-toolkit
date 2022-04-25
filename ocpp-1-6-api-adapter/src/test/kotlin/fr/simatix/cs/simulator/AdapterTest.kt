@@ -87,6 +87,8 @@ import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessa
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.UnpublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
@@ -397,6 +399,13 @@ class AdapterTest {
                 meta: RequestMetadata,
                 req: CustomerInformationReq
         ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+            throw NotImplementedError()
+        }
+
+        override fun unpublishFirmware(
+                meta: RequestMetadata,
+                req: UnpublishFirmwareReq
+        ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
             throw NotImplementedError()
         }
     }

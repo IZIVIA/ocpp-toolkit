@@ -161,6 +161,9 @@ import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMe
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.enumeration.UnlockStatusEnumType
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareResp
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.FirmwareType
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
@@ -1183,6 +1186,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `unpublishFirmware request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                UnpublishFirmwareReq("checksum"),
+                "UnpublishFirmwareRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+    }
+
+    @Test
     fun `getInstalledCertificateIds request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
                 GetInstalledCertificateIdsReq(
@@ -2134,6 +2147,16 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
                 ReportChargingProfilesResp(),
                 "ReportChargingProfilesResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `unpublishFirmware response format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.Unpublished),
+                "UnpublishFirmwareResponse.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }

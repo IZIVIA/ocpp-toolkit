@@ -53,6 +53,8 @@ import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorReq
 import fr.simatix.cs.simulator.core20.model.unlockconnector.UnlockConnectorResp
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.unpublishfirmware.UnpublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareReq
 import fr.simatix.cs.simulator.core20.model.updatefirmware.UpdateFirmwareResp
 import fr.simatix.cs.simulator.operation.information.ExecutionMetadata
@@ -386,6 +388,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
         val mapper: CustomerInformationMapper = Mappers.getMapper(CustomerInformationMapper::class.java)
         val response = csApi.customerInformation(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun unpublishFirmware(
+            meta: RequestMetadata,
+            req: UnpublishFirmwareReq
+    ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
+        val mapper: UnpublishFirmwareMapper = Mappers.getMapper(UnpublishFirmwareMapper::class.java)
+        val response = csApi.unpublishFirmware(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,
