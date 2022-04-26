@@ -35,6 +35,9 @@ import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedCharging
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
@@ -1169,6 +1172,57 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `customerInformation request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                CustomerInformationReq(
+                        requestId = 3,
+                        report = false,
+                        clear =true,
+                        customerIdentifier ="identifier",
+                        idToken = IdTokenType(
+                                idToken = "idToken",
+                                type = IdTokenEnumType.Central,
+                                additionalInfo = listOf(
+                                        AdditionalInfoType(
+                                                "add",
+                                                "value"
+                                        ),
+                                        AdditionalInfoType(
+                                                "add",
+                                                "value"
+                                        ),
+                                        AdditionalInfoType(
+                                                "add",
+                                                "value"
+                                        )
+                                )
+                        ),
+                        customerCertificate = CertificateHashDataType(
+                                hashAlgorithm=HashAlgorithmEnumType.SHA512,
+                                issuerNameHash="issuerNameHash",
+                                issuerKeyHash="issuerKeyHash",
+                                serialNumber="serial"
+                        ),
+                ),
+                "CustomerInformationRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                CustomerInformationReq(
+                        requestId = 3,
+                        report = false,
+                        clear =true,
+                        customerIdentifier ="identifier",
+                ),
+                "CustomerInformationRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+    }
+
+
+    @Test
     fun `notifyEVChargingSchedule response format`() {
         val errors = JsonSchemaValidator.isValidObjectV6(
             NotifyEVChargingScheduleResp(
@@ -1897,5 +1951,27 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `customerInformation response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                CustomerInformationResp(
+                        CustomerInformationStatusEnumType.Accepted,
+                        StatusInfoType("reason","code")
+                ),
+                "CustomerInformationResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                CustomerInformationResp(
+                        CustomerInformationStatusEnumType.Accepted
+                ),
+                "CustomerInformationResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
     }
 }

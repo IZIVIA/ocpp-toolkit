@@ -15,6 +15,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -345,6 +347,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun customerInformation(
+            meta: RequestMetadata,
+            req: CustomerInformationReq
+    ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+        val mapper: CustomerInformationMapper = Mappers.getMapper(CustomerInformationMapper::class.java)
+        val response = csApi.customerInformation(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
         )
     }
 }

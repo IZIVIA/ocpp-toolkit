@@ -78,6 +78,9 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
@@ -375,6 +378,16 @@ class IntegrationTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             throw NotImplementedError()
+        }
+
+        override fun customerInformation(
+                meta: RequestMetadata,
+                req: CustomerInformationReq
+        ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+            val response = CustomerInformationResp(
+                    CustomerInformationStatusEnumType.Accepted,
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
 

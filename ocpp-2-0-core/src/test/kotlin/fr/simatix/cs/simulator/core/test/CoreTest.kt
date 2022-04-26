@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -235,6 +237,13 @@ class CoreTest {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 TODO("Not implemented")
+            }
+
+            override fun customerInformation(
+                    meta: RequestMetadata,
+                    req: CustomerInformationReq
+            ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+                TODO("Not yet implemented")
             }
         }
 

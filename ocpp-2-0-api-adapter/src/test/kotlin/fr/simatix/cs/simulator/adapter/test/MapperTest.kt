@@ -4,6 +4,8 @@ import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType as CustomerInformationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumType as MessageFormatEnumTypeGen
@@ -129,6 +131,8 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -1292,6 +1296,52 @@ class MapperTest {
         val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
         expectThat(req)
             .and { get { id }.isEqualTo(2) }
+    }
+
+    @Test
+    fun customerInformationMapper() {
+        val mapper: CustomerInformationMapper = Mappers.getMapper(CustomerInformationMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                CustomerInformationResp(
+                        status = CustomerInformationStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(CustomerInformationStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+                CustomerInformationReq(
+                        requestId = 3,
+                        report = false,
+                        clear =true,
+                        customerIdentifier ="identifier",
+                        idToken = IdTokenType(
+                                idToken = "idToken",
+                                type = IdTokenEnumType.Central,
+                                additionalInfo = null
+                        ),
+                        customerCertificate = CertificateHashDataType(
+                                hashAlgorithm=HashAlgorithmEnumType.SHA512,
+                                issuerNameHash="issuerNameHash",
+                                issuerKeyHash="issuerKeyHash",
+                                serialNumber="serial"
+                        ),
+                )
+        )
+        expectThat(req)
+                .and { get { requestId }.isEqualTo(3) }
+                .and { get { report }.isEqualTo(false) }
+                .and { get { clear }.isEqualTo(true) }
+                .and { get { customerIdentifier }.isEqualTo("identifier") }
+                .and { get { idToken?.idToken }.isEqualTo("idToken") }
+                .and { get { idToken?.type }.isEqualTo(IdTokenEnumTypeGen.Central) }
+                .and { get { idToken?.additionalInfo }.isEqualTo(null) }
+                .and { get { customerCertificate?.hashAlgorithm }.isEqualTo(HashAlgorithmEnumTypeGen.SHA512) }
+                .and { get { customerCertificate?.issuerNameHash }.isEqualTo("issuerNameHash") }
+                .and { get { customerCertificate?.issuerKeyHash }.isEqualTo("issuerKeyHash") }
+                .and { get { customerCertificate?.serialNumber }.isEqualTo("serial") }
     }
 }
 
