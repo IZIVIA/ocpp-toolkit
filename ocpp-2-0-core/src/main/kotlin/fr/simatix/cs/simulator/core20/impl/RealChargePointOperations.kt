@@ -14,6 +14,7 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -245,6 +246,13 @@ class RealChargePointOperations(
             csmsOperations.clearDisplayMessage(
                 RequestMetadata(chargeStationId),
                 req
+            ).response
+        }
+
+        client.receiveMessage("CustomerInformation") { req: CustomerInformationReq ->
+            csmsOperations.customerInformation(
+                    RequestMetadata(chargeStationId),
+                    req
             ).response
         }
     }

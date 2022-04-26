@@ -22,6 +22,9 @@ import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessage
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
@@ -463,6 +466,16 @@ class AdapterTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun customerInformation(
+                meta: RequestMetadata,
+                req: CustomerInformationReq
+        ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+            val response = CustomerInformationResp(
+                    CustomerInformationStatusEnumType.Accepted
+            )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

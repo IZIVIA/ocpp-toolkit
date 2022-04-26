@@ -35,6 +35,9 @@ import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -352,6 +355,16 @@ class IntegrationTestCSApi {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun customerInformation(
+                    meta: RequestMetadata,
+                    req: CustomerInformationReq
+            ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
+                val response = CustomerInformationResp(
+                        CustomerInformationStatusEnumType.Accepted,
+                )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -683,6 +696,31 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "CustomerInformation",
+                "{" +
+                            "\"requestId\": 12378, " +
+                            "\"report\": false," +
+                            "\"clear\": false," +
+                            "\"customerIdentifier\": \"identifier\"," +
+                            "\"idToken\": " +
+                                "{" +
+                                    "\"idToken\": \"id1378\"," +
+                                    "\"type\": \"Central\"" +
+                                "}," +
+                            "\"customerCertificate\": " +
+                                "{" +
+                                    "\"hashAlgorithm\": \"SHA512\"," +
+                                    "\"issuerNameHash\": \"issuernamehash\"," +
+                                    "\"issuerKeyHash\": \"issuerkeyhash\"," +
+                                    "\"serialNumber\": \"serialn\"" +
+                                "}" +
+                        "}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -706,6 +744,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
         verify(csApiSpy, times(1)).clearDisplayMessage(any(), any())
         verify(csApiSpy, times(1)).certificateSigned(any(), any())
+        verify(csApiSpy, times(1)).customerInformation(any(), any())
 
         csmsApi.close()
     }
