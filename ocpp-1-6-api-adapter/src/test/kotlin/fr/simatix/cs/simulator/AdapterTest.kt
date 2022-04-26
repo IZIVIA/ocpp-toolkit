@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -374,6 +376,13 @@ class AdapterTest {
             meta: RequestMetadata,
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+            throw NotImplementedError()
+        }
+
+        override fun getInstalledCertificateIds(
+            meta: RequestMetadata,
+            req: GetInstalledCertificateIdsReq
+        ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
             throw NotImplementedError()
         }
 
