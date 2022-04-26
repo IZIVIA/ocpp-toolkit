@@ -71,6 +71,10 @@ import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateResp
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.enumeration.UploadLogStatusEnumType
@@ -1172,6 +1176,21 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `installCertificate request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                InstallCertificateReq(
+                        InstallCertificateUseEnumType.CSMSRootCertificate,
+                        "certificate"
+                ),
+                "InstallCertificateRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+    }
+
+
+    @Test
     fun `customerInformation request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
                 CustomerInformationReq(
@@ -1951,6 +1970,29 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `installCertificate response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                InstallCertificateResp(
+                    InstallCertificateStatusEnumType.Accepted,
+                    StatusInfoType("reason","info")
+                ),
+                "InstallCertificateResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                InstallCertificateResp(
+                        InstallCertificateStatusEnumType.Accepted
+                ),
+                "InstallCertificateResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
     }
 
     @Test

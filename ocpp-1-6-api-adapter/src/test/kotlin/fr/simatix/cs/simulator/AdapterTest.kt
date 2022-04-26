@@ -48,6 +48,8 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
@@ -372,6 +374,13 @@ class AdapterTest {
             meta: RequestMetadata,
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
+            throw NotImplementedError()
+        }
+
+        override fun installCertificate(
+                meta: RequestMetadata,
+                req: InstallCertificateReq
+        ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
             throw NotImplementedError()
         }
 

@@ -44,6 +44,10 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateUseEnumType
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -466,6 +470,17 @@ class AdapterTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun installCertificate(
+                meta: RequestMetadata,
+                req: InstallCertificateReq
+        ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
+            val response = InstallCertificateResp(
+                InstallCertificateStatusEnumType.Accepted,
+                StatusInfoTypeGen("reason","info")
+            )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 

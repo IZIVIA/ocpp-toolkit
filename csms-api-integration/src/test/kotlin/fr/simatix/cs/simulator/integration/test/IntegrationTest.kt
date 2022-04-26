@@ -81,6 +81,9 @@ import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
@@ -378,6 +381,17 @@ class IntegrationTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             throw NotImplementedError()
+        }
+
+        override fun installCertificate(
+                meta: RequestMetadata,
+                req: InstallCertificateReq
+        ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
+            val response = InstallCertificateResp(
+                    InstallCertificateStatusEnumType.Accepted,
+                    StatusInfoType("reason","info")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun customerInformation(
