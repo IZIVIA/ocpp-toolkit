@@ -1,6 +1,7 @@
 package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.CSApi
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationReq
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
@@ -19,6 +20,7 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearC
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
@@ -35,6 +37,11 @@ import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
@@ -381,6 +388,41 @@ class IntegrationTestCSApi {
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun getInstalledCertificateIds(
+                    meta: RequestMetadata,
+                    req: GetInstalledCertificateIdsReq
+            ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
+                val response = GetInstalledCertificateIdsResp(
+                        GetInstalledCertificateStatusEnumType.Accepted,
+                        listOf(
+                                CertificateHashDataChainType(
+                                        GetCertificateIdUseEnumType.CSMSRootCertificate,
+                                        CertificateHashDataType(
+                                            HashAlgorithmEnumType.SHA512,
+                                                "",
+                                                "",
+                                                ""
+                                        ),
+                                        listOf(
+                                                CertificateHashDataType(
+                                                        HashAlgorithmEnumType.SHA512,
+                                                        "",
+                                                        "",
+                                                        ""
+                                                ),
+                                                CertificateHashDataType(
+                                                        HashAlgorithmEnumType.SHA512,
+                                                        "",
+                                                        "",
+                                                        "")
+                                        )
+                                ),
+                        ),
+                        StatusInfoType("reason", "info")
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
         }
     }
 
@@ -713,6 +755,19 @@ class IntegrationTestCSApi {
         server.sendBlocking(
                 "chargePoint2", WampMessage(
                 WampMessageType.CALL, "1",
+                "GetInstalledCertificateIds",
+                "{\"certificateType\": " +
+                            "[" +
+                                "\"MORootCertificate\"," +
+                                "\"CSMSRootCertificate\"" +
+                            "]" +
+                        "}"
+            )
+        )
+
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
                 "InstallCertificate", "{\"certificateType\": \"CSMSRootCertificate\", \"certificate\": \"certificateString\"}"
             )
         )
@@ -766,6 +821,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).certificateSigned(any(), any())
         verify(csApiSpy, times(1)).customerInformation(any(), any())
         verify(csApiSpy, times(1)).installCertificate(any(), any())
+        verify(csApiSpy, times(1)).getInstalledCertificateIds(any(), any())
 
         csmsApi.close()
     }

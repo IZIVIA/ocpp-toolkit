@@ -4,6 +4,7 @@ import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType as CertificateHashDataTypeGen
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType as CustomerInformationStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.MessageContentType as MessageContentTypeGen
@@ -14,6 +15,10 @@ import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransfe
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType as GetCertificateIdUseEnumTypeGen
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType as GetInstalledCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
@@ -135,6 +140,9 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
@@ -1302,6 +1310,84 @@ class MapperTest {
         val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
         expectThat(req)
             .and { get { id }.isEqualTo(2) }
+    }
+
+    @Test
+    fun getInstalledCertificateIds() {
+        val mapper: GetInstalledCertificateIdsMapper = Mappers.getMapper(GetInstalledCertificateIdsMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            GetInstalledCertificateIdsResp(
+                status = GetInstalledCertificateStatusEnumTypeGen.Accepted,
+                certificateHashDataChain = listOf(
+                    CertificateHashDataChainType(
+                        GetCertificateIdUseEnumTypeGen.CSMSRootCertificate,
+                        CertificateHashDataTypeGen(
+                            HashAlgorithmEnumTypeGen.SHA512,
+                            "issuerNameHash",
+                            "issuerKeyHash",
+                            "serial"
+                        ),
+                        listOf(
+                            CertificateHashDataTypeGen(
+                                HashAlgorithmEnumTypeGen.SHA512,
+                                "issuerNameHash",
+                                "issuerKeyHash",
+                                "serial"
+                            ),
+                            CertificateHashDataTypeGen(
+                                HashAlgorithmEnumTypeGen.SHA512,
+                                "issuerNameHash2",
+                                "issuerKeyHash2",
+                                "serial2"
+                            )
+                        )
+                    ),
+                ),
+                statusInfo = StatusInfoTypeGen("reason", "info")
+            )
+        )
+        expectThat(resp)
+            .and { get { status }.isEqualTo(GetInstalledCertificateStatusEnumType.Accepted) }
+            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "info")) }
+
+            .and { get { certificateHashDataChain?.get(0)?.certificateType }.isEqualTo(GetCertificateIdUseEnumType.CSMSRootCertificate) }
+            .and {
+                get { certificateHashDataChain?.get(0)?.certificateHashData }
+                    .and {
+                        get { this?.hashAlgorithm }.isEqualTo(HashAlgorithmEnumType.SHA512)
+                        get { this?.issuerNameHash }.isEqualTo("issuerNameHash")
+                        get { this?.hashAlgorithm }.isEqualTo(HashAlgorithmEnumType.SHA512)
+                        get { this?.issuerNameHash }.isEqualTo("issuerNameHash")
+                        get { this?.issuerKeyHash }.isEqualTo("issuerKeyHash")
+                        get { this?.serialNumber }.isEqualTo("serial")
+                    }
+            }
+            .and {
+                get { certificateHashDataChain?.get(0)?.childCertificateHashData }
+                    .and {
+                        get { this?.get(0)?.hashAlgorithm }.isEqualTo(HashAlgorithmEnumType.SHA512)
+                        get { this?.get(0)?.issuerNameHash }.isEqualTo("issuerNameHash")
+                        get { this?.get(0)?.issuerKeyHash }.isEqualTo("issuerKeyHash")
+                        get { this?.get(0)?.serialNumber }.isEqualTo("serial")
+                        get { this?.get(1)?.hashAlgorithm }.isEqualTo(HashAlgorithmEnumType.SHA512)
+                        get { this?.get(1)?.issuerNameHash }.isEqualTo("issuerNameHash2")
+                        get { this?.get(1)?.issuerKeyHash }.isEqualTo("issuerKeyHash2")
+                        get { this?.get(1)?.serialNumber }.isEqualTo("serial2")
+                    }
+            }
+
+        val req = mapper.coreToGenReq(
+            GetInstalledCertificateIdsReq(
+                certificateType = listOf(
+                    GetCertificateIdUseEnumType.CSMSRootCertificate,
+                    GetCertificateIdUseEnumType.MORootCertificate
+                )
+            )
+        )
+
+        expectThat(req)
+            .and { get { certificateType?.get(0) }.isEqualTo(GetCertificateIdUseEnumTypeGen.CSMSRootCertificate) }
+            .and { get { certificateType?.get(1) }.isEqualTo(GetCertificateIdUseEnumTypeGen.MORootCertificate) }
     }
 
     @Test

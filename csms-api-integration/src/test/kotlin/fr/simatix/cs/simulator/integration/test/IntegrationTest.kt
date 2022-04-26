@@ -78,6 +78,11 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
@@ -381,6 +386,42 @@ class IntegrationTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             throw NotImplementedError()
+        }
+
+        override fun getInstalledCertificateIds(
+                meta: RequestMetadata,
+                req: GetInstalledCertificateIdsReq
+        ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
+            val response = GetInstalledCertificateIdsResp(
+                    GetInstalledCertificateStatusEnumType.Accepted,
+                    listOf(
+                            CertificateHashDataChainType(
+                                    GetCertificateIdUseEnumType.CSMSRootCertificate,
+                                    CertificateHashDataType(
+                                            HashAlgorithmEnumType.SHA512,
+                                            "",
+                                            "",
+                                            ""
+                                    ),
+                                    listOf(
+                                            CertificateHashDataType(
+                                                    HashAlgorithmEnumType.SHA512,
+                                                    "",
+                                                    "",
+                                                    ""
+                                            ),
+                                            CertificateHashDataType(
+                                                    HashAlgorithmEnumType.SHA512,
+                                                    "",
+                                                    "",
+                                                    ""
+                                            )
+                                    )
+                            ),
+                    ),
+                    StatusInfoType("reason", "info")
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun installCertificate(

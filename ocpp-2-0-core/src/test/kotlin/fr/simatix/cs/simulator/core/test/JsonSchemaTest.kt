@@ -53,9 +53,11 @@ import fr.simatix.cs.simulator.core20.model.getcertificatestatus.enumeration.Get
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -1179,10 +1181,10 @@ class JsonSchemaTest {
     }
 
     @Test
-    fun `getInstalledCertificatesIds request format`() {
+    fun `getInstalledCertificateIds request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
                 GetInstalledCertificateIdsReq(
-                        GetCertificateIdUseEnumType.CSMSRootCertificate
+                        listOf(GetCertificateIdUseEnumType.CSMSRootCertificate)
                 ),
                 "GetInstalledCertificateIdsRequest.json"
         )
@@ -1997,10 +1999,16 @@ class JsonSchemaTest {
 
     @Test
     fun `getInstalledCertificateIds response format`() {
-        TODO("after merge dev into")
+
         var errors = JsonSchemaValidator.isValidObjectV6(
                 GetInstalledCertificateIdsResp(
-
+                    GetInstalledCertificateStatusEnumType.Accepted,
+                    listOf(
+                            CertificateHashDataChainType(GetCertificateIdUseEnumType.CSMSRootCertificate, CertificateHashDataType(
+                                HashAlgorithmEnumType.SHA512,"","",""),listOf(CertificateHashDataType(
+                                HashAlgorithmEnumType.SHA512,"","",""),CertificateHashDataType(HashAlgorithmEnumType.SHA512,"","",""))),
+                    ),
+                    StatusInfoType("reason","info")
                 ),
                 "GetInstalledCertificateIdsResponse.json"
         )
@@ -2009,9 +2017,9 @@ class JsonSchemaTest {
 
         errors = JsonSchemaValidator.isValidObjectV6(
                 GetInstalledCertificateIdsResp(
-
+                        GetInstalledCertificateStatusEnumType.Accepted,
                 ),
-                "ClearDisplayMessageResponse.json"
+                "GetInstalledCertificateIdsResponse.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
