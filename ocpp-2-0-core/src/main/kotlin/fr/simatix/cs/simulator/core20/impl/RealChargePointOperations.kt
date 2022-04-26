@@ -29,6 +29,7 @@ import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
@@ -246,6 +247,13 @@ class RealChargePointOperations(
             csmsOperations.clearDisplayMessage(
                 RequestMetadata(chargeStationId),
                 req
+            ).response
+        }
+
+        client.receiveMessage("InstallCertificate") { req: InstallCertificateReq ->
+            csmsOperations.installCertificate(
+                    RequestMetadata(chargeStationId),
+                    req
             ).response
         }
 

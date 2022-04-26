@@ -31,6 +31,8 @@ import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
@@ -347,6 +349,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun installCertificate(
+            meta: RequestMetadata,
+            req: InstallCertificateReq
+    ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
+        val mapper: InstallCertificateMapper = Mappers.getMapper(InstallCertificateMapper::class.java)
+        val response = csApi.installCertificate(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
         )
     }
 

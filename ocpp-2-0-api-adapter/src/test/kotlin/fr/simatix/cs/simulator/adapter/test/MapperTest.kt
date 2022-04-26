@@ -18,6 +18,10 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType as InstallCertificateStatusEnumTypeGen
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateUseEnumType as InstallCertificateUseEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
@@ -133,6 +137,8 @@ import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -1296,6 +1302,30 @@ class MapperTest {
         val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
         expectThat(req)
             .and { get { id }.isEqualTo(2) }
+    }
+
+    @Test
+    fun installCertificateMapper() {
+        val mapper: InstallCertificateMapper = Mappers.getMapper(InstallCertificateMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                InstallCertificateResp(
+                        status = InstallCertificateStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(InstallCertificateStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+                InstallCertificateReq(
+                        certificateType=InstallCertificateUseEnumType.CSMSRootCertificate,
+                        certificate="certificate"
+                )
+        )
+        expectThat(req)
+                .and { get { certificateType }.isEqualTo(InstallCertificateUseEnumTypeGen.CSMSRootCertificate) }
+                .and { get { certificate }.isEqualTo("certificate") }
     }
 
     @Test

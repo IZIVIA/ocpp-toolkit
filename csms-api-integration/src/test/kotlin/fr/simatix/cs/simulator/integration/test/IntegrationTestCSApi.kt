@@ -49,6 +49,9 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
+import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -364,6 +367,17 @@ class IntegrationTestCSApi {
             ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
                 val response = CustomerInformationResp(
                         CustomerInformationStatusEnumType.Accepted,
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun installCertificate(
+                    meta: RequestMetadata,
+                    req: InstallCertificateReq
+            ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
+                val response = InstallCertificateResp(
+                        InstallCertificateStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
@@ -699,6 +713,12 @@ class IntegrationTestCSApi {
         server.sendBlocking(
                 "chargePoint2", WampMessage(
                 WampMessageType.CALL, "1",
+                "InstallCertificate", "{\"certificateType\": \"CSMSRootCertificate\", \"certificate\": \"certificateString\"}"
+            )
+        )
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
                 "CustomerInformation",
                 "{" +
                             "\"requestId\": 12378, " +
@@ -745,6 +765,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).clearDisplayMessage(any(), any())
         verify(csApiSpy, times(1)).certificateSigned(any(), any())
         verify(csApiSpy, times(1)).customerInformation(any(), any())
+        verify(csApiSpy, times(1)).installCertificate(any(), any())
 
         csmsApi.close()
     }
