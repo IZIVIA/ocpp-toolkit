@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model.authorize.enumeration
+package fr.simatix.cs.simulator.api.model.common.enumeration
 
 enum class HashAlgorithmEnumType(val value: String) {
     SHA256("SHA256"),

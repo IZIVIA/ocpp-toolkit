@@ -1,6 +1,6 @@
 package fr.simatix.cs.simulator.api.model.common
 
-import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType
 
 data class CertificateHashDataType(
         val hashAlgorithm : HashAlgorithmEnumType,

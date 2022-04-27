@@ -3,7 +3,7 @@ package fr.simatix.cs.simulator.core.test
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
 import fr.simatix.cs.simulator.core20.model.authorize.enumeration.AuthorizeCertificateStatusEnumType
-import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
@@ -1198,7 +1198,7 @@ class JsonSchemaTest {
                                 )
                         ),
                         customerCertificate = CertificateHashDataType(
-                                hashAlgorithm=HashAlgorithmEnumType.SHA512,
+                                hashAlgorithm= HashAlgorithmEnumType.SHA512,
                                 issuerNameHash="issuerNameHash",
                                 issuerKeyHash="issuerKeyHash",
                                 serialNumber="serial"
