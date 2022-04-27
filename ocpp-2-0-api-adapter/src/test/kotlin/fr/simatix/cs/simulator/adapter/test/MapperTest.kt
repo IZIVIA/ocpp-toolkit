@@ -48,7 +48,7 @@ import fr.simatix.cs.simulator.api.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.api.model.triggermessage.TriggerMessageResp
 import fr.simatix.cs.simulator.api.model.unlockconnector.UnlockConnectorResp
 import fr.simatix.cs.simulator.api.model.updatefirmware.UpdateFirmwareResp
-import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import fr.simatix.cs.simulator.core20.model.cancelreservation.CancelReservationReq
@@ -146,7 +146,7 @@ import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
-import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import strikt.assertions.isTrue
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType as CancelReservationStatusEnumTypeGen
@@ -1323,7 +1323,7 @@ class MapperTest {
                                 additionalInfo = null
                         ),
                         customerCertificate = CertificateHashDataType(
-                                hashAlgorithm=HashAlgorithmEnumType.SHA512,
+                                hashAlgorithm= HashAlgorithmEnumType.SHA512,
                                 issuerNameHash="issuerNameHash",
                                 issuerKeyHash="issuerKeyHash",
                                 serialNumber="serial"

@@ -2,7 +2,7 @@ package fr.simatix.cs.simulator.integration.test
 
 import fr.simatix.cs.simulator.api.CSApi
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq
-import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType

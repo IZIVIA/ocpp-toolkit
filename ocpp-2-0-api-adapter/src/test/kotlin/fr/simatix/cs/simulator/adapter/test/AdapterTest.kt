@@ -78,7 +78,7 @@ import fr.simatix.cs.simulator.core20.ChargePointOperations
 import fr.simatix.cs.simulator.core20.impl.RealChargePointOperations
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeReq
 import fr.simatix.cs.simulator.core20.model.authorize.AuthorizeResp
-import fr.simatix.cs.simulator.core20.model.authorize.enumeration.HashAlgorithmEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.HashAlgorithmEnumType
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationReq
 import fr.simatix.cs.simulator.core20.model.bootnotification.BootNotificationResp
 import fr.simatix.cs.simulator.core20.model.bootnotification.ChargingStationType
@@ -174,7 +174,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
-import fr.simatix.cs.simulator.api.model.authorize.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.HashAlgorithmEnumType as HashAlgorithmEnumTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
 import fr.simatix.cs.simulator.api.model.bootnotification.ChargingStationType as ChargingStationTypeGen
 import fr.simatix.cs.simulator.api.model.bootnotification.enumeration.BootReasonEnumType as BootReasonEnumTypeGen
