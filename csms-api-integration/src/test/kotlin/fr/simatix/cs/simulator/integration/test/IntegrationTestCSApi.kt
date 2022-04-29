@@ -60,6 +60,8 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
@@ -378,6 +380,14 @@ class IntegrationTestCSApi {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun publishFirmware(
+                    meta: RequestMetadata,
+                    req: PublishFirmwareReq
+            ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
+                val response = PublishFirmwareResp(GenericStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
 
@@ -885,6 +895,20 @@ class IntegrationTestCSApi {
         server.sendBlocking(
                 "chargePoint2", WampMessage(
                 WampMessageType.CALL, "1",
+                "PublishFirmware",
+                "{" +
+                            "\"location\": \"location string\", " +
+                            "\"retries\": 312, " +
+                            "\"checksum\": \"identifier string\", " +
+                            "\"requestId\": 23, " +
+                            "\"retryInterval\": 32 " +
+                        "}"
+            )
+        )
+
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
                 "SetVariableMonitoring",
                 "{\"setMonitoringData\": " +
                             "[{" +
@@ -943,6 +967,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getChargingProfiles(any(), any())
         verify(csApiSpy, times(1)).setVariableMonitoring(any(), any())
         verify(csApiSpy, times(1)).setMonitoringLevel(any(), any())
+        verify(csApiSpy, times(1)).publishFirmware(any(), any())
 
         csmsApi.close()
     }

@@ -36,6 +36,8 @@ import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -249,6 +251,13 @@ class CoreTest {
                 req: ClearDisplayMessageReq
             ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
                 TODO("Not implemented")
+            }
+
+            override fun publishFirmware(
+                    meta: RequestMetadata,
+                    req: PublishFirmwareReq
+            ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
+                TODO("Not yet implemented")
             }
 
             override fun getChargingProfiles(meta: RequestMetadata, req: GetChargingProfilesReq): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {

@@ -115,6 +115,8 @@ import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
@@ -1480,6 +1482,33 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `publishFirmware request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            PublishFirmwareReq(
+                    "location",
+                    "identifier string",
+                    43,
+                    24243,
+                    23443
+            ),
+            "PublishFirmwareRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                PublishFirmwareReq(
+                        location="location",
+                        checksum="identifier string",
+                        requestId=24243,
+                ),
+                "PublishFirmwareRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -2294,6 +2323,28 @@ class JsonSchemaTest {
         val errors = JsonSchemaValidator.isValidObjectV6(
                 UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.Unpublished),
                 "UnpublishFirmwareResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `publishFirmware response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                PublishFirmwareResp(
+                        GenericStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "PublishFirmwareResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                PublishFirmwareResp(
+                        GenericStatusEnumType.Accepted
+                ),
+                "PublishFirmwareResponse.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }

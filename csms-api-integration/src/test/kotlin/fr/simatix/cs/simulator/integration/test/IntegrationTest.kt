@@ -79,6 +79,14 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotificationReq
+import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
@@ -474,6 +482,14 @@ class IntegrationTest {
                 req: UnpublishFirmwareReq
         ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
             val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun publishFirmware(
+                meta: RequestMetadata,
+                req: PublishFirmwareReq
+        ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
+            val response = PublishFirmwareResp(GenericStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 

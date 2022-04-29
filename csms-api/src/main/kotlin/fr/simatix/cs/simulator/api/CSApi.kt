@@ -34,6 +34,8 @@ import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
@@ -126,6 +128,8 @@ interface CSApi {
 
     fun unpublishFirmware(meta: RequestMetadata, req: UnpublishFirmwareReq): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp>
 
+
+    fun publishFirmware(meta: RequestMetadata, req: PublishFirmwareReq): OperationExecution<PublishFirmwareReq, PublishFirmwareResp>
 
     fun setVariableMonitoring(meta: RequestMetadata, req: SetVariableMonitoringReq): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp>
 
