@@ -52,6 +52,7 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportResp
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -287,6 +288,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetChargingProfiles") { req: GetChargingProfilesReq ->
             csmsOperations.getChargingProfiles(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("PublishFirmware") { req: PublishFirmwareReq ->
+            csmsOperations.publishFirmware(
                     RequestMetadata(chargeStationId),
                     req
             ).response

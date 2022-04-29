@@ -66,6 +66,8 @@ import fr.simatix.cs.simulator.api.model.logstatusnotification.LogStatusNotifica
 import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionReq
@@ -468,6 +470,14 @@ fun main(args: Array<String>) {
                 StatusInfoType("reason","info")
             )
 
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun publishFirmware(
+                meta: RequestMetadata,
+                req: PublishFirmwareReq
+        ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
+            val response = PublishFirmwareResp(GenericStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 

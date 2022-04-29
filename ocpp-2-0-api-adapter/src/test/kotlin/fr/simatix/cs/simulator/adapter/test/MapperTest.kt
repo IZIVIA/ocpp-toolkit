@@ -17,6 +17,11 @@ import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
+import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
+import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventResp as NotifyEventRespGen
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
 import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
@@ -125,6 +130,20 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
+import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
+import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
+import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
+import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -1597,6 +1616,40 @@ class MapperTest {
                 .and { get { chargingProfile.chargingProfileId}.isEqualTo(listOf(1,2)) }
                 .and { get { chargingProfile.chargingLimitSource}.isEqualTo(listOf(ChargingLimitSourceEnumTypeGen.CSO,ChargingLimitSourceEnumTypeGen.EMS)) }
     }
+
+    @Test
+    fun publishFirmwareMapper() {
+        val mapper: PublishFirmwareMapper = Mappers.getMapper(PublishFirmwareMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                PublishFirmwareResp(
+                        status = GenericStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(GenericStatusEnumType.Accepted)
+            get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+
+        val req = mapper.coreToGenReq(
+                PublishFirmwareReq(
+                        location="location",
+                        retries=1,
+                        checksum="checksum",
+                        requestId = 31,
+                        retryInterval = 4
+                )
+        )
+        expectThat(req) {
+            get { location }.isEqualTo("location")
+            get { retries }.isEqualTo(1)
+            get { checksum }.isEqualTo("checksum")
+            get { requestId }.isEqualTo(31)
+            get { retryInterval }.isEqualTo(4)
+        }
+    }
+}
 
     @Test
     fun setVariableMonitoringMapper() {

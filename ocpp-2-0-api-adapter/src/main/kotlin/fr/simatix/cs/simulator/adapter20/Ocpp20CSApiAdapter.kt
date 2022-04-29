@@ -35,6 +35,8 @@ import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
+import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
@@ -360,6 +362,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun publishFirmware(
+            meta: RequestMetadata,
+            req: PublishFirmwareReq
+    ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
+        val mapper: PublishFirmwareMapper = Mappers.getMapper(PublishFirmwareMapper::class.java)
+        val response = csApi.publishFirmware(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
         )
     }
 
