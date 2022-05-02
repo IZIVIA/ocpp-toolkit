@@ -18,6 +18,8 @@ import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
@@ -163,4 +165,6 @@ interface CSApi {
 
     fun setDisplayMessage(meta: RequestMetadata, req: SetDisplayMessageReq): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp>
 
+
+    fun deleteCertificate(meta: RequestMetadata, req: DeleteCertificateReq): OperationExecution<DeleteCertificateReq, DeleteCertificateResp>
 }

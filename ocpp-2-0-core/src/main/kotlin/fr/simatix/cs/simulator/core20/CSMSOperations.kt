@@ -18,6 +18,8 @@ import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
@@ -159,4 +161,6 @@ interface CSMSOperations {
 
     fun setDisplayMessage(meta: RequestMetadata, req: SetDisplayMessageReq): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp>
 
+
+    fun deleteCertificate(meta: RequestMetadata, req: DeleteCertificateReq): OperationExecution<DeleteCertificateReq, DeleteCertificateResp>
 }
