@@ -16,6 +16,7 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateH
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
@@ -98,7 +99,7 @@ import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
 import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
 import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
+import fr.simatix.cs.simulator.core20.model.common.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
 import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
@@ -166,6 +167,9 @@ import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq as SetDisplayMessageReqGen
 import fr.simatix.cs.simulator.core20.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.enumeration.MonitoringCriterionEnumType
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.enumeration.MonitoringCriterionEnumType as MonitoringCriterionEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -232,7 +236,7 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq as GetLocalListVersionReqGen
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogEnumType as LogEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType as LogStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.getreport.ComponentVariableType as ComponentVariableTypeGen
+import fr.simatix.cs.simulator.api.model.common.ComponentVariableType as ComponentVariableTypeGen
 import fr.simatix.cs.simulator.api.model.getreport.enumeration.ComponentCriterionEnumType as ComponentCriterionEnumTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType as GetVariableResultTypeGen
 import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableStatusEnumType as GetVariableStatusEnumTypeGen
@@ -1879,6 +1883,54 @@ class MapperTest {
                 CostUpdatedRespGen()
         )
         expectThat(resp).isA<CostUpdatedResp>()
+    }
+
+    @Test
+    fun getMonitoringReportMapper() {
+        val mapper: GetMonitoringReportMapper = Mappers.getMapper(GetMonitoringReportMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                GetMonitoringReportResp(
+                    status = GenericDeviceModelStatusEnumTypeGen.Accepted,
+                    statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp)
+                .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+
+        val req = mapper.coreToGenReq(
+                GetMonitoringReportReq(
+                        432768,
+                        listOf(MonitoringCriterionEnumType.DeltaMonitoring),
+                        listOf(ComponentVariableType(
+                              ComponentType(
+                                      "name",
+                                      "instance"
+                              ),
+                                VariableType(
+                                        "name",
+                                        "instance"
+                                )
+                        ))
+                )
+        )
+        expectThat(req)
+            .and { get { requestId }.isEqualTo(432768) }
+            .and { get { monitoringCriteria }.isEqualTo(listOf(MonitoringCriterionEnumTypeGen.DeltaMonitoring)) }
+            .and { get { componentVariable }.isEqualTo(
+                    listOf(ComponentVariableTypeGen(
+                            ComponentTypeGen(
+                                    "name",
+                                    "instance"
+                            ),
+                            VariableTypeGen(
+                                    "name",
+                                    "instance"
+                            )
+                        )
+                    )
+                )
+            }
     }
 
     @Test

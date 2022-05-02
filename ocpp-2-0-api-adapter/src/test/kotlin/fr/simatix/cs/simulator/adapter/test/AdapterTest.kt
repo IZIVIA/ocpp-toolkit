@@ -52,6 +52,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
@@ -666,6 +668,14 @@ class AdapterTest {
                 req: CostUpdatedReq
         ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
             val response = CostUpdatedResp()
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getMonitoringReport(
+                meta: RequestMetadata,
+                req: GetMonitoringReportReq
+        ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
+            val response = GetMonitoringReportResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

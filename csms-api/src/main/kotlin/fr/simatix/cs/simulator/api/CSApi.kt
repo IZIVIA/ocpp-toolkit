@@ -36,6 +36,8 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalled
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
@@ -167,4 +169,6 @@ interface CSApi {
 
 
     fun deleteCertificate(meta: RequestMetadata, req: DeleteCertificateReq): OperationExecution<DeleteCertificateReq, DeleteCertificateResp>
+
+    fun getMonitoringReport(meta: RequestMetadata, req: GetMonitoringReportReq): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp>
 }

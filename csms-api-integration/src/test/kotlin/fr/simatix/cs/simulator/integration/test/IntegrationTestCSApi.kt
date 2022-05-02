@@ -62,6 +62,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
@@ -568,6 +570,14 @@ class IntegrationTestCSApi {
                     req: DeleteCertificateReq
             ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
                 val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getMonitoringReport(
+                    meta: RequestMetadata,
+                    req: GetMonitoringReportReq
+            ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
+                val response = GetMonitoringReportResp(GenericDeviceModelStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -1113,6 +1123,28 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetMonitoringReport",
+                "{\"requestId\": 43243, " +
+                        "\"monitoringCriteria\": [\"ThresholdMonitoring\"]," +
+                        "\"componentVariable\": [{" +
+                                    "\"component\": {" +
+                                        "\"name\": \"name\"," +
+                                        "\"instance\": \"instance\"" +
+                                    "}," +
+                                    "\"variable\":  {" +
+                                        "\"name\": \"name\"," +
+                                        "\"instance\": \"instance\"" +
+                                    "}" +
+                                "}" +
+                            "]" +
+                        "}"
+            )
+        )
+
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1151,6 +1183,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).costUpdated(any(), any())
         verify(csApiSpy, times(1)).setDisplayMessage(any(), any())
         verify(csApiSpy, times(1)).deleteCertificate(any(),any())
+        verify(csApiSpy, times(1)).getMonitoringReport(any(), any())
 
         csmsApi.close()
     }

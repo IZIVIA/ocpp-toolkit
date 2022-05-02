@@ -52,6 +52,8 @@ import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesRe
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
@@ -506,6 +508,13 @@ class AdapterTest {
                 meta: RequestMetadata,
                 req: DeleteCertificateReq
         ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+            throw NotImplementedError()
+        }
+
+        override fun getMonitoringReport(
+                meta: RequestMetadata,
+                req: GetMonitoringReportReq
+        ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
             throw NotImplementedError()
         }
     }

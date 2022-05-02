@@ -74,7 +74,10 @@ import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.core20.model.getlog.LogParametersType
 import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogEnumType
 import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
-import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportResp
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.enumeration.MonitoringCriterionEnumType
+import fr.simatix.cs.simulator.core20.model.common.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
@@ -1211,6 +1214,34 @@ class JsonSchemaTest {
                 CertificateSigningUseEnumType.ChargingStationCertificate
             ), "SignCertificateRequest.json"
         )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getMonitoringReport request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetMonitoringReportReq(
+                        243432,
+                        listOf(MonitoringCriterionEnumType.DeltaMonitoring),
+                        listOf(ComponentVariableType(
+                                ComponentType(
+                                        "typename",
+                                        "instance"
+                                )
+                        ))
+                ),
+                "GetMonitoringReportRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetMonitoringReportReq(
+                        243432
+                ),
+                "GetMonitoringReportRequest.json"
+        )
+
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -2761,5 +2792,25 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
     }
-}
+    @Test
+    fun `getMonitoringReport response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetMonitoringReportResp(
+                        GenericDeviceModelStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "GetMonitoringReportResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
 
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetMonitoringReportResp(
+                        GenericDeviceModelStatusEnumType.Accepted
+                ),
+                "GetMonitoringReportResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+}

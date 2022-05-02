@@ -6,7 +6,6 @@ import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstal
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp as GetInstalledCertificateIdsRespGen
 import org.mapstruct.Mapper
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
-import org.mapstruct.Named
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq as GetInstalledCertificateIdsReqGen
 import org.mapstruct.ReportingPolicy
 
