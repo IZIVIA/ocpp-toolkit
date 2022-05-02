@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessage
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
@@ -154,4 +156,6 @@ interface CSApi {
 
 
     fun getDisplayMessages(meta: RequestMetadata, req: GetDisplayMessagesReq): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp>
+
+    fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq): OperationExecution<CostUpdatedReq, CostUpdatedResp>
 }

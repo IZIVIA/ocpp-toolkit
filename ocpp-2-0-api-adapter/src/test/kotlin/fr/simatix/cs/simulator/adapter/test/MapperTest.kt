@@ -101,6 +101,12 @@ import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionS
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
@@ -117,7 +123,6 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffType
-import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
 import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
@@ -202,7 +207,6 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.MessageFormatEnumTyp
 import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType as MonitorEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType as RequestStartStopStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType as CustomerInformationStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType as DataTransferStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
@@ -261,6 +265,7 @@ import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableSta
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp as CostUpdatedRespGen
 import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
@@ -1748,6 +1753,22 @@ class MapperTest {
             get { requestId }.isEqualTo(31)
             get { retryInterval }.isEqualTo(4)
         }
+    }
+    @Test
+    fun costUpdatedMapper() {
+        val mapper: CostUpdatedMapper = Mappers.getMapper(CostUpdatedMapper::class.java)
+        val req = mapper.coreToGenReq(
+                CostUpdatedReq(50.0,"451")
+        )
+        expectThat(req) {
+            get { totalCost }.isEqualTo(50.0)
+            get { transactionId }.isEqualTo("451")
+        }
+
+        val resp = mapper.genToCoreResp(
+                CostUpdatedRespGen()
+        )
+        expectThat(resp).isA<CostUpdatedResp>()
     }
 
     @Test

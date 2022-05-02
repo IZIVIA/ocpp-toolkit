@@ -12,6 +12,8 @@ import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheReq
 import fr.simatix.cs.simulator.core20.model.clearcache.ClearCacheResp
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
@@ -339,6 +341,11 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: GetDisplayMessagesReq
             ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq
+            ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
                 TODO("Not yet implemented")
             }
         }

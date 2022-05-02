@@ -22,6 +22,8 @@ import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessage
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
@@ -634,6 +636,14 @@ class AdapterTest {
                 req: SetMonitoringBaseReq
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun costUpdated(
+                meta: RequestMetadata,
+                req: CostUpdatedReq
+        ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+            val response = CostUpdatedResp()
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
