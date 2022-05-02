@@ -59,7 +59,7 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.api.model.common.MessageInfoType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessagePriorityEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageStateEnumType
@@ -138,6 +138,9 @@ import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelRe
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -569,6 +572,14 @@ class IntegrationTest {
         ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
             val response = CostUpdatedResp()
             return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+        }
+
+        override fun setDisplayMessage(
+                meta: RequestMetadata,
+                req: SetDisplayMessageReq
+        ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
+            val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
 

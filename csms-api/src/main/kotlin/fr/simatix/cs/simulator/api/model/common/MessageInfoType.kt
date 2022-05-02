@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.api.model.notifydisplaymessages
+package fr.simatix.cs.simulator.api.model.common
 
 import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.MessageContentType

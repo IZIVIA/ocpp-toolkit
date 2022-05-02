@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20.model.notifydisplaymessages
+package fr.simatix.cs.simulator.core20.model.common
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize

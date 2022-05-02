@@ -65,6 +65,8 @@ import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileR
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -542,6 +544,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
         val mapper: GetDisplayMessagesMapper = Mappers.getMapper(GetDisplayMessagesMapper::class.java)
         val response = csApi.getDisplayMessages(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun setDisplayMessage(
+            meta: RequestMetadata,
+            req: SetDisplayMessageReq
+    ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
+        val mapper: SetDisplayMessageMapper = Mappers.getMapper(SetDisplayMessageMapper::class.java)
+        val response = csApi.setDisplayMessage(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,

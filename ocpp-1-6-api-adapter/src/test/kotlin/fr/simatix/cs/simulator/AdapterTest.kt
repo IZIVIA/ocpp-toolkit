@@ -89,6 +89,8 @@ import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelRe
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -488,6 +490,13 @@ class AdapterTest {
         }
 
         override fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+            throw NotImplementedError()
+        }
+
+        override fun setDisplayMessage(
+                meta: RequestMetadata,
+                req: SetDisplayMessageReq
+        ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
             throw NotImplementedError()
         }
     }

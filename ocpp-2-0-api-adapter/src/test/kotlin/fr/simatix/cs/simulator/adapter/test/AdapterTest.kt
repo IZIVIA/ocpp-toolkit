@@ -80,6 +80,9 @@ import fr.simatix.cs.simulator.api.model.sendlocallist.enumeration.SendLocalList
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetMonitoringResultType
@@ -154,7 +157,7 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLi
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessagePriorityEnumType
@@ -249,7 +252,7 @@ import fr.simatix.cs.simulator.api.model.logstatusnotification.enumeration.Uploa
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq as NotifyCustomerInformationReqGen
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
+import fr.simatix.cs.simulator.api.model.common.MessageInfoType as MessageInfoTypeGen
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
@@ -636,6 +639,14 @@ class AdapterTest {
                 req: SetMonitoringBaseReq
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setDisplayMessage(
+                meta: RequestMetadata,
+                req: SetDisplayMessageReq
+        ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
+            val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
