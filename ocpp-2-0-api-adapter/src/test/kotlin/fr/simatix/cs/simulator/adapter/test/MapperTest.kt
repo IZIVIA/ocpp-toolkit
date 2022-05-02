@@ -76,11 +76,17 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.enumeration.ClearChargingProfileEnumType
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageFormatEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
@@ -106,16 +112,14 @@ import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionS
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
 import fr.simatix.cs.simulator.core20.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.installcertificate.enumeration.InstallCertificateUseEnumType
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
@@ -160,7 +164,6 @@ import fr.simatix.cs.simulator.core20.model.setnetworkprofile.VPNType
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
-import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
 import fr.simatix.cs.simulator.core20.model.deletecertificate.enumeration.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
@@ -197,10 +200,14 @@ import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheReq as ClearCacheR
 import fr.simatix.cs.simulator.api.model.clearcache.ClearCacheResp as ClearCacheRespGen
 import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatusEnumType as ClearCacheStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType as ClearChargingProfileStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearMonitoringResultType as ClearMonitoringResultTypeGen
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq as ClearVariableMonitoringReqGen
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp as ClearVariableMonitoringRespGen
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType as ClearMonitoringStatusEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType as ClearMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.common.CertificateHashDataType as CertificateHashDataTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingProfileType as ChargingProfileTypeGen
-import fr.simatix.cs.simulator.api.model.common.ChargingSchedulePeriodType as ChargingSchedulePeriodTypeGen
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType as ChargingScheduleTypeGen
 import fr.simatix.cs.simulator.api.model.common.ComponentType as ComponentTypeGen
 import fr.simatix.cs.simulator.api.model.common.EVSEType as EVSETypeGen
@@ -280,11 +287,10 @@ import fr.simatix.cs.simulator.api.model.setvariables.enumeration.SetVariableSta
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.MessageTriggerEnumType as MessageTriggerEnumTypeGen
 import fr.simatix.cs.simulator.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType as TriggerMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.unlockconnector.enumeration.UnlockStatusEnumType as UnlockStatusEnumTypeGen
-import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp as CostUpdatedRespGen
-import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.FirmwareType as FirmwareTypeGen
 import fr.simatix.cs.simulator.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType as UpdateFirmwareStatusEnumTypeGen
-
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp as CostUpdatedRespGen
+import fr.simatix.cs.simulator.api.model.unpublishfirmware.enumeration.UnpublishFirmwareStatusEnumType as UnpublishFirmwareStatusEnumTypeGen
 class MapperTest {
     @Test
     fun changeAvailabilityMapper() {
@@ -2014,6 +2020,38 @@ class MapperTest {
         )
         expectThat(req.monitoringBase).isEqualTo(MonitoringBaseEnumTypeGen.All)
     }
+
+    @Test
+    fun clearVariableMonitoringMapper() {
+        val mapper: ClearVariableMonitoringMapper = Mappers.getMapper(ClearVariableMonitoringMapper::class.java)
+        val resp = mapper.genToCoreResp(
+            ClearVariableMonitoringRespGen(
+                clearMonitoringResults =
+                listOf(
+                    ClearMonitoringResultTypeGen(
+                        status = ClearMonitoringStatusEnumTypeGen.Accepted,
+                        id = 1,
+                        statusInfo = StatusInfoTypeGen(
+                            reasonCode = "reasonCode",
+                            additionalInfo = "additionalInfo"
+                        )
+                    )
+                )
+            )
+        )
+        expectThat(resp).and { get { resp }.isA<ClearVariableMonitoringResp>() }
+
+        val req = mapper.coreToGenReq(
+            ClearVariableMonitoringReq(
+                ids = listOf(1, 2)
+            )
+        )
+        expectThat(req) {
+            get { req }.isA<ClearVariableMonitoringReqGen>()
+            get { ids }.isEqualTo(listOf(1, 2))
+        }
+    }
+
 
     @Test
     fun getTransactionStatusMapper()

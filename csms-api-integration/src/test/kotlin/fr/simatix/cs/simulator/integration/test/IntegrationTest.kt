@@ -24,6 +24,8 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearC
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
@@ -59,8 +61,8 @@ import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.ChargingLimitType
 import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.api.model.common.MessageInfoType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.common.MessageInfoType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessagePriorityEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
@@ -73,6 +75,9 @@ import fr.simatix.cs.simulator.api.model.notifyevent.EventDataType
 import fr.simatix.cs.simulator.api.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventNotificationEnumType
 import fr.simatix.cs.simulator.api.model.notifyevent.enumeration.EventTriggerEnumType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.api.model.notifyreport.NotifyReportReq
 import fr.simatix.cs.simulator.api.model.notifyreport.ReportDataType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
@@ -89,9 +94,6 @@ import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
-import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
@@ -601,6 +603,13 @@ class IntegrationTest {
         ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
             val response = GetMonitoringReportResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearVariableMonitoring(
+            meta: RequestMetadata,
+            req: ClearVariableMonitoringReq
+        ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+            throw NotImplementedError()
         }
     }
 

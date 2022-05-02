@@ -32,6 +32,10 @@ import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMess
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearMonitoringResultType
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.*
 import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
@@ -133,7 +137,10 @@ import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType
-import fr.simatix.cs.simulator.core20.model.remotestart.*
+import fr.simatix.cs.simulator.core20.model.remotestart.RelativeTimeIntervalType
+import fr.simatix.cs.simulator.core20.model.remotestart.RequestStartTransactionReq
+import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffEntryType
+import fr.simatix.cs.simulator.core20.model.remotestart.SalesTariffType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.RecurrencyKindEnumType
 import fr.simatix.cs.simulator.core20.model.remotestop.RequestStopTransactionReq
@@ -1213,6 +1220,18 @@ class JsonSchemaTest {
                 "csr",
                 CertificateSigningUseEnumType.ChargingStationCertificate
             ), "SignCertificateRequest.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearVariableMonitoring request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+            ClearVariableMonitoringReq(
+                ids = listOf(1, 2)
+            ),
+            "ClearVariableMonitoringRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
@@ -2812,5 +2831,42 @@ class JsonSchemaTest {
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `clearVariableMonitoring response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+            ClearVariableMonitoringResp(
+                clearMonitoringResults =
+                listOf(
+                    ClearMonitoringResultType(
+                        status = ClearMonitoringStatusEnumType.Accepted,
+                        id = 1,
+                        statusInfo = StatusInfoType(
+                            reasonCode = "reasonCode",
+                            additionalInfo = "additionalInfo"
+                        )
+                    )
+                )
+            ),
+            "ClearVariableMonitoringResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+            ClearVariableMonitoringResp(
+                clearMonitoringResults =
+                listOf(
+                    ClearMonitoringResultType(
+                        status = ClearMonitoringStatusEnumType.Accepted,
+                        id = 1
+                    )
+                )
+            ),
+            "ClearVariableMonitoringResponse.json"
+        )
+        expectThat(errors)
+            .and { get { this.size }.isEqualTo(0) }
     }
 }

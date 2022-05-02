@@ -15,6 +15,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
@@ -236,6 +238,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<DataTransferReq, DataTransferResp> {
         val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
         val response = csApi.dataTransfer(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS),
+            req,
+            mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun clearVariableMonitoring(
+        meta: RequestMetadata,
+        req: ClearVariableMonitoringReq
+    ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+        val mapper: ClearVariableMonitoringMapper = Mappers.getMapper(ClearVariableMonitoringMapper::class.java)
+        val response = csApi.clearVariableMonitoring(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
