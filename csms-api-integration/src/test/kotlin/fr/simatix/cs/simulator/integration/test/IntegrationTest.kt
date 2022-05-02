@@ -99,6 +99,8 @@ import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateRe
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionReq
 import fr.simatix.cs.simulator.api.model.remotestart.RequestStartTransactionResp
@@ -527,6 +529,14 @@ class IntegrationTest {
                 req: SetNetworkProfileReq
         ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
             val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getTransactionStatus(
+                meta: RequestMetadata,
+                req: GetTransactionStatusReq
+        ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+            val response = GetTransactionStatusResp(false,true)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

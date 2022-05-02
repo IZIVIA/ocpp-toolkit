@@ -32,6 +32,8 @@ import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
@@ -312,6 +314,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: SetNetworkProfileReq
             ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getTransactionStatus(
+                    meta: RequestMetadata,
+                    req: GetTransactionStatusReq
+            ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
                 TODO("Not yet implemented")
             }
         }

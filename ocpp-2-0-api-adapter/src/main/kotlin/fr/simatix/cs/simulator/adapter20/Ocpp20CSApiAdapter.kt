@@ -33,6 +33,8 @@ import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
@@ -482,6 +484,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
         val mapper: SetNetworkProfileMapper = Mappers.getMapper(SetNetworkProfileMapper::class.java)
         val response = csApi.setNetworkProfile(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getTransactionStatus(
+            meta: RequestMetadata,
+            req: GetTransactionStatusReq
+    ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+        val mapper: GetTransactionStatusMapper = Mappers.getMapper(GetTransactionStatusMapper::class.java)
+        val response = csApi.getTransactionStatus(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,
