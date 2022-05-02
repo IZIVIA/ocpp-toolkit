@@ -54,6 +54,9 @@ import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesRe
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -557,6 +560,14 @@ class IntegrationTestCSApi {
                     req: SetDisplayMessageReq
             ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
                 val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun deleteCertificate(
+                    meta: RequestMetadata,
+                    req: DeleteCertificateReq
+            ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+                val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -1091,6 +1102,17 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "DeleteCertificate", "{\"certificateHashData\": " +
+                    "{\"hashAlgorithm\": \"SHA512\"," +
+                    " \"issuerNameHash\": \"someHash\"," +
+                    " \"issuerKeyHash\": \"KeyHashed\", " +
+                    "\"serialNumber\": \"763478643276432\"}}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1128,6 +1150,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getDisplayMessages(any(), any())
         verify(csApiSpy, times(1)).costUpdated(any(), any())
         verify(csApiSpy, times(1)).setDisplayMessage(any(), any())
+        verify(csApiSpy, times(1)).deleteCertificate(any(),any())
 
         csmsApi.close()
     }

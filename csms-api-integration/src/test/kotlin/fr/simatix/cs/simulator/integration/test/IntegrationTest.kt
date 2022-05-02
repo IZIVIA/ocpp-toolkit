@@ -79,6 +79,9 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
@@ -579,6 +582,14 @@ class IntegrationTest {
                 req: SetDisplayMessageReq
         ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
             val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun deleteCertificate(
+                meta: RequestMetadata,
+                req: DeleteCertificateReq
+        ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+            val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

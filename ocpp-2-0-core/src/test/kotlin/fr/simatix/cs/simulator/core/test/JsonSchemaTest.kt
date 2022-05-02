@@ -41,6 +41,9 @@ import fr.simatix.cs.simulator.core20.model.customerinformation.enumeration.Cust
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.enumeration.DataTransferStatusEnumType
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.core20.model.deletecertificate.enumeration.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
@@ -1211,6 +1214,26 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `deleteCertificate request format`() {
+        val certif = CertificateHashDataType(
+                HashAlgorithmEnumType.SHA512,
+                "3041edbcdd46190c0acc504ed195f8a90129efcab173a7b9ac4646b92d04cc80005acaa3554f4b1df839eacadc2491cb623bf3aa6f9eb44f6ea8ca005821d25d",
+                "1f40fc92da241694750979ee6cf582f2d5d7d28e18335de05abc54d0560e0f5302860c652bf08d560252aa5e74210546f369fbbbce8c12cfc7957b2652fe9a75",
+                "7683246784"
+        )
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                DeleteCertificateReq(
+                        certif
+                ),
+                "DeleteCertificateRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
 
     @Test
     fun `setDisplayMessage request format`() {
@@ -2710,4 +2733,33 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
     }
+
+    @Test
+    fun `deleteCertificate response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                //Test without optional parameter
+                DeleteCertificateResp(
+                        DeleteCertificateStatusEnumType.Accepted
+                ),
+                "DeleteCertificateResponse.json"
+        )
+
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        //Test with all parameters
+        errors = JsonSchemaValidator.isValidObjectV6(
+                //Test without optional parameter
+                DeleteCertificateResp(
+                        DeleteCertificateStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "DeleteCertificateResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
 }
+

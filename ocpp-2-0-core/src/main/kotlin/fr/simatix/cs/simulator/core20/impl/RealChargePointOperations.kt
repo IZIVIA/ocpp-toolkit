@@ -18,6 +18,7 @@ import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import fr.simatix.cs.simulator.core20.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -358,6 +359,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("SetDisplayMessage") { req: SetDisplayMessageReq ->
             csmsOperations.setDisplayMessage(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("DeleteCertificate") { req: DeleteCertificateReq ->
+            csmsOperations.deleteCertificate(
                     RequestMetadata(chargeStationId),
                     req
             ).response

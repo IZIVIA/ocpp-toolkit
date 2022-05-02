@@ -20,6 +20,8 @@ import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformat
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
@@ -355,6 +357,13 @@ class CoreTest {
 
             override fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq
             ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun deleteCertificate(
+                    meta: RequestMetadata,
+                    req: DeleteCertificateReq
+            ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
                 TODO("Not yet implemented")
             }
         }

@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
@@ -497,6 +499,13 @@ class AdapterTest {
                 meta: RequestMetadata,
                 req: SetDisplayMessageReq
         ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
+            throw NotImplementedError()
+        }
+
+        override fun deleteCertificate(
+                meta: RequestMetadata,
+                req: DeleteCertificateReq
+        ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
             throw NotImplementedError()
         }
     }

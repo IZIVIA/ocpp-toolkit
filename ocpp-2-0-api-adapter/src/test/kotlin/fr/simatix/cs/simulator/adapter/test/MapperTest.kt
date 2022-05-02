@@ -4,6 +4,8 @@ import fr.simatix.cs.simulator.adapter20.mapper.*
 import fr.simatix.cs.simulator.api.model.cancelreservation.CancelReservationResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType as DeleteCertificateStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
@@ -158,6 +160,8 @@ import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.core20.model.deletecertificate.enumeration.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq as SetDisplayMessageReqGen
@@ -1808,12 +1812,11 @@ class MapperTest {
             get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
         }
 
-
         val req = mapper.coreToGenReq(
                 PublishFirmwareReq(
-                        location="location",
-                        retries=1,
-                        checksum="checksum",
+                        location = "location",
+                        retries = 1,
+                        checksum = "checksum",
                         requestId = 31,
                         retryInterval = 4
                 )
@@ -1824,6 +1827,41 @@ class MapperTest {
             get { checksum }.isEqualTo("checksum")
             get { requestId }.isEqualTo(31)
             get { retryInterval }.isEqualTo(4)
+        }
+    }
+
+    @Test
+    fun deleteCertificateMapper() {
+        val mapper: DeleteCertificateMapper = Mappers.getMapper(DeleteCertificateMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                DeleteCertificateResp(
+                        status = DeleteCertificateStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(DeleteCertificateStatusEnumType.Accepted)
+            get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+        val req = mapper.coreToGenReq(
+            DeleteCertificateReq(
+                CertificateHashDataType(
+                    HashAlgorithmEnumType.SHA512,
+                        "issuerNameHash",
+                        "issuerKeyHash",
+                        "serialNumber"
+                )
+            )
+        )
+        expectThat(req) {
+            get { certificateHashData }.and {
+                get{ hashAlgorithm }.isEqualTo(HashAlgorithmEnumTypeGen.SHA512)
+                get{ issuerNameHash }.isEqualTo("issuerNameHash")
+                get{ issuerKeyHash }.isEqualTo("issuerKeyHash")
+                get{ serialNumber }.isEqualTo("serialNumber")
+
+            }
         }
     }
     @Test

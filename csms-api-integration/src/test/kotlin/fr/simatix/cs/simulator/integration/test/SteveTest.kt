@@ -54,6 +54,9 @@ import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformation
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
@@ -573,6 +576,14 @@ fun main(args: Array<String>) {
         ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
             val response = CostUpdatedResp()
             return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+        }
+
+        override fun deleteCertificate(
+                meta: RequestMetadata,
+                req: DeleteCertificateReq
+        ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+            val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
 

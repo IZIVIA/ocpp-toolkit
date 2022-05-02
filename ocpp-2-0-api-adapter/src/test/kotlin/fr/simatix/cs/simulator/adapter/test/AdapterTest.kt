@@ -28,6 +28,9 @@ import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformation
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
+import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
+import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesReq
 import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
@@ -513,6 +516,14 @@ class AdapterTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun deleteCertificate(
+                meta: RequestMetadata,
+                req: DeleteCertificateReq
+        ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+            val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
