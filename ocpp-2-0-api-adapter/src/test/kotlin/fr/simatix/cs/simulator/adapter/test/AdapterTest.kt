@@ -20,6 +20,10 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearC
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearMonitoringResultType
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
@@ -138,6 +142,7 @@ import fr.simatix.cs.simulator.core20.model.common.MessageContentType
 import fr.simatix.cs.simulator.core20.model.common.OCSPRequestDataType
 import fr.simatix.cs.simulator.core20.model.common.StatusInfoType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.AuthorizationStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSourceEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingRateUnitEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.GenericStatusEnumType
@@ -191,7 +196,6 @@ import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEv
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
-import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
@@ -410,6 +414,26 @@ class AdapterTest {
                 statusInfo = fr.simatix.cs.simulator.api.model.common.StatusInfoType(
                     reasonCode = "reasonCode",
                     additionalInfo = "additionalInfo"
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearVariableMonitoring(
+            meta: RequestMetadata,
+            req: ClearVariableMonitoringReq
+        ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+
+            val response = ClearVariableMonitoringResp(
+                listOf(
+                    ClearMonitoringResultType(
+                        status = ClearMonitoringStatusEnumType.Accepted,
+                        id = 1,
+                        fr.simatix.cs.simulator.api.model.common.StatusInfoType(
+                            "reasonCode",
+                            "additionalInfo"
+                        )
+                    )
                 )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)

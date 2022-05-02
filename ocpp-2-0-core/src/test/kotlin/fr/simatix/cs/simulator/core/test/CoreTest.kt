@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
@@ -244,6 +246,13 @@ class CoreTest {
                 meta: RequestMetadata,
                 req: DataTransferReq
             ): OperationExecution<DataTransferReq, DataTransferResp> {
+                TODO("Not implemented")
+            }
+
+            override fun clearVariableMonitoring(
+                meta: RequestMetadata,
+                req: ClearVariableMonitoringReq
+            ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
                 TODO("Not implemented")
             }
 

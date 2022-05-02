@@ -23,6 +23,8 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfi
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.enumeration.DataTransferStatusEnumType
@@ -32,10 +34,10 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
-import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
-import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
 import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
@@ -164,12 +166,12 @@ import strikt.assertions.isEqualTo
 import fr.simatix.cs.simulator.api.model.authorize.AuthorizeReq as AuthorizeReqGen
 import fr.simatix.cs.simulator.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq as DataTransferReqGen
+import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
+import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import fr.simatix.cs.simulator.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
-import fr.simatix.cs.simulator.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
-import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp as DataTransferRespGen
 
 class AdapterTest {
     private lateinit var transport: Transport
@@ -299,6 +301,13 @@ class AdapterTest {
                 )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearVariableMonitoring(
+            meta: RequestMetadata,
+            req: ClearVariableMonitoringReq
+        ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+            throw NotImplementedError()
         }
 
         override fun getBaseReport(

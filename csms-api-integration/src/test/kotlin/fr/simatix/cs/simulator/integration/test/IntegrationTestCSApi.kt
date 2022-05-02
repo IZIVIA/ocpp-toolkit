@@ -17,6 +17,10 @@ import fr.simatix.cs.simulator.api.model.clearcache.enumeration.ClearCacheStatus
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearMonitoringResultType
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.enumeration.ClearMessageStatusEnumType
@@ -25,6 +29,7 @@ import fr.simatix.cs.simulator.api.model.common.ComponentType
 import fr.simatix.cs.simulator.api.model.common.StatusInfoType
 import fr.simatix.cs.simulator.api.model.common.VariableType
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericDeviceModelStatusEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.RequestStartStopStatusEnumType
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferResp
@@ -36,7 +41,6 @@ import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
-import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
@@ -272,6 +276,25 @@ class IntegrationTestCSApi {
                     statusInfo = StatusInfoType(
                         reasonCode = "reasonCode",
                         additionalInfo = "additionalInfo"
+                    )
+                )
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun clearVariableMonitoring(
+                meta: RequestMetadata,
+                req: ClearVariableMonitoringReq
+            ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+                val response = ClearVariableMonitoringResp(
+                    listOf(
+                        ClearMonitoringResultType(
+                            status = ClearMonitoringStatusEnumType.Accepted,
+                            id = 1,
+                            StatusInfoType(
+                                "reasonCode",
+                                "additionalInfo"
+                            )
+                        )
                     )
                 )
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
@@ -1145,6 +1168,13 @@ class IntegrationTestCSApi {
         )
 
 
+        server.sendBlocking(
+            "chargePoint2", WampMessage(
+            WampMessageType.CALL, "1",
+            "ClearVariableMonitoring", "{\"ids\": [1, 2]}"
+        )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1184,6 +1214,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).setDisplayMessage(any(), any())
         verify(csApiSpy, times(1)).deleteCertificate(any(),any())
         verify(csApiSpy, times(1)).getMonitoringReport(any(), any())
+        verify(csApiSpy, times(1)).clearVariableMonitoring(any(), any())
 
         csmsApi.close()
     }

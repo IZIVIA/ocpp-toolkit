@@ -12,6 +12,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
@@ -24,10 +26,10 @@ import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportResp
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesResp
-import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
-import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -54,10 +56,10 @@ import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.core20.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.core20.model.reset.ResetReq
 import fr.simatix.cs.simulator.core20.model.reset.ResetResp
-import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
-import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
@@ -167,4 +169,7 @@ interface CSMSOperations {
     fun deleteCertificate(meta: RequestMetadata, req: DeleteCertificateReq): OperationExecution<DeleteCertificateReq, DeleteCertificateResp>
 
     fun getMonitoringReport(meta: RequestMetadata, req: GetMonitoringReportReq): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp>
+
+    fun clearVariableMonitoring(meta: RequestMetadata, req: ClearVariableMonitoringReq): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp>
+
 }

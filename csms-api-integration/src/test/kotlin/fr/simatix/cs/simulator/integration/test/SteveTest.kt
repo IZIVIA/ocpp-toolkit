@@ -23,6 +23,10 @@ import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfi
 import fr.simatix.cs.simulator.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.api.model.cleardisplaymessage.ClearDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearMonitoringResultType
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
+import fr.simatix.cs.simulator.api.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.*
 import fr.simatix.cs.simulator.api.model.common.enumeration.*
 import fr.simatix.cs.simulator.api.model.datatransfer.DataTransferReq
@@ -33,10 +37,10 @@ import fr.simatix.cs.simulator.api.model.getallvariables.GetAllVariablesResp
 import fr.simatix.cs.simulator.api.model.getallvariables.KeyValue
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportReq
 import fr.simatix.cs.simulator.api.model.getbasereport.GetBaseReportResp
-import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
-import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
+import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
@@ -326,6 +330,25 @@ fun main(args: Array<String>) {
                 statusInfo = StatusInfoType(
                     reasonCode = "reasonCode",
                     additionalInfo = "additionalInfo"
+                )
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun clearVariableMonitoring(
+            meta: RequestMetadata,
+            req: ClearVariableMonitoringReq
+        ): OperationExecution<ClearVariableMonitoringReq, ClearVariableMonitoringResp> {
+            val response = ClearVariableMonitoringResp(
+                listOf(
+                    ClearMonitoringResultType(
+                        status = ClearMonitoringStatusEnumType.Accepted,
+                        id = 1,
+                        StatusInfoType(
+                            "reasonCode",
+                            "additionalInfo"
+                        )
+                    )
                 )
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)

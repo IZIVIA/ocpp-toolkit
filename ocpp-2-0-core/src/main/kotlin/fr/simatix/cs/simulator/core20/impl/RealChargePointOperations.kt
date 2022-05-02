@@ -14,6 +14,7 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.clearvariablemonitoring.ClearVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
@@ -41,18 +42,18 @@ import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotif
 import fr.simatix.cs.simulator.core20.model.logstatusnotification.LogStatusNotificationResp
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.core20.model.metervalues.MeterValuesResp
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
+import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationResp
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventReq
 import fr.simatix.cs.simulator.core20.model.notifyevent.NotifyEventResp
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
-import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
-import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
-import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.NotifyReportReq
@@ -376,6 +377,13 @@ class RealChargePointOperations(
             csmsOperations.getMonitoringReport(
                     RequestMetadata(chargeStationId),
                     req
+            ).response
+        }
+
+        client.receiveMessage("ClearVariableMonitoring") { req: ClearVariableMonitoringReq ->
+            csmsOperations.clearVariableMonitoring(
+                RequestMetadata(chargeStationId),
+                req
             ).response
         }
     }
