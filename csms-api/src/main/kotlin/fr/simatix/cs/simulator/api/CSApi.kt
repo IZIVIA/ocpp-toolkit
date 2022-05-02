@@ -52,6 +52,8 @@ import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileRe
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelReq
@@ -144,5 +146,8 @@ interface CSApi {
     fun setNetworkProfile(meta: RequestMetadata, req: SetNetworkProfileReq): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp>
 
     fun getTransactionStatus(meta: RequestMetadata, req: GetTransactionStatusReq): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp>
+
+
+    fun setMonitoringBase(meta: RequestMetadata, req: SetMonitoringBaseReq): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp>
 
 }

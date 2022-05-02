@@ -59,6 +59,8 @@ import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLeve
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileReq
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesResp
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
@@ -497,6 +499,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
         val mapper: GetTransactionStatusMapper = Mappers.getMapper(GetTransactionStatusMapper::class.java)
         val response = csApi.getTransactionStatus(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun setMonitoringBase(
+            meta: RequestMetadata,
+            req: SetMonitoringBaseReq
+    ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
+        val mapper: SetMonitoringBaseMapper = Mappers.getMapper(SetMonitoringBaseMapper::class.java)
+        val response = csApi.setMonitoringBase(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,

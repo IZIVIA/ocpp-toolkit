@@ -92,6 +92,8 @@ import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelRe
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -515,6 +517,14 @@ class IntegrationTestCSApi {
                     req: GetTransactionStatusReq
             ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
                 val response = GetTransactionStatusResp(false,true)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun setMonitoringBase(
+                    meta: RequestMetadata,
+                    req: SetMonitoringBaseReq
+            ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
+                val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -1003,6 +1013,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SetMonitoringBase", "{\"monitoringBase\": \"All\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1036,6 +1053,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).publishFirmware(any(), any())
         verify(csApiSpy, times(1)).setNetworkProfile(any(), any())
         verify(csApiSpy, times(1)).getTransactionStatus(any(), any())
+        verify(csApiSpy, times(1)).setMonitoringBase(any(), any())
 
         csmsApi.close()
     }
