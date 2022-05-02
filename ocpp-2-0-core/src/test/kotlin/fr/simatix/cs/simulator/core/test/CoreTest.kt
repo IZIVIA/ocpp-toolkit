@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -330,6 +332,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: SetMonitoringBaseReq
             ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getDisplayMessages(
+                    meta: RequestMetadata,
+                    req: GetDisplayMessagesReq
+            ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
                 TODO("Not yet implemented")
             }
         }

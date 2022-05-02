@@ -49,6 +49,9 @@ import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformation
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -525,6 +528,14 @@ class IntegrationTestCSApi {
                     req: SetMonitoringBaseReq
             ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
                 val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getDisplayMessages(
+                    meta: RequestMetadata,
+                    req: GetDisplayMessagesReq
+            ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+                val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -1020,6 +1031,14 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetDisplayMessages", "{\"id\":[321],\"requestId\":\"624387\",\"priority\":\"AlwaysFront\",\"state\":\"Charging\"}"
+            )
+        )
+
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1054,6 +1073,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).setNetworkProfile(any(), any())
         verify(csApiSpy, times(1)).getTransactionStatus(any(), any())
         verify(csApiSpy, times(1)).setMonitoringBase(any(), any())
+        verify(csApiSpy, times(1)).getDisplayMessages(any(), any())
 
         csmsApi.close()
     }

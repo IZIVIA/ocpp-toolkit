@@ -61,8 +61,8 @@ import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimit
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
@@ -79,6 +79,9 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.MonitoringDataType
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.NotifyMonitoringReportReq
 import fr.simatix.cs.simulator.api.model.notifymonitoringreport.VariableMonitoringType
@@ -547,6 +550,14 @@ class IntegrationTest {
                 req: SetMonitoringBaseReq
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getDisplayMessages(
+                meta: RequestMetadata,
+                req: GetDisplayMessagesReq
+        ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+            val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

@@ -1,4 +1,4 @@
-package fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration
+package fr.simatix.cs.simulator.api.model.common.enumeration
 
 enum class MessageStateEnumType(val value: String) {
     Charging("Charging"),

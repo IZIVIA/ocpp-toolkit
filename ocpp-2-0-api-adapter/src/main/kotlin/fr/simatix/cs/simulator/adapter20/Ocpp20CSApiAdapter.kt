@@ -27,6 +27,8 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -512,6 +514,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
         val mapper: SetMonitoringBaseMapper = Mappers.getMapper(SetMonitoringBaseMapper::class.java)
         val response = csApi.setMonitoringBase(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getDisplayMessages(
+            meta: RequestMetadata,
+            req: GetDisplayMessagesReq
+    ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+        val mapper: GetDisplayMessagesMapper = Mappers.getMapper(GetDisplayMessagesMapper::class.java)
+        val response = csApi.getDisplayMessages(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,
