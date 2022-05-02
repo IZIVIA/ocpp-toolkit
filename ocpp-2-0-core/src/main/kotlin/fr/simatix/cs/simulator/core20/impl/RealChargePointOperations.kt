@@ -28,6 +28,7 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatReq
 import fr.simatix.cs.simulator.core20.model.heartbeat.HeartbeatResp
@@ -318,6 +319,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("SetNetworkProfile") { req: SetNetworkProfileReq ->
             csmsOperations.setNetworkProfile(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("GetTransactionStatus") { req: GetTransactionStatusReq ->
+            csmsOperations.getTransactionStatus(
                     RequestMetadata(chargeStationId),
                     req
             ).response

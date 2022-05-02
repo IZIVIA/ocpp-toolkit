@@ -48,6 +48,8 @@ import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
@@ -453,6 +455,14 @@ class AdapterTest {
                 req: SetNetworkProfileReq
         ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
             val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getTransactionStatus(
+                meta: RequestMetadata,
+                req: GetTransactionStatusReq
+        ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+            val response = GetTransactionStatusResp(true)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

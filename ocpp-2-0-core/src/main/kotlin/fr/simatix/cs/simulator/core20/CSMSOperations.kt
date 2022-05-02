@@ -30,6 +30,8 @@ import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
@@ -136,5 +138,7 @@ interface CSMSOperations {
     fun publishFirmware(meta: RequestMetadata, req: PublishFirmwareReq): OperationExecution<PublishFirmwareReq, PublishFirmwareResp>
 
     fun setNetworkProfile(meta: RequestMetadata, req: SetNetworkProfileReq): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp>
+
+    fun getTransactionStatus(meta: RequestMetadata, req: GetTransactionStatusReq): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp>
 
 }

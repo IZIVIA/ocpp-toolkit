@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.api.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariableResultType
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
@@ -505,6 +507,14 @@ class IntegrationTestCSApi {
                     req: SetNetworkProfileReq
             ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
                 val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getTransactionStatus(
+                    meta: RequestMetadata,
+                    req: GetTransactionStatusReq
+            ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+                val response = GetTransactionStatusResp(false,true)
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
@@ -986,6 +996,13 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "GetTransactionStatus", "{\"transactionId\": \"valueid\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1018,6 +1035,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).setMonitoringLevel(any(), any())
         verify(csApiSpy, times(1)).publishFirmware(any(), any())
         verify(csApiSpy, times(1)).setNetworkProfile(any(), any())
+        verify(csApiSpy, times(1)).getTransactionStatus(any(), any())
 
         csmsApi.close()
     }

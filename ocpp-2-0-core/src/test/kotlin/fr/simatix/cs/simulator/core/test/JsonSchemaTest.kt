@@ -112,6 +112,8 @@ import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitor
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.NotifyMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.notifymonitoringreport.VariableMonitoringType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MonitorEnumType
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.core20.model.notifyreport.*
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.core20.model.notifyreport.enumeration.MutabilityEnumType
@@ -2482,6 +2484,48 @@ class JsonSchemaTest {
                         )
                 ),
                 "SetVariableMonitoringResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getTransactionStatus response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetTransactionStatusResp(
+                        true,
+                        false
+                ),
+                "GetTransactionStatusResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetTransactionStatusResp(
+                        true,
+                ),
+                "GetTransactionStatusResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getTransactionStatus request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetTransactionStatusReq(
+                    "id"
+                ),
+                "GetTransactionStatusRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetTransactionStatusReq(
+                ),
+                "GetTransactionStatusRequest.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }

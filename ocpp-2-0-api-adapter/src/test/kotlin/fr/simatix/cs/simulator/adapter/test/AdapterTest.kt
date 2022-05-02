@@ -53,7 +53,6 @@ import fr.simatix.cs.simulator.api.model.getvariables.enumeration.GetVariableSta
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateReq
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
-import fr.simatix.cs.simulator.api.model.installcertificate.enumeration.InstallCertificateUseEnumType
 import fr.simatix.cs.simulator.api.model.metervalues.MeterValuesReq
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.api.model.publishfirmware.PublishFirmwareResp
@@ -64,7 +63,6 @@ import fr.simatix.cs.simulator.api.model.remotestop.RequestStopTransactionResp
 import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesReq
 import fr.simatix.cs.simulator.core20.model.reportchargingprofiles.ReportChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesReq as ReportChargingProfilesReqGen
-import fr.simatix.cs.simulator.api.model.reportchargingprofiles.ReportChargingProfilesResp as ReportChargingProfilesRespGen
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowReq
 import fr.simatix.cs.simulator.api.model.reservenow.ReserveNowResp
 import fr.simatix.cs.simulator.api.model.reservenow.enumeration.ReserveNowStatusEnumType
@@ -181,6 +179,8 @@ import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusReq
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.remotestart.enumeration.ChargingProfileKindEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType as ChargingProfilePurposeEnumTypeGen
@@ -601,6 +601,13 @@ class AdapterTest {
         ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
             val response = SetNetworkProfileResp(
                     SetNetworkProfileStatusEnumType.Accepted
+            )
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getTransactionStatus(meta: RequestMetadata, req: GetTransactionStatusReq): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+            val response = GetTransactionStatusResp(
+                    false,true
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }

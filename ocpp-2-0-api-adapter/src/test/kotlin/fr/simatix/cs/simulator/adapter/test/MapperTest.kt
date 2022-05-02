@@ -13,6 +13,7 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalled
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
+import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
 import fr.simatix.cs.simulator.api.model.installcertificate.InstallCertificateResp
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq
@@ -88,6 +89,7 @@ import fr.simatix.cs.simulator.core20.model.getlog.enumeration.LogStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getreport.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
+import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariableDataType
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
 import fr.simatix.cs.simulator.core20.model.getvariables.enumeration.GetVariableStatusEnumType
@@ -1774,5 +1776,30 @@ class MapperTest {
                 get { variable }.isEqualTo(VariableTypeGen("name"))
             }
         }
+    }
+
+
+    @Test
+    fun getTransactionStatusMapper()
+    {
+        val mapper: GetTransactionStatusMapper = Mappers.getMapper(GetTransactionStatusMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                GetTransactionStatusResp(
+                    false,
+                        true
+                )
+        )
+        expectThat(resp) {
+            get { messagesInQueue }.isEqualTo(false)
+            get { ongoingIndicator }.isEqualTo(true)
+        }
+
+        val req = mapper.coreToGenReq(
+                GetTransactionStatusReq(
+                        "id"
+                )
+        )
+
+        expectThat(req.transactionId).isEqualTo("id")
     }
 }
