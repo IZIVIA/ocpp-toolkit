@@ -17,7 +17,7 @@ import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.api.model.gettransactionstatus.GetTransactionStatusResp
 import fr.simatix.cs.simulator.api.model.getvariables.GetVariablesResp
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
+import fr.simatix.cs.simulator.api.model.common.MessageInfoType as MessageInfoTypeGen
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessagePriorityEnumType
@@ -42,6 +42,8 @@ import fr.simatix.cs.simulator.api.model.securityeventnotification.SecurityEvent
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.VPNEnumType as VPNEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType as DisplayMessageStatusEnumTypeGen
 import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
@@ -155,6 +157,11 @@ import fr.simatix.cs.simulator.core20.model.setnetworkprofile.VPNType
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq as SetDisplayMessageReqGen
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.TriggerMessageReq
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.MessageTriggerEnumType
 import fr.simatix.cs.simulator.core20.model.triggermessage.enumeration.TriggerMessageStatusEnumType
@@ -276,319 +283,319 @@ class MapperTest {
         val mapper: ChangeAvailabilityMapper = Mappers.getMapper(ChangeAvailabilityMapper::class.java)
         val resp = mapper.genToCoreResp(ChangeAvailabilityRespGen(ChangeAvailabilityStatusEnumTypeGen.Accepted))
         expectThat(resp)
-            .and { get { status }.isEqualTo(ChangeAvailabilityStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(null) }
+                .and { get { status }.isEqualTo(ChangeAvailabilityStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(null) }
 
         val req = mapper.coreToGenReq(ChangeAvailabilityReq(OperationalStatusEnumType.Operative, EVSEType(1)))
         expectThat(req)
-            .and { get { operationalStatus }.isEqualTo(OperationalStatusEnumTypeGen.Operative) }
-            .and { get { evse }.isEqualTo(EVSETypeGen(1)) }
+                .and { get { operationalStatus }.isEqualTo(OperationalStatusEnumTypeGen.Operative) }
+                .and { get { evse }.isEqualTo(EVSETypeGen(1)) }
     }
 
     @Test
     fun clearCacheMapper() {
         val mapper: ClearCacheMapper = Mappers.getMapper(ClearCacheMapper::class.java)
         val resp = mapper.genToCoreResp(
-            ClearCacheRespGen(
-                ClearCacheStatusEnumTypeGen.Accepted,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                ClearCacheRespGen(
+                        ClearCacheStatusEnumTypeGen.Accepted,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(ClearCacheStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(ClearCacheStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(ClearCacheReq())
         expectThat(req)
-            .and { get { req }.isA<ClearCacheReqGen>() }
+                .and { get { req }.isA<ClearCacheReqGen>() }
     }
 
     @Test
     fun unlockConnectorMapper() {
         val mapper: UnlockConnectorMapper = Mappers.getMapper(UnlockConnectorMapper::class.java)
         val req = mapper.genToCoreResp(
-            UnlockConnectorResp(
-                UnlockStatusEnumTypeGen.UnknownConnector,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                UnlockConnectorResp(
+                        UnlockStatusEnumTypeGen.UnknownConnector,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(req)
-            .and { get { req.status }.isEqualTo(UnlockStatusEnumType.UnknownConnector) }
-            .and { get { req.statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { req.status }.isEqualTo(UnlockStatusEnumType.UnknownConnector) }
+                .and { get { req.statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val resp = mapper.coreToGenReq(UnlockConnectorReq(1, 2))
         expectThat(resp)
-            .and { get { resp.connectorId }.isEqualTo(1) }
-            .and { get { resp.evseId }.isEqualTo(2) }
+                .and { get { resp.connectorId }.isEqualTo(1) }
+                .and { get { resp.evseId }.isEqualTo(2) }
     }
 
     @Test
     fun requestStartTransactionMapper() {
         val mapper: RequestStartTransactionMapper = Mappers.getMapper(RequestStartTransactionMapper::class.java)
         val resp = mapper.genToCoreResp(
-            RequestStartTransactionResp(
-                RequestStartStopStatusEnumTypeGen.Accepted,
-                "1234",
-                StatusInfoTypeGen("reason", "additional")
-            )
+                RequestStartTransactionResp(
+                        RequestStartStopStatusEnumTypeGen.Accepted,
+                        "1234",
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
-            .and { get { transactionId }.isEqualTo("1234") }
+                .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { transactionId }.isEqualTo("1234") }
 
         val req = mapper.coreToGenReq(
-            RequestStartTransactionReq(
-                1, IdTokenType("token1", IdTokenEnumType.Central), 2,
-                ChargingProfileType(
-                    id = 3,
-                    stackLevel = 4,
-                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
-                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
-                    chargingSchedule = listOf(
-                        ChargingScheduleType(
-                            id = 5,
-                            chargingRateUnit = ChargingRateUnitEnumType.A,
-                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
-                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
-                            duration = 6,
-                            minChargingRate = 7.0,
-                            salesTariff = SalesTariffType(8, listOf())
+                RequestStartTransactionReq(
+                        1, IdTokenType("token1", IdTokenEnumType.Central), 2,
+                        ChargingProfileType(
+                                id = 3,
+                                stackLevel = 4,
+                                chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                                chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                                chargingSchedule = listOf(
+                                        ChargingScheduleType(
+                                                id = 5,
+                                                chargingRateUnit = ChargingRateUnitEnumType.A,
+                                                chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                                                startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                                duration = 6,
+                                                minChargingRate = 7.0,
+                                                salesTariff = SalesTariffType(8, listOf())
+                                        )
+                                ),
+                                recurrencyKind = RecurrencyKindEnumType.Daily,
+                                validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
+                                validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
+                                transactionId = "transaction"
                         )
-                    ),
-                    recurrencyKind = RecurrencyKindEnumType.Daily,
-                    validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
-                    validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
-                    transactionId = "transaction"
                 )
-            )
         )
         expectThat(req)
-            .and { get { remoteStartId }.isEqualTo(1) }
-            .and { get { idToken }.isEqualTo(IdTokenTypeGen("token1", IdTokenEnumTypeGen.Central)) }
-            .and { get { evseId }.isEqualTo(2) }
-            .and { get { chargingProfile?.id }.isEqualTo(3) }
-            .and { get { chargingProfile?.stackLevel }.isEqualTo(4) }
-            .and { get { chargingProfile?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
-            .and { get { chargingProfile?.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
-            .and { get { chargingProfile?.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
-            .and { get { chargingProfile?.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
-            .and { get { chargingProfile?.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
-            .and { get { chargingProfile?.transactionId }.isEqualTo("transaction") }
+                .and { get { remoteStartId }.isEqualTo(1) }
+                .and { get { idToken }.isEqualTo(IdTokenTypeGen("token1", IdTokenEnumTypeGen.Central)) }
+                .and { get { evseId }.isEqualTo(2) }
+                .and { get { chargingProfile?.id }.isEqualTo(3) }
+                .and { get { chargingProfile?.stackLevel }.isEqualTo(4) }
+                .and { get { chargingProfile?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+                .and { get { chargingProfile?.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
+                .and { get { chargingProfile?.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
+                .and { get { chargingProfile?.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+                .and { get { chargingProfile?.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
+                .and { get { chargingProfile?.transactionId }.isEqualTo("transaction") }
     }
 
     @Test
     fun requestStopTransactionMapper() {
         val mapper: RequestStopTransactionMapper = Mappers.getMapper(RequestStopTransactionMapper::class.java)
         val resp = mapper.genToCoreResp(
-            RequestStopTransactionResp(
-                RequestStartStopStatusEnumTypeGen.Rejected,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                RequestStopTransactionResp(
+                        RequestStartStopStatusEnumTypeGen.Rejected,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Rejected) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(RequestStartStopStatusEnumType.Rejected) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(RequestStopTransactionReq("tag1"))
         expectThat(req)
-            .and { get { transactionId }.isEqualTo("tag1") }
+                .and { get { transactionId }.isEqualTo("tag1") }
     }
 
     @Test
     fun getVariablesMapper() {
         val mapper: GetVariablesMapper = Mappers.getMapper(GetVariablesMapper::class.java)
         val resp = mapper.genToCoreResp(
-            GetVariablesResp(
-                listOf(
-                    GetVariableResultTypeGen(
-                        attributeStatus = GetVariableStatusEnumTypeGen.Accepted,
-                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
-                        variable = VariableTypeGen("variable", "instance"),
-                        attributeType = AttributeEnumTypeGen.MaxSet,
-                        attributeValue = "value",
-                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
-                    )
+                GetVariablesResp(
+                        listOf(
+                                GetVariableResultTypeGen(
+                                        attributeStatus = GetVariableStatusEnumTypeGen.Accepted,
+                                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
+                                        variable = VariableTypeGen("variable", "instance"),
+                                        attributeType = AttributeEnumTypeGen.MaxSet,
+                                        attributeValue = "value",
+                                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
+                                )
+                        )
                 )
-            )
         )
 
         expectThat(resp.getVariableResult[0])
-            .and { get { attributeStatus }.isEqualTo(GetVariableStatusEnumType.Accepted) }
-            .and { get { component }.isEqualTo(ComponentType("component", "instance", EVSEType(1, 2))) }
-            .and { get { variable }.isEqualTo(VariableType("variable", "instance")) }
-            .and { get { attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
-            .and { get { attributeValue }.isEqualTo("value") }
-            .and {
-                get { attributeStatusInfo }.isEqualTo(
-                    StatusInfoType(
-                        "reason",
-                        "additional"
+                .and { get { attributeStatus }.isEqualTo(GetVariableStatusEnumType.Accepted) }
+                .and { get { component }.isEqualTo(ComponentType("component", "instance", EVSEType(1, 2))) }
+                .and { get { variable }.isEqualTo(VariableType("variable", "instance")) }
+                .and { get { attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
+                .and { get { attributeValue }.isEqualTo("value") }
+                .and {
+                    get { attributeStatusInfo }.isEqualTo(
+                            StatusInfoType(
+                                    "reason",
+                                    "additional"
+                            )
                     )
-                )
-            }
+                }
 
 
         val req = mapper.coreToGenReq(
-            GetVariablesReq(
-                listOf(
-                    GetVariableDataType(
-                        component = ComponentType(
-                            "component", "instance",
-                            EVSEType(1, 2)
-                        ),
-                        variable = VariableType("variable", "instance"),
-                        attributeType = AttributeEnumType.MaxSet
-                    )
+                GetVariablesReq(
+                        listOf(
+                                GetVariableDataType(
+                                        component = ComponentType(
+                                                "component", "instance",
+                                                EVSEType(1, 2)
+                                        ),
+                                        variable = VariableType("variable", "instance"),
+                                        attributeType = AttributeEnumType.MaxSet
+                                )
+                        )
                 )
-            )
         )
         expectThat(req.getVariableData[0])
-            .and {
-                get { component }.isEqualTo(
-                    ComponentTypeGen(
-                        "component",
-                        "instance",
-                        EVSETypeGen(1, 2)
+                .and {
+                    get { component }.isEqualTo(
+                            ComponentTypeGen(
+                                    "component",
+                                    "instance",
+                                    EVSETypeGen(1, 2)
+                            )
                     )
-                )
-            }
-            .and { get { variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
-            .and { get { attributeType }.isEqualTo(AttributeEnumTypeGen.MaxSet) }
+                }
+                .and { get { variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
+                .and { get { attributeType }.isEqualTo(AttributeEnumTypeGen.MaxSet) }
     }
 
     @Test
     fun setVariablesMapper() {
         val mapper: SetVariablesMapper = Mappers.getMapper(SetVariablesMapper::class.java)
         val resp = mapper.genToCoreResp(
-            SetVariablesResp(
-                listOf(
-                    SetVariableResultType(
-                        attributeStatus = SetVariableStatusEnumTypeGen.RebootRequired,
-                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
-                        variable = VariableTypeGen("variable", "instance"),
-                        attributeType = AttributeEnumTypeGen.MaxSet,
-                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
-                    )
+                SetVariablesResp(
+                        listOf(
+                                SetVariableResultType(
+                                        attributeStatus = SetVariableStatusEnumTypeGen.RebootRequired,
+                                        component = ComponentTypeGen("component", "instance", EVSETypeGen(1, 2)),
+                                        variable = VariableTypeGen("variable", "instance"),
+                                        attributeType = AttributeEnumTypeGen.MaxSet,
+                                        attributeStatusInfo = StatusInfoTypeGen("reason", "additional")
+                                )
+                        )
                 )
-            )
         )
         expectThat(resp)
-            .and { get { setVariableResult.size }.isEqualTo(1) }
-            .and { get { setVariableResult[0].attributeStatus }.isEqualTo(SetVariableStatusEnumType.RebootRequired) }
-            .and {
-                get { setVariableResult[0].component }.isEqualTo(
-                    ComponentType(
-                        "component",
-                        "instance",
-                        EVSEType(1, 2)
+                .and { get { setVariableResult.size }.isEqualTo(1) }
+                .and { get { setVariableResult[0].attributeStatus }.isEqualTo(SetVariableStatusEnumType.RebootRequired) }
+                .and {
+                    get { setVariableResult[0].component }.isEqualTo(
+                            ComponentType(
+                                    "component",
+                                    "instance",
+                                    EVSEType(1, 2)
+                            )
                     )
-                )
-            }
-            .and { get { setVariableResult[0].variable }.isEqualTo(VariableType("variable", "instance")) }
-            .and { get { setVariableResult[0].attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
-            .and {
-                get { setVariableResult[0].attributeStatusInfo }.isEqualTo(
-                    StatusInfoType(
-                        "reason",
-                        "additional"
+                }
+                .and { get { setVariableResult[0].variable }.isEqualTo(VariableType("variable", "instance")) }
+                .and { get { setVariableResult[0].attributeType }.isEqualTo(AttributeEnumType.MaxSet) }
+                .and {
+                    get { setVariableResult[0].attributeStatusInfo }.isEqualTo(
+                            StatusInfoType(
+                                    "reason",
+                                    "additional"
+                            )
                     )
-                )
-            }
+                }
 
         val req = mapper.coreToGenReq(
-            SetVariablesReq(
-                listOf(
-                    SetVariableDataType(
-                        attributeValue = "value",
-                        component = ComponentType("component", "instance", EVSEType(1, 2)),
-                        variable = VariableType("variable", "instance"),
-                        attributeType = AttributeEnumType.Target
-                    )
+                SetVariablesReq(
+                        listOf(
+                                SetVariableDataType(
+                                        attributeValue = "value",
+                                        component = ComponentType("component", "instance", EVSEType(1, 2)),
+                                        variable = VariableType("variable", "instance"),
+                                        attributeType = AttributeEnumType.Target
+                                )
+                        )
                 )
-            )
         )
         expectThat(req)
-            .and { get { setVariableData.size }.isEqualTo(1) }
-            .and { get { setVariableData[0].attributeValue }.isEqualTo("value") }
-            .and {
-                get { setVariableData[0].component }.isEqualTo(
-                    ComponentTypeGen(
-                        "component",
-                        "instance",
-                        EVSETypeGen(1, 2)
+                .and { get { setVariableData.size }.isEqualTo(1) }
+                .and { get { setVariableData[0].attributeValue }.isEqualTo("value") }
+                .and {
+                    get { setVariableData[0].component }.isEqualTo(
+                            ComponentTypeGen(
+                                    "component",
+                                    "instance",
+                                    EVSETypeGen(1, 2)
+                            )
                     )
-                )
-            }
-            .and { get { setVariableData[0].variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
-            .and { get { setVariableData[0].attributeType }.isEqualTo(AttributeEnumTypeGen.Target) }
+                }
+                .and { get { setVariableData[0].variable }.isEqualTo(VariableTypeGen("variable", "instance")) }
+                .and { get { setVariableData[0].attributeType }.isEqualTo(AttributeEnumTypeGen.Target) }
     }
 
     @Test
     fun getBaseReportMapper() {
         val mapper: GetBaseReportMapper = Mappers.getMapper(GetBaseReportMapper::class.java)
         val resp = mapper.genToCoreResp(
-            GetBaseReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+                GetBaseReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory)
+                GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory)
         )
         expectThat(req)
-            .and { get { requestId }.isEqualTo(1) }
-            .and { get { reportBase }.isEqualTo(ReportBaseEnumTypeGen.ConfigurationInventory) }
+                .and { get { requestId }.isEqualTo(1) }
+                .and { get { reportBase }.isEqualTo(ReportBaseEnumTypeGen.ConfigurationInventory) }
     }
 
     @Test
     fun getReportMapper() {
         val mapper: GetReportMapper = Mappers.getMapper(GetReportMapper::class.java)
         val resp = mapper.genToCoreResp(
-            GetReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+                GetReportResp(GenericDeviceModelStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            GetReportReq(
-                1, listOf(ComponentCriterionEnumType.Active), listOf(
-                    ComponentVariableType(
-                        ComponentType("component"),
-                        VariableType("variable")
-                    )
+                GetReportReq(
+                        1, listOf(ComponentCriterionEnumType.Active), listOf(
+                        ComponentVariableType(
+                                ComponentType("component"),
+                                VariableType("variable")
+                        )
                 )
-            )
+                )
         )
         expectThat(req)
-            .and { get { requestId }.isEqualTo(1) }
-            .and { get { componentCriteria }.isEqualTo(listOf(ComponentCriterionEnumTypeGen.Active)) }
-            .and {
-                get { componentVariable }.isEqualTo(
-                    listOf(
-                        ComponentVariableTypeGen(
-                            ComponentTypeGen("component"),
-                            VariableTypeGen("variable")
-                        )
+                .and { get { requestId }.isEqualTo(1) }
+                .and { get { componentCriteria }.isEqualTo(listOf(ComponentCriterionEnumTypeGen.Active)) }
+                .and {
+                    get { componentVariable }.isEqualTo(
+                            listOf(
+                                    ComponentVariableTypeGen(
+                                            ComponentTypeGen("component"),
+                                            VariableTypeGen("variable")
+                                    )
+                            )
                     )
-                )
-            }
+                }
     }
 
     @Test
     fun cancelReservationMapper() {
         val mapper: CancelReservationMapper = Mappers.getMapper(CancelReservationMapper::class.java)
         val resp = mapper.genToCoreResp(
-            CancelReservationResp(
-                CancelReservationStatusEnumTypeGen.Rejected,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                CancelReservationResp(
+                        CancelReservationStatusEnumTypeGen.Rejected,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { resp.status }.isEqualTo(CancelReservationStatusEnumType.Rejected) }
-            .and { get { resp.statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { resp.status }.isEqualTo(CancelReservationStatusEnumType.Rejected) }
+                .and { get { resp.statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(CancelReservationReq(3))
         expectThat(req).and { get { req.reservationId }.isEqualTo(3) }
@@ -600,75 +607,75 @@ class MapperTest {
 
         val req = mapper.genToCoreReq(FirmwareStatusNotificationReqGen(FirmwareStatusEnumTypeGen.InstallRebooting))
         expectThat(req)
-            .and { get { status }.isEqualTo(FirmwareStatusEnumType.InstallRebooting) }
+                .and { get { status }.isEqualTo(FirmwareStatusEnumType.InstallRebooting) }
     }
 
     @Test
     fun clearChargingProfileMapper() {
         val mapper: ClearChargingProfileMapper = Mappers.getMapper(ClearChargingProfileMapper::class.java)
         val resp = mapper.genToCoreResp(
-            ClearChargingProfileResp(
-                ClearChargingProfileStatusEnumTypeGen.Accepted,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                ClearChargingProfileResp(
+                        ClearChargingProfileStatusEnumTypeGen.Accepted,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(ClearChargingProfileEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(ClearChargingProfileEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            ClearChargingProfileReq(
-                1,
-                ClearChargingProfileType(
-                    1,
-                    ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
-                    1
+                ClearChargingProfileReq(
+                        1,
+                        ClearChargingProfileType(
+                                1,
+                                ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                                1
+                        )
                 )
-            )
         )
         expectThat(req)
-            .and { get { chargingProfileId }.isEqualTo(1) }
-            .and { get { chargingProfileCriteria?.evseId }.isEqualTo(1) }
-            .and { get { chargingProfileCriteria?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
-            .and { get { chargingProfileCriteria?.stackLevel }.isEqualTo(1) }
+                .and { get { chargingProfileId }.isEqualTo(1) }
+                .and { get { chargingProfileCriteria?.evseId }.isEqualTo(1) }
+                .and { get { chargingProfileCriteria?.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+                .and { get { chargingProfileCriteria?.stackLevel }.isEqualTo(1) }
     }
 
     @Test
     fun getCompositeScheduleMapper() {
         val mapper: GetCompositeScheduleMapper = Mappers.getMapper(GetCompositeScheduleMapper::class.java)
         val resp = mapper.genToCoreResp(
-            GetCompositeScheduleResp(
-                GenericStatusEnumTypeGen.Accepted,
-                CompositeScheduleTypeGen(
-                    1,
-                    3,
-                    Instant.parse("2022-02-15T00:00:00.001Z"),
-                    ChargingRateUnitEnumTypeGen.A,
-                    listOf(ChargingSchedulePeriodTypeGen(9, 10.0))
-                ),
-                StatusInfoTypeGen("reason", "additional")
-            )
+                GetCompositeScheduleResp(
+                        GenericStatusEnumTypeGen.Accepted,
+                        CompositeScheduleTypeGen(
+                                1,
+                                3,
+                                Instant.parse("2022-02-15T00:00:00.001Z"),
+                                ChargingRateUnitEnumTypeGen.A,
+                                listOf(ChargingSchedulePeriodTypeGen(9, 10.0))
+                        ),
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(GenericStatusEnumType.Accepted) }
-            .and { get { schedule?.evseId }.isEqualTo(1) }
-            .and { get { schedule?.duration }.isEqualTo(3) }
-            .and { get { schedule?.scheduleStart }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
-            .and { get { schedule?.chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A) }
-            .and { get { schedule?.chargingSchedulePeriod }.isEqualTo(listOf(ChargingSchedulePeriodType(9, 10.0))) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(GenericStatusEnumType.Accepted) }
+                .and { get { schedule?.evseId }.isEqualTo(1) }
+                .and { get { schedule?.duration }.isEqualTo(3) }
+                .and { get { schedule?.scheduleStart }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+                .and { get { schedule?.chargingRateUnit }.isEqualTo(ChargingRateUnitEnumType.A) }
+                .and { get { schedule?.chargingSchedulePeriod }.isEqualTo(listOf(ChargingSchedulePeriodType(9, 10.0))) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            GetCompositeScheduleReq(
-                1,
-                3,
-                ChargingRateUnitEnumType.A
-            )
+                GetCompositeScheduleReq(
+                        1,
+                        3,
+                        ChargingRateUnitEnumType.A
+                )
         )
         expectThat(req)
-            .and { get { evseId }.isEqualTo(1) }
-            .and { get { duration }.isEqualTo(3) }
-            .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumTypeGen.A) }
+                .and { get { evseId }.isEqualTo(1) }
+                .and { get { duration }.isEqualTo(3) }
+                .and { get { chargingRateUnit }.isEqualTo(ChargingRateUnitEnumTypeGen.A) }
     }
 
     @Test
@@ -679,17 +686,17 @@ class MapperTest {
 
         val req = mapper.coreToGenReq(GetLocalListVersionReq())
         expectThat(req)
-            .and { get { req }.isA<GetLocalListVersionReqGen>() }
+                .and { get { req }.isA<GetLocalListVersionReqGen>() }
     }
 
     @Test
     fun updateFirmwareMapper() {
         val mapper: UpdateFirmwareMapper = Mappers.getMapper(UpdateFirmwareMapper::class.java)
         val resp = mapper.genToCoreResp(
-            UpdateFirmwareResp(
-                status = UpdateFirmwareStatusEnumTypeGen.Accepted,
-                statusInfo = StatusInfoTypeGen("reason", "additional")
-            )
+                UpdateFirmwareResp(
+                        status = UpdateFirmwareStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp) {
             get { resp.status }.isEqualTo(UpdateFirmwareStatusEnumType.Accepted)
@@ -697,31 +704,31 @@ class MapperTest {
         }
 
         val req = mapper.coreToGenReq(
-            UpdateFirmwareReq(
-                retries = 3,
-                retryInterval = 1,
-                requestId = 2,
-                firmware = FirmwareType(
-                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
-                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    signingCertificate = "signingCertificate",
-                    signature = "signature"
+                UpdateFirmwareReq(
+                        retries = 3,
+                        retryInterval = 1,
+                        requestId = 2,
+                        firmware = FirmwareType(
+                                location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                                retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                signingCertificate = "signingCertificate",
+                                signature = "signature"
+                        )
                 )
-            )
         )
         expectThat(req) {
             get { req.retries }.isEqualTo(3)
             get { req.retryInterval }.isEqualTo(1)
             get { req.requestId }.isEqualTo(2)
             get { req.firmware }.isEqualTo(
-                FirmwareTypeGen(
-                    location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
-                    retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    signingCertificate = "signingCertificate",
-                    signature = "signature"
-                )
+                    FirmwareTypeGen(
+                            location = "http://www.ietf.org/rfc/rfc2396.txt", // URI
+                            retrieveDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            installDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                            signingCertificate = "signingCertificate",
+                            signature = "signature"
+                    )
             )
         }
     }
@@ -730,40 +737,40 @@ class MapperTest {
     fun sendLocalListMapper() {
         val mapper: SendLocalListMapper = Mappers.getMapper(SendLocalListMapper::class.java)
         val resp = mapper.genToCoreResp(
-            SendLocalListResp(
-                SendLocalListStatusEnumTypeGen.Accepted,
-                StatusInfoTypeGen("reason", "additional")
-            )
+                SendLocalListResp(
+                        SendLocalListStatusEnumTypeGen.Accepted,
+                        StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(SendLocalListStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(SendLocalListStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            SendLocalListReq(
-                1,
-                UpdateEnumType.Full,
-                listOf(AuthorizationData(IdTokenType("", IdTokenEnumType.Local)))
-            )
+                SendLocalListReq(
+                        1,
+                        UpdateEnumType.Full,
+                        listOf(AuthorizationData(IdTokenType("", IdTokenEnumType.Local)))
+                )
         )
         expectThat(req)
-            .and { get { versionNumber }.isEqualTo(1) }
-            .and { get { updateType }.isEqualTo(UpdateEnumTypeGen.Full) }
-            .and {
-                get { localAuthorizationList }.isEqualTo(
-                    listOf(AuthorizationDataGen(IdTokenTypeGen("", IdTokenEnumTypeGen.Local)))
-                )
-            }
+                .and { get { versionNumber }.isEqualTo(1) }
+                .and { get { updateType }.isEqualTo(UpdateEnumTypeGen.Full) }
+                .and {
+                    get { localAuthorizationList }.isEqualTo(
+                            listOf(AuthorizationDataGen(IdTokenTypeGen("", IdTokenEnumTypeGen.Local)))
+                    )
+                }
     }
 
     @Test
     fun triggerMessage() {
         val mapper: TriggerMessageMapper = Mappers.getMapper(TriggerMessageMapper::class.java)
         val resp = mapper.genToCoreResp(
-            TriggerMessageResp(
-                status = TriggerMessageStatusEnumTypeGen.Accepted,
-                statusInfo = StatusInfoTypeGen("reason", "additional")
-            )
+                TriggerMessageResp(
+                        status = TriggerMessageStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp) {
             get { status }.isEqualTo(TriggerMessageStatusEnumType.Accepted)
@@ -771,10 +778,10 @@ class MapperTest {
         }
 
         val req = mapper.coreToGenReq(
-            TriggerMessageReq(
-                MessageTriggerEnumType.Heartbeat,
-                EVSEType(1, 1)
-            )
+                TriggerMessageReq(
+                        MessageTriggerEnumType.Heartbeat,
+                        EVSEType(1, 1)
+                )
         )
         expectThat(req) {
             get { requestedMessage }.isEqualTo(MessageTriggerEnumTypeGen.Heartbeat)
@@ -786,164 +793,164 @@ class MapperTest {
     fun setChargingProfileMapper() {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
         val resp = mapper.genToCoreResp(
-            SetChargingProfileResp(ChargingProfileStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
+                SetChargingProfileResp(ChargingProfileStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "additional"))
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(ChargingProfileStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(ChargingProfileStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            SetChargingProfileReq(
-                1, ChargingProfileType(
-                    id = 3,
-                    stackLevel = 4,
-                    chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
-                    chargingProfileKind = ChargingProfileKindEnumType.Absolute,
-                    chargingSchedule = listOf(
-                        ChargingScheduleType(
-                            id = 5,
-                            chargingRateUnit = ChargingRateUnitEnumType.A,
-                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
-                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
-                            duration = 6,
-                            minChargingRate = 7.0,
-                            salesTariff = SalesTariffType(8, listOf())
-                        )
-                    ),
-                    recurrencyKind = RecurrencyKindEnumType.Daily,
-                    validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
-                    validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
-                    transactionId = "transaction"
+                SetChargingProfileReq(
+                        1, ChargingProfileType(
+                        id = 3,
+                        stackLevel = 4,
+                        chargingProfilePurpose = ChargingProfilePurposeEnumType.ChargingStationMaxProfile,
+                        chargingProfileKind = ChargingProfileKindEnumType.Absolute,
+                        chargingSchedule = listOf(
+                                ChargingScheduleType(
+                                        id = 5,
+                                        chargingRateUnit = ChargingRateUnitEnumType.A,
+                                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                        duration = 6,
+                                        minChargingRate = 7.0,
+                                        salesTariff = SalesTariffType(8, listOf())
+                                )
+                        ),
+                        recurrencyKind = RecurrencyKindEnumType.Daily,
+                        validFrom = Instant.parse("2022-02-15T00:00:00.001Z"),
+                        validTo = Instant.parse("2022-02-15T00:00:00.002Z"),
+                        transactionId = "transaction"
                 )
-            )
+                )
         )
         expectThat(req)
-            .and { get { evseId }.isEqualTo(1) }
-            .and { get { chargingProfile.id }.isEqualTo(3) }
-            .and { get { chargingProfile.stackLevel }.isEqualTo(4) }
-            .and { get { chargingProfile.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
-            .and { get { chargingProfile.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
-            .and { get { chargingProfile.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
-            .and { get { chargingProfile.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
-            .and { get { chargingProfile.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
-            .and { get { chargingProfile.transactionId }.isEqualTo("transaction") }
+                .and { get { evseId }.isEqualTo(1) }
+                .and { get { chargingProfile.id }.isEqualTo(3) }
+                .and { get { chargingProfile.stackLevel }.isEqualTo(4) }
+                .and { get { chargingProfile.chargingProfilePurpose }.isEqualTo(ChargingProfilePurposeEnumTypeGen.ChargingStationMaxProfile) }
+                .and { get { chargingProfile.chargingProfileKind }.isEqualTo(ChargingProfileKindEnumTypeGen.Absolute) }
+                .and { get { chargingProfile.recurrencyKind }.isEqualTo(RecurrencyKindEnumTypeGen.Daily) }
+                .and { get { chargingProfile.validFrom }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z")) }
+                .and { get { chargingProfile.validTo }.isEqualTo(Instant.parse("2022-02-15T00:00:00.002Z")) }
+                .and { get { chargingProfile.transactionId }.isEqualTo("transaction") }
     }
 
     @Test
     fun getCertificateStatusMapper() {
         val mapper: GetCertificateStatusMapper = Mappers.getMapper(GetCertificateStatusMapper::class.java)
         val req = mapper.genToCoreReq(
-            GetCertificateStatusReqGen(
-                OCSPRequestDataTypeGen(
-                    hashAlgorithm = HashAlgorithmEnumTypeGen.SHA256,
-                    issuerNameHash = "",
-                    issuerKeyHash = "",
-                    serialNumber = "",
-                    responderURL = ""
+                GetCertificateStatusReqGen(
+                        OCSPRequestDataTypeGen(
+                                hashAlgorithm = HashAlgorithmEnumTypeGen.SHA256,
+                                issuerNameHash = "",
+                                issuerKeyHash = "",
+                                serialNumber = "",
+                                responderURL = ""
+                        )
                 )
-            )
         )
         expectThat(req).and {
             get { ocspRequestData }.isEqualTo(
-                OCSPRequestDataType(
-                    hashAlgorithm = HashAlgorithmEnumType.SHA256,
-                    issuerNameHash = "",
-                    issuerKeyHash = "",
-                    serialNumber = "",
-                    responderURL = ""
-                )
+                    OCSPRequestDataType(
+                            hashAlgorithm = HashAlgorithmEnumType.SHA256,
+                            issuerNameHash = "",
+                            issuerKeyHash = "",
+                            serialNumber = "",
+                            responderURL = ""
+                    )
             )
         }
 
         val resp = mapper.coreToGenResp(
-            GetCertificateStatusResp(
-                GetCertificateStatusEnumType.Accepted,
-                "",
-                StatusInfoType("reason", "additional")
-            )
+                GetCertificateStatusResp(
+                        GetCertificateStatusEnumType.Accepted,
+                        "",
+                        StatusInfoType("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
-            .and { get { ocspResult }.isEqualTo("") }
-            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+                .and { get { status }.isEqualTo(GetCertificateStatusEnumTypeGen.Accepted) }
+                .and { get { ocspResult }.isEqualTo("") }
+                .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 
     @Test
     fun notifyEVChargingNeedsMapper() {
         val mapper: NotifyEVChargingNeedsMapper = Mappers.getMapper(NotifyEVChargingNeedsMapper::class.java)
         val req = mapper.genToCoreReq(
-            NotifyEVChargingNeedsReqGen(
-                evseId = 1,
-                maxScheduleTuples = 3,
-                chargingNeeds = ChargingNeedsTypeGen(
-                    requestedEnergyTransfer = EnergyTransferModeEnumTypeGen.DC,
-                    departureTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    acChargingParameters = ACChargingParametersTypeGen(
-                        energyAmount = 1,
-                        evMinCurrent = 2,
-                        evMaxCurrent = 3,
-                        evMaxVoltage = 4
-                    ),
-                    dcChargingParameters = DCChargingParametersTypeGen(
-                        evMaxCurrent = 1,
-                        evMaxVoltage = 2,
-                        energyAmount = 3,
-                        evMaxPower = 4,
-                        stateOfCharge = 5,
-                        evEnergyCapacity = 6,
-                        fullSoC = 7,
-                        bulkSoC = 8
-                    )
+                NotifyEVChargingNeedsReqGen(
+                        evseId = 1,
+                        maxScheduleTuples = 3,
+                        chargingNeeds = ChargingNeedsTypeGen(
+                                requestedEnergyTransfer = EnergyTransferModeEnumTypeGen.DC,
+                                departureTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                acChargingParameters = ACChargingParametersTypeGen(
+                                        energyAmount = 1,
+                                        evMinCurrent = 2,
+                                        evMaxCurrent = 3,
+                                        evMaxVoltage = 4
+                                ),
+                                dcChargingParameters = DCChargingParametersTypeGen(
+                                        evMaxCurrent = 1,
+                                        evMaxVoltage = 2,
+                                        energyAmount = 3,
+                                        evMaxPower = 4,
+                                        stateOfCharge = 5,
+                                        evEnergyCapacity = 6,
+                                        fullSoC = 7,
+                                        bulkSoC = 8
+                                )
+                        )
                 )
-            )
         )
         expectThat(req)
-            .and { get { evseId }.isEqualTo(1) }
-            .and { get { maxScheduleTuples }.isEqualTo(3) }
-            .and { get { chargingNeeds.requestedEnergyTransfer }.isEqualTo(EnergyTransferModeEnumType.DC) }
-            .and { get { chargingNeeds.departureTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { chargingNeeds.acChargingParameters?.energyAmount }.isEqualTo(1) }
-            .and { get { chargingNeeds.acChargingParameters?.evMinCurrent }.isEqualTo(2) }
-            .and { get { chargingNeeds.acChargingParameters?.evMaxCurrent }.isEqualTo(3) }
-            .and { get { chargingNeeds.acChargingParameters?.evMaxVoltage }.isEqualTo(4) }
-            .and { get { chargingNeeds.dcChargingParameters?.evMaxCurrent }.isEqualTo(1) }
-            .and { get { chargingNeeds.dcChargingParameters?.evMaxVoltage }.isEqualTo(2) }
-            .and { get { chargingNeeds.dcChargingParameters?.energyAmount }.isEqualTo(3) }
-            .and { get { chargingNeeds.dcChargingParameters?.evMaxPower }.isEqualTo(4) }
-            .and { get { chargingNeeds.dcChargingParameters?.stateOfCharge }.isEqualTo(5) }
-            .and { get { chargingNeeds.dcChargingParameters?.evEnergyCapacity }.isEqualTo(6) }
-            .and { get { chargingNeeds.dcChargingParameters?.fullSoC }.isEqualTo(7) }
-            .and { get { chargingNeeds.dcChargingParameters?.bulkSoC }.isEqualTo(8) }
+                .and { get { evseId }.isEqualTo(1) }
+                .and { get { maxScheduleTuples }.isEqualTo(3) }
+                .and { get { chargingNeeds.requestedEnergyTransfer }.isEqualTo(EnergyTransferModeEnumType.DC) }
+                .and { get { chargingNeeds.departureTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+                .and { get { chargingNeeds.acChargingParameters?.energyAmount }.isEqualTo(1) }
+                .and { get { chargingNeeds.acChargingParameters?.evMinCurrent }.isEqualTo(2) }
+                .and { get { chargingNeeds.acChargingParameters?.evMaxCurrent }.isEqualTo(3) }
+                .and { get { chargingNeeds.acChargingParameters?.evMaxVoltage }.isEqualTo(4) }
+                .and { get { chargingNeeds.dcChargingParameters?.evMaxCurrent }.isEqualTo(1) }
+                .and { get { chargingNeeds.dcChargingParameters?.evMaxVoltage }.isEqualTo(2) }
+                .and { get { chargingNeeds.dcChargingParameters?.energyAmount }.isEqualTo(3) }
+                .and { get { chargingNeeds.dcChargingParameters?.evMaxPower }.isEqualTo(4) }
+                .and { get { chargingNeeds.dcChargingParameters?.stateOfCharge }.isEqualTo(5) }
+                .and { get { chargingNeeds.dcChargingParameters?.evEnergyCapacity }.isEqualTo(6) }
+                .and { get { chargingNeeds.dcChargingParameters?.fullSoC }.isEqualTo(7) }
+                .and { get { chargingNeeds.dcChargingParameters?.bulkSoC }.isEqualTo(8) }
 
         val resp = mapper.coreToGenResp(
-            NotifyEVChargingNeedsResp(
-                NotifyEVChargingNeedsStatusEnumType.Accepted,
-                StatusInfoType("reason", "additional")
-            )
+                NotifyEVChargingNeedsResp(
+                        NotifyEVChargingNeedsStatusEnumType.Accepted,
+                        StatusInfoType("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(NotifyEVChargingNeedsStatusEnumTypeGen.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+                .and { get { status }.isEqualTo(NotifyEVChargingNeedsStatusEnumTypeGen.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
 
     @Test
     fun notifyCustomerInformation() {
         val mapper: NotifyCustomerInformationMapper = Mappers.getMapper(NotifyCustomerInformationMapper::class.java)
         val resp = mapper.coreToGenResp(
-            NotifyCustomerInformationResp()
+                NotifyCustomerInformationResp()
         )
         expectThat(resp) {
             get { resp }.isA<NotifyCustomerInformationRespGen>()
         }
 
         val req = mapper.genToCoreReq(
-            NotifyCustomerInformationReq(
-                data = "Some data",
-                tbc = true,
-                seqNo = 0,
-                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
-                requestId = 1
-            )
+                NotifyCustomerInformationReq(
+                        data = "Some data",
+                        tbc = true,
+                        seqNo = 0,
+                        generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        requestId = 1
+                )
         )
         expectThat(req) {
             get { req.data }.isEqualTo("Some data")
@@ -961,28 +968,28 @@ class MapperTest {
         expectThat(resp).isA<NotifyEventRespGen>()
 
         val req = mapper.genToCoreReq(
-            NotifyEventReqGen(
-                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
-                seqNo = 0,
-                eventData = listOf(
-                    EventDataTypeGen(
-                        eventId = 1,
-                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
-                        trigger = EventTriggerEnumTypeGen.Delta,
-                        actualValue = "actualValue",
-                        eventNotificationType = EventNotificationEnumTypeGen.HardWiredNotification,
-                        component = ComponentTypeGen("component"),
-                        variable = VariableTypeGen("variable"),
-                        cause = 2,
-                        techCode = "techCode",
-                        techInfo = "techInfo",
-                        cleared = true,
-                        transactionId = "transaction",
-                        variableMonitoringId = 3
-                    )
-                ),
-                tbc = true
-            )
+                NotifyEventReqGen(
+                        generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        seqNo = 0,
+                        eventData = listOf(
+                                EventDataTypeGen(
+                                        eventId = 1,
+                                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                        trigger = EventTriggerEnumTypeGen.Delta,
+                                        actualValue = "actualValue",
+                                        eventNotificationType = EventNotificationEnumTypeGen.HardWiredNotification,
+                                        component = ComponentTypeGen("component"),
+                                        variable = VariableTypeGen("variable"),
+                                        cause = 2,
+                                        techCode = "techCode",
+                                        techInfo = "techInfo",
+                                        cleared = true,
+                                        transactionId = "transaction",
+                                        variableMonitoringId = 3
+                                )
+                        ),
+                        tbc = true
+                )
         )
         expectThat(req) {
             get { req.generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
@@ -1011,42 +1018,42 @@ class MapperTest {
         expectThat(resp).and { get { resp }.isA<NotifyChargingLimitRespGen>() }
 
         val req = mapper.genToCoreReq(
-            NotifyChargingLimitReqGen(
-                ChargingLimitTypeGen(
-                    chargingLimitSource = ChargingLimitSourceEnumTypeGen.CSO,
-                    isGridCritical = true
-                ),
-                1,
-                listOf(
-                    ChargingScheduleTypeGen(
-                        id = 5,
-                        chargingRateUnit = ChargingRateUnitEnumTypeGen.A,
-                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodTypeGen(9, 10.0)),
-                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
-                        duration = 6,
-                        minChargingRate = 7.0
-                    )
+                NotifyChargingLimitReqGen(
+                        ChargingLimitTypeGen(
+                                chargingLimitSource = ChargingLimitSourceEnumTypeGen.CSO,
+                                isGridCritical = true
+                        ),
+                        1,
+                        listOf(
+                                ChargingScheduleTypeGen(
+                                        id = 5,
+                                        chargingRateUnit = ChargingRateUnitEnumTypeGen.A,
+                                        chargingSchedulePeriod = listOf(ChargingSchedulePeriodTypeGen(9, 10.0)),
+                                        startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                        duration = 6,
+                                        minChargingRate = 7.0
+                                )
+                        )
                 )
-            )
         )
         expectThat(req)
-            .and { get { chargingLimit.chargingLimitSource }.isEqualTo(ChargingLimitSourceEnumType.CSO) }
-            .and { get { chargingLimit.isGridCritical }.isTrue() }
-            .and { get { evseId }.isEqualTo(1) }
-            .and {
-                get { chargingSchedule }.isEqualTo(
-                    listOf(
-                        ChargingScheduleType(
-                            id = 5,
-                            chargingRateUnit = ChargingRateUnitEnumType.A,
-                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
-                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
-                            duration = 6,
-                            minChargingRate = 7.0
-                        )
+                .and { get { chargingLimit.chargingLimitSource }.isEqualTo(ChargingLimitSourceEnumType.CSO) }
+                .and { get { chargingLimit.isGridCritical }.isTrue() }
+                .and { get { evseId }.isEqualTo(1) }
+                .and {
+                    get { chargingSchedule }.isEqualTo(
+                            listOf(
+                                    ChargingScheduleType(
+                                            id = 5,
+                                            chargingRateUnit = ChargingRateUnitEnumType.A,
+                                            chargingSchedulePeriod = listOf(ChargingSchedulePeriodType(9, 10.0)),
+                                            startSchedule = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                            duration = 6,
+                                            minChargingRate = 7.0
+                                    )
+                            )
                     )
-                )
-            }
+                }
     }
 
     @Test
@@ -1056,33 +1063,33 @@ class MapperTest {
         expectThat(resp).and { get { resp }.isA<NotifyDisplayMessagesRespGen>() }
 
         val req = mapper.genToCoreReq(
-            NotifyDisplayMessagesReqGen(
-                requestId = 1,
-                tbc = false,
-                messageInfo = listOf(
-                    MessageInfoTypeGen(
-                        id = 2,
-                        priority = MessagePriorityEnumTypeGen.InFront,
-                        state = MessageStateEnumTypeGen.Charging,
-                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                        endDateTime = Instant.parse("2022-02-15T00:00:00.001Z"),
-                        transactionId = "2",
-                        message = MessageContentTypeGen(
-                            format = MessageFormatEnumTypeGen.URI,
-                            language = "language",
-                            content = "Message content"
-                        ),
-                        display = ComponentTypeGen(
-                            name = "name",
-                            instance = "instance",
-                            evse = EVSETypeGen(
-                                id = 1,
-                                connectorId = 2
-                            )
+                NotifyDisplayMessagesReqGen(
+                        requestId = 1,
+                        tbc = false,
+                        messageInfo = listOf(
+                                MessageInfoTypeGen(
+                                        id = 2,
+                                        priority = MessagePriorityEnumTypeGen.InFront,
+                                        state = MessageStateEnumTypeGen.Charging,
+                                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                        endDateTime = Instant.parse("2022-02-15T00:00:00.001Z"),
+                                        transactionId = "2",
+                                        message = MessageContentTypeGen(
+                                                format = MessageFormatEnumTypeGen.URI,
+                                                language = "language",
+                                                content = "Message content"
+                                        ),
+                                        display = ComponentTypeGen(
+                                                name = "name",
+                                                instance = "instance",
+                                                evse = EVSETypeGen(
+                                                        id = 1,
+                                                        connectorId = 2
+                                                )
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         )
         expectThat(req) {
             get { req }.isA<NotifyDisplayMessagesReq>()
@@ -1108,14 +1115,14 @@ class MapperTest {
     fun dataTransferMapper() {
         val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
         val resp = mapper.genToCoreResp(
-            DataTransferRespGen(
-                status = DataTransferStatusEnumTypeGen.Accepted,
-                data = "Some data",
-                statusInfo = StatusInfoTypeGen(
-                    reasonCode = "reasonCode",
-                    additionalInfo = "additionalInfo"
+                DataTransferRespGen(
+                        status = DataTransferStatusEnumTypeGen.Accepted,
+                        data = "Some data",
+                        statusInfo = StatusInfoTypeGen(
+                                reasonCode = "reasonCode",
+                                additionalInfo = "additionalInfo"
+                        )
                 )
-            )
         )
         expectThat(resp) {
             isA<DataTransferResp>()
@@ -1126,11 +1133,11 @@ class MapperTest {
         }
 
         val req = mapper.coreToGenReq(
-            DataTransferReq(
-                messageId = "messageId",
-                data = "Some data",
-                vendorId = "vendorId"
-            )
+                DataTransferReq(
+                        messageId = "messageId",
+                        data = "Some data",
+                        vendorId = "vendorId"
+                )
         )
         expectThat(req) {
             isA<DataTransferReqGen>()
@@ -1144,15 +1151,15 @@ class MapperTest {
     fun diagnosticsStatusNotificationMapper() {
         val mapper: LogStatusNotificationMapper = Mappers.getMapper(LogStatusNotificationMapper::class.java)
         val resp = mapper.coreToGenResp(
-            LogStatusNotificationResp()
+                LogStatusNotificationResp()
         )
         expectThat(resp) {
             get { resp }.isA<LogStatusNotificationRespGen>()
         }
 
         val req = mapper.genToCoreReq(LogStatusNotificationReqGen(
-            status = UploadLogStatusEnumTypeGen.Uploaded,
-            requestId = 1
+                status = UploadLogStatusEnumTypeGen.Uploaded,
+                requestId = 1
         ))
         expectThat(req) {
             get { status }.isEqualTo(UploadLogStatusEnumType.Uploaded)
@@ -1164,16 +1171,16 @@ class MapperTest {
     fun publishFirmwareStatusNotificationMapper() {
         val mapper: PublishFirmwareStatusNotificationMapper = Mappers.getMapper(PublishFirmwareStatusNotificationMapper::class.java)
         val resp = mapper.coreToGenResp(
-            PublishFirmwareStatusNotificationResp()
+                PublishFirmwareStatusNotificationResp()
         )
         expectThat(resp) {
             get { resp }.isA<PublishFirmwareStatusNotificationRespGen>()
         }
 
         val req = mapper.genToCoreReq(PublishFirmwareStatusNotificationReqGen(
-            status = PublishFirmwareStatusEnumTypeGen.PublishFailed,
-            location = listOf("location"),
-            requestId = 1
+                status = PublishFirmwareStatusEnumTypeGen.PublishFailed,
+                location = listOf("location"),
+                requestId = 1
         ))
         expectThat(req) {
             get { status }.isEqualTo(PublishFirmwareStatusEnumType.PublishFailed)
@@ -1189,40 +1196,40 @@ class MapperTest {
         expectThat(resp).and { get { resp }.isA<NotifyMonitoringReportRespGen>() }
 
         val req = mapper.genToCoreReq(
-            NotifyMonitoringReportReq(
-                requestId = 1,
-                generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
-                seqNo = 2,
-                tbc = true,
-                monitor = listOf(
-                    MonitoringDataTypeGen(
-                        component = ComponentTypeGen("component"),
-                        variable = VariableTypeGen("variable"),
-                        variableMonitoring = listOf(
-                            VariableMonitoringTypeGen(
-                                id = 3,
-                                transaction = true,
-                                value = 10.0,
-                                type = MonitorEnumTypeGen.Periodic,
-                                severity = 3
-                            )
+                NotifyMonitoringReportReq(
+                        requestId = 1,
+                        generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        seqNo = 2,
+                        tbc = true,
+                        monitor = listOf(
+                                MonitoringDataTypeGen(
+                                        component = ComponentTypeGen("component"),
+                                        variable = VariableTypeGen("variable"),
+                                        variableMonitoring = listOf(
+                                                VariableMonitoringTypeGen(
+                                                        id = 3,
+                                                        transaction = true,
+                                                        value = 10.0,
+                                                        type = MonitorEnumTypeGen.Periodic,
+                                                        severity = 3
+                                                )
+                                        )
+                                )
                         )
-                    )
                 )
-            )
         )
         expectThat(req)
-            .and { get { requestId }.isEqualTo(1) }
-            .and { get { seqNo }.isEqualTo(2) }
-            .and { get { tbc }.isEqualTo(true) }
-            .and { get { generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { monitor?.get(0)?.component }.isEqualTo(ComponentType("component")) }
-            .and { get { monitor?.get(0)?.variable }.isEqualTo(VariableType("variable")) }
-            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.id }.isEqualTo(3) }
-            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.transaction }.isEqualTo(true) }
-            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.value }.isEqualTo(10.0) }
-            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.type }.isEqualTo(MonitorEnumType.Periodic) }
-            .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.severity }.isEqualTo(3) }
+                .and { get { requestId }.isEqualTo(1) }
+                .and { get { seqNo }.isEqualTo(2) }
+                .and { get { tbc }.isEqualTo(true) }
+                .and { get { generatedAt }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+                .and { get { monitor?.get(0)?.component }.isEqualTo(ComponentType("component")) }
+                .and { get { monitor?.get(0)?.variable }.isEqualTo(VariableType("variable")) }
+                .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.id }.isEqualTo(3) }
+                .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.transaction }.isEqualTo(true) }
+                .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.value }.isEqualTo(10.0) }
+                .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.type }.isEqualTo(MonitorEnumType.Periodic) }
+                .and { get { monitor?.get(0)?.variableMonitoring?.get(0)?.severity }.isEqualTo(3) }
     }
 
     @Test
@@ -1232,14 +1239,14 @@ class MapperTest {
         expectThat(resp).and { get { resp }.isA<ReservationStatusUpdateRespGen>() }
 
         val req = mapper.genToCoreReq(
-            ReservationStatusUpdateReq(
-                reservationId = 1,
-                reservationUpdateStatus = ReservationUpdateStatusEnumTypeGen.Expired
-            )
+                ReservationStatusUpdateReq(
+                        reservationId = 1,
+                        reservationUpdateStatus = ReservationUpdateStatusEnumTypeGen.Expired
+                )
         )
         expectThat(req)
-            .and { get { reservationId }.isEqualTo(1) }
-            .and { get { reservationUpdateStatus }.isEqualTo(ReservationUpdateStatusEnumType.Expired) }
+                .and { get { reservationId }.isEqualTo(1) }
+                .and { get { reservationUpdateStatus }.isEqualTo(ReservationUpdateStatusEnumType.Expired) }
     }
 
     @Test
@@ -1249,27 +1256,27 @@ class MapperTest {
         expectThat(resp).and { get { resp }.isA<SecurityEventNotificationRespGen>() }
 
         val req = mapper.genToCoreReq(
-            SecurityEventNotificationReq(
-                type = "type",
-                timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
-                techInfo = "techInfo"
-            )
+                SecurityEventNotificationReq(
+                        type = "type",
+                        timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        techInfo = "techInfo"
+                )
         )
         expectThat(req)
-            .and { get { type }.isEqualTo("type") }
-            .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { techInfo }.isEqualTo("techInfo") }
+                .and { get { type }.isEqualTo("type") }
+                .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+                .and { get { techInfo }.isEqualTo("techInfo") }
     }
 
     @Test
     fun certificateSignedMapper() {
         val mapper: CertificateSignedMapper = Mappers.getMapper(CertificateSignedMapper::class.java)
-        val resp = mapper.genToCoreResp(CertificateSignedRespGen(CertificateSignedStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason","info")))
+        val resp = mapper.genToCoreResp(CertificateSignedRespGen(CertificateSignedStatusEnumTypeGen.Accepted, StatusInfoTypeGen("reason", "info")))
         expectThat(resp)
-            .and { get { status }.isEqualTo(CertificateSignedStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason","info")) }
+                .and { get { status }.isEqualTo(CertificateSignedStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "info")) }
 
-        val req = mapper.coreToGenReq(CertificateSignedReq("certificateChain",CertificateSigningUseEnumType.V2GCertificate))
+        val req = mapper.coreToGenReq(CertificateSignedReq("certificateChain", CertificateSigningUseEnumType.V2GCertificate))
         expectThat(req) {
             get { certificateChain }.isEqualTo("certificateChain")
             get { certificateType }.isEqualTo(CertificateSigningUseEnumTypeGen.V2GCertificate)
@@ -1280,61 +1287,62 @@ class MapperTest {
     fun signCertificateMapper() {
         val mapper: SignCertificateMapper = Mappers.getMapper(SignCertificateMapper::class.java)
         val req = mapper.genToCoreReq(
-            SignCertificateReq(
-                csr = "csr",
-                certificateType = CertificateSigningUseEnumTypeGen.V2GCertificate
-            )
+                SignCertificateReq(
+                        csr = "csr",
+                        certificateType = CertificateSigningUseEnumTypeGen.V2GCertificate
+                )
         )
         expectThat(req)
-            .and { get { csr }.isEqualTo("csr") }
-            .and { get { certificateType }.isEqualTo(CertificateSigningUseEnumType.V2GCertificate) }
+                .and { get { csr }.isEqualTo("csr") }
+                .and { get { certificateType }.isEqualTo(CertificateSigningUseEnumType.V2GCertificate) }
 
         val resp = mapper.coreToGenResp(
-            SignCertificateResp(
-                status = GenericStatusEnumType.Accepted,
-                statusInfo = StatusInfoType("reason", "additional")
-            )
+                SignCertificateResp(
+                        status = GenericStatusEnumType.Accepted,
+                        statusInfo = StatusInfoType("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(GenericStatusEnumTypeGen.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
+                .and { get { status }.isEqualTo(GenericStatusEnumTypeGen.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoTypeGen("reason", "additional")) }
     }
+
     @Test
     fun getLogMapper() {
         val mapper: GetLogMapper = Mappers.getMapper(GetLogMapper::class.java)
         val resp = mapper.genToCoreResp(
-            GetLogResp(
-                status = LogStatusEnumTypeGen.Accepted,
-                filename = "filename",
-                statusInfo = StatusInfoTypeGen("reason", "additional")
-            )
+                GetLogResp(
+                        status = LogStatusEnumTypeGen.Accepted,
+                        filename = "filename",
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(LogStatusEnumType.Accepted) }
-            .and { get { filename }.isEqualTo("filename") }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(LogStatusEnumType.Accepted) }
+                .and { get { filename }.isEqualTo("filename") }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(
-            GetLogReq(
-                requestId = 1,
-                logType = LogEnumType.DiagnosticsLog,
-                log = LogParametersType(
-                    remoteLocation = "remoteLocation",
-                    oldestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
-                    latestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z")
-                ),
-                retries = 2,
-                retryInterval = 3
-            )
+                GetLogReq(
+                        requestId = 1,
+                        logType = LogEnumType.DiagnosticsLog,
+                        log = LogParametersType(
+                                remoteLocation = "remoteLocation",
+                                oldestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                latestTimestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+                        ),
+                        retries = 2,
+                        retryInterval = 3
+                )
         )
         expectThat(req)
-            .and { get { requestId }.isEqualTo(1) }
-            .and { get { logType }.isEqualTo(LogEnumTypeGen.DiagnosticsLog) }
-            .and { get { log.remoteLocation }.isEqualTo("remoteLocation") }
-            .and { get { log.oldestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { log.latestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { retries }.isEqualTo(2) }
-            .and { get { retryInterval }.isEqualTo(3) }
+                .and { get { requestId }.isEqualTo(1) }
+                .and { get { logType }.isEqualTo(LogEnumTypeGen.DiagnosticsLog) }
+                .and { get { log.remoteLocation }.isEqualTo("remoteLocation") }
+                .and { get { log.oldestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+                .and { get { log.latestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+                .and { get { retries }.isEqualTo(2) }
+                .and { get { retryInterval }.isEqualTo(3) }
     }
 
 
@@ -1342,19 +1350,20 @@ class MapperTest {
     fun clearDisplayMessageMapper() {
         val mapper: ClearDisplayMessageMapper = Mappers.getMapper(ClearDisplayMessageMapper::class.java)
         val resp = mapper.genToCoreResp(
-            ClearDisplayMessageResp(
-                status = ClearMessageStatusEnumTypeGen.Accepted,
-                statusInfo = StatusInfoTypeGen("reason", "additional")
-            )
+                ClearDisplayMessageResp(
+                        status = ClearMessageStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
         )
         expectThat(resp)
-            .and { get { status }.isEqualTo(ClearMessageStatusEnumType.Accepted) }
-            .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
+                .and { get { status }.isEqualTo(ClearMessageStatusEnumType.Accepted) }
+                .and { get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional")) }
 
         val req = mapper.coreToGenReq(ClearDisplayMessageReq(2))
         expectThat(req)
-            .and { get { id }.isEqualTo(2) }
+                .and { get { id }.isEqualTo(2) }
     }
+
     @Test
     fun reportChargingProfilesMapper() {
         val mapper: ReportChargingProfilesMapper = Mappers.getMapper(ReportChargingProfilesMapper::class.java)
@@ -1379,7 +1388,7 @@ class MapperTest {
                                         )
                                 )
                         ),
-                    false
+                        false
                 )
         )
         expectThat(req) {
@@ -1400,7 +1409,70 @@ class MapperTest {
         val resp = mapper.coreToGenResp(ReportChargingProfilesResp())
 
         expectThat(resp).isA<ReportChargingProfilesRespGen>()
+    }
 
+    @Test
+    fun setDisplayMessageMapper() {
+        val mapper: SetDisplayMessageMapper = Mappers.getMapper(SetDisplayMessageMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                SetDisplayMessageResp(
+                        status = DisplayMessageStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(DisplayMessageStatusEnumType.Accepted)
+            get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+
+        val req = mapper.coreToGenReq(SetDisplayMessageReq(
+                MessageInfoType(
+                        id = 2,
+                        priority = MessagePriorityEnumType.InFront,
+                        state = MessageStateEnumType.Charging,
+                        startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                        endDateTime = Instant.parse("2022-02-15T00:00:00.001Z"),
+                        transactionId = "2",
+                        message = MessageContentType(
+                                format = MessageFormatEnumType.URI,
+                                language = "language",
+                                content = "Message content"
+                        ),
+                        display = ComponentType(
+                                name = "name",
+                                instance = "instance",
+                                evse = EVSEType(
+                                        id = 1,
+                                        connectorId = 2
+                                )
+                        )
+                )
+        )
+        )
+
+        expectThat(req) {
+            get { req }.isA<SetDisplayMessageReqGen>()
+            get { message }.and {
+                get { id }.isEqualTo(2)
+                get { priority }.isEqualTo(MessagePriorityEnumTypeGen.InFront)
+                get { state }.isEqualTo(MessageStateEnumTypeGen.Charging)
+                get { startDateTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+                get { endDateTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.001Z"))
+                get { transactionId }.isEqualTo("2")
+                get { message }.and {
+                    get { format }.isEqualTo(MessageFormatEnumTypeGen.URI)
+                    get { language }.isEqualTo("language")
+                    get { content }.isEqualTo("Message content")
+                }
+                get { display }.and {
+                    get { this?.name }.isEqualTo("name")
+                    get { this?.instance }.isEqualTo("instance")
+                    get { this?.evse?.id }.isEqualTo(1)
+                    get { this?.evse?.connectorId }.isEqualTo(2)
+                }
+            }
+        }
     }
 
     @Test

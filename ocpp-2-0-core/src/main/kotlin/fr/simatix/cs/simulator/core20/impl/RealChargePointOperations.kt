@@ -15,7 +15,6 @@ import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMess
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
-import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
@@ -71,6 +70,7 @@ import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEv
 import fr.simatix.cs.simulator.core20.model.securityeventnotification.SecurityEventNotificationResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileReq
@@ -351,6 +351,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("CostUpdated") { req: CostUpdatedReq ->
             csmsOperations.costUpdated(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("SetDisplayMessage") { req: SetDisplayMessageReq ->
+            csmsOperations.setDisplayMessage(
                     RequestMetadata(chargeStationId),
                     req
             ).response

@@ -58,6 +58,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
@@ -341,6 +343,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: GetDisplayMessagesReq
             ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun setDisplayMessage(
+                    meta: RequestMetadata,
+                    req: SetDisplayMessageReq
+            ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
                 TODO("Not yet implemented")
             }
 

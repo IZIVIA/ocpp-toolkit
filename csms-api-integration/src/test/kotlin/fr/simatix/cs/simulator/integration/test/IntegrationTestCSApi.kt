@@ -99,6 +99,9 @@ import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -547,6 +550,14 @@ class IntegrationTestCSApi {
             ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
                 val response = CostUpdatedResp()
                 return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+            }
+
+            override fun setDisplayMessage(
+                    meta: RequestMetadata,
+                    req: SetDisplayMessageReq
+            ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
+                val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
         }
     }
@@ -1057,6 +1068,29 @@ class IntegrationTestCSApi {
             )
         )
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "SetDisplayMessage",
+                "{\"message\": " +
+                            "{" +
+                                "\"id\":321," +
+                                "\"priority\": \"AlwaysFront\"," +
+                                "\"state\": \"Charging\"," +
+                                "\"startDateTime\": \"2022-02-15T00:00:00.000Z\"," +
+                                "\"endDateTime\": \"2022-02-15T00:00:00.000Z\"," +
+                                "\"transactionId\": \"identifierstringtransacionid\"," +
+                                "\"message\": " +
+                                    "{" +
+                                        "\"format\": \"ASCII\"," +
+                                        "\"language\": \"frfr\"," +
+                                        "\"content\": \"messqge content\"" +
+                                    "}" +
+                            "}" +
+                        "}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1093,6 +1127,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).setMonitoringBase(any(), any())
         verify(csApiSpy, times(1)).getDisplayMessages(any(), any())
         verify(csApiSpy, times(1)).costUpdated(any(), any())
+        verify(csApiSpy, times(1)).setDisplayMessage(any(), any())
 
         csmsApi.close()
     }

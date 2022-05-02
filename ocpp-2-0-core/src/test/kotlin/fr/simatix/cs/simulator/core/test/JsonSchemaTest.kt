@@ -95,7 +95,7 @@ import fr.simatix.cs.simulator.core20.model.notifycharginglimit.ChargingLimitTyp
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.notifycharginglimit.NotifyChargingLimitResp
 import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCustomerInformationReq
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
+import fr.simatix.cs.simulator.core20.model.common.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.common.enumeration.MessagePriorityEnumType
@@ -151,6 +151,9 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.enumeration.UpdateEnum
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.SetDisplayMessageResp
+import fr.simatix.cs.simulator.core20.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringDataType
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetMonitoringResultType
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
@@ -1207,6 +1210,53 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setDisplayMessage request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetDisplayMessageReq(
+                        MessageInfoType(
+                                id = 2,
+                                priority = MessagePriorityEnumType.InFront,
+                                state = MessageStateEnumType.Charging,
+                                startDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                endDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                                transactionId = "2",
+                                message = MessageContentType(
+                                        format = MessageFormatEnumType.URI,
+                                        language = "language",
+                                        content = "Message content"
+                                ),
+                                display = ComponentType(
+                                        name = "name",
+                                        instance = "instance",
+                                        evse = EVSEType(
+                                                id = 1,
+                                                connectorId = 2
+                                        )
+                                )
+                        )
+                ),
+                "SetDisplayMessageRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetDisplayMessageReq(
+                        MessageInfoType(
+                                id = 2,
+                                priority = MessagePriorityEnumType.InFront,
+                                message = MessageContentType(
+                                        format = MessageFormatEnumType.URI,
+                                        language = "language",
+                                        content = "Message content"
+                                )
+                        )
+                ),
+                "SetDisplayMessageRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
@@ -2629,10 +2679,32 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `setDisplayMessage response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetDisplayMessageResp(
+                        DisplayMessageStatusEnumType.Accepted,
+                        StatusInfoType("reason","code")
+                ),
+                "SetDisplayMessageResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetDisplayMessageResp(
+                        DisplayMessageStatusEnumType.Accepted
+                ),
+                "SetDisplayMessageResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `costUpdated response format`() {
 
         val errors = JsonSchemaValidator.isValidObjectV6(
-                StatusNotificationResp(),
+                CostUpdatedResp(),
                 "CostUpdatedResponse.json"
         )
         expectThat(errors)

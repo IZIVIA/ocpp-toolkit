@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileRe
 import fr.simatix.cs.simulator.api.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.api.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageReq
+import fr.simatix.cs.simulator.api.model.setdisplaymessage.SetDisplayMessageResp
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.api.model.setvariablemonitoring.SetVariableMonitoringReq
@@ -158,4 +160,7 @@ interface CSApi {
     fun getDisplayMessages(meta: RequestMetadata, req: GetDisplayMessagesReq): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp>
 
     fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq): OperationExecution<CostUpdatedReq, CostUpdatedResp>
+
+    fun setDisplayMessage(meta: RequestMetadata, req: SetDisplayMessageReq): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp>
+
 }
