@@ -17,6 +17,8 @@ import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMess
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
 import fr.simatix.cs.simulator.core20.model.getbasereport.GetBaseReportReq
@@ -357,6 +359,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
             mapper.genToCoreResp(response.response)
+        )
+    }
+    override fun costUpdated(
+            meta: RequestMetadata,
+            req: CostUpdatedReq
+    ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+        val mapper: CostUpdatedMapper = Mappers.getMapper(CostUpdatedMapper::class.java)
+        val response = csApi.costUpdated(meta, mapper.coreToGenReq(req))
+
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
         )
     }
 

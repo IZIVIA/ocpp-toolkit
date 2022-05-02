@@ -56,6 +56,8 @@ import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetC
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -1208,6 +1210,16 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `costUpdated request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                CostUpdatedReq(5465.2, "45465"),
+                "CostUpdatedRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `getDisplayMessages request format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
                 GetDisplayMessagesReq(
@@ -2286,7 +2298,6 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
-
     @Test
     fun `clearDisplayMessage response format`() {
         var errors = JsonSchemaValidator.isValidObjectV6(
@@ -2612,6 +2623,17 @@ class JsonSchemaTest {
                 GetTransactionStatusReq(
                 ),
                 "GetTransactionStatusRequest.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `costUpdated response format`() {
+
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                StatusNotificationResp(),
+                "CostUpdatedResponse.json"
         )
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }

@@ -14,6 +14,8 @@ import fr.simatix.cs.simulator.core20.model.clearchargingprofile.ClearChargingPr
 import fr.simatix.cs.simulator.core20.model.cleardisplaymessage.ClearDisplayMessageReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitReq
 import fr.simatix.cs.simulator.core20.model.clearedcharginglimit.ClearedChargingLimitResp
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.core20.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.core20.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferReq
 import fr.simatix.cs.simulator.core20.model.datatransfer.DataTransferResp
@@ -342,6 +344,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetDisplayMessages") { req: GetDisplayMessagesReq ->
             csmsOperations.getDisplayMessages(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("CostUpdated") { req: CostUpdatedReq ->
+            csmsOperations.costUpdated(
                     RequestMetadata(chargeStationId),
                     req
             ).response

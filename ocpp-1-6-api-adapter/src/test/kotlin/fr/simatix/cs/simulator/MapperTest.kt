@@ -604,5 +604,4 @@ class MapperTest {
             .and { get { retries }.isEqualTo(2) }
             .and { get { retryInterval }.isEqualTo(3) }
     }
-
 }

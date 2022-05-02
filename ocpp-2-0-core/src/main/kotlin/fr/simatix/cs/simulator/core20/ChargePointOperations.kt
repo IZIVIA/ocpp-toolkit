@@ -60,7 +60,7 @@ import java.net.ConnectException
 interface ChargePointOperations {
     companion object {
         fun newChargePointOperations(chargingStationId: String, transport: Transport, csmsOperations: CSMSOperations) =
-            RealChargePointOperations(chargingStationId,transport, csmsOperations)
+                RealChargePointOperations(chargingStationId, transport, csmsOperations)
     }
 
     /**
@@ -202,6 +202,7 @@ interface ChargePointOperations {
      */
     @Throws(IllegalStateException::class, ConnectException::class)
     fun signCertificate(meta: RequestMetadata, request: SignCertificateReq): OperationExecution<SignCertificateReq, SignCertificateResp>
+
 
     @Throws(IllegalStateException::class, ConnectException::class)
     fun reportChargingProfiles(meta: RequestMetadata, request: ReportChargingProfilesReq): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp>

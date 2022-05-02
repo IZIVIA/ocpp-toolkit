@@ -79,6 +79,8 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
@@ -559,6 +561,14 @@ class IntegrationTest {
         ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
             val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun costUpdated(
+                meta: RequestMetadata,
+                req: CostUpdatedReq
+        ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+            val response = CostUpdatedResp()
+            return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
         }
     }
 

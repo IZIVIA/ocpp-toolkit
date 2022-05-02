@@ -52,6 +52,8 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
 import fr.simatix.cs.simulator.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
@@ -552,6 +554,14 @@ fun main(args: Array<String>) {
         ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
             val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun costUpdated(
+                meta: RequestMetadata,
+                req: CostUpdatedReq
+        ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+            val response = CostUpdatedResp()
+            return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
         }
     }
 

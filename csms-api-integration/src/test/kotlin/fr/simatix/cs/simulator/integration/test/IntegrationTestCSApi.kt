@@ -52,6 +52,8 @@ import fr.simatix.cs.simulator.api.model.common.enumeration.MonitorEnumType
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedReq
+import fr.simatix.cs.simulator.api.model.costupdated.CostUpdatedResp
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionReq
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -538,6 +540,14 @@ class IntegrationTestCSApi {
                 val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
+
+            override fun costUpdated(
+                    meta: RequestMetadata,
+                    req: CostUpdatedReq
+            ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+                val response = CostUpdatedResp()
+                return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+            }
         }
     }
 
@@ -708,6 +718,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
+
         csmsApi.close()
     }
 
@@ -851,7 +862,7 @@ class IntegrationTestCSApi {
             "chargePoint2", WampMessage(
             WampMessageType.CALL, "1",
             "DataTransfer", "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
-        )
+            )
         )
         server.sendBlocking(
             "chargePoint2", WampMessage(
@@ -1039,6 +1050,13 @@ class IntegrationTestCSApi {
         )
 
 
+        server.sendBlocking(
+                "chargePoint2", WampMessage(
+                WampMessageType.CALL, "1",
+                "CostUpdated", "{\"totalCost\": \"43.3\", \"transactionId\": \"transactionId\"}"
+            )
+        )
+
         verify(csApiSpy, times(1)).reset(any(), any())
         verify(csApiSpy, times(1)).changeAvailability(any(), any())
         verify(csApiSpy, times(1)).setVariables(any(), any())
@@ -1074,6 +1092,7 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).getTransactionStatus(any(), any())
         verify(csApiSpy, times(1)).setMonitoringBase(any(), any())
         verify(csApiSpy, times(1)).getDisplayMessages(any(), any())
+        verify(csApiSpy, times(1)).costUpdated(any(), any())
 
         csmsApi.close()
     }
