@@ -24,6 +24,8 @@ import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVers
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
@@ -146,4 +148,6 @@ interface CSMSOperations {
 
     fun setMonitoringBase(meta: RequestMetadata, req: SetMonitoringBaseReq): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp>
 
+
+    fun getDisplayMessages(meta: RequestMetadata, req: GetDisplayMessagesReq): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp>
 }

@@ -38,6 +38,9 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
 import fr.simatix.cs.simulator.api.model.common.enumeration.GenericStatusEnumType
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
@@ -540,6 +543,14 @@ fun main(args: Array<String>) {
                 req: SetMonitoringBaseReq
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getDisplayMessages(
+                meta: RequestMetadata,
+                req: GetDisplayMessagesReq
+        ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+            val response = GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted,StatusInfoType("reason","more"))
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

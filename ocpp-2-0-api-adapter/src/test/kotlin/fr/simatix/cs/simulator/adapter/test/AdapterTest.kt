@@ -36,6 +36,9 @@ import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfiles
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
@@ -152,8 +155,8 @@ import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCust
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageStateEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.ChargingNeedsType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
@@ -246,8 +249,8 @@ import fr.simatix.cs.simulator.api.model.notifycharginglimit.NotifyChargingLimit
 import fr.simatix.cs.simulator.api.model.notifycustomerinformation.NotifyCustomerInformationReq as NotifyCustomerInformationReqGen
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.MessageInfoType as MessageInfoTypeGen
 import fr.simatix.cs.simulator.api.model.notifydisplaymessages.NotifyDisplayMessagesReq as NotifyDisplayMessagesReqGen
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
-import fr.simatix.cs.simulator.api.model.notifydisplaymessages.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessagePriorityEnumType as MessagePriorityEnumTypeGen
+import fr.simatix.cs.simulator.api.model.common.enumeration.MessageStateEnumType as MessageStateEnumTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.ChargingNeedsType as ChargingNeedsTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.DCChargingParametersType as DCChargingParametersTypeGen
 import fr.simatix.cs.simulator.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq as NotifyEVChargingNeedsReqGen
@@ -505,6 +508,18 @@ class AdapterTest {
             req: ClearDisplayMessageReq
         ): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp> {
             val response = ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getDisplayMessages(
+                meta: RequestMetadata,
+                req: GetDisplayMessagesReq
+        ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+            val response = GetDisplayMessagesResp(
+                                status = GetDisplayMessagesStatusEnumType.Accepted,
+                                statusInfo = StatusInfoTypeGen("reason", "additional")
+                            )
+
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 

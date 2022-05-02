@@ -43,6 +43,8 @@ import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalled
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationReq
 import fr.simatix.cs.simulator.api.model.customerinformation.CustomerInformationResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.api.model.getlog.GetLogResp
 import fr.simatix.cs.simulator.api.model.getlog.enumeration.LogStatusEnumType
@@ -474,6 +476,13 @@ class AdapterTest {
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getDisplayMessages(
+                meta: RequestMetadata,
+                req: GetDisplayMessagesReq
+        ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
+            throw NotImplementedError()
         }
     }
 

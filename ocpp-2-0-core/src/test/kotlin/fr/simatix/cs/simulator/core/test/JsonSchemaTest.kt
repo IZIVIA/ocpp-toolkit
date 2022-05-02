@@ -56,6 +56,7 @@ import fr.simatix.cs.simulator.core20.model.getchargingprofiles.enumeration.GetC
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.CompositeScheduleType
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.CertificateHashDataChainType
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
@@ -95,8 +96,10 @@ import fr.simatix.cs.simulator.core20.model.notifycustomerinformation.NotifyCust
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.MessageInfoType
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.NotifyDisplayMessagesResp
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessagePriorityEnumType
-import fr.simatix.cs.simulator.core20.model.notifydisplaymessages.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessagePriorityEnumType
+import fr.simatix.cs.simulator.core20.model.common.enumeration.MessageStateEnumType
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.*
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
 import fr.simatix.cs.simulator.core20.model.notifyevchargingneeds.enumeration.NotifyEVChargingNeedsStatusEnumType
@@ -1205,6 +1208,28 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `getDisplayMessages request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetDisplayMessagesReq(
+                        id=listOf(32,23),
+                        requestId=2,
+                        priority = MessagePriorityEnumType.AlwaysFront,
+                        state = MessageStateEnumType.Charging
+                ),
+                "GetDisplayMessagesRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetDisplayMessagesReq(
+                        requestId=2
+                ),
+                "GetDisplayMessagesRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `getChargingProfiles request format`() {
         //without optionnal parameters
         var errors = JsonSchemaValidator.isValidObjectV6(
@@ -2279,6 +2304,30 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `getDisplayMessages response format`() {
+        //without optionnal parameters
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted),
+                "GetDisplayMessagesResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        //with all parameters
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                GetDisplayMessagesResp(
+                        GetDisplayMessagesStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "GetDisplayMessagesResponse.json"
+        )
+
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test

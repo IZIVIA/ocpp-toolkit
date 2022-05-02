@@ -26,6 +26,8 @@ import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersion
 import fr.simatix.cs.simulator.api.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleReq
 import fr.simatix.cs.simulator.api.model.getcompositeschedule.GetCompositeScheduleResp
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesReq
+import fr.simatix.cs.simulator.api.model.getdisplaymessages.GetDisplayMessagesResp
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.api.model.getlog.GetLogReq
@@ -150,4 +152,6 @@ interface CSApi {
 
     fun setMonitoringBase(meta: RequestMetadata, req: SetMonitoringBaseReq): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp>
 
+
+    fun getDisplayMessages(meta: RequestMetadata, req: GetDisplayMessagesReq): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp>
 }
