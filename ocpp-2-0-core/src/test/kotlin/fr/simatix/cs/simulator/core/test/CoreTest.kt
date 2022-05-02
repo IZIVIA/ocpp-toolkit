@@ -54,6 +54,8 @@ import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
@@ -321,6 +323,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: GetTransactionStatusReq
             ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun setMonitoringBase(
+                    meta: RequestMetadata,
+                    req: SetMonitoringBaseReq
+            ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
                 TODO("Not yet implemented")
             }
         }

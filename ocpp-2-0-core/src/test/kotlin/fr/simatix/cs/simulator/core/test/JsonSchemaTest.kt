@@ -155,6 +155,9 @@ import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLeve
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelResp
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.*
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.enumeration.*
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.enumeration.MonitoringBaseEnumType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
@@ -1584,6 +1587,17 @@ class JsonSchemaTest {
     }
 
     @Test
+    fun `setMonitoringBase request format`() {
+        val errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringBaseReq(
+                        MonitoringBaseEnumType.All
+                ),
+                "SetMonitoringBaseRequest.json")
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
     fun `heartbeat response format`() {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -2265,6 +2279,29 @@ class JsonSchemaTest {
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `setMonitoringBase response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringBaseResp(
+                        GenericDeviceModelStatusEnumType.Accepted,
+                        StatusInfoType("reason","info")
+                ),
+                "SetMonitoringBaseResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
+        errors = JsonSchemaValidator.isValidObjectV6(
+                SetMonitoringBaseResp(
+                        GenericDeviceModelStatusEnumType.Accepted
+                ),
+                "SetMonitoringBaseResponse.json"
+        )
+        expectThat(errors)
+                .and { get { this.size }.isEqualTo(0) }
+
     }
 
     @Test

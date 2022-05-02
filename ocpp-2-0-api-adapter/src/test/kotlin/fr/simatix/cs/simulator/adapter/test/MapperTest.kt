@@ -135,6 +135,11 @@ import fr.simatix.cs.simulator.core20.model.setvariables.SetVariableDataType
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.setvariables.enumeration.SetVariableStatusEnumType
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
+import fr.simatix.cs.simulator.core20.model.common.enumeration.CertificateSigningUseEnumType
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.enumeration.MonitoringBaseEnumType
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.enumeration.MonitoringBaseEnumType as MonitoringBaseEnumTypeGen
 import fr.simatix.cs.simulator.core20.model.publishfirmware.PublishFirmwareReq
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.APNType
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.NetworkConnectionProfileType
@@ -1777,6 +1782,29 @@ class MapperTest {
             }
         }
     }
+
+    @Test
+    fun setMonitoringBaseMapper() {
+        val mapper: SetMonitoringBaseMapper = Mappers.getMapper(SetMonitoringBaseMapper::class.java)
+        val resp = mapper.genToCoreResp(
+                SetMonitoringBaseResp(
+                        status = GenericDeviceModelStatusEnumTypeGen.Accepted,
+                        statusInfo = StatusInfoTypeGen("reason", "additional")
+                )
+        )
+        expectThat(resp) {
+            get { status }.isEqualTo(GenericDeviceModelStatusEnumType.Accepted)
+            get { statusInfo }.isEqualTo(StatusInfoType("reason", "additional"))
+        }
+
+        val req = mapper.coreToGenReq(
+                SetMonitoringBaseReq(
+                        monitoringBase = MonitoringBaseEnumType.All
+                )
+        )
+        expectThat(req.monitoringBase).isEqualTo(MonitoringBaseEnumTypeGen.All)
+    }
+}
 
 
     @Test

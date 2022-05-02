@@ -71,6 +71,7 @@ import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfil
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
 import fr.simatix.cs.simulator.core20.model.setnetworkprofile.SetNetworkProfileReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
 import fr.simatix.cs.simulator.core20.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateReq
 import fr.simatix.cs.simulator.core20.model.signcertificate.SignCertificateResp
@@ -326,6 +327,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("GetTransactionStatus") { req: GetTransactionStatusReq ->
             csmsOperations.getTransactionStatus(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("SetMonitoringBase") { req: SetMonitoringBaseReq ->
+            csmsOperations.setMonitoringBase(
                     RequestMetadata(chargeStationId),
                     req
             ).response

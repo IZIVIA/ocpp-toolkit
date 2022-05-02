@@ -50,6 +50,8 @@ import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfil
 import fr.simatix.cs.simulator.core20.model.setchargingprofile.SetChargingProfileResp
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListReq
 import fr.simatix.cs.simulator.core20.model.sendlocallist.SendLocalListResp
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.core20.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringReq
 import fr.simatix.cs.simulator.core20.model.setvariablemonitoring.SetVariableMonitoringResp
 import fr.simatix.cs.simulator.core20.model.setmonitoringlevel.SetMonitoringLevelReq
@@ -140,5 +142,8 @@ interface CSMSOperations {
     fun setNetworkProfile(meta: RequestMetadata, req: SetNetworkProfileReq): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp>
 
     fun getTransactionStatus(meta: RequestMetadata, req: GetTransactionStatusReq): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp>
+
+
+    fun setMonitoringBase(meta: RequestMetadata, req: SetMonitoringBaseReq): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp>
 
 }

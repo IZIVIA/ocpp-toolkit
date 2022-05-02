@@ -94,6 +94,8 @@ import fr.simatix.cs.simulator.api.model.setmonitoringlevel.SetMonitoringLevelRe
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileReq
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.SetNetworkProfileResp
 import fr.simatix.cs.simulator.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseReq
+import fr.simatix.cs.simulator.api.model.setmonitoringbase.SetMonitoringBaseResp
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariableResultType
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesReq
 import fr.simatix.cs.simulator.api.model.setvariables.SetVariablesResp
@@ -530,6 +532,14 @@ fun main(args: Array<String>) {
                 req: GetTransactionStatusReq
         ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
             val response = GetTransactionStatusResp(false,true)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun setMonitoringBase(
+                meta: RequestMetadata,
+                req: SetMonitoringBaseReq
+        ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
+            val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }
