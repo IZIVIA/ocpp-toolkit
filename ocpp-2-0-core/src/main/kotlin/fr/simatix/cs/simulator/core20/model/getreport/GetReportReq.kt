@@ -1,5 +1,6 @@
 package fr.simatix.cs.simulator.core20.model.getreport
 
+import fr.simatix.cs.simulator.core20.model.common.ComponentVariableType
 import fr.simatix.cs.simulator.core20.model.getreport.enumeration.ComponentCriterionEnumType
 
 data class GetReportReq(

@@ -79,6 +79,8 @@ import fr.simatix.cs.simulator.api.model.notifyreport.VariableAttributeType
 import fr.simatix.cs.simulator.api.model.notifyreport.VariableCharacteristicsType
 import fr.simatix.cs.simulator.api.model.notifyreport.enumeration.DataEnumType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.api.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateReq
 import fr.simatix.cs.simulator.api.model.deletecertificate.DeleteCertificateResp
 import fr.simatix.cs.simulator.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
@@ -590,6 +592,14 @@ class IntegrationTest {
                 req: DeleteCertificateReq
         ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
             val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getMonitoringReport(
+                meta: RequestMetadata,
+                req: GetMonitoringReportReq
+        ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
+            val response = GetMonitoringReportResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
     }

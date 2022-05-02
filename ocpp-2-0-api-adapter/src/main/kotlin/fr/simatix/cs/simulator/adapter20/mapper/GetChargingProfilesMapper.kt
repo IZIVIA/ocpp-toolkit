@@ -1,13 +1,11 @@
 package fr.simatix.cs.simulator.adapter20.mapper
 
-import fr.simatix.cs.simulator.api.model.clearchargingprofile.ClearChargingProfileReq
 import fr.simatix.cs.simulator.core20.model.common.ChargingProfileCriterionType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingLimitSourceEnumType
 import fr.simatix.cs.simulator.core20.model.common.enumeration.ChargingProfilePurposeEnumType
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesResp
 import fr.simatix.cs.simulator.core20.model.getchargingprofiles.GetChargingProfilesReq
 import org.mapstruct.Mapper
-import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesResp as GetChargingProfilesRespGen
 import fr.simatix.cs.simulator.api.model.getchargingprofiles.GetChargingProfilesReq as GetChargingProfilesReqGen

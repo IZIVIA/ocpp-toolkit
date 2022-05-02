@@ -37,6 +37,8 @@ import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVers
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
@@ -572,6 +574,19 @@ class Ocpp20CSApiAdapter(private val csApi: CSApi) : CSMSOperations {
     ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
         val mapper: DeleteCertificateMapper = Mappers.getMapper(DeleteCertificateMapper::class.java)
         val response = csApi.deleteCertificate(meta, mapper.coreToGenReq(req))
+        return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.SUCCESS),
+                req,
+                mapper.genToCoreResp(response.response)
+        )
+    }
+
+    override fun getMonitoringReport(
+            meta: RequestMetadata,
+            req: GetMonitoringReportReq
+    ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
+        val mapper: GetMonitoringReportMapper = Mappers.getMapper(GetMonitoringReportMapper::class.java)
+        val response = csApi.getMonitoringReport(meta, mapper.coreToGenReq(req))
         return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
                 req,

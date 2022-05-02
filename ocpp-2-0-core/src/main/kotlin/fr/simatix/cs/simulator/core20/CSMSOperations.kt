@@ -34,6 +34,8 @@ import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstal
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
@@ -163,4 +165,6 @@ interface CSMSOperations {
 
 
     fun deleteCertificate(meta: RequestMetadata, req: DeleteCertificateReq): OperationExecution<DeleteCertificateReq, DeleteCertificateResp>
+
+    fun getMonitoringReport(meta: RequestMetadata, req: GetMonitoringReportReq): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp>
 }

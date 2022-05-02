@@ -36,6 +36,8 @@ import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVers
 import fr.simatix.cs.simulator.core20.model.getlocallistversion.GetLocalListVersionResp
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogResp
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportResp
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportResp
 import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
@@ -364,6 +366,13 @@ class CoreTest {
                     meta: RequestMetadata,
                     req: DeleteCertificateReq
             ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
+                TODO("Not yet implemented")
+            }
+
+            override fun getMonitoringReport(
+                    meta: RequestMetadata,
+                    req: GetMonitoringReportReq
+            ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
                 TODO("Not yet implemented")
             }
         }

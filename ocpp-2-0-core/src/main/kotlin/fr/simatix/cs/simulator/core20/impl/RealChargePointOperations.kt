@@ -30,6 +30,7 @@ import fr.simatix.cs.simulator.core20.model.getcompositeschedule.GetCompositeSch
 import fr.simatix.cs.simulator.core20.model.getdisplaymessages.GetDisplayMessagesReq
 import fr.simatix.cs.simulator.core20.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import fr.simatix.cs.simulator.core20.model.getlog.GetLogReq
+import fr.simatix.cs.simulator.core20.model.getmonitoringreport.GetMonitoringReportReq
 import fr.simatix.cs.simulator.core20.model.getreport.GetReportReq
 import fr.simatix.cs.simulator.core20.model.gettransactionstatus.GetTransactionStatusReq
 import fr.simatix.cs.simulator.core20.model.getvariables.GetVariablesReq
@@ -366,6 +367,13 @@ class RealChargePointOperations(
 
         client.receiveMessage("DeleteCertificate") { req: DeleteCertificateReq ->
             csmsOperations.deleteCertificate(
+                    RequestMetadata(chargeStationId),
+                    req
+            ).response
+        }
+
+        client.receiveMessage("GetMonitoringReport") { req: GetMonitoringReportReq ->
+            csmsOperations.getMonitoringReport(
                     RequestMetadata(chargeStationId),
                     req
             ).response
