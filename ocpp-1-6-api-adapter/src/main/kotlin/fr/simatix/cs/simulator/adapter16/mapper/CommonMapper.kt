@@ -1,22 +1,32 @@
 package fr.simatix.cs.simulator.adapter16.mapper
 
-import fr.simatix.cs.simulator.api.model.common.*
-import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
-import fr.simatix.cs.simulator.api.model.common.enumeration.*
-import fr.simatix.cs.simulator.api.model.common.EVSEType
+import fr.simatix.cs.simulator.api.model.common.ChargingProfileType
 import fr.simatix.cs.simulator.api.model.common.ChargingScheduleType
+import fr.simatix.cs.simulator.api.model.common.EVSEType
+import fr.simatix.cs.simulator.api.model.common.IdTokenInfoType
+import fr.simatix.cs.simulator.api.model.common.IdTokenType
+import fr.simatix.cs.simulator.api.model.common.MeterValueType
+import fr.simatix.cs.simulator.api.model.common.SampledValueType
+import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
+import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.LocationEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.MeasurandEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.PhaseEnumType
+import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
 import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
 import fr.simatix.cs.simulator.core16.model.common.SampledValue
 import fr.simatix.cs.simulator.core16.model.common.enumeration.*
-import fr.simatix.cs.simulator.core16.model.common.enumeration.ChargingProfilePurposeType
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
+import org.mapstruct.ReportingPolicy
+import fr.simatix.cs.simulator.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 
-@Mapper
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class CommonMapper {
 
     companion object {
