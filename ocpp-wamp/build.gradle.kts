@@ -9,6 +9,7 @@ dependencies {
     implementation("org.http4k:http4k-client-websocket:_")
     implementation("org.http4k:http4k-server-undertow:_")
     implementation("org.http4k:http4k-client-apache:_")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:_")
 
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
