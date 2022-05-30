@@ -41,7 +41,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             if (msgMeta == wampMessageMeta && wampMsg.action == action) {
                 val response = fn(mapper.readValue(wampMsg.payload, clazz.java))
                 val payload = mapper.writeValueAsString(response)
-                WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, wampMsg.action, payload)
+                WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
             } else {
                 null
             }

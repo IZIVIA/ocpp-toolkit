@@ -10,11 +10,11 @@ import fr.simatix.cs.simulator.api.model.common.SampledValueType
 import fr.simatix.cs.simulator.api.model.common.SignedMeterValueType
 import fr.simatix.cs.simulator.api.model.common.enumeration.AuthorizationStatusEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ChargingProfilePurposeEnumType
-import fr.simatix.cs.simulator.api.model.common.enumeration.IdTokenEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.LocationEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.MeasurandEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.PhaseEnumType
 import fr.simatix.cs.simulator.api.model.common.enumeration.ReadingContextEnumType
+import fr.simatix.cs.simulator.api.model.common.getTypeByIdToken
 import fr.simatix.cs.simulator.core16.model.common.ChargingProfile
 import fr.simatix.cs.simulator.core16.model.common.ChargingSchedule
 import fr.simatix.cs.simulator.core16.model.common.IdTagInfo
@@ -33,8 +33,9 @@ abstract class CommonMapper {
 
         fun convertIdTagInfo(idTag: IdTagInfo): IdTokenInfoType {
             val status = AuthorizationStatusEnumType.valueOf(idTag.status.name)
-            val groupIdToken = if (idTag.parentIdTag != null) {
-                IdTokenType(idTag.parentIdTag!!, IdTokenEnumType.Central)
+            val parentIdTag = idTag.parentIdTag
+            val groupIdToken = if (parentIdTag != null) {
+                IdTokenType(parentIdTag, parentIdTag.getTypeByIdToken())
             } else {
                 null
             }
@@ -137,7 +138,7 @@ abstract class CommonMapper {
         }
 
     @Named("convertIdTag")
-    fun convertIdTag(idTag: String): IdTokenType = IdTokenType(idTag, IdTokenEnumType.Central)
+    fun convertIdTag(idTag: String): IdTokenType = IdTokenType(idTag, idTag.getTypeByIdToken())
 
     @Named("convertChargingProfilePurpose")
     fun convertChargingProfilePurpose(profilePurpose: ChargingProfilePurposeType): ChargingProfilePurposeEnumType =
