@@ -5,8 +5,8 @@ import io.simatix.ev.ocpp.OcppVersion
 data class Settings(
     val ocppVersion: OcppVersion,
     val transportType: TransportEnum,
-    val url: String = "",
+    val domain: String = "",
     val port: String = "",
     val path: String = "",
-    val target : String = "ws://${url}:${port}/${path}"
+    val target : String = "ws://${domain}:${port}/${path}"
 )

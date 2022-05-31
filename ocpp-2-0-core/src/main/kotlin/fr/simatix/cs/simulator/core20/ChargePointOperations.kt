@@ -206,4 +206,7 @@ interface ChargePointOperations {
 
     @Throws(IllegalStateException::class, ConnectException::class)
     fun reportChargingProfiles(meta: RequestMetadata, request: ReportChargingProfilesReq): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp>
+    fun connect()
+
+    fun close()
 }

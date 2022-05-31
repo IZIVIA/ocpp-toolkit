@@ -543,4 +543,12 @@ class RealChargePointOperations(
     ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> =
         sendMessage(meta,"ReportChargingProfiles",request)
 
+    override fun connect() {
+        client.connect()
+    }
+
+    override fun close() {
+        client.close()
+    }
+
 }

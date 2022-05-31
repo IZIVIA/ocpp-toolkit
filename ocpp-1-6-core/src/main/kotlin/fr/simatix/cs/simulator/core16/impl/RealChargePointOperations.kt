@@ -203,6 +203,14 @@ class RealChargePointOperations(
         return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime), request, response)
     }
 
+    override fun connect() {
+        client.connect()
+    }
+
+    override fun close() {
+        client.close()
+    }
+
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): OperationExecution<HeartbeatReq, HeartbeatResp> =
         sendMessage(meta, "Heartbeat", request)

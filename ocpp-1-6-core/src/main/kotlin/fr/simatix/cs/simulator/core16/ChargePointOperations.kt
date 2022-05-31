@@ -35,6 +35,12 @@ interface ChargePointOperations {
             RealChargePointOperations(chargingStationId,transport, csmsOperations)
     }
 
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun connect()
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    fun close()
+
     /**
      * Sends a Heartbeat request to let the Central System know the Charge Point is still connected
      */
