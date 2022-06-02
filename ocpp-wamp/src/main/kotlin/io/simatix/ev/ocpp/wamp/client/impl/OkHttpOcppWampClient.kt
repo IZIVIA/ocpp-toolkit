@@ -11,6 +11,7 @@ import io.simatix.ev.ocpp.wamp.messages.WampMessageType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import okhttp3.OkHttpClient
@@ -60,36 +61,39 @@ class OkHttpOcppWampClient(private val target: Uri, val ocppId: CSOcppId, val oc
                         if (msg == null) {
                             logger.warn("can't parse wamp message from server: $msgString")
                         } else {
-                            try {
-                                withTimeout(5000L) {
-                                    when {
-                                        msg.msgType == WampMessageType.CALL_RESULT || msg.msgType == WampMessageType.CALL_ERROR -> {
-                                            // outcoming call result
-                                            callManager?.handleResult("[$ocppId]", msg)
-                                        }
+                            val asyncBlock = async {
+                                when {
+                                    msg.msgType == WampMessageType.CALL_RESULT || msg.msgType == WampMessageType.CALL_ERROR -> {
+                                        // outcoming call result
+                                        callManager?.handleResult("[$ocppId]", msg)
+                                    }
 
-                                        msg.msgType == WampMessageType.CALL -> {
-                                            // incoming call
-                                            logger.info("[$ocppId] <- ${msg.action} - $msgString")
-                                            val r = handlers.asSequence()
-                                                // use sequence to avoid greedy mapping, to find the first handler with non null result
+                                    msg.msgType == WampMessageType.CALL -> {
+                                        // incoming call
+                                        logger.info("[$ocppId] <- ${msg.action} - $msgString")
+                                        val r = handlers.asSequence()
+                                            // use sequence to avoid greedy mapping, to find the first handler with non null result
 
-                                                .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
-                                                .filterNotNull()
-                                                .firstOrNull()
-                                                ?: WampMessage.CallError(msg.msgId, "{}")
-                                            logger.info("[$ocppId] -> ${r.toJson()}")
-                                            websocket?.send(r.toJson())
-                                        }
+                                            .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
+                                            .filterNotNull()
+                                            .firstOrNull()
+                                            ?: WampMessage.CallError(msg.msgId, "{}")
+                                        logger.info("[$ocppId] -> ${r.toJson()}")
+                                        websocket?.send(r.toJson())
+                                    }
 
-                                        else -> {
-                                            logger.warn("unsupported wamp message type: ${msg.msgType} - message = $msgString")
-                                        }
+                                    else -> {
+                                        logger.warn("unsupported wamp message type: ${msg.msgType} - message = $msgString")
                                     }
                                 }
+                            }
+
+                            try { // Timeout response to csms
+                                withTimeout(5000L) { asyncBlock.await() }
                             } catch (e: TimeoutCancellationException) {
                                 logger.error(e.message)
                                 websocket?.send(WampMessage.CallError(msg.msgId, "{}").toJson())
+                                connect() // reconnect to csms after timeout
                             }
                         }
                     }
