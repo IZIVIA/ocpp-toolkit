@@ -39,7 +39,9 @@ import org.junit.jupiter.api.Test
 import java.lang.Thread.sleep
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 
+@EnabledIfSystemProperty(named = "has.local.steve", matches = "true")
 class ExampleTest {
 
     private val chargPointId = "my-chargepoint1"
