@@ -1,0 +1,16 @@
+package com.izivia.ocpp.adapter20.mapper
+
+import com.izivia.ocpp.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import com.izivia.ocpp.core20.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import org.mapstruct.Mapper
+import org.mapstruct.ReportingPolicy
+import com.izivia.ocpp.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq as PublishFirmwareStatusNotificationReqGen
+import com.izivia.ocpp.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp as PublishFirmwareStatusNotificationRespGen
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+interface PublishFirmwareStatusNotificationMapper {
+
+    fun genToCoreReq(statusReq: PublishFirmwareStatusNotificationReqGen?): PublishFirmwareStatusNotificationReq
+
+    fun coreToGenResp(statusResp: PublishFirmwareStatusNotificationResp?): PublishFirmwareStatusNotificationRespGen
+}

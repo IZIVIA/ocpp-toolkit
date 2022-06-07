@@ -1,3 +1,0 @@
-package fr.simatix.cs.simulator.core20.model.notifycustomerinformation
-
-class NotifyCustomerInformationResp
