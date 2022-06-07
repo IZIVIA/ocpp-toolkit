@@ -3,12 +3,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") apply true
     id("com.google.protobuf") version "0.8.18" apply false
+    id("maven-publish")
 }
 
 val versionNumber = System.getenv("version")?.substringAfter("R-") ?: "dev"
 
+
 allprojects {
-    group = "fr.simatix.cs.simulator"
+    group = "com.izivia.ocpp"
     version = versionNumber
 
     repositories {
@@ -32,4 +34,6 @@ subprojects {
         useJUnitPlatform()
         ignoreFailures = true
     }
+
+
 }

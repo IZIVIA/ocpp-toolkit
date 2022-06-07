@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     java
+    `maven-publish`
 }
 
 coreProject()
@@ -12,4 +13,16 @@ dependencies {
     implementation(project(":ocpp-transport"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["java"])
+        }
+    }
 }

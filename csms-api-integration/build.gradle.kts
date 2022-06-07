@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     java
+    id("maven-publish")
 }
 
 coreProject()
@@ -26,4 +27,16 @@ dependencies {
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:_")
     testImplementation("org.mockito:mockito-inline:_")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["java"])
+        }
+    }
 }
