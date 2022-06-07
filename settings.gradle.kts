@@ -14,7 +14,7 @@ gradleEnterprise {
 
 include(
     "csms-api-integration",
-    "csms-api",
+    "generic-api",
     "ocpp-wamp",
     "ocpp-websocket",
     "ocpp-transport",
