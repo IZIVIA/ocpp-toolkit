@@ -13,7 +13,7 @@ gradleEnterprise {
 }
 
 include(
-    "csms-api-integration",
+    "toolkit",
     "generic-api",
     "ocpp-wamp",
     "ocpp-websocket",
