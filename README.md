@@ -1,10 +1,31 @@
 # OCPP Toolkit
 
-This module can be used to : 
+This project aim is to provide a Kotlin library to perform OCPP (Open Charge Point Protocol - see https://www.openchargealliance.org/) operations.
 
-- Establishing a websocket connection with a CSMS
-- Send messages to the CSMS using OCPP 1.6 or 2.0.1 thanks to 1.6, 2.0 or generic API
-- To process the messages sent by the CSMS and respond to them
+## Goal 
+
+The aim is to support:
+- both the CSMS and the Charging Station sides
+- versions 1.5, 1.6 and 2.0.1 of OCPP
+- WS/JSON (OCPP-J - all versions) and SOAP (OCPP-S ; 1.x versions only) flavor for the transport
+
+It can be used:
+- to simulate a charging station, eg to test a CSMS
+- to simulate a CSMS, eg to test a Charging Station
+- to implement a CSMS
+- to implement a ChargingStation controller (if the use of Kotlin fit your requirements)
+
+The aim is to be a strict implementation of OCPP protocol, with no business logic: you use it as a library, and you own the business logic.
+
+We also attempt to provide a generic API, trying to make switching between ocpp versions transparent. The design between versions of OCPP being sometimes very different, the generic API may not cover all aspects with high fidelity.
+
+## Status
+
+Currently the ChargingStation side of versions 1.6 and 2.0.1 are fully supported in OCPP-J flavor - except the security requirements besides support for http basic auth. This includes all the data structures described by the specification, with json serialisation verified against the json schemas provided in the specification.
+
+Support of CSMS side, OCPP 1.5 and SOAP flavor is planned.
+
+Support for security requirements like SSL and mutual certificates is under discussion, as it can be achieved using a proxy like Envoy.
 
 ## Usage of the API
 
@@ -14,12 +35,7 @@ a whole transaction process.
 
 ### OCPP 1.6 Example
 
-
-
 With the API, you can perform instructions one after the other. In those examples, we're doing full transactions.
-
-
-
 
 OCPP 1.6 Charge : 
 
@@ -290,4 +306,18 @@ if (remoteStartTransactionReq != null) {
 connection.close()
 ```
 
+## Code Organisation
+
+The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.
+
+For each version of ocpp supported, you will find:
+- a `-core` module which provided all the data structures and operations declaration.
+- a `-api-adapter` module which is used as an adapter between that version of ocpp and the generic api
+
+Plus, you will find:
+- `generic-api`, which is an ocpp independent api which can be used to switch between ocpp versions without changing your code
+- `ocpp-transport`, which defines an interface for different transport of operations, with the modules `-websocket` and `-soap` for implementations
+- `operation-information`, used to described operations in whatever version of apis
+- `utils`, used to ease some common needs between apis
+- `ocpp-wamp`, a client & server implementation of the WAMP-like RPC-over-websocket system defined in the OCPP-J protcols
 
