@@ -211,11 +211,11 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.client.impl.OkHttpOcppWampClient
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageType
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

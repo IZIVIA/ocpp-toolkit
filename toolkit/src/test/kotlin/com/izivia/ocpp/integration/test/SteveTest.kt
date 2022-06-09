@@ -160,7 +160,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import io.simatix.ev.ocpp.OcppVersion
+import com.izivia.ocpp.OcppVersion
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import java.lang.Thread.sleep

@@ -1,12 +1,12 @@
-package io.simatix.ev.ocpp.wamp.server.impl
+package com.izivia.ocpp.wamp.server.impl
 
-import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.core.WampCallManager
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
-import io.simatix.ev.ocpp.wamp.messages.WampMessageType
-import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.core.WampCallManager
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import org.http4k.routing.bind
 import org.http4k.routing.websockets
 import org.http4k.websocket.Websocket
@@ -19,7 +19,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)->OcppWampServerHandler,
                         val timeoutInMs:Long) {
     companion object {
-        private val logger = LoggerFactory.getLogger("io.simatix.ev.ocpp.wamp.server")
+        private val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server")
     }
     private val connections:MutableMap<String, ChargingStationConnection?> = mutableMapOf()
     private val shutdown = AtomicBoolean(false)

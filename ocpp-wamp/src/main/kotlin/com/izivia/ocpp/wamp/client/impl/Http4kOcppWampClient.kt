@@ -1,13 +1,13 @@
-package io.simatix.ev.ocpp.wamp.client.impl
+package com.izivia.ocpp.wamp.client.impl
 
-import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.client.WampOnActionHandler
-import io.simatix.ev.ocpp.wamp.core.WampCallManager
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
-import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.client.WampOnActionHandler
+import com.izivia.ocpp.wamp.core.WampCallManager
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.messages.WampMessageType
 import org.http4k.asString
 import org.http4k.core.Uri
 import org.http4k.websocket.Websocket

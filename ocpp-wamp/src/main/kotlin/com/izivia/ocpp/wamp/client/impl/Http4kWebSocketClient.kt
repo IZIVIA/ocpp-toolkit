@@ -1,4 +1,4 @@
-package io.simatix.ev.ocpp.wamp.client.impl
+package com.izivia.ocpp.wamp.client.impl
 
 import org.http4k.client.internal.AdaptingWebSocket
 import org.http4k.client.internal.NonBlockingClient

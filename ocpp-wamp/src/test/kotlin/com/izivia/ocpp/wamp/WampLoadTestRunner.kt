@@ -1,4 +1,4 @@
-package io.simatix.ev.ocpp.wamp
+package com.izivia.ocpp.wamp
 
 import kotlin.time.Duration
 

@@ -1,4 +1,4 @@
-package io.simatix.ev.ocpp
+package com.izivia.ocpp
 
 typealias CSOcppId = String
 

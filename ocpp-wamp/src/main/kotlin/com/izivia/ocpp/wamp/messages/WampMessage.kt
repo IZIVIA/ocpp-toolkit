@@ -1,7 +1,7 @@
-package io.simatix.ev.ocpp.wamp.messages
+package com.izivia.ocpp.wamp.messages
 
-import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.OcppVersion
 import org.http4k.core.UriTemplate
 
 data class WampMessage(val msgType:WampMessageType,val msgId:String,val action:String?,val payload:String) {

@@ -1,6 +1,6 @@
 package com.izivia.ocpp.integration.model
 
-import io.simatix.ev.ocpp.OcppVersion
+import com.izivia.ocpp.OcppVersion
 
 data class Settings(
     val ocppVersion: OcppVersion,

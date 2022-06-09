@@ -1,4 +1,4 @@
-package io.simatix.ev.ocpp.wamp.server.impl
+package com.izivia.ocpp.wamp.server.impl
 
 import org.http4k.core.UriTemplate
 

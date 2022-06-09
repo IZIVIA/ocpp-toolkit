@@ -1,6 +1,6 @@
-package io.simatix.ev.ocpp.wamp.core
+package com.izivia.ocpp.wamp.core
 
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessage
 import kotlinx.datetime.Clock
 import org.slf4j.Logger
 import java.util.concurrent.CountDownLatch

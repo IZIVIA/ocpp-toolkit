@@ -1,10 +1,10 @@
-package io.simatix.ev.ocpp.wamp.server
+package com.izivia.ocpp.wamp.server
 
-import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
-import io.simatix.ev.ocpp.wamp.server.impl.UndertowOcppWampServer
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.server.impl.UndertowOcppWampServer
 
 interface OcppWampServer {
     /**

@@ -1,13 +1,13 @@
-package io.simatix.ev.ocpp.wamp
+package com.izivia.ocpp.wamp
 
-import io.simatix.ev.ocpp.CSOcppId
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
-import io.simatix.ev.ocpp.wamp.messages.WampMessageType
-import io.simatix.ev.ocpp.wamp.server.OcppWampServer
-import io.simatix.ev.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.wamp.server.OcppWampServer
+import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import kotlinx.datetime.Clock
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test

@@ -2,11 +2,11 @@ package com.izivia.ocpp.websocket
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.izivia.ocpp.transport.Transport
-import io.simatix.ev.ocpp.OcppVersion
-import io.simatix.ev.ocpp.wamp.client.OcppWampClient
-import io.simatix.ev.ocpp.wamp.messages.WampMessage
-import io.simatix.ev.ocpp.wamp.messages.WampMessageMeta
-import io.simatix.ev.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.messages.WampMessageType
 import org.http4k.core.Uri
 import java.net.ConnectException
 import java.util.*

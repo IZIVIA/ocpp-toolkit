@@ -1,4 +1,4 @@
-package io.simatix.ev.ocpp.wamp.server.impl
+package com.izivia.ocpp.wamp.server.impl
 
 import io.undertow.Handlers.*
 import io.undertow.Undertow

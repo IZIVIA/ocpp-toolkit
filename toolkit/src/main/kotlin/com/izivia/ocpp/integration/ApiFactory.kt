@@ -17,7 +17,7 @@ import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.transport.Transport
 import com.izivia.ocpp.websocket.WebsocketClient
-import io.simatix.ev.ocpp.OcppVersion
+import com.izivia.ocpp.OcppVersion
 
 class ApiFactory {
     companion object {
