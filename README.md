@@ -1,6 +1,7 @@
 # OCPP Toolkit
 
-This project aim is to provide a Kotlin library to perform OCPP (Open Charge Point Protocol - see https://www.openchargealliance.org/) operations.
+This project aim is to provide a Kotlin library to perform OCPP operations.
+For more information about OCPP (Open Charge Point Protocol), see https://www.openchargealliance.org/)
 
 ## Goal 
 
