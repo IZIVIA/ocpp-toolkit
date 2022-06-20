@@ -227,6 +227,15 @@ fun main(args: Array<String>) {
     val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = args[0])
     val ocppId = "chargePoint2"
     val csApi: CSApi = object : CSApi {
+
+        override fun start() {
+            TODO("Not yet implemented")
+        }
+
+        override fun stop() {
+            TODO("Not yet implemented")
+        }
+
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS), req,

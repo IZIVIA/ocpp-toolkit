@@ -229,6 +229,14 @@ class IntegrationTest {
     private lateinit var ocppWampClient: OkHttpOcppWampClient
     private val csApi: CSApi = object : CSApi {
 
+        override fun start() {
+            throw NotImplementedError()
+        }
+
+        override fun stop() {
+            throw NotImplementedError()
+        }
+
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
