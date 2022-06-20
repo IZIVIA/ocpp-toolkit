@@ -1,6 +1,5 @@
-package com.izivia.ocpp.api20.impl
+package com.izivia.ocpp.api20
 
-import com.izivia.ocpp.api20.IOcppCSCallbacks
 import com.izivia.ocpp.core20.model.cancelreservation.CancelReservationReq
 import com.izivia.ocpp.core20.model.cancelreservation.CancelReservationResp
 import com.izivia.ocpp.core20.model.certificateSigned.CertificateSignedReq
@@ -82,164 +81,86 @@ import com.izivia.ocpp.core20.model.unpublishfirmware.UnpublishFirmwareResp
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareResp
 
-open class OcppCSCallbacks : IOcppCSCallbacks {
-    override fun reset(req: ResetReq): ResetResp {
-        throw NotImplementedError()
-    }
 
-    override fun changeAvailability(req: ChangeAvailabilityReq): ChangeAvailabilityResp {
-        throw NotImplementedError()
-    }
+interface OcppCSCallbacks {
+    fun reset(req: ResetReq): ResetResp = throw NotImplementedError()
 
-    override fun setVariables(req: SetVariablesReq): SetVariablesResp {
-        throw NotImplementedError()
-    }
+    fun changeAvailability(req: ChangeAvailabilityReq): ChangeAvailabilityResp = throw NotImplementedError()
 
-    override fun clearCache(req: ClearCacheReq): ClearCacheResp {
-        throw NotImplementedError()
-    }
+    fun setVariables(req: SetVariablesReq): SetVariablesResp = throw NotImplementedError()
 
-    override fun requestStartTransaction(req: RequestStartTransactionReq): RequestStartTransactionResp {
-        throw NotImplementedError()
-    }
+    fun clearCache(req: ClearCacheReq):ClearCacheResp = throw NotImplementedError()
 
-    override fun requestStopTransaction(req: RequestStopTransactionReq): RequestStopTransactionResp {
-        throw NotImplementedError()
-    }
+    fun requestStartTransaction(req: RequestStartTransactionReq): RequestStartTransactionResp = throw NotImplementedError()
 
-    override fun unlockConnector(req: UnlockConnectorReq): UnlockConnectorResp {
-        throw NotImplementedError()
-    }
+    fun requestStopTransaction(req: RequestStopTransactionReq): RequestStopTransactionResp = throw NotImplementedError()
 
-    override fun getReport(req: GetReportReq): GetReportResp {
-        throw NotImplementedError()
-    }
+    fun unlockConnector(req: UnlockConnectorReq): UnlockConnectorResp = throw NotImplementedError()
 
-    override fun getBaseReport(req: GetBaseReportReq): GetBaseReportResp {
-        throw NotImplementedError()
-    }
+    fun getReport(req: GetReportReq): GetReportResp = throw NotImplementedError()
 
-    override fun getVariables(req: GetVariablesReq): GetVariablesResp {
-        throw NotImplementedError()
-    }
+    fun getBaseReport(req: GetBaseReportReq): GetBaseReportResp = throw NotImplementedError()
 
-    override fun cancelReservation(req: CancelReservationReq): CancelReservationResp {
-        throw NotImplementedError()
-    }
+    fun getVariables(req : GetVariablesReq): GetVariablesResp = throw NotImplementedError()
 
-    override fun clearChargingProfile(req: ClearChargingProfileReq): ClearChargingProfileResp {
-        throw NotImplementedError()
-    }
+    fun cancelReservation(req: CancelReservationReq): CancelReservationResp = throw NotImplementedError()
 
-    override fun getCompositeSchedule(req: GetCompositeScheduleReq): GetCompositeScheduleResp {
-        throw NotImplementedError()
-    }
+    fun clearChargingProfile(req: ClearChargingProfileReq): ClearChargingProfileResp = throw NotImplementedError()
 
-    override fun getLocalListVersion(req: GetLocalListVersionReq): GetLocalListVersionResp {
-        throw NotImplementedError()
-    }
+    fun getCompositeSchedule(req: GetCompositeScheduleReq): GetCompositeScheduleResp = throw NotImplementedError()
 
-    override fun updateFirmware(req: UpdateFirmwareReq): UpdateFirmwareResp {
-        throw NotImplementedError()
-    }
+    fun getLocalListVersion(req: GetLocalListVersionReq): GetLocalListVersionResp = throw NotImplementedError()
 
-    override fun sendLocalList(req: SendLocalListReq): SendLocalListResp {
-        throw NotImplementedError()
-    }
+    fun updateFirmware(req : UpdateFirmwareReq): UpdateFirmwareResp = throw NotImplementedError()
 
-    override fun triggerMessage(req: TriggerMessageReq): TriggerMessageResp {
-        throw NotImplementedError()
-    }
+    fun sendLocalList(req: SendLocalListReq): SendLocalListResp = throw NotImplementedError()
 
-    override fun setChargingProfile(req: SetChargingProfileReq): SetChargingProfileResp {
-        throw NotImplementedError()
-    }
+    fun triggerMessage(req: TriggerMessageReq): TriggerMessageResp = throw NotImplementedError()
 
-    override fun reserveNow(req: ReserveNowReq): ReserveNowResp {
-        throw NotImplementedError()
-    }
+    fun setChargingProfile(req: SetChargingProfileReq):SetChargingProfileResp = throw NotImplementedError()
 
-    override fun dataTransfer(req: DataTransferReq): DataTransferResp {
-        throw NotImplementedError()
-    }
+    fun reserveNow(req : ReserveNowReq): ReserveNowResp = throw NotImplementedError()
 
-    override fun certificateSigned(req: CertificateSignedReq): CertificateSignedResp {
-        throw NotImplementedError()
-    }
+    fun dataTransfer(req : DataTransferReq): DataTransferResp = throw NotImplementedError()
 
-    override fun getLog(req: GetLogReq): GetLogResp {
-        throw NotImplementedError()
-    }
+    fun certificateSigned(req: CertificateSignedReq): CertificateSignedResp = throw NotImplementedError()
 
-    override fun clearDisplayMessage(req: ClearDisplayMessageReq): ClearDisplayMessageResp {
-        throw NotImplementedError()
-    }
+    fun getLog(req: GetLogReq): GetLogResp = throw NotImplementedError()
 
-    override fun getChargingProfiles(req: GetChargingProfilesReq): GetChargingProfilesResp {
-        throw NotImplementedError()
-    }
+    fun clearDisplayMessage(req: ClearDisplayMessageReq): ClearDisplayMessageResp = throw NotImplementedError()
 
-    override fun getInstalledCertificateIds(req: GetInstalledCertificateIdsReq): GetInstalledCertificateIdsResp {
-        throw NotImplementedError()
-    }
+    fun getChargingProfiles(req: GetChargingProfilesReq): GetChargingProfilesResp = throw NotImplementedError()
 
-    override fun installCertificate(req: InstallCertificateReq): InstallCertificateResp {
-        throw NotImplementedError()
-    }
+    fun getInstalledCertificateIds(req: GetInstalledCertificateIdsReq): GetInstalledCertificateIdsResp = throw NotImplementedError()
 
-    override fun customerInformation(req: CustomerInformationReq): CustomerInformationResp {
-        throw NotImplementedError()
-    }
+    fun installCertificate(req: InstallCertificateReq): InstallCertificateResp = throw NotImplementedError()
 
-    override fun unpublishFirmware(req: UnpublishFirmwareReq): UnpublishFirmwareResp {
-        throw NotImplementedError()
-    }
+    fun customerInformation(req: CustomerInformationReq):CustomerInformationResp = throw NotImplementedError()
 
-    override fun setVariableMonitoring(req: SetVariableMonitoringReq): SetVariableMonitoringResp {
-        throw NotImplementedError()
-    }
+    fun unpublishFirmware(req: UnpublishFirmwareReq): UnpublishFirmwareResp = throw NotImplementedError()
 
-    override fun setMonitoringLevel(req: SetMonitoringLevelReq): SetMonitoringLevelResp {
-        throw NotImplementedError()
-    }
+    fun setVariableMonitoring(req: SetVariableMonitoringReq): SetVariableMonitoringResp = throw NotImplementedError()
 
-    override fun publishFirmware(req: PublishFirmwareReq): PublishFirmwareResp {
-        throw NotImplementedError()
-    }
+    fun setMonitoringLevel(req: SetMonitoringLevelReq): SetMonitoringLevelResp = throw NotImplementedError()
 
-    override fun setNetworkProfile(req: SetNetworkProfileReq): SetNetworkProfileResp {
-        throw NotImplementedError()
-    }
+    fun publishFirmware(req: PublishFirmwareReq): PublishFirmwareResp = throw NotImplementedError()
 
-    override fun getTransactionStatus(req: GetTransactionStatusReq): GetTransactionStatusResp {
-        throw NotImplementedError()
-    }
+    fun setNetworkProfile(req: SetNetworkProfileReq): SetNetworkProfileResp = throw NotImplementedError()
 
-    override fun setMonitoringBase(req: SetMonitoringBaseReq): SetMonitoringBaseResp {
-        throw NotImplementedError()
-    }
+    fun getTransactionStatus(req: GetTransactionStatusReq): GetTransactionStatusResp = throw NotImplementedError()
 
-    override fun getDisplayMessages(req: GetDisplayMessagesReq): GetDisplayMessagesResp {
-        throw NotImplementedError()
-    }
+    fun setMonitoringBase(req: SetMonitoringBaseReq): SetMonitoringBaseResp = throw NotImplementedError()
 
-    override fun costUpdated(req: CostUpdatedReq): CostUpdatedResp {
-        throw NotImplementedError()
-    }
+    fun getDisplayMessages(req: GetDisplayMessagesReq): GetDisplayMessagesResp = throw NotImplementedError()
 
-    override fun setDisplayMessage(req: SetDisplayMessageReq): SetDisplayMessageResp {
-        throw NotImplementedError()
-    }
+    fun costUpdated(req: CostUpdatedReq): CostUpdatedResp = throw NotImplementedError()
 
-    override fun deleteCertificate(req: DeleteCertificateReq): DeleteCertificateResp {
-        throw NotImplementedError()
-    }
+    fun setDisplayMessage(req: SetDisplayMessageReq):SetDisplayMessageResp = throw NotImplementedError()
 
-    override fun getMonitoringReport(req: GetMonitoringReportReq): GetMonitoringReportResp {
-        throw NotImplementedError()
-    }
+    fun deleteCertificate(req: DeleteCertificateReq): DeleteCertificateResp = throw NotImplementedError()
 
-    override fun clearVariableMonitoring(req: ClearVariableMonitoringReq): ClearVariableMonitoringResp {
-        throw NotImplementedError()
-    }
+    fun getMonitoringReport(req: GetMonitoringReportReq): GetMonitoringReportResp = throw NotImplementedError()
+
+    fun clearVariableMonitoring(req: ClearVariableMonitoringReq): ClearVariableMonitoringResp = throw NotImplementedError()
+
 }

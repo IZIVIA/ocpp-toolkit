@@ -7,8 +7,8 @@ import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
 import com.izivia.ocpp.api16.DefaultCSMSOperations as DefaultCSMSOperations16
 import com.izivia.ocpp.api20.DefaultCSMSOperations as DefaultCSMSOperations20
-import com.izivia.ocpp.api16.IOcppCSCallbacks as IOcppCSCallbacks16
-import com.izivia.ocpp.api20.IOcppCSCallbacks as IOcppCSCallbacks20
+import com.izivia.ocpp.api16.OcppCSCallbacks as OcppCSCallbacks16
+import com.izivia.ocpp.api20.OcppCSCallbacks as OcppCSCallbacks20
 import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
 import com.izivia.ocpp.core16.impl.RealChargePointOperations as RealChargePointOperations16
@@ -42,7 +42,7 @@ class ApiFactory {
             }
         }
 
-        fun Ocpp16ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : IOcppCSCallbacks16): ChargePointOperations16 =
+        fun Ocpp16ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks16): ChargePointOperations16 =
              RealChargePointOperations16(
                 chargeStationId = chargePointId,
                 client= createTransport(
@@ -54,7 +54,7 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
 
-        fun Ocpp20ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : IOcppCSCallbacks20): ChargePointOperations20 =
+        fun Ocpp20ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks20): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
                 client= createTransport(

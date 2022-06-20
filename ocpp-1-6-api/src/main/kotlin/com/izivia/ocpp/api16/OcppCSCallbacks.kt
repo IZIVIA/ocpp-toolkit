@@ -39,77 +39,41 @@ import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareResp
 
-interface IOcppCSCallbacks {
-    fun reset (req: ResetReq): ResetResp
-    fun changeAvailability(
-    req: ChangeAvailabilityReq
-): ChangeAvailabilityResp
+interface OcppCSCallbacks {
+    fun reset(req: ResetReq): ResetResp = throw NotImplementedError()
+    fun changeAvailability(req: ChangeAvailabilityReq): ChangeAvailabilityResp = throw NotImplementedError()
 
-    fun changeConfiguration(
-    req: ChangeConfigurationReq
-): ChangeConfigurationResp
+    fun changeConfiguration(req: ChangeConfigurationReq): ChangeConfigurationResp = throw NotImplementedError()
 
-    fun clearCache(
-    req: ClearCacheReq
-): ClearCacheResp
+    fun clearCache(req: ClearCacheReq): ClearCacheResp = throw NotImplementedError()
 
-    fun remoteStartTransaction(
-    req: RemoteStartTransactionReq
-): RemoteStartTransactionResp
+    fun remoteStartTransaction(req: RemoteStartTransactionReq): RemoteStartTransactionResp = throw NotImplementedError()
 
-    fun remoteStopTransaction(
-    req: RemoteStopTransactionReq
-): RemoteStopTransactionResp
+    fun remoteStopTransaction(req: RemoteStopTransactionReq): RemoteStopTransactionResp = throw NotImplementedError()
 
-    fun unlockConnector(
-    req: UnlockConnectorReq
-): UnlockConnectorResp
+    fun unlockConnector(req: UnlockConnectorReq): UnlockConnectorResp = throw NotImplementedError()
 
-    fun getConfiguration(
-    req: GetConfigurationReq
-): GetConfigurationResp
+    fun getConfiguration(req: GetConfigurationReq): GetConfigurationResp = throw NotImplementedError()
 
-    fun cancelReservation(
-    req: CancelReservationReq
-): CancelReservationResp
+    fun cancelReservation(req: CancelReservationReq): CancelReservationResp = throw NotImplementedError()
 
-    fun clearChargingProfile(
-    req: ClearChargingProfileReq
-): ClearChargingProfileResp
+    fun clearChargingProfile(req: ClearChargingProfileReq): ClearChargingProfileResp = throw NotImplementedError()
 
-    fun getCompositeSchedule(
-    req: GetCompositeScheduleReq
-): GetCompositeScheduleResp
+    fun getCompositeSchedule(req: GetCompositeScheduleReq): GetCompositeScheduleResp = throw NotImplementedError()
 
-    fun getLocalListVersion(
-    req: GetLocalListVersionReq
-): GetLocalListVersionResp
+    fun getLocalListVersion(req: GetLocalListVersionReq): GetLocalListVersionResp = throw NotImplementedError()
 
-    fun updateFirmware(
-    req: UpdateFirmwareReq
-): UpdateFirmwareResp
+    fun updateFirmware(req: UpdateFirmwareReq): UpdateFirmwareResp = throw NotImplementedError()
 
-    fun sendLocalList(
-    req: SendLocalListReq
-): SendLocalListResp
+    fun sendLocalList(req: SendLocalListReq): SendLocalListResp = throw NotImplementedError()
 
-    fun triggerMessage(
-    req: TriggerMessageReq
-): TriggerMessageResp
+    fun triggerMessage(req: TriggerMessageReq): TriggerMessageResp = throw NotImplementedError()
 
-    fun setChargingProfile(
-    req: SetChargingProfileReq
-): SetChargingProfileResp
+    fun setChargingProfile(req: SetChargingProfileReq): SetChargingProfileResp = throw NotImplementedError()
 
-    fun reserveNow(
-    req: ReserveNowReq
-): ReserveNowResp
+    fun reserveNow(req: ReserveNowReq): ReserveNowResp = throw NotImplementedError()
 
-    fun dataTransfer(
-    req: DataTransferReq
-): DataTransferResp
+    fun dataTransfer(req: DataTransferReq): DataTransferResp = throw NotImplementedError()
 
-    fun getDiagnostics(
-    req: GetDiagnosticsReq
-): GetDiagnosticsResp
+    fun getDiagnostics(req: GetDiagnosticsReq): GetDiagnosticsResp = throw NotImplementedError()
 }
