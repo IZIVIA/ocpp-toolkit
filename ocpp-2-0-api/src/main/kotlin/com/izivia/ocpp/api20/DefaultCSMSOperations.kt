@@ -87,7 +87,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import kotlinx.datetime.Clock.System.now
 
-open class DefaultCSMSOperations(val ocppCSCallbacks : IOcppCSCallbacks): CSMSOperations {
+open class DefaultCSMSOperations(val ocppCSCallbacks : OcppCSCallbacks): CSMSOperations {
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> =
         OperationExecution(
             ExecutionMetadata(meta,RequestStatus.SUCCESS,now()),

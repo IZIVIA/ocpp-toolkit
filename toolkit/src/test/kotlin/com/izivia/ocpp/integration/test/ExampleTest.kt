@@ -1,6 +1,6 @@
 package com.izivia.ocpp.integration.test
 
-import com.izivia.ocpp.api20.impl.OcppCSCallbacks
+import com.izivia.ocpp.api20.OcppCSCallbacks
 import com.izivia.ocpp.core20.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core20.model.authorize.AuthorizeResp
 import com.izivia.ocpp.core20.model.common.IdTokenType
@@ -19,7 +19,7 @@ import com.izivia.ocpp.core20.model.transactionevent.enumeration.TransactionEven
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.TriggerReasonEnumType
 import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCode16
 import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointStatus as ChargePointStatus16
-import com.izivia.ocpp.api16.impl.OcppCSCallbacks as OcppCSCallbacks16
+import com.izivia.ocpp.api16.OcppCSCallbacks as OcppCSCallbacks16
 import com.izivia.ocpp.core16.model.authorize.AuthorizeReq as AuthorizeReq16
 import com.izivia.ocpp.core16.model.authorize.AuthorizeResp as AuthorizeResp16
 import com.izivia.ocpp.core16.model.common.enumeration.AuthorizationStatus as AuthorizationStatus16
@@ -55,7 +55,7 @@ class ExampleTest {
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,
-                ocppCSCallbacks = OcppCSCallbacks16()
+                ocppCSCallbacks = object: OcppCSCallbacks16{}
         )
         connection.connect()
 
@@ -135,7 +135,7 @@ class ExampleTest {
 
         //define the callback for the remoteTransactionRequest
         //It returns a RemoteTransactionResponse
-        val ocppCSCallbacks = object : OcppCSCallbacks16() {
+        val ocppCSCallbacks = object : OcppCSCallbacks16 {
             override fun remoteStartTransaction(req: RemoteStartTransactionReq16): RemoteStartTransactionResp16 {
                 remoteStartTransactionReq = req
                 return RemoteStartTransactionResp16(status = RemoteStartStopStatus16.Accepted)
@@ -214,7 +214,7 @@ class ExampleTest {
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,
-                ocppCSCallbacks = OcppCSCallbacks()
+                ocppCSCallbacks = object : OcppCSCallbacks {}
         )
         connection.connect()
 
@@ -268,7 +268,7 @@ class ExampleTest {
 
         var remoteStartTransactionReq: RequestStartTransactionReq? = null
 
-        val ocppCSCallbacks = object : OcppCSCallbacks() {
+        val ocppCSCallbacks = object : OcppCSCallbacks {
             override fun requestStartTransaction(req: RequestStartTransactionReq): RequestStartTransactionResp {
                 remoteStartTransactionReq = req
                 return RequestStartTransactionResp(RequestStartStopStatusEnumType.Accepted)
