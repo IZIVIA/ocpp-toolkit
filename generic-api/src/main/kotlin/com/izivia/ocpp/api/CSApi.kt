@@ -87,6 +87,10 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 
 interface CSApi {
 
+    fun start()
+
+    fun stop()
+
     fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 
     fun changeAvailability(meta: RequestMetadata, req: ChangeAvailabilityReq): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp>

@@ -178,6 +178,14 @@ class IntegrationTestCSApi {
 
         csApi = object : CSApi {
 
+            override fun start() {
+                throw NotImplementedError()
+            }
+
+            override fun stop() {
+                throw NotImplementedError()
+            }
+
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
                 val response = if (req.type == ResetEnumType.Immediate) {
                     ResetResp(ResetStatusEnumType.Scheduled)
