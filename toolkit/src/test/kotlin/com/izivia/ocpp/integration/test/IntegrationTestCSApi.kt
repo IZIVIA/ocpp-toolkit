@@ -178,13 +178,9 @@ class IntegrationTestCSApi {
 
         csApi = object : CSApi {
 
-            override fun start() {
-                throw NotImplementedError()
-            }
+            override fun start() = throw NotImplementedError("ChargePoint can't start a server")
 
-            override fun stop() {
-                throw NotImplementedError()
-            }
+            override fun stop() = throw NotImplementedError("ChargePoint can't stop a server")
 
             override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
                 val response = if (req.type == ResetEnumType.Immediate) {
