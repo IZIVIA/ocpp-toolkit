@@ -228,13 +228,9 @@ fun main(args: Array<String>) {
     val ocppId = "chargePoint2"
     val csApi: CSApi = object : CSApi {
 
-        override fun start() {
-            TODO("Not yet implemented")
-        }
+        override fun start() = throw NotImplementedError("ChargePoint can't start a server")
 
-        override fun stop() {
-            TODO("Not yet implemented")
-        }
+        override fun stop() = throw NotImplementedError("ChargePoint can't stop a server")
 
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(

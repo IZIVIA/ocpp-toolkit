@@ -304,6 +304,11 @@ class AdapterTest {
 
     private val csApi: CSApi = object : CSApi {
 
+        override fun start() = throw NotImplementedError("ChargePoint can't start a server")
+
+
+        override fun stop() = throw NotImplementedError("ChargePoint can't stop a server")
+
         override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> {
             return OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),
