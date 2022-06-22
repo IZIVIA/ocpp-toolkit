@@ -36,8 +36,6 @@ import com.izivia.ocpp.core16.model.reservenow.ReserveNowReq
 import com.izivia.ocpp.core16.model.reservenow.ReserveNowResp
 import com.izivia.ocpp.core16.model.reset.ResetReq
 import com.izivia.ocpp.core16.model.reset.ResetResp
-import com.izivia.ocpp.core16.model.triggermessage.TriggerMessageReq
-import com.izivia.ocpp.core16.model.triggermessage.TriggerMessageResp
 import com.izivia.ocpp.core16.model.sendlocallist.SendLocalListReq
 import com.izivia.ocpp.core16.model.sendlocallist.SendLocalListResp
 import com.izivia.ocpp.core16.model.setchargingprofile.SetChargingProfileReq
@@ -45,28 +43,30 @@ import com.izivia.ocpp.core16.model.setchargingprofile.SetChargingProfileResp
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionReq
 import com.izivia.ocpp.core16.model.statusnotification.StatusNotificationReq
 import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionReq
+import com.izivia.ocpp.core16.model.triggermessage.TriggerMessageReq
+import com.izivia.ocpp.core16.model.triggermessage.TriggerMessageResp
 import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorReq
 import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareResp
-import com.izivia.ocpp.operation.information.ChargingStationConfig
-import com.izivia.ocpp.operation.information.ExecutionMetadata
-import com.izivia.ocpp.operation.information.OperationExecution
-import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.operation.information.RequestStatus
+import com.izivia.ocpp.operation.information.*
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
 
+typealias OcppId = String
+
 class RealCSMSOperations(
+
     private val servers: Set<ServerTransport>,
     private val acceptConnection: (String) -> ChargingStationConfig,
     chargePointOperations: ChargePointOperations
+
 ) : CSMSOperations {
 
-    init{
+    init {
         servers.forEach {
             it.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
                 chargePointOperations.heartbeat(meta, req).response
@@ -148,58 +148,112 @@ class RealCSMSOperations(
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> =
         sendMessage(meta, meta.chargingStationId, "Reset", req)
 
-    override fun changeAvailability(meta: RequestMetadata, req: ChangeAvailabilityReq): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> =
+    override fun changeAvailability(
+        meta: RequestMetadata,
+        req: ChangeAvailabilityReq
+    ): OperationExecution<ChangeAvailabilityReq, ChangeAvailabilityResp> =
         sendMessage(meta, meta.chargingStationId, "ChangeAvailability", req)
 
-    override fun changeConfiguration(meta: RequestMetadata,  req: ChangeConfigurationReq): OperationExecution<ChangeConfigurationReq, ChangeConfigurationResp> =
+    override fun changeConfiguration(
+        meta: RequestMetadata,
+        req: ChangeConfigurationReq
+    ): OperationExecution<ChangeConfigurationReq, ChangeConfigurationResp> =
         sendMessage(meta, meta.chargingStationId, "ChangeConfiguration", req)
 
-    override fun clearCache(meta: RequestMetadata,  req: ClearCacheReq): OperationExecution<ClearCacheReq, ClearCacheResp> =
+    override fun clearCache(
+        meta: RequestMetadata,
+        req: ClearCacheReq
+    ): OperationExecution<ClearCacheReq, ClearCacheResp> =
         sendMessage(meta, meta.chargingStationId, "ClearCache", req)
 
-    override fun remoteStartTransaction(meta: RequestMetadata,  req: RemoteStartTransactionReq): OperationExecution<RemoteStartTransactionReq, RemoteStartTransactionResp> =
+    override fun remoteStartTransaction(
+        meta: RequestMetadata,
+        req: RemoteStartTransactionReq
+    ): OperationExecution<RemoteStartTransactionReq, RemoteStartTransactionResp> =
         sendMessage(meta, meta.chargingStationId, "RemoteStartTransaction", req)
 
-    override fun remoteStopTransaction(meta: RequestMetadata,  req: RemoteStopTransactionReq): OperationExecution<RemoteStopTransactionReq, RemoteStopTransactionResp> =
+    override fun remoteStopTransaction(
+        meta: RequestMetadata,
+        req: RemoteStopTransactionReq
+    ): OperationExecution<RemoteStopTransactionReq, RemoteStopTransactionResp> =
         sendMessage(meta, meta.chargingStationId, "RemoteStopTransaction", req)
 
-    override fun unlockConnector(meta: RequestMetadata,  req: UnlockConnectorReq): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> =
+    override fun unlockConnector(
+        meta: RequestMetadata,
+        req: UnlockConnectorReq
+    ): OperationExecution<UnlockConnectorReq, UnlockConnectorResp> =
         sendMessage(meta, meta.chargingStationId, "UnlockConnector", req)
 
-    override fun getConfiguration(meta: RequestMetadata,  req: GetConfigurationReq): OperationExecution<GetConfigurationReq, GetConfigurationResp> =
+    override fun getConfiguration(
+        meta: RequestMetadata,
+        req: GetConfigurationReq
+    ): OperationExecution<GetConfigurationReq, GetConfigurationResp> =
         sendMessage(meta, meta.chargingStationId, "GetConfiguration", req)
 
-    override fun cancelReservation(meta: RequestMetadata, req: CancelReservationReq): OperationExecution<CancelReservationReq, CancelReservationResp> =
+    override fun cancelReservation(
+        meta: RequestMetadata,
+        req: CancelReservationReq
+    ): OperationExecution<CancelReservationReq, CancelReservationResp> =
         sendMessage(meta, meta.chargingStationId, "CancelReservation", req)
 
-    override fun clearChargingProfile(meta: RequestMetadata, req: ClearChargingProfileReq): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> =
+    override fun clearChargingProfile(
+        meta: RequestMetadata,
+        req: ClearChargingProfileReq
+    ): OperationExecution<ClearChargingProfileReq, ClearChargingProfileResp> =
         sendMessage(meta, meta.chargingStationId, "ClearChargingProfile", req)
 
-    override fun getCompositeSchedule(meta: RequestMetadata, req: GetCompositeScheduleReq): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> =
+    override fun getCompositeSchedule(
+        meta: RequestMetadata,
+        req: GetCompositeScheduleReq
+    ): OperationExecution<GetCompositeScheduleReq, GetCompositeScheduleResp> =
         sendMessage(meta, meta.chargingStationId, "GetCompositeSchedule", req)
 
-    override fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> =
+    override fun getLocalListVersion(
+        meta: RequestMetadata,
+        req: GetLocalListVersionReq
+    ): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp> =
         sendMessage(meta, meta.chargingStationId, "GetLocalListVersion", req)
 
-    override fun updateFirmware(meta: RequestMetadata, req : UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> =
+    override fun updateFirmware(
+        meta: RequestMetadata,
+        req: UpdateFirmwareReq
+    ): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp> =
         sendMessage(meta, meta.chargingStationId, "UpdateFirmware", req)
 
-    override fun sendLocalList(meta: RequestMetadata, req: SendLocalListReq): OperationExecution<SendLocalListReq, SendLocalListResp> =
+    override fun sendLocalList(
+        meta: RequestMetadata,
+        req: SendLocalListReq
+    ): OperationExecution<SendLocalListReq, SendLocalListResp> =
         sendMessage(meta, meta.chargingStationId, "SendLocalList", req)
 
-    override fun triggerMessage(meta: RequestMetadata,  req: TriggerMessageReq): OperationExecution<TriggerMessageReq, TriggerMessageResp> =
+    override fun triggerMessage(
+        meta: RequestMetadata,
+        req: TriggerMessageReq
+    ): OperationExecution<TriggerMessageReq, TriggerMessageResp> =
         sendMessage(meta, meta.chargingStationId, "TriggerMessage", req)
 
-    override fun setChargingProfile(meta: RequestMetadata, req: SetChargingProfileReq): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> =
+    override fun setChargingProfile(
+        meta: RequestMetadata,
+        req: SetChargingProfileReq
+    ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> =
         sendMessage(meta, meta.chargingStationId, "SetChargingProfile", req)
 
-    override fun reserveNow(meta: RequestMetadata,  req: ReserveNowReq): OperationExecution<ReserveNowReq, ReserveNowResp> =
+    override fun reserveNow(
+        meta: RequestMetadata,
+        req: ReserveNowReq
+    ): OperationExecution<ReserveNowReq, ReserveNowResp> =
         sendMessage(meta, meta.chargingStationId, "ReserveNow", req)
 
-    override fun dataTransfer(meta: RequestMetadata,  req: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp> =
+    override fun dataTransfer(
+        meta: RequestMetadata,
+        req: DataTransferReq
+    ): OperationExecution<DataTransferReq, DataTransferResp> =
         sendMessage(meta, meta.chargingStationId, "DataTransfer", req)
 
-    override fun getDiagnostics(meta: RequestMetadata, req: GetDiagnosticsReq): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> =
+    override fun getDiagnostics(
+        meta: RequestMetadata,
+        req: GetDiagnosticsReq
+    ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> =
         sendMessage(meta, meta.chargingStationId, "GetDiagnostics", req)
 
     private inline fun <T, reified P> sendMessage(meta: RequestMetadata, ocppId: String, action: String, request: T)
