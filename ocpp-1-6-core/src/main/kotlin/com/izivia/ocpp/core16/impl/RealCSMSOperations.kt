@@ -59,10 +59,12 @@ import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
 
+typealias OcppId = String
+
 class RealCSMSOperations(
     private val server: ServerTransport,
     private val chargePointOperations: ChargePointOperations,
-    acceptConnection: (String) -> Boolean
+    acceptConnection: (OcppId) -> Boolean
 ) : CSMSOperations {
 
     init{
