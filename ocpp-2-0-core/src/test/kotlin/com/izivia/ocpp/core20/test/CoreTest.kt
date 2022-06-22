@@ -86,7 +86,7 @@ import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import io.mockk.every
@@ -98,7 +98,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
 class CoreTest {
-    private lateinit var transport: Transport
+    private lateinit var transport: ClientTransport
 
     @BeforeEach
     fun init(){

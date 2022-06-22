@@ -1,7 +1,7 @@
 package com.izivia.ocpp.websocket
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
@@ -12,7 +12,7 @@ import java.net.ConnectException
 import java.util.*
 import kotlin.reflect.KClass
 
-class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) : Transport {
+class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) : ClientTransport {
 
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)

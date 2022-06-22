@@ -5,6 +5,7 @@ plugins {
 }
 
 dependencies {
+    implementation(project(":operation-information"))
 }
 
 publishing {

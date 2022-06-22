@@ -23,7 +23,7 @@ import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionReq
 import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import java.net.ConnectException
 
 /**
@@ -31,7 +31,7 @@ import java.net.ConnectException
  */
 interface ChargePointOperations {
     companion object {
-        fun newChargePointOperations(chargingStationId: String, transport: Transport, csmsOperations: CSMSOperations) =
+        fun newChargePointOperations(chargingStationId: String, transport: ClientTransport, csmsOperations: CSMSOperations) =
             RealChargePointOperations(chargingStationId,transport, csmsOperations)
     }
 

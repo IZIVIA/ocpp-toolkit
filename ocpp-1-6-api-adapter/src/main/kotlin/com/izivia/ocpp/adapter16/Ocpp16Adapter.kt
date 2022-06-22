@@ -53,7 +53,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.plus
 import org.mapstruct.factory.Mappers
@@ -66,7 +66,7 @@ import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
 class Ocpp16Adapter(
     chargingStationId: String,
-    private val transport: Transport,
+    private val transport: ClientTransport,
     csApi: CSApi,
     private val transactionIds: TransactionRepository
 ) : CSMSApi {

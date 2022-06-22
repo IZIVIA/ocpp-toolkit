@@ -44,7 +44,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
@@ -52,7 +52,7 @@ import java.net.ConnectException
 
 class RealChargePointOperations(
     private val chargeStationId: String,
-    private val client: Transport,
+    private val client: ClientTransport,
     private val csmsOperations: CSMSOperations
 ) : ChargePointOperations {
 

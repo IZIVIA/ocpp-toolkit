@@ -15,7 +15,7 @@ import com.izivia.ocpp.core16.impl.RealChargePointOperations as RealChargePointO
 import com.izivia.ocpp.core20.impl.RealChargePointOperations as RealChargePointOperations20
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.OcppVersion
 
@@ -26,14 +26,14 @@ class ApiFactory {
             ocppId: String,
             transportType: TransportEnum,
             target: String
-        ): Transport =
+        ): ClientTransport =
             when (transportType) {
                 TransportEnum.WEBSOCKET -> WebsocketClient(ocppId, ocppVersion, target)
                 TransportEnum.SOAP -> WebsocketClient(ocppId, ocppVersion, target)
             }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
-            val transport: Transport =
+            val transport: ClientTransport =
                 createTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
             return if (settings.ocppVersion == OcppVersion.OCPP_1_6) {
                 Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())

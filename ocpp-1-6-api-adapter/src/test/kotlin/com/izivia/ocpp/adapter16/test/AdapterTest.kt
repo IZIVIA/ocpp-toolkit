@@ -169,7 +169,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -181,7 +181,7 @@ import strikt.api.expectThat
 import strikt.assertions.isEqualTo
 
 class AdapterTest {
-    private lateinit var transport: Transport
+    private lateinit var transport: ClientTransport
     private lateinit var chargePointOperations: RealChargePointOperations
 
     private val csApi: CSApi = object : CSApi {

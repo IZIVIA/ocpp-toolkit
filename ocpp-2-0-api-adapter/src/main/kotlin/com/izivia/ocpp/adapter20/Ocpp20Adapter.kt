@@ -54,14 +54,14 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import com.izivia.ocpp.transport.Transport
+import com.izivia.ocpp.transport.ClientTransport
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
-class Ocpp20Adapter(chargingStationId: String, private val transport: Transport, csApi: CSApi) : CSMSApi {
+class Ocpp20Adapter(chargingStationId: String, private val transport: ClientTransport, csApi: CSApi) : CSMSApi {
 
     companion object {
         private val logger = LoggerFactory.getLogger(Ocpp20Adapter::class.java)
