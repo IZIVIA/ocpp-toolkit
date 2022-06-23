@@ -1,10 +1,12 @@
 package com.izivia.ocpp.operation.information
 
+import java.net.ConnectException
+
 enum class ActionOcpp(val value: String) {
     RESET("Reset"),
     SET_VARIABLES("etVariables"),
     CHANGE_AVAILABILITY("ChangeAvailability"),
-    CLEAR_CACHE	("ClearCache"),
+    CLEAR_CACHE("ClearCache"),
     REQUEST_START_TRANSACTION("RequestStartTransaction"),
     REQUEST_STOP_TRANSACTION("RequestStopTransaction"),
     UNLOCK_CONNECTOR("UnlockConnector"),
@@ -37,9 +39,32 @@ enum class ActionOcpp(val value: String) {
     SET_MONITORING_BASE("SetMonitoringBase"),
     GET_DISPLAY_MESSAGES("GetDisplayMessages"),
     COST_UPDATED("CostUpdated"),
-    SET_DISPLAYMESSAGE("setDisplayMessage"),
+    SET_DISPLAY_MESSAGE("setDisplayMessage"),
     DELETE_CERTIFICATE("deleteCertificate"),
     GET_MONITORING_REPORT("getMonitoringReport"),
-    CLEAR_VARIABLE_MONITORING("clearVariableMonitoring")
+    CLEAR_VARIABLE_MONITORING("clearVariableMonitoring"),
+    HEARTBEAT("Heartbeat"),
+    AUTHORIZE("Authorize"),
+    METER_VALUES("MeterValues"),
+    TRANSACTION_EVENT("TransactionEvent"),
+    STATUS_NOTIFICATION("StatusNotification"),
+    BOOT_NOTIFICATION("BootNotification"),
+    NOTIFY_REPORT("NotifyReport"),
+    FIRMWARE_STATUS_NOTIFICATION("FirmwareStatusNotification"),
+    CLEARED_CHARGING_LIMIT("ClearedChargingLimit"),
+    GET_CERTIFICATE_STATUS("GetCertificateStatus"),
+    NOTIFY_CUSTOMER_INFORMATION("NotifyCustomerInformation"),
+    NOTIFY_EVENT("NotifyEvent"),
+    NOTIFY_EV_CHARGING_SCHEDULE("NotifyEVChargingSchedule"),
+    NOTIFY_CHARGING_LIMIT("NotifyChargingLimit"),
+    NOTIFY_DISPLAY_MESSAGES("NotifyDisplayMessages"),
+    NOTIFY_EV_CHARGING_NEEDS("NotifyEVChargingNeeds"),
+    LOG_STATUS_NOTIFICATION("LogStatusNotification"),
+    PUBLISH_FIRMWARE_STATUS_NOTIFICATION("PublishFirmwareStatusNotification"),
+    NOTIFY_MONITORING_REPORT("NotifyMonitoringReport"),
+    RESERVATION_STATUS_UPDATE("ReservationStatusUpdate"),
+    SECURITY_EVENT_NOTIFICATION("SecurityEventNotification"),
+    SIGN_CERTIFICATE("SignCertificate"),
+    REPORT_CHARGING_PROFILES("ReportChargingProfiles")
 }
 
