@@ -211,7 +211,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.mockkStatic
-import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage

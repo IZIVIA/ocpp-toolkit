@@ -16,7 +16,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
-                        private val handlers: (CSOcppId)->OcppWampServerHandler,
+                        private val handlers: (CSOcppId)-> List<OcppWampServerHandler>,
                         val timeoutInMs:Long) {
     companion object {
         private val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server")
@@ -72,7 +72,10 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         }
 
                         logger.info("""[$chargingStationOcppId] [$wsConnectionId] -> ${it.bodyString()}""")
-                        val resp = handler.onAction(WampMessageMeta(ocppVersion, chargingStationOcppId), msg)
+                        val resp = handler.asSequence()
+                            .map { it.onAction(WampMessageMeta(ocppVersion, chargingStationOcppId), msg) }
+                            .filterNotNull()
+                            .firstOrNull()
                             ?: WampMessage.CallError(msg.msgId, "{}").also { logger.warn("no action handler found for $msg") }
 
                         logger.info("""[$chargingStationOcppId] [$wsConnectionId] <- ${resp.toJson()}""")

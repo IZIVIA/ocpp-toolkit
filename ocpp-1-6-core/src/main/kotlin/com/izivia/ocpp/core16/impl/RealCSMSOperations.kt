@@ -49,6 +49,7 @@ import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorReq
 import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareResp
+import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
@@ -60,51 +61,88 @@ import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
 
 class RealCSMSOperations(
-    private val server: ServerTransport,
-    private val chargePointOperations: ChargePointOperations,
-    acceptConnection: (String) -> Boolean
+    private val servers: Set<ServerTransport>,
+    private val acceptConnection: (String) -> ChargingStationConfig,
+    chargePointOperations: ChargePointOperations
 ) : CSMSOperations {
 
     init{
-        server.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
-            chargePointOperations.heartbeat(meta, req).response
-        }, acceptConnection)
+        servers.forEach {
+            it.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
+                chargePointOperations.heartbeat(meta, req).response
+            }, acceptConnection)
 
-        server.receiveMessage("Authorize", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: AuthorizeReq ->
-            chargePointOperations.authorize(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage("Authorize", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: AuthorizeReq ->
+                chargePointOperations.authorize(meta, req).response
+            }, acceptConnection)
 
-        server.receiveMessage("MeterValues", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: MeterValuesReq ->
-            chargePointOperations.meterValues(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage("MeterValues", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: MeterValuesReq ->
+                chargePointOperations.meterValues(meta, req).response
+            }, acceptConnection)
 
-        server.receiveMessage("StartTransaction", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: StartTransactionReq ->
-            chargePointOperations.startTransaction(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "StartTransaction",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: StartTransactionReq ->
+                    chargePointOperations.startTransaction(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("StopTransaction", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: StopTransactionReq ->
-            chargePointOperations.stopTransaction(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "StopTransaction",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: StopTransactionReq ->
+                    chargePointOperations.stopTransaction(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("StatusNotification", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: StatusNotificationReq ->
-            chargePointOperations.statusNotification(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "StatusNotification",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: StatusNotificationReq ->
+                    chargePointOperations.statusNotification(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("DataTransfer", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: DataTransferReq ->
-            chargePointOperations.dataTransfer(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "DataTransfer",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: DataTransferReq ->
+                    chargePointOperations.dataTransfer(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("BootNotification", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: BootNotificationReq ->
-            chargePointOperations.bootNotification(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "BootNotification",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: BootNotificationReq ->
+                    chargePointOperations.bootNotification(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("FirmwareStatusNotification", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: FirmwareStatusNotificationReq ->
-            chargePointOperations.firmwareStatusNotification(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "FirmwareStatusNotification",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: FirmwareStatusNotificationReq ->
+                    chargePointOperations.firmwareStatusNotification(meta, req).response
+                },
+                acceptConnection
+            )
 
-        server.receiveMessage("DiagnosticsStatusNotification", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: DiagnosticsStatusNotificationReq ->
-            chargePointOperations.diagnosticsStatusNotification(meta, req).response
-        }, acceptConnection)
+            it.receiveMessage(
+                "DiagnosticsStatusNotification",
+                OcppVersion.OCPP_1_6,
+                { meta: RequestMetadata, req: DiagnosticsStatusNotificationReq ->
+                    chargePointOperations.diagnosticsStatusNotification(meta, req).response
+                },
+                acceptConnection
+            )
+        }
     }
 
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> =
@@ -166,8 +204,9 @@ class RealCSMSOperations(
 
     private inline fun <T, reified P> sendMessage(meta: RequestMetadata, ocppId: String, action: String, request: T)
             : OperationExecution<T, P> {
+        val transport = getTransport(ocppId)
         val requestTime = Clock.System.now()
-        val response: P = server.sendMessage(action, ocppId, request)
+        val response: P = transport.sendMessage(ocppId, action, request)
         val responseTime = Clock.System.now()
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime),
@@ -175,4 +214,8 @@ class RealCSMSOperations(
             response
         )
     }
+
+    private fun getTransport(ocppId: String): ServerTransport =
+        servers.filter { it.canSendToChargingStation(acceptConnection(ocppId)) }.firstOrNull()
+            ?: throw IllegalStateException("No transport to send a message to $ocppId")
 }

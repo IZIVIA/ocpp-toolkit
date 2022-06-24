@@ -49,6 +49,7 @@ import com.izivia.ocpp.core20.model.statusnotification.StatusNotificationReq
 import com.izivia.ocpp.core20.model.statusnotification.StatusNotificationResp
 import com.izivia.ocpp.core20.model.transactionevent.TransactionEventReq
 import com.izivia.ocpp.core20.model.transactionevent.TransactionEventResp
+import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.ClientTransport
@@ -57,7 +58,7 @@ import java.net.ConnectException
 /**
  * Operations initiated by Charge Point
  */
-interface ChargePointOperations {
+interface ChargePointOperations: CSMSCallbacks {
     companion object {
         fun newChargePointOperations(chargingStationId: String, transport: ClientTransport, csmsOperations: CSMSOperations) =
                 RealChargePointOperations(chargingStationId, transport, csmsOperations)

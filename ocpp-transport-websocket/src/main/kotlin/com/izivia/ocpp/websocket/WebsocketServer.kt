@@ -2,6 +2,7 @@ package com.izivia.ocpp.websocket
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
@@ -37,9 +38,9 @@ class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>) : ServerTranspo
         }
 
     override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, ocppVersion: OcppVersion,
-                                                  onAction: (RequestMetadata, T) -> P, accept: (CSOcppId) -> Boolean) {
+                                                  onAction: (RequestMetadata, T) -> P, accept: (CSOcppId) -> ChargingStationConfig) {
         server.register(handler = object : OcppWampServerHandler {
-            override fun accept(ocppId: CSOcppId): Boolean = accept(ocppId)
+            override fun accept(ocppId: CSOcppId): Boolean = accept(ocppId).acceptConnection
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
@@ -51,5 +52,8 @@ class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>) : ServerTranspo
                 }
         })
     }
+
+    override fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean =
+        chargingStationConfig.acceptConnection
 }
 

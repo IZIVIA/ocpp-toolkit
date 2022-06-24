@@ -1,9 +1,9 @@
 package com.izivia.ocpp.integration.model
 
-import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.transport.OcppVersion as OcppVersionTransport
 
 data class Settings(
-    val ocppVersion: OcppVersion,
+    val ocppVersion: OcppVersionTransport,
     val transportType: TransportEnum,
     val domain: String = "localhost",
     val port: String = "8080",
@@ -19,6 +19,6 @@ data class CSMSSettings(
 )
 data class ServerSetting(
     val path: String = "",
-    val ocppVersion: Set<OcppVersion>,
+    val ocppVersion: Set<OcppVersionTransport>,
     val transportType: TransportEnum,
 )
