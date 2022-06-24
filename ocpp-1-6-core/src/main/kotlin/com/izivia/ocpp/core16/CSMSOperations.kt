@@ -38,10 +38,11 @@ import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorReq
 import com.izivia.ocpp.core16.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareResp
+import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 
-interface CSMSOperations {
+interface CSMSOperations: CSCallbacks {
 
     fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 

@@ -1,5 +1,6 @@
 package com.izivia.ocpp.transport
 
+import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import kotlin.reflect.KClass
 
@@ -15,7 +16,9 @@ interface ServerTransport {
                                          action: String,
                                          ocppVersion: OcppVersion,
                                          onAction: (RequestMetadata, T) -> P,
-                                         accept: (String) -> Boolean)
+                                         accept: (String) -> ChargingStationConfig)
+
+    fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean
 
 }
 
@@ -26,5 +29,5 @@ inline fun <reified T : Any, P> ServerTransport.receiveMessage(
     action: String,
     ocppVersion: OcppVersion,
     noinline onAction: (RequestMetadata, T) -> P,
-    noinline accept: (String) -> Boolean
+    noinline accept: (String) -> ChargingStationConfig
 ) = receiveMessageClass(T::class, action, ocppVersion, onAction, accept)

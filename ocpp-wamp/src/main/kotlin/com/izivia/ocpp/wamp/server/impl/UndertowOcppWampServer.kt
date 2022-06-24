@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, val timeoutInMs:Long = 30_000) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
-    private val selectedHandler = ConcurrentHashMap<CSOcppId, OcppWampServerHandler>()
+    private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
     private var server: Http4kServer? = null
     private var wsApp: OcppWampServerApp? = null
 
@@ -30,9 +30,9 @@ class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, va
                     enableHttp2 = true,
                     acceptWebSocketPredicate = { exch ->
                         // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-                        OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)
-                            ?.let { handlers.find { h-> h.accept(it) }?.let { h -> it to h } }
-                            ?.also { selectedHandler[it.first] = it.second } != null },
+                        OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId -> handlers
+                                .filter { h-> h.accept(ocppId) }
+                                .also { selectedHandler[ocppId] = it}} != null},
                     wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
                 )).start()
             }

@@ -136,6 +136,7 @@ import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.transport.OcppVersion as OcppVersionTransport
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
@@ -616,7 +617,7 @@ class IntegrationTestCSApi {
     @Test
     fun `1-6 test`() {
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
+        val settings = Settings(OcppVersionTransport.OCPP_1_6, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
 
         val csApiSpy = spy(csApi)
@@ -786,7 +787,7 @@ class IntegrationTestCSApi {
 
     @Test
     fun `2-0 test`() {
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
+        val settings = Settings(OcppVersionTransport.OCPP_2_0, TransportEnum.WEBSOCKET, target = "ws://localhost:$port/ws")
         val ocppId = "chargePoint2"
 
         val csApiSpy = spy(csApi)
