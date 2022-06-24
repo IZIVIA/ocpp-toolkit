@@ -649,7 +649,7 @@ class RealCSMSOperations(
         is DeleteCertificateReq -> ActionOcpp.DELETE_CERTIFICATE.value
         is GetMonitoringReportReq -> ActionOcpp.GET_MONITORING_REPORT.value
         is ClearVariableMonitoringReq -> ActionOcpp.CLEAR_VARIABLE_MONITORING.value
-        else -> throw IllegalArgumentException("Unknown action")
+        else -> throw IllegalArgumentException("Unknown action ${req::class}")
 
     }
 

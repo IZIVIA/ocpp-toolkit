@@ -1,10 +1,8 @@
 package com.izivia.ocpp.operation.information
 
-import java.net.ConnectException
-
 enum class ActionOcpp(val value: String) {
     RESET("Reset"),
-    SET_VARIABLES("etVariables"),
+    SET_VARIABLES("SetVariables"),
     CHANGE_AVAILABILITY("ChangeAvailability"),
     CLEAR_CACHE("ClearCache"),
     REQUEST_START_TRANSACTION("RequestStartTransaction"),
@@ -39,10 +37,10 @@ enum class ActionOcpp(val value: String) {
     SET_MONITORING_BASE("SetMonitoringBase"),
     GET_DISPLAY_MESSAGES("GetDisplayMessages"),
     COST_UPDATED("CostUpdated"),
-    SET_DISPLAY_MESSAGE("setDisplayMessage"),
-    DELETE_CERTIFICATE("deleteCertificate"),
-    GET_MONITORING_REPORT("getMonitoringReport"),
-    CLEAR_VARIABLE_MONITORING("clearVariableMonitoring"),
+    SET_DISPLAY_MESSAGE("SetDisplayMessage"),
+    DELETE_CERTIFICATE("DeleteCertificate"),
+    GET_MONITORING_REPORT("GetMonitoringReport"),
+    CLEAR_VARIABLE_MONITORING("ClearVariableMonitoring"),
     HEARTBEAT("Heartbeat"),
     AUTHORIZE("Authorize"),
     METER_VALUES("MeterValues"),
