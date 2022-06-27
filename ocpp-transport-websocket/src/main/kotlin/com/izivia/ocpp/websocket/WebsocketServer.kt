@@ -15,10 +15,10 @@ import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 import java.util.*
 import kotlin.reflect.KClass
 
-class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>) : ServerTransport {
+class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>, path: String) : ServerTransport {
 
     private val server: OcppWampServer =
-        OcppWampServer.newServer(port, ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet())
+        OcppWampServer.newServer(port, ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path)
     private val mapper = jacksonObjectMapper()
 
     override fun start(): Unit = server.start()

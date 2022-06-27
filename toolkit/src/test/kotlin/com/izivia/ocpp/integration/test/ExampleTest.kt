@@ -30,8 +30,8 @@ import com.izivia.ocpp.core16.model.starttransaction.StartTransactionReq as Star
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionResp as StartTransactionResp16
 import com.izivia.ocpp.core16.model.statusnotification.StatusNotificationReq as StatusNotificationReq16
 
-import com.izivia.ocpp.integration.ApiFactory.Companion.Ocpp16ConnectionToCSMS
-import com.izivia.ocpp.integration.ApiFactory.Companion.Ocpp20ConnectionToCSMS
+import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp16ConnectionToCSMS
+import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp20ConnectionToCSMS
 import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.operation.information.RequestMetadata
 import kotlinx.datetime.Clock.System.now
@@ -51,7 +51,7 @@ class ExampleTest {
     fun ocpp16Charge() {
 
         //establish a connection to the CSMS
-        val connection = Ocpp16ConnectionToCSMS(
+        val connection = ocpp16ConnectionToCSMS(
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,
@@ -143,7 +143,7 @@ class ExampleTest {
         }
 
         //establish a connection to the CSMS
-        val connection = Ocpp16ConnectionToCSMS(
+        val connection = ocpp16ConnectionToCSMS(
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,
@@ -210,7 +210,7 @@ class ExampleTest {
 
     @Test
     fun ocpp20Charge() {
-        val connection = Ocpp20ConnectionToCSMS(
+        val connection = ocpp20ConnectionToCSMS(
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,
@@ -275,7 +275,7 @@ class ExampleTest {
             }
         }
 
-        val connection = Ocpp20ConnectionToCSMS(
+        val connection = ocpp20ConnectionToCSMS(
                 chargePointId = chargPointId,
                 csmsUrl = csmsUrl,
                 transportType = transport,

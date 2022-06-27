@@ -59,28 +59,26 @@ import kotlinx.datetime.Clock
 typealias OcppId = String
 
 class RealCSMSOperations(
-
     private val servers: Set<ServerTransport>,
-    private val acceptConnection: (String) -> ChargingStationConfig,
+    private val acceptConnection: (OcppId) -> ChargingStationConfig,
     chargePointOperations: ChargePointOperations
-
 ) : CSMSOperations {
 
     init {
-        servers.forEach {
-            it.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
+        servers.forEach {server ->
+            server.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
                 chargePointOperations.heartbeat(meta, req).response
             }, acceptConnection)
 
-            it.receiveMessage("Authorize", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: AuthorizeReq ->
+            server.receiveMessage("Authorize", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: AuthorizeReq ->
                 chargePointOperations.authorize(meta, req).response
             }, acceptConnection)
 
-            it.receiveMessage("MeterValues", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: MeterValuesReq ->
+            server.receiveMessage("MeterValues", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: MeterValuesReq ->
                 chargePointOperations.meterValues(meta, req).response
             }, acceptConnection)
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "StartTransaction",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: StartTransactionReq ->
@@ -89,7 +87,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "StopTransaction",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: StopTransactionReq ->
@@ -98,7 +96,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "StatusNotification",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: StatusNotificationReq ->
@@ -107,7 +105,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "DataTransfer",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: DataTransferReq ->
@@ -116,7 +114,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "BootNotification",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: BootNotificationReq ->
@@ -125,7 +123,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "FirmwareStatusNotification",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: FirmwareStatusNotificationReq ->
@@ -134,7 +132,7 @@ class RealCSMSOperations(
                 acceptConnection
             )
 
-            it.receiveMessage(
+            server.receiveMessage(
                 "DiagnosticsStatusNotification",
                 OcppVersion.OCPP_1_6,
                 { meta: RequestMetadata, req: DiagnosticsStatusNotificationReq ->

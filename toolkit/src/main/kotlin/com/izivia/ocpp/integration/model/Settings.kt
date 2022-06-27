@@ -14,10 +14,10 @@ data class Settings(
     })
 
 data class CSMSSettings(
-    val port: Int = 1234,
     val servers: List<ServerSetting>,
 )
 data class ServerSetting(
+    val port: Int,
     val path: String = "",
     val ocppVersion: Set<OcppVersionTransport>,
     val transportType: TransportEnum,

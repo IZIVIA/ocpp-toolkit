@@ -49,8 +49,8 @@ interface OcppWampServer {
     fun register(handler: OcppWampServerHandler)
 
     companion object {
-        fun newServer(port:Int, ocppVersions:Set<OcppVersion> = OcppVersion.values().toSet(), timeoutInMs:Long = 30_000)
-            = UndertowOcppWampServer(port, ocppVersions, timeoutInMs)
+        fun newServer(port:Int, ocppVersions:Set<OcppVersion> = OcppVersion.values().toSet(), path: String = "ws", timeoutInMs:Long = 30_000)
+            = UndertowOcppWampServer(port, ocppVersions, path, timeoutInMs)
     }
 }
 

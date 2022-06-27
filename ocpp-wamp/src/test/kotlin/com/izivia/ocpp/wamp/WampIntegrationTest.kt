@@ -132,7 +132,7 @@ class WampIntegrationTest {
     fun `should call from server to charging station timeout`() {
         val port = 12345
 
-        val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0), 200)
+        val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0), "ws",200)
         server.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
