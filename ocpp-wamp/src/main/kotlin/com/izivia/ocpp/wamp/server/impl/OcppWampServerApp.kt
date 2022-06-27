@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)-> List<OcppWampServerHandler>,
+                        private val ocppWsEndpoint: OcppWsEndpoint,
                         val timeoutInMs:Long) {
     companion object {
         private val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server")
@@ -31,7 +32,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
             return
         }
         val wsConnectionId = UUID.randomUUID().toString()
-        val chargingStationOcppId = OcppWsEndpoint.extractChargingStationOcppId(ws.upgradeRequest.uri.path)
+        val chargingStationOcppId = ocppWsEndpoint.extractChargingStationOcppId(ws.upgradeRequest.uri.path)
             ?.takeUnless { it.isEmpty() }
             ?:throw IllegalArgumentException("malformed request - no chargingStationOcppId - ${ws.upgradeRequest}")
         val ocppVersion = ws.upgradeRequest.header("Sec-WebSocket-Protocol")
@@ -119,7 +120,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
         return connection ?: throw IllegalStateException("no connection to $ocppId")
     }
 
-    fun newRoutingHandler() = websockets(OcppWsEndpoint.uriTemplate.toString() bind ::newConnection)
+    fun newRoutingHandler() = websockets(ocppWsEndpoint.uriTemplate.toString() bind ::newConnection)
 
     private class ChargingStationConnection(val wsConnectionId:String,
                                                  val ocppId:CSOcppId, val ws: Websocket,

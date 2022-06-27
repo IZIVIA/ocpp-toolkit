@@ -45,8 +45,8 @@ class ApiFactory {
             transportType: TransportEnum
         ): ServerTransport =
             when (transportType) {
-                TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion)
-                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion)
+                TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion, path)
+                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion, path)
             }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
@@ -59,7 +59,7 @@ class ApiFactory {
             }
         }
 
-        fun Ocpp16ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks16): ChargePointOperations16 =
+        fun ocpp16ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks16): ChargePointOperations16 =
              RealChargePointOperations16(
                 chargeStationId = chargePointId,
                 client= createClientTransport(
@@ -71,7 +71,7 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
 
-        fun Ocpp20ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks20): ChargePointOperations20 =
+        fun ocpp20ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks20): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
                 client= createClientTransport(
@@ -83,7 +83,7 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations20(ocppCSCallbacks)
             )
 
-        fun CSMSOcppServer(
+        fun csmsOcppServer(
             csmsSettings: CSMSSettings,
             csmsApiCallbacks: List<CSMSCallbacks>,
             fn: (String) -> ChargingStationConfig
@@ -91,7 +91,7 @@ class ApiFactory {
             val transports: Map<ServerTransport, Set<OcppVersionTransport>> = mutableMapOf<ServerTransport, Set<OcppVersionTransport>>().also {
                 map -> csmsSettings.servers.map {
                     map.put(createServerTransport(
-                        csmsSettings.port,
+                        it.port,
                         it.path,
                         it.ocppVersion,
                         it.transportType

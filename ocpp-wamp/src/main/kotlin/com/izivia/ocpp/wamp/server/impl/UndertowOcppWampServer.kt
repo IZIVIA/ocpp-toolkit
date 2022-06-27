@@ -12,16 +12,18 @@ import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
-class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, val timeoutInMs:Long = 30_000) : OcppWampServer {
+class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, path: String = "ws", val timeoutInMs:Long = 30_000) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
     private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
     private var server: Http4kServer? = null
     private var wsApp: OcppWampServerApp? = null
+    private var ocppWsEndpoint = OcppWsEndpoint(path)
 
     override fun start() {
         wsApp = OcppWampServerApp(
             ocppVersions = ocppVersions,
             handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
+            ocppWsEndpoint = ocppWsEndpoint,
             timeoutInMs = timeoutInMs
         )
             .also {
@@ -30,7 +32,7 @@ class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, va
                     enableHttp2 = true,
                     acceptWebSocketPredicate = { exch ->
                         // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-                        OcppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId -> handlers
+                        ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId -> handlers
                                 .filter { h-> h.accept(ocppId) }
                                 .also { selectedHandler[ocppId] = it}} != null},
                     wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
