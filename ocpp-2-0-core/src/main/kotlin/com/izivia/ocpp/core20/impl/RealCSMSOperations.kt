@@ -112,250 +112,262 @@ import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
 
-typealias OcppId = String
 typealias Action = String
 
 
 class RealCSMSOperations(
-    val server: ServerTransport,
-    private val chargePointOperations: ChargePointOperations,
-    acceptConnection: (OcppId) -> Boolean
-) : CSMSOperations {
+    private val servers: Set<ServerTransport>,
+    private val acceptConnection: (String) -> ChargingStationConfig,
+    chargePointOperations: ChargePointOperations,
+
+    ) : CSMSOperations {
     init {
-        server.receiveMessage(
-            ActionOcpp.HEARTBEAT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: HeartbeatReq -> chargePointOperations.heartbeat(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.AUTHORIZE.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: AuthorizeReq -> chargePointOperations.authorize(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.METER_VALUES.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: MeterValuesReq -> chargePointOperations.meterValues(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.TRANSACTION_EVENT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: TransactionEventReq ->
-                chargePointOperations.transactionEvent(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.STATUS_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: StatusNotificationReq ->
-                chargePointOperations.statusNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.DATA_TRANSFER.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: DataTransferReq -> chargePointOperations.dataTransfer(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.BOOT_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: BootNotificationReq ->
-                chargePointOperations.bootNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_REPORT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyReportReq -> chargePointOperations.notifyReport(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.FIRMWARE_STATUS_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: FirmwareStatusNotificationReq ->
-                chargePointOperations.firmwareStatusNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.CLEARED_CHARGING_LIMIT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: ClearedChargingLimitReq ->
-                chargePointOperations.clearedChargingLimit(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.GET_CERTIFICATE_STATUS.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: GetCertificateStatusReq ->
-                chargePointOperations.getCertificateStatus(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_CUSTOMER_INFORMATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyCustomerInformationReq ->
-                chargePointOperations.notifyCustomerInformation(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_EVENT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyEventReq -> chargePointOperations.notifyEvent(meta, req).response },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_EV_CHARGING_SCHEDULE.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyEVChargingScheduleReq ->
-                chargePointOperations.notifyEVChargingSchedule(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_CHARGING_LIMIT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyChargingLimitReq ->
-                chargePointOperations.notifyChargingLimit(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_DISPLAY_MESSAGES.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyDisplayMessagesReq ->
-                chargePointOperations.notifyDisplayMessages(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_EV_CHARGING_NEEDS.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyEVChargingNeedsReq ->
-                chargePointOperations.notifyEVChargingNeeds(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.LOG_STATUS_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: LogStatusNotificationReq ->
-                chargePointOperations.logStatusNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.PUBLISH_FIRMWARE_STATUS_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: PublishFirmwareStatusNotificationReq ->
-                chargePointOperations.publishFirmwareStatusNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.NOTIFY_MONITORING_REPORT.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: NotifyMonitoringReportReq ->
-                chargePointOperations.notifyMonitoringReport(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.RESERVATION_STATUS_UPDATE.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: ReservationStatusUpdateReq ->
-                chargePointOperations.reservationStatusUpdate(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.SECURITY_EVENT_NOTIFICATION.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: SecurityEventNotificationReq ->
-                chargePointOperations.securityEventNotification(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.SIGN_CERTIFICATE.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: SignCertificateReq ->
-                chargePointOperations.signCertificate(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
-        server.receiveMessage(
-            ActionOcpp.REPORT_CHARGING_PROFILES.value,
-            OcppVersion.OCPP_2_0,
-            { meta: RequestMetadata, req: ReportChargingProfilesReq ->
-                chargePointOperations.reportChargingProfiles(
-                    meta,
-                    req
-                ).response
-            },
-            acceptConnection
-        )
+        servers.forEach {
+            it.receiveMessage(
+                ActionOcpp.HEARTBEAT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: HeartbeatReq -> chargePointOperations.heartbeat(meta, req).response },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.AUTHORIZE.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: AuthorizeReq -> chargePointOperations.authorize(meta, req).response },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.METER_VALUES.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: MeterValuesReq -> chargePointOperations.meterValues(meta, req).response },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.TRANSACTION_EVENT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: TransactionEventReq ->
+                    chargePointOperations.transactionEvent(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.STATUS_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: StatusNotificationReq ->
+                    chargePointOperations.statusNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.DATA_TRANSFER.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: DataTransferReq ->
+                    chargePointOperations.dataTransfer(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.BOOT_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: BootNotificationReq ->
+                    chargePointOperations.bootNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_REPORT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyReportReq ->
+                    chargePointOperations.notifyReport(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.FIRMWARE_STATUS_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: FirmwareStatusNotificationReq ->
+                    chargePointOperations.firmwareStatusNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.CLEARED_CHARGING_LIMIT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: ClearedChargingLimitReq ->
+                    chargePointOperations.clearedChargingLimit(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.GET_CERTIFICATE_STATUS.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: GetCertificateStatusReq ->
+                    chargePointOperations.getCertificateStatus(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_CUSTOMER_INFORMATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyCustomerInformationReq ->
+                    chargePointOperations.notifyCustomerInformation(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_EVENT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyEventReq -> chargePointOperations.notifyEvent(meta, req).response },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_EV_CHARGING_SCHEDULE.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyEVChargingScheduleReq ->
+                    chargePointOperations.notifyEVChargingSchedule(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_CHARGING_LIMIT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyChargingLimitReq ->
+                    chargePointOperations.notifyChargingLimit(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_DISPLAY_MESSAGES.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyDisplayMessagesReq ->
+                    chargePointOperations.notifyDisplayMessages(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_EV_CHARGING_NEEDS.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyEVChargingNeedsReq ->
+                    chargePointOperations.notifyEVChargingNeeds(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.LOG_STATUS_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: LogStatusNotificationReq ->
+                    chargePointOperations.logStatusNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.PUBLISH_FIRMWARE_STATUS_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: PublishFirmwareStatusNotificationReq ->
+                    chargePointOperations.publishFirmwareStatusNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.NOTIFY_MONITORING_REPORT.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: NotifyMonitoringReportReq ->
+                    chargePointOperations.notifyMonitoringReport(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.RESERVATION_STATUS_UPDATE.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: ReservationStatusUpdateReq ->
+                    chargePointOperations.reservationStatusUpdate(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.SECURITY_EVENT_NOTIFICATION.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: SecurityEventNotificationReq ->
+                    chargePointOperations.securityEventNotification(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.SIGN_CERTIFICATE.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: SignCertificateReq ->
+                    chargePointOperations.signCertificate(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+            it.receiveMessage(
+                ActionOcpp.REPORT_CHARGING_PROFILES.value,
+                OcppVersion.OCPP_2_0,
+                { meta: RequestMetadata, req: ReportChargingProfilesReq ->
+                    chargePointOperations.reportChargingProfiles(
+                        meta,
+                        req
+                    ).response
+                },
+                acceptConnection
+            )
+        }
     }
 
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> =
@@ -596,7 +608,8 @@ class RealCSMSOperations(
         action: String
     ): OperationExecution<T, P> {
         val startTime = Clock.System.now()
-        val resp = server.sendMessage<T, P>(csOcppId = meta.chargingStationId, action = action, message = req)
+        val transport = getTransport(meta.chargingStationId)
+        val resp = transport.sendMessage<T, P>(csOcppId = meta.chargingStationId, action = action, message = req)
         val stopTime = Clock.System.now()
         return OperationExecution(
             ExecutionMetadata(
@@ -607,6 +620,10 @@ class RealCSMSOperations(
             ), req, resp
         )
     }
+
+    private fun getTransport(ocppId: String): ServerTransport =
+        servers.filter { it.canSendToChargingStation(acceptConnection(ocppId)) }.firstOrNull()
+            ?: throw IllegalStateException("No transport to send a message to $ocppId")
 
     private fun <T : Any> getActionFromReq(req: T): Action = when (req) {
         is ResetReq -> ActionOcpp.RESET.value

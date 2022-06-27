@@ -56,8 +56,6 @@ import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import kotlinx.datetime.Clock
 
-typealias OcppId = String
-
 class RealCSMSOperations(
 
     private val servers: Set<ServerTransport>,

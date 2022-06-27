@@ -1,17 +1,18 @@
 package com.izivia.ocpp.integration
 
+// import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
 import com.izivia.ocpp.api.CSApi
-import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
-import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
-import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.CSMSCallbacks
+import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
 import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
 import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
-// import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
+import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
 
 class CSMS(
     private val transports: Map<ServerTransport, Set<OcppVersion>>,
@@ -35,7 +36,7 @@ class CSMS(
                     csApis[csApiType.OCPP_1_6] = RealCSMSOperations16(transports16, fn, it)
                 }
                 is ChargePointOperations20 -> transportByVersion[OcppVersion.OCPP_2_0]?.let { transports20 ->
-                    //csApis[csApiType.OCPP_2_0] = RealCSMSOperations20(transports20, it, fn)
+                    csApis[csApiType.OCPP_2_0] = RealCSMSOperations20(transports20, fn, it)
                 }
                 else -> throw IllegalStateException("Unknow csms callbacks")
             }
