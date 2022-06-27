@@ -24,6 +24,7 @@ import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.websocket.WebsocketServer
+import com.izivia.ocpp.http.HttpServer
 
 class ApiFactory {
     companion object {
@@ -47,7 +48,7 @@ class ApiFactory {
         ): ServerTransport =
             when (transportType) {
                 TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion, path, newMessageId)
-                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion, path, newMessageId)
+                TransportEnum.SOAP -> HttpServer(port, path)
             }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
