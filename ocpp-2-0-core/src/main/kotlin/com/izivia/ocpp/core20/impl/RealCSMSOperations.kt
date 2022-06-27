@@ -119,7 +119,7 @@ typealias Action = String
 class RealCSMSOperations(
     val server: ServerTransport,
     private val chargePointOperations: ChargePointOperations,
-    acceptConnection: (OcppId) -> Boolean
+    acceptConnection: (OcppId) -> ChargingStationConfig
 ) : CSMSOperations {
     init {
         server.receiveMessage(
