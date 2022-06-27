@@ -80,10 +80,11 @@ import com.izivia.ocpp.core20.model.unpublishfirmware.UnpublishFirmwareReq
 import com.izivia.ocpp.core20.model.unpublishfirmware.UnpublishFirmwareResp
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareResp
+import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 
-interface CSMSOperations {
+interface CSMSOperations: CSCallbacks {
 
     fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 
