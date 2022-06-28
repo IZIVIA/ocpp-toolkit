@@ -1,9 +1,10 @@
 package com.izivia.ocpp.integration.model
 
-import com.izivia.ocpp.transport.OcppVersion as OcppVersionTransport
+import com.izivia.ocpp.transport.OcppVersion
+import java.util.*
 
 data class Settings(
-    val ocppVersion: OcppVersionTransport,
+    val ocppVersion: OcppVersion,
     val transportType: TransportEnum,
     val domain: String = "localhost",
     val port: String = "8080",
@@ -19,6 +20,7 @@ data class CSMSSettings(
 data class ServerSetting(
     val port: Int,
     val path: String = "",
-    val ocppVersion: Set<OcppVersionTransport>,
+    val ocppVersion: Set<OcppVersion>,
     val transportType: TransportEnum,
+    val newMessageId: () -> String = { UUID.randomUUID().toString() }
 )

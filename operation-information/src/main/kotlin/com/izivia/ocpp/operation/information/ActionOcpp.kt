@@ -1,6 +1,14 @@
 package com.izivia.ocpp.operation.information
 
 enum class ActionOcpp(val value: String) {
+    START_TRANSACTION("StartTransaction"),
+    STOP_TRANSACTION("StopTransaction"),
+    DIAGNOSTICS_STATUS_NOTIFICATION("DiagnosticsStatusNotification"),
+    CHANGE_CONFIGURATION("ChangeConfiguration"),
+    REMOTE_START_TRANSACTION("RemoteStartTransaction"),
+    REMOTE_STOP_TRANSACTION("RemoteStopTransaction"),
+    GET_CONFIGURATION("GetConfiguration"),
+
     RESET("Reset"),
     SET_VARIABLES("SetVariables"),
     CHANGE_AVAILABILITY("ChangeAvailability"),
@@ -12,6 +20,7 @@ enum class ActionOcpp(val value: String) {
     GET_BASE_REPORT("GetBaseReport"),
     GET_VARIABLES("GetVariables"),
     CANCEL_RESERVATION("CancelReservation"),
+    GET_DIAGNOSTICS("GetDiagnostics"),
     CLEAR_CHARGING_PROFILE("ClearChargingProfile"),
     GET_COMPOSITE_SCHEDULE("GetCompositeSchedule"),
     GET_LOCAL_LIST_VERSION("GetLocalListVersion"),

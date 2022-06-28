@@ -31,21 +31,30 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             if (response.msgId != msgId) {
                 throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected")
             }
-            mapper.readValue(response.payload, clazz.java)
+            when (response.msgType) {
+                WampMessageType.CALL_RESULT -> mapper.readValue(response.payload, clazz.java)
+                WampMessageType.CALL_ERROR -> throw IllegalStateException("$response")
+                else -> throw IllegalStateException("The message received type ${response.msgType} is not the one expected")
+            }
         } catch (e: Exception) {
             throw e
         }
 
     override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, fn: (T) -> P) {
-        val handler: (WampMessageMeta, WampMessage) -> WampMessage? = { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
-            if (msgMeta == wampMessageMeta && wampMsg.action == action) {
-                val response = fn(mapper.readValue(wampMsg.payload, clazz.java))
-                val payload = mapper.writeValueAsString(response)
-                WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
-            } else {
-                null
+        val handler: (WampMessageMeta, WampMessage) -> WampMessage? =
+            { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
+                if (msgMeta == wampMessageMeta && wampMsg.action == action) {
+                    try {
+                        val response = fn(mapper.readValue(wampMsg.payload, clazz.java))
+                        val payload = mapper.writeValueAsString(response)
+                        WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
+                    } catch (e: Exception) {
+                        WampMessage(WampMessageType.CALL_ERROR, wampMsg.msgId, null, "{}")
+                    }
+                } else {
+                    null
+                }
             }
-        }
         client.onAction(handler)
     }
 }
