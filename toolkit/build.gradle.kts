@@ -29,14 +29,25 @@ dependencies {
     testImplementation("org.mockito:mockito-inline:_")
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-toolkit"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP Toolkit")
+                artifactId = "ocpp-toolkit"
+                description.set("OCPP Toolkit")
+            }
         }
     }
 }

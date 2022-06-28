@@ -13,14 +13,25 @@ dependencies {
     implementation(project(":operation-information"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-1-6-core"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP 1.6 Core")
+                artifactId = "ocpp-1-6-core"
+                description.set("OCPP 1.6 Core")
+            }
         }
     }
 }

@@ -15,14 +15,25 @@ dependencies {
     implementation(project(":ocpp-1-6-core"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-transport-websocket"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP Transport Websocket")
+                artifactId = "ocpp-transport-websocket"
+                description.set("OCPP Transport Websocket")
+            }
         }
     }
 }

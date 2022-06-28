@@ -10,14 +10,25 @@ dependencies {
     implementation(project(":operation-information"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-generic-api"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP Generic API")
+                artifactId = "ocpp-generic-api"
+                description.set("OCPP Generic API")
+            }
         }
     }
 }

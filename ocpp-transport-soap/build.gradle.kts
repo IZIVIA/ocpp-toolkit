@@ -6,14 +6,25 @@ plugins {
 
 dependencies {}
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-transport-soap"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP Transport SOAP")
+                artifactId = "ocpp-transport-soap"
+                description.set("OCPP Transport SOAP")
+            }
         }
     }
 }

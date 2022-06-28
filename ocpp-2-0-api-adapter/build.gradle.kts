@@ -17,14 +17,25 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:_")
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-2-0-api-adapter"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP 2.0 API Adapter")
+                artifactId = "ocpp-2-0-api-adapter"
+                description.set("OCPP 2.0 API Adapter")
+            }
         }
     }
 }
