@@ -1,5 +1,7 @@
 # OCPP Toolkit
 
+[![OCPP CI](https://github.com/IZIVIA/ocpp-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/IZIVIA/ocpp-toolkit/actions/workflows/ci.yml)
+
 This project aim is to provide a Kotlin library to perform OCPP operations.
 For more information about OCPP (Open Charge Point Protocol), see https://www.openchargealliance.org/)
 
