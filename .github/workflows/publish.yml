@@ -35,5 +35,4 @@ jobs:
                     GPG_PASSPHRASE: ${{ secrets.DELIVERY_GPG_KEY_PASSPHRASE }}
                 with:
                     gradle-version: 7.4.2
-                    arguments: publishToSonatype
-#                    arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
+                    arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
