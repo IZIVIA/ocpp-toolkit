@@ -1,0 +1,39 @@
+name: OCPP Publish
+
+on:
+    push:
+        tags:
+            - "R-*"
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+
+        concurrency: ocpp-publish
+
+        runs-on: ubuntu-latest
+
+        steps:
+            -   name: Set up JDK 17
+                uses: actions/setup-java@v3
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
+
+            -   name: Checkout IZIVIA OCPP toolkit library code from GH
+                uses: actions/checkout@v3
+
+            -   name: Build OCPP toolkit with Gradle
+                uses: gradle/gradle-build-action@v2.2.1
+                env:
+                    VERSION: ${{ github.ref }}
+                    SONATYPE_USERNAME: ${{ secrets.DELIVERY_SONATYPE_USERNAME }}
+                    SONATYPE_PASSWORD: ${{ secrets.DELIVERY_SONATYPE_PASSWORD }}
+                    GPG_PRIVATE_KEY: ${{ secrets.DELIVERY_GPG_SECRET_KEY }}
+                    GPG_PASSPHRASE: ${{ secrets.DELIVERY_GPG_KEY_PASSPHRASE }}
+                with:
+                    gradle-version: 7.4.2
+                    arguments: publishToSonatype
+#                    arguments: publishToSonatype closeAndReleaseSonatypeStagingRepository
