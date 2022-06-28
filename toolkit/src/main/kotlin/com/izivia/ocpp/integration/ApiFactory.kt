@@ -42,11 +42,12 @@ class ApiFactory {
             port: Int,
             path: String,
             ocppVersion: Set<OcppVersionTransport>,
-            transportType: TransportEnum
+            transportType: TransportEnum,
+            newMessageId: () -> String
         ): ServerTransport =
             when (transportType) {
-                TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion, path)
-                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion, path)
+                TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion, path, newMessageId)
+                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion, path, newMessageId)
             }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
@@ -94,7 +95,8 @@ class ApiFactory {
                         it.port,
                         it.path,
                         it.ocppVersion,
-                        it.transportType
+                        it.transportType,
+                        it.newMessageId
                     ), it.ocppVersion)
                 }
             }

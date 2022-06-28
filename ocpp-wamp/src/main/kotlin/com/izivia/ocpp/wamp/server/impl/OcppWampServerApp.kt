@@ -15,6 +15,11 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 
+/**
+ * Websocket Server
+ *
+ * @param handlers are called in the list order and return the first not null response
+ */
 class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
                         private val handlers: (CSOcppId)-> List<OcppWampServerHandler>,
                         private val ocppWsEndpoint: OcppWsEndpoint,
@@ -74,6 +79,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
 
                         logger.info("""[$chargingStationOcppId] [$wsConnectionId] -> ${it.bodyString()}""")
                         val resp = handler.asSequence()
+                            // use sequence to avoid greedy mapping, to find the first handler with non null result
                             .map { it.onAction(WampMessageMeta(ocppVersion, chargingStationOcppId), msg) }
                             .filterNotNull()
                             .firstOrNull()

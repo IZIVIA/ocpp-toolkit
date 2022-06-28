@@ -15,7 +15,12 @@ import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 import java.util.*
 import kotlin.reflect.KClass
 
-class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>, path: String) : ServerTransport {
+class WebsocketServer(
+    port: Int,
+    ocppVersions: Set<OcppVersion>,
+    path: String,
+    val newMessageId: () -> String = { UUID.randomUUID().toString() }
+) : ServerTransport {
 
     private val server: OcppWampServer =
         OcppWampServer.newServer(port, ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path)
@@ -27,12 +32,15 @@ class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>, path: String) :
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P =
         try {
-            val msgId: String = UUID.randomUUID().toString()
+            val msgId: String = newMessageId()
             val response = server.sendBlocking(csOcppId, WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
             if (response.msgId != msgId) {
                 throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected")
             }
-            mapper.readValue(response.payload, clazz.java)
+            when(response.msgType) {
+                WampMessageType.CALL_RESULT -> mapper.readValue(response.payload, clazz.java)
+                else -> throw IllegalStateException("The message received type ${response.msgType} is not the one expected")
+            }
         } catch (e: Exception) {
             throw e
         }
@@ -44,9 +52,13 @@ class WebsocketServer(port: Int, ocppVersions: Set<OcppVersion>, path: String) :
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
-                    val response = onAction(RequestMetadata(meta.ocppId), mapper.readValue(msg.payload, clazz.java))
-                    val payload = mapper.writeValueAsString(response)
-                    WampMessage(WampMessageType.CALL_RESULT, msg.msgId, null, payload)
+                    try {
+                        val response = onAction(RequestMetadata(meta.ocppId), mapper.readValue(msg.payload, clazz.java))
+                        val payload = mapper.writeValueAsString(response)
+                        WampMessage(WampMessageType.CALL_RESULT, msg.msgId, null, payload)
+                    } catch (e: Exception) {
+                        WampMessage(WampMessageType.CALL_ERROR, msg.msgId, null, "{}")
+                    }
                 } else {
                     null
                 }
