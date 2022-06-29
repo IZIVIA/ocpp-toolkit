@@ -2,7 +2,7 @@ package com.izivia.ocpp.adapter16.mapper
 
 import com.izivia.ocpp.api.model.reservenow.enumeration.ReserveNowStatusEnumType
 import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
+import com.izivia.ocpp.api.model.common.getTypeByIdToken
 import com.izivia.ocpp.core16.model.reservenow.ReserveNowReq
 import com.izivia.ocpp.core16.model.reservenow.ReserveNowResp
 import com.izivia.ocpp.core16.model.reservenow.enumeration.ReservationStatus
@@ -21,8 +21,8 @@ abstract class ReserveNowMapper {
         ReservationStatus.valueOf(status.name)
 
     @Named("convertIdToken")
-    fun convertIdToken(idTag: String): IdTokenType =
-        IdTokenType(idToken = idTag, type = IdTokenEnumType.Central)
+    fun convertIdToken(idTag: String?): IdTokenType? =
+        idTag?.let { IdTokenType(idToken = idTag, type = idTag.getTypeByIdToken()) }
 
 
     @Mapping(target = "status", source = "status", qualifiedByName = ["convertReservationStatus"])

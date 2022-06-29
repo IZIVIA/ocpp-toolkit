@@ -32,7 +32,6 @@ abstract class SendLocalListMapper {
     fun convertIdTagInfo(info: IdTagInfo?): IdTokenInfoType? =
         if (info == null) null else CommonMapper.convertIdTagInfo(info)
 
-    @Named("convertAuthorizationData")
     @Mapping(target = "idToken", source = "idTag", qualifiedByName = ["convertIdTag"])
     @Mapping(target = "idTokenInfo", source = "idTagInfo", qualifiedByName = ["convertIdTagInfo"])
     abstract fun convertAuthorizationData(data: AuthorizationData): AuthorizationDataGen
