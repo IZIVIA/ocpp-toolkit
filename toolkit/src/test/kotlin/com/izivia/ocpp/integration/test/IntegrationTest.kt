@@ -216,7 +216,9 @@ import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageType
+import io.mockk.unmockkAll
 import kotlinx.datetime.Instant
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -659,6 +661,11 @@ class IntegrationTest {
         every { ocppWampClient.onAction(any()) } returns Unit
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
+    }
+
+    @AfterEach
+    fun destroy(){
+        unmockkAll()
     }
 
     @Test
