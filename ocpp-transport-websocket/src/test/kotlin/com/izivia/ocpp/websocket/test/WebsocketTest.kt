@@ -19,10 +19,11 @@ import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import io.mockk.unmockkAll
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Disabled
 import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -31,6 +32,11 @@ import strikt.assertions.isFailure
 import java.util.*
 
 class WebsocketTest {
+
+    @AfterEach
+    fun destroy(){
+        unmockkAll()
+    }
 
     @Test
     fun `sendMessageClass success`() {
@@ -86,7 +92,6 @@ class WebsocketTest {
             .isA<IllegalStateException>()
     }
 
-    @Disabled("Disabled until it has been fixed")
     @Test
     fun `receiveMessageClass success`() {
 
