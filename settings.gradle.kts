@@ -20,6 +20,7 @@ include(
     "ocpp-transport",
     "ocpp-1-6-api-adapter",
     "ocpp-1-6-core",
+    "ocpp-1-6-soap",
     "ocpp-transport-soap",
     "ocpp-2-0-api-adapter",
     "ocpp-2-0-core",
