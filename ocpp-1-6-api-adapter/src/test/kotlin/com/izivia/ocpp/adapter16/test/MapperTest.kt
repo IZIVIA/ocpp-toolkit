@@ -434,7 +434,7 @@ class MapperTest {
         expectThat(resp).and { get { status }.isEqualTo(UpdateStatus.Accepted) }
 
         val req = mapper.coreToGenReq(
-            SendLocalListReq(1, UpdateType.Differential, listOf(AuthorizationData("")))
+            SendLocalListReq(1, UpdateType.Differential, listOf(AuthorizationData("1A2B")))
         )
         expectThat(req)
             .and { get { versionNumber }.isEqualTo(1) }
@@ -444,8 +444,8 @@ class MapperTest {
                     listOf(
                         com.izivia.ocpp.api.model.sendlocallist.AuthorizationData(
                             IdTokenType(
-                                "",
-                                IdTokenEnumType.Central
+                                "1A2B",
+                                IdTokenEnumType.ISO14443
                             )
                         )
                     )
@@ -545,6 +545,23 @@ class MapperTest {
             get { idToken }.isEqualTo(IdTokenType("idTag", IdTokenEnumType.Central))
             get { evseId }.isEqualTo(1)
             get { groupIdToken }.isEqualTo(IdTokenType("idTagParent", IdTokenEnumType.Central))
+        }
+
+        val req2 = mapper.coreToGenReq(
+            ReserveNowReq(
+                connectorId = 1,
+                expiryDate = Instant.parse("2022-06-29T08:24:00.000Z"),
+                idTag ="1A2B",
+                parentIdTag = null,
+                reservationId = 8
+            )
+        )
+        expectThat(req2) {
+            get { id }.isEqualTo(8)
+            get { expiryDateTime }.isEqualTo(Instant.parse("2022-06-29T08:24:00.000Z"))
+            get { idToken }.isEqualTo(IdTokenType("1A2B", IdTokenEnumType.ISO14443))
+            get { evseId }.isEqualTo(1)
+            get { groupIdToken }.isEqualTo(null)
         }
     }
 

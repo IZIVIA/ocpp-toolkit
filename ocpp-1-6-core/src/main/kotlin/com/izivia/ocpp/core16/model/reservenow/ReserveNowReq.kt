@@ -12,6 +12,6 @@ data class ReserveNowReq(
     @JsonDeserialize(using = InstantDeserializer::class)
     val expiryDate: Instant,
     val idTag: String,
-    val parentIdTag: String? = null,
-    val reservationId: Int
+    val reservationId: Int,
+    val parentIdTag: String? = null
 )
