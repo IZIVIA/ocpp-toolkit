@@ -1,20 +1,17 @@
 package com.izivia.ocpp.soap16
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.dataformat.xml.XmlMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.kotlinModule
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectReader
+import com.izivia.ocpp.soap.OcppSoapMapper
+import com.izivia.ocpp.soap.SoapEnvelope
 
 class Soap16MessageParser {
 
-    val mapper: ObjectMapper = XmlMapper()
-        .registerModule(kotlinModule())
-        .registerModule(JavaTimeModule())
-        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+    val reader: ObjectReader = OcppSoapMapper
+        .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
 
     inline fun <reified T> parse(messageStr: String): T {
-        val envelope = mapper.readValue(messageStr, SoapEnvelope::class.java)
+        val envelope: SoapEnvelope<Ocpp16SoapBody> = reader.readValue(messageStr)
         return when {
             envelope.body.authorizeRequest != null -> envelope.body.authorizeRequest as T
             envelope.body.bootNotificationRequest != null -> envelope.body.bootNotificationRequest as T

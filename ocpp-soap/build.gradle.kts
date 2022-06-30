@@ -6,9 +6,6 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation(project(":ocpp-1-6-core"))
-    implementation(project(":ocpp-soap"))
-
     implementation("com.fasterxml.jackson.core:jackson-core:_")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:_")
