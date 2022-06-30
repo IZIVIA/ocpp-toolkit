@@ -2,6 +2,7 @@ package com.izivia.ocpp.core16.model.stoptransaction
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.izivia.ocpp.core16.model.common.MeterValue
 import com.izivia.ocpp.core16.model.stoptransaction.enumeration.Reason
 import com.izivia.ocpp.utils.InstantDeserializer
@@ -16,5 +17,6 @@ data class StopTransactionReq(
     val transactionId: Int,
     val idTag: String? = null,
     val reason: Reason? = null,
+    @JacksonXmlElementWrapper(useWrapping = false)
     val transactionData: List<MeterValue>? = null
 )
