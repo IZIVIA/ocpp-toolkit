@@ -12,7 +12,9 @@ import java.io.InputStream
 class JsonSchemaValidator {
 
     companion object {
-        private val mapper = jacksonObjectMapper().setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        private val mapper = jacksonObjectMapper()
+            .registerModule(KotlinxInstantModule())
+            .setSerializationInclusion(JsonInclude.Include.NON_NULL)
 
         private fun <T> getJsonNodeObject(value: T): JsonNode = mapper.readTree(mapper.writeValueAsString(value))
 
