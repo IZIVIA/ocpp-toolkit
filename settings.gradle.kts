@@ -22,11 +22,13 @@ include(
     "ocpp-1-6-api-adapter",
     "ocpp-1-6-core",
     "ocpp-1-6-soap",
+    "ocpp-1-6-json",
     "ocpp-transport-soap",
     "ocpp-2-0-api-adapter",
     "ocpp-2-0-core",
     "ocpp-1-6-api",
     "ocpp-2-0-api",
+    "ocpp-2-0-json",
     "utils",
     "operation-information"
 )

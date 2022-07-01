@@ -1,4 +1,4 @@
-package com.izivia.ocpp.core.test
+package com.izivia.ocpp.json20
 
 import com.izivia.ocpp.core20.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core20.model.authorize.AuthorizeResp
@@ -208,7 +208,6 @@ import com.izivia.ocpp.core20.model.updatefirmware.FirmwareType
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
-import com.izivia.ocpp.utils.JsonSchemaValidator
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test

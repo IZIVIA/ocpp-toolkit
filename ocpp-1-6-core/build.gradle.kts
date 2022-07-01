@@ -8,8 +8,6 @@ coreProject()
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:_")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:_")
-    implementation(project(":utils"))
     implementation(project(":ocpp-transport"))
     implementation(project(":operation-information"))
 }
