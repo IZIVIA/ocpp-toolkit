@@ -1,13 +1,20 @@
 package com.izivia.ocpp.soap16
 
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectReader
+import com.izivia.ocpp.core16.model.common.enumeration.Measurand
+import com.izivia.ocpp.core16.model.common.enumeration.Phase
+import com.izivia.ocpp.core16.model.common.enumeration.ReadingContext
 import com.izivia.ocpp.soap.OcppSoapMapper
 import com.izivia.ocpp.soap.SoapEnvelope
 
 class Soap16MessageParser {
 
     val reader: ObjectReader = OcppSoapMapper
+        .addMixIn(Measurand::class.java, EnumMixin::class.java)
+        .addMixIn(ReadingContext::class.java, EnumMixin::class.java)
+        .addMixIn(Phase::class.java, EnumMixin::class.java)
         .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
 
     inline fun <reified T> parse(messageStr: String): T {
@@ -27,3 +34,7 @@ class Soap16MessageParser {
         }
     }
 }
+
+abstract class EnumMixin(
+    @JsonValue val value: String
+)

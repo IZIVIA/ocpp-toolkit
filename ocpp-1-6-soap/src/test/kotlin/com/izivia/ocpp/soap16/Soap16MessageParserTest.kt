@@ -15,7 +15,7 @@ import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointEr
 import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionReq
 import kotlinx.datetime.Instant
-import org.junit.Ignore
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
@@ -134,7 +134,7 @@ class Soap16MessageParserTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     fun `should parse message to DiagnosticsStatusNotificationReq`() {
         // TODO
     }

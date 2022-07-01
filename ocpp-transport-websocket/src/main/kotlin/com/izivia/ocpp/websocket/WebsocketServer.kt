@@ -8,6 +8,7 @@ import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.utils.KotlinxInstantModule
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
@@ -30,6 +31,8 @@ class WebsocketServer(
     private val server: OcppWampServer =
         OcppWampServer.newServer(port, ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path)
     private val mapper = jacksonObjectMapper()
+        .registerModule(KotlinxInstantModule())
+
     override fun start(): Unit = server.start()
 
     override fun stop(): Unit = server.stop()

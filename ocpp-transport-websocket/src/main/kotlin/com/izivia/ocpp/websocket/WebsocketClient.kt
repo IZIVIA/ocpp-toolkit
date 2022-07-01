@@ -3,6 +3,7 @@ package com.izivia.ocpp.websocket
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.utils.KotlinxInstantModule
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.wamp.client.OcppWampClient
@@ -22,6 +23,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
     private val mapper = jacksonObjectMapper()
+        .registerModule(KotlinxInstantModule())
     private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 
     override fun connect(): Unit = client.connect()
