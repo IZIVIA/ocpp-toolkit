@@ -1,7 +1,5 @@
 package com.izivia.ocpp.core20.model.notifyreport.enumeration
 
-import com.fasterxml.jackson.annotation.JsonValue
-
 enum class DataEnumType(val value: String) {
     STRING("string"),
 
@@ -18,7 +16,4 @@ enum class DataEnumType(val value: String) {
     SEQUENCELIST("SequenceList"),
 
     MEMBERLIST("MemberList");
-
-    @JsonValue
-    fun getEnumValue(): String = value
 }

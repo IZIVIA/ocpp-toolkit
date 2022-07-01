@@ -1,7 +1,5 @@
 package com.izivia.ocpp.core16.model.common.enumeration
 
-import com.fasterxml.jackson.annotation.JsonValue
-
 enum class UnitOfMeasure(val value: String) {
     Wh("Wh"),
 
@@ -19,7 +17,7 @@ enum class UnitOfMeasure(val value: String) {
 
     kVA("kVA"),
 
-    Var("var"),
+    `var`("var"),
 
     kvar("kvar"),
 
@@ -36,7 +34,4 @@ enum class UnitOfMeasure(val value: String) {
     Fahrenheit("Fahrenheit"),
 
     Percent("Percent");
-
-    @JsonValue
-    fun getEnumValue(): String = value
 }
