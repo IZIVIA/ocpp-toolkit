@@ -34,7 +34,9 @@ import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 
-interface CMSOperations : CSCallbacks {
+// TODO to implement for ocpp 1.5
+
+interface CSMSOperations : CSCallbacks {
     fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp>
 
     fun changeAvailability(

@@ -1,26 +1,19 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "GetCompositeScheduleRequest",
+  "title": "CancelReservationResponse",
   "type": "object",
   "properties": {
-    "connectorId": {
-      "type": "integer"
-    },
-    "duration": {
-      "type": "integer"
-    },
-    "chargingRateUnit": {
+    "status": {
       "type": "string",
       "additionalProperties": false,
       "enum": [
-        "A",
-        "W"
+        "Accepted",
+        "Rejected"
       ]
     }
   },
   "additionalProperties": false,
   "required": [
-    "connectorId",
-    "duration"
+    "status"
   ]
 }

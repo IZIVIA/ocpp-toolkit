@@ -1,6 +1,6 @@
 package com.izivia.ocpp.core15.impl
 
-import com.izivia.ocpp.core15.CMSOperations
+import com.izivia.ocpp.core15.CSMSOperations
 import com.izivia.ocpp.core15.ChargePointOperations
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core15.model.authorize.AuthorizeResp
@@ -47,7 +47,7 @@ typealias OcppId = String
 typealias Action = String
 
 class RealChargePointOperations(
-    private val chargeStationId: String, private val client: ClientTransport, private val csmsOperations: CMSOperations
+    private val chargeStationId: String, private val client: ClientTransport, private val csmsOperations: CSMSOperations
 ) : ChargePointOperations {
 
     init {

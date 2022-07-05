@@ -1,6 +1,6 @@
 package com.izivia.ocpp.core15.impl
 
-import com.izivia.ocpp.core15.CMSOperations
+import com.izivia.ocpp.core15.CSMSOperations
 import com.izivia.ocpp.core15.ChargePointOperations
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationReq
@@ -52,7 +52,7 @@ class RealCSMSOperations(
     private val servers: Set<ServerTransport>,
     private val acceptConnection: (OcppId) -> ChargingStationConfig,
     chargePointOperations: ChargePointOperations
-) : CMSOperations {
+) : CSMSOperations {
     init {
         servers.forEach { server ->
             server.receiveMessage(

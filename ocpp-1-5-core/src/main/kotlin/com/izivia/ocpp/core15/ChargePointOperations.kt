@@ -33,7 +33,7 @@ import java.net.ConnectException
 interface ChargePointOperations : CSMSCallbacks {
     companion object {
         fun newChargePointOperations(
-            chargingStationId: String, transport: ClientTransport, csmsOperations: CMSOperations
+            chargingStationId: String, transport: ClientTransport, csmsOperations: CSMSOperations
         ) = RealChargePointOperations(chargingStationId, transport, csmsOperations)
     }
 

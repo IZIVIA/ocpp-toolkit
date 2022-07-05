@@ -11,11 +11,9 @@
             "additionalProperties": false,
             "enum": [
                 "ConnectorLockFailure",
-                "EVCommunicationError",
                 "GroundFailure",
                 "HighTemperature",
-                "InternalError",
-                "LocalListConflict",
+                "Mode3Error",
                 "NoError",
                 "OtherError",
                 "OverCurrentFailure",
@@ -24,7 +22,6 @@
                 "ReaderFailure",
                 "ResetFailure",
                 "UnderVoltage",
-                "OverVoltage",
                 "WeakSignal"
             ]
         },
@@ -37,11 +34,7 @@
             "additionalProperties": false,
             "enum": [
                 "Available",
-                "Preparing",
-                "Charging",
-                "SuspendedEVSE",
-                "SuspendedEV",
-                "Finishing",
+                "Occupied",
                 "Reserved",
                 "Unavailable",
                 "Faulted"

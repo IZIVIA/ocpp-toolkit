@@ -1,0 +1,105 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "MeterValuesRequest",
+    "type": "object",
+    "properties": {
+        "connectorId": {
+            "type": "integer"
+        },
+        "transactionId": {
+            "type": "integer"
+        },
+        "values": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "timestamp": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "value": {
+                        "type": "string"
+                    },
+                    "context": {
+                        "type": "string",
+                        "additionalProperties": false,
+                        "enum": [
+                            "Interruption.Begin",
+                            "Interruption.End",
+                            "Sample.Clock",
+                            "Sample.Periodic",
+                            "Transaction.Begin",
+                            "Transaction.End"
+                        ]
+                    },
+                    "format": {
+                        "type": "string",
+                        "additionalProperties": false,
+                        "enum": [
+                            "Raw",
+                            "SignedData"
+                        ]
+                    },
+                    "measurand": {
+                        "type": "string",
+                        "additionalProperties": false,
+                        "enum": [
+                            "Energy.Active.Export.Register",
+                            "Energy.Active.Import.Register",
+                            "Energy.Reactive.Export.Register",
+                            "Energy.Reactive.Import.Register",
+                            "Energy.Active.Export.Interval",
+                            "Energy.Active.Import.Interval",
+                            "Energy.Reactive.Export.Interval",
+                            "Energy.Reactive.Import.Interval",
+                            "Power.Active.Export",
+                            "Power.Active.Import",
+                            "Power.Reactive.Export",
+                            "Power.Reactive.Import",
+                            "Current.Import",
+                            "Current.Export",
+                            "Voltage",
+                            "Temperature"
+                        ]
+                    },
+                    "location": {
+                        "type": "string",
+                        "additionalProperties": false,
+                        "enum": [
+                            "Inlet",
+                            "Outlet",
+                            "Body"
+                        ]
+                    },
+                    "unit": {
+                        "type": "string",
+                        "additionalProperties": false,
+                        "enum": [
+                            "Wh",
+                            "kWh",
+                            "varh",
+                            "kvarh",
+                            "W",
+                            "kW",
+                            "var",
+                            "kvar",
+                            "Amp",
+                            "Volt",
+                            "Celsius"
+                        ]
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "timestamp",
+                    "value"
+                ]
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "connectorId"
+    ]
+}

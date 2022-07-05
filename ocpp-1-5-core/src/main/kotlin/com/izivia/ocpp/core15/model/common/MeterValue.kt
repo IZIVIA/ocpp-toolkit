@@ -12,9 +12,9 @@ data class MeterValue(
     @JsonDeserialize(using = InstantDeserializer::class)
     val timestamp: Instant,
     val value: String,
-    val context: ReadingContext = ReadingContext.SamplePeriodic,
-    val format: ValueFormat = ValueFormat.Raw,
-    val measurand: Measurand = Measurand.EnergyActiveImportRegister,
-    val location: Location = Location.Outlet,
-    val unit: UnitOfMeasure = UnitOfMeasure.Wh
+    val context: ReadingContext? = ReadingContext.SamplePeriodic,
+    val format: ValueFormat? = ValueFormat.Raw,
+    val measurand: Measurand? = Measurand.EnergyActiveImportRegister,
+    val location: Location? = Location.Outlet,
+    val unit: UnitOfMeasure? = UnitOfMeasure.Wh
 )

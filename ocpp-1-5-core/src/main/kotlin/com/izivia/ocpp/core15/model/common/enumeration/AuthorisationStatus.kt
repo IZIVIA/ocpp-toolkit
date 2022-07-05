@@ -1,6 +1,6 @@
 package com.izivia.ocpp.core15.model.common.enumeration
 
-enum class AuthorizationStatus(val value: String) {
+enum class AuthorisationStatus(val value: String) {
     Accepted("Accepted"),
 
     Blocked("Blocked"),
