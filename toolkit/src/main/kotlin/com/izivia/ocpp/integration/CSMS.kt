@@ -1,18 +1,22 @@
 package com.izivia.ocpp.integration
 
 import com.izivia.ocpp.api.CSApi
-import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
-import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
-import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.CSMSCallbacks
+import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.OcppVersion.*
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
+import com.izivia.ocpp.core15.impl.RealCSMSOperations as RealCSMSOperations15
+import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
+import com.izivia.ocpp.core15.CMSOperations as CSMSOperations15
 import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
 import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
-import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
+import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+
 
 class CSMS(
     private val transports: Map<ServerTransport, Set<OcppVersion>>,
@@ -35,6 +39,9 @@ class CSMS(
                 is ChargePointOperations16 -> transportByVersion[OCPP_1_6]?.let { transports16 ->
                     csApis[CsApiType.OcppCsApiType(OCPP_1_6)] = RealCSMSOperations16(transports16, fn, it)
                 }
+                is ChargePointOperations15 -> transportByVersion[OCPP_1_5]?.let { transports15 ->
+                    csApis[CsApiType.OcppCsApiType(OCPP_1_5)] = RealCSMSOperations15(transports15, fn, it)
+                }
                 is ChargePointOperations20 -> transportByVersion[OCPP_2_0]?.let { transports20 ->
                     csApis[CsApiType.OcppCsApiType(OCPP_2_0)] = RealCSMSOperations20(transports20, fn, it)
                 }
@@ -53,6 +60,9 @@ class CSMS(
 
     fun getCSApiGeneric(): CSApi =
         csApi[CsApiType.GenericCsApiType()] as CSApi? ?: throw IllegalStateException("No generic api is available")
+
+    fun getCSApi15(): CSMSOperations15 =
+        csApi[CsApiType.OcppCsApiType(OCPP_1_5)] as CSMSOperations15? ?: throw IllegalStateException("No 1.5 api is available")
 
     fun getCSApi16(): CSMSOperations16 =
         csApi[CsApiType.OcppCsApiType(OCPP_1_6)] as CSMSOperations16? ?: throw IllegalStateException("No 1.6 api is available")
