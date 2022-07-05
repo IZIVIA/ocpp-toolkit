@@ -57,7 +57,7 @@ class RealCSMSOperations(
         servers.forEach { server ->
             server.receiveMessage(
                 ActionOcpp.HEARTBEAT.value,
-                OcppVersion.OCPP_1_6,
+                OcppVersion.OCPP_1_5,
                 { meta: RequestMetadata, req: HeartbeatReq ->
                     chargePointOperations.heartbeat(meta, req).response
                 },
@@ -66,7 +66,7 @@ class RealCSMSOperations(
 
             server.receiveMessage(
                 ActionOcpp.AUTHORIZE.value,
-                OcppVersion.OCPP_1_6,
+                OcppVersion.OCPP_1_5,
                 { meta: RequestMetadata, req: AuthorizeReq ->
                     chargePointOperations.authorize(meta, req).response
                 },
