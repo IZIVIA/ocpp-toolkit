@@ -13,7 +13,11 @@ data class SoapEnvelope<T: SoapBody>(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SoapHeader(
-    val chargeBoxIdentity: String
+    @JsonProperty("MessageID")
+    val messageId: String,
+    @JsonProperty("Action")
+    val action: String,
+    val chargeBoxIdentity: String?
 )
 
 interface SoapBody

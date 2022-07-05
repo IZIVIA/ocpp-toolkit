@@ -6,8 +6,8 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation(project(":ocpp-1-6-core"))
-    implementation(project(":ocpp-soap"))
+    api(project(":ocpp-1-6-core"))
+    api(project(":ocpp-soap"))
 
     implementation("com.fasterxml.jackson.core:jackson-core:_")
     implementation("com.fasterxml.jackson.core:jackson-databind:_")
