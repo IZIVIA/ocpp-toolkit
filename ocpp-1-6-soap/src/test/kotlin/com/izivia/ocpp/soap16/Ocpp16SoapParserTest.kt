@@ -41,7 +41,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.*
 
-class Soap16MessageParserTest {
+class Ocpp16SoapParserTest {
 
     @Test
     fun `should parse message to AuthorizeReq`() {
@@ -70,7 +70,7 @@ class Soap16MessageParserTest {
                 </SOAP-ENV:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<AuthorizeReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<AuthorizeReq>(message).payload).and {
             get { idTag }.isEqualTo("049E16B2EC7180")
         }
             .isA<AuthorizeReq>()
@@ -102,7 +102,7 @@ class Soap16MessageParserTest {
                 </ns0:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<BootNotificationReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<BootNotificationReq>(message).payload).and {
             get { chargePointModel }.isEqualTo("LEC-3030A-SPX1")
             get { chargePointVendor }.isEqualTo("Izivia")
             get { chargePointSerialNumber }.isEqualTo("5aa469fd41344fe5a575368cd")
@@ -145,7 +145,7 @@ class Soap16MessageParserTest {
                 </SOAP-ENV:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<DataTransferReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<DataTransferReq>(message).payload).and {
             get { vendorId }.isEqualTo("Schneider Electric")
             get { messageId }.isEqualTo("Detection loop")
             get { data }.isEqualTo("{\"connectorId\":10,\"name\":\"Vehicle\",\"state\":\"1\",\"timestamp\":\"2022-05-17T15:42:03Z:\"}")
@@ -186,7 +186,7 @@ class Soap16MessageParserTest {
                 </soap:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<FirmwareStatusNotificationReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<FirmwareStatusNotificationReq>(message).payload).and {
             get { status }.isEqualTo(FirmwareStatus.Installed)
         }
             .isA<FirmwareStatusNotificationReq>()
@@ -218,7 +218,7 @@ class Soap16MessageParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<HeartbeatReq>(message).payload)
+        expectThat(Ocpp16SoapParser().parseFromRequest<HeartbeatReq>(message).payload)
             .isA<HeartbeatReq>()
     }
 
@@ -259,7 +259,7 @@ class Soap16MessageParserTest {
                 </v:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<MeterValuesReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<MeterValuesReq>(message).payload).and {
             get { connectorId }.isEqualTo(1)
             get { transactionId }.isEqualTo(15917)
             get { meterValue }.hasSize(1).first().and {
@@ -307,7 +307,7 @@ class Soap16MessageParserTest {
                 </v:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<StartTransactionReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<StartTransactionReq>(message).payload).and {
             get { connectorId }.isEqualTo(1)
             get { idTag }.isEqualTo("046924C2D86485")
             get { meterStart }.isEqualTo(18804500)
@@ -349,7 +349,7 @@ class Soap16MessageParserTest {
                 </soap:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<StatusNotificationReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<StatusNotificationReq>(message).payload).and {
             get { connectorId }.isEqualTo(1)
             get { errorCode }.isEqualTo(ChargePointErrorCode.NoError)
             get { status }.isEqualTo(ChargePointStatus.Available)
@@ -390,7 +390,7 @@ class Soap16MessageParserTest {
                 </SOAP-ENV:Envelope>
             """.trimIndent()
 
-        expectThat(Soap16MessageParser().parseFromRequest<StopTransactionReq>(message).payload).and {
+        expectThat(Ocpp16SoapParser().parseFromRequest<StopTransactionReq>(message).payload).and {
             get { meterStop }.isEqualTo(19224)
             get { timestamp }.isEqualTo(Instant.parse("2022-05-05T04:37:15Z"))
             get { transactionId }.isEqualTo(16696)
@@ -428,7 +428,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<AuthorizeReq>(message).payload as AuthorizeReq
+            Ocpp16SoapParser().parseFromRequest<AuthorizeReq>(message).payload as AuthorizeReq
         }
     }
 
@@ -459,7 +459,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<BootNotificationReq>(message).payload as BootNotificationReq
+            Ocpp16SoapParser().parseFromRequest<BootNotificationReq>(message).payload as BootNotificationReq
         }
     }
 
@@ -490,7 +490,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<DataTransferReq>(message).payload as DataTransferReq
+            Ocpp16SoapParser().parseFromRequest<DataTransferReq>(message).payload as DataTransferReq
         }
     }
 
@@ -521,7 +521,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<DiagnosticsStatusNotificationReq>(message).payload as DiagnosticsStatusNotificationReq
+            Ocpp16SoapParser().parseFromRequest<DiagnosticsStatusNotificationReq>(message).payload as DiagnosticsStatusNotificationReq
         }
     }
 
@@ -552,7 +552,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<FirmwareStatusNotificationReq>(message).payload as FirmwareStatusNotificationReq
+            Ocpp16SoapParser().parseFromRequest<FirmwareStatusNotificationReq>(message).payload as FirmwareStatusNotificationReq
         }
     }
 
@@ -584,7 +584,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<HeartbeatReq>(message).payload as HeartbeatReq
+            Ocpp16SoapParser().parseFromRequest<HeartbeatReq>(message).payload as HeartbeatReq
         }
     }
 
@@ -615,7 +615,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<MeterValuesReq>(message).payload as MeterValuesReq
+            Ocpp16SoapParser().parseFromRequest<MeterValuesReq>(message).payload as MeterValuesReq
         }
     }
 
@@ -646,7 +646,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<StartTransactionReq>(message).payload as StartTransactionReq
+            Ocpp16SoapParser().parseFromRequest<StartTransactionReq>(message).payload as StartTransactionReq
         }
     }
 
@@ -677,7 +677,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<StatusNotificationReq>(message).payload as StatusNotificationReq
+            Ocpp16SoapParser().parseFromRequest<StatusNotificationReq>(message).payload as StatusNotificationReq
         }
     }
 
@@ -708,7 +708,7 @@ class Soap16MessageParserTest {
             """.trimIndent()
 
         expectThrows<ClassCastException> {
-            Soap16MessageParser().parseFromRequest<StopTransactionReq>(message).payload as StopTransactionReq
+            Ocpp16SoapParser().parseFromRequest<StopTransactionReq>(message).payload as StopTransactionReq
         }
     }
 
@@ -721,7 +721,7 @@ class Soap16MessageParserTest {
             )
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -752,7 +752,7 @@ class Soap16MessageParserTest {
             interval = 1800,
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -780,7 +780,7 @@ class Soap16MessageParserTest {
             status = DataTransferStatus.Accepted
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -810,7 +810,7 @@ class Soap16MessageParserTest {
     fun `should map FirmwareStatusNotificationResp to soap`() {
         val response = FirmwareStatusNotificationResp()
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -834,7 +834,7 @@ class Soap16MessageParserTest {
             currentTime = Instant.parse("2022-05-17T15:42:00.503Z")
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -858,7 +858,7 @@ class Soap16MessageParserTest {
     fun `should map MeterValuesResp to soap`() {
         val response = MeterValuesResp()
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -886,7 +886,7 @@ class Soap16MessageParserTest {
             )
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -914,7 +914,7 @@ class Soap16MessageParserTest {
     fun `should map StatusNotificationResp to soap`() {
         val response = StatusNotificationResp()
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",
@@ -941,7 +941,7 @@ class Soap16MessageParserTest {
             )
         )
 
-        val messageSoap = Soap16MessageParser().mapToResponse(
+        val messageSoap = Ocpp16SoapParser().mapToResponse(
             SoapMessage(
                 ocppId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
                 chargingStationId = "00:80:F4:44:13:AA",

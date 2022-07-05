@@ -19,11 +19,12 @@ import com.izivia.ocpp.core16.model.starttransaction.StartTransactionResp
 import com.izivia.ocpp.core16.model.statusnotification.StatusNotificationResp
 import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.soap.OcppSoapMapper
+import com.izivia.ocpp.soap.OcppSoapParser
 import com.izivia.ocpp.soap.SoapEnvelope
 import com.izivia.ocpp.soap.SoapMessage
 import java.util.*
 
-class Soap16MessageParser {
+class Ocpp16SoapParser : OcppSoapParser {
 
     private val mapper: ObjectMapper = OcppSoapMapper
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
@@ -40,7 +41,7 @@ class Soap16MessageParser {
         .addMixIn(StatusNotificationResp::class.java, StatusNotificationRespMixin::class.java)
         .addMixIn(StopTransactionResp::class.java, StopTransactionRespMixin::class.java)
 
-    fun <T> parseFromRequest(messageStr: String): SoapMessage<T> {
+    override fun <T> parseFromRequest(messageStr: String): SoapMessage<T> {
         val envelope: SoapEnvelope<Ocpp16SoapBody> = mapper
             .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
             .readValue(messageStr)
@@ -60,13 +61,13 @@ class Soap16MessageParser {
             SoapMessage(
                 ocppId = envelope.header.messageId,
                 chargingStationId = envelope.header.chargeBoxIdentity!!,
-                action = envelope.header.action.removeSuffix("/"),
+                action = envelope.header.action.removePrefix("/"),
                 payload = it
             )
         }
     }
 
-    fun <T> mapToResponse(message: SoapMessage<T>): String =
+    override fun <T> mapToResponse(message: SoapMessage<T>): String =
         """
             <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
                 <soap:Header>
