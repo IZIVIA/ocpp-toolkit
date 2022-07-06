@@ -95,7 +95,7 @@ class HttpServer(
                                 payload = response
                             )
                         )
-                        HttpMessage(msg.msgId, null, payload)
+                        HttpMessage(msg.msgId, action, payload)
                     } else {
                         null
                     }
