@@ -1,6 +1,6 @@
 package com.izivia.ocpp.api15
 
-import com.izivia.ocpp.core15.CMSOperations
+import com.izivia.ocpp.core15.CSMSOperations
 import com.izivia.ocpp.core15.model.cancelreservation.CancelReservationReq
 import com.izivia.ocpp.core15.model.cancelreservation.CancelReservationResp
 import com.izivia.ocpp.core15.model.changeavailability.ChangeAvailabilityReq
@@ -37,7 +37,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import kotlinx.datetime.Clock
 
-class DefaultCSMSOperations(val ocppCSCallbacks: OcppCSCallbacks) : CMSOperations {
+class DefaultCSMSOperations(val ocppCSCallbacks: OcppCSCallbacks) : CSMSOperations {
     override fun reset(meta: RequestMetadata, req: ResetReq): OperationExecution<ResetReq, ResetResp> =
         OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS, Clock.System.now()), req, ocppCSCallbacks.reset(req)
