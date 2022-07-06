@@ -27,8 +27,9 @@ class HttpServer(
     private val ocppVersion: OcppVersion,
     private val port: Int,
     private val path: String,
-    private var server: Http4kServer? = null,
-    private val ocppSoapParser: OcppSoapParser
+    private val ocppSoapParser: OcppSoapParser,
+    private val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    private var server: Http4kServer? = null
 ) : ServerTransport {
 
     companion object {
@@ -88,7 +89,7 @@ class HttpServer(
                         val response = onAction(RequestMetadata(message.messageId), message.payload)
                         val payload = ocppSoapParser.mapResponseToSoap(
                             ResponseSoapMessage(
-                                messageId = "urn:uuid:${UUID.randomUUID()}",
+                                messageId = "urn:uuid:${newMessageId()}",
                                 relatesTo = message.messageId,
                                 action = message.action,
                                 payload = response

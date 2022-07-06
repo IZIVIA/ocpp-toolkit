@@ -36,7 +36,7 @@ class JsonSchemaValidator {
          * Serialize the object with jackson and verify that the format is conformed to the
          * json schema
          */
-        fun <T> isValidObjectV6(value: T, file: String): MutableSet<ValidationMessage> {
+        fun <T> isValidObject(value: T, file: String): MutableSet<ValidationMessage> {
             val jsonNode: JsonNode = getJsonNodeObject(value)
             val schema = getJsonSchema(file, SpecVersion.VersionFlag.V6)
             return schema.validate(jsonNode)

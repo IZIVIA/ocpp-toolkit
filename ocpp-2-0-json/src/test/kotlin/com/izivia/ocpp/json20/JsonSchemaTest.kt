@@ -218,7 +218,7 @@ class JsonSchemaTest {
 
     @Test
     fun `heartbeat request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(HeartbeatReq(), "HeartbeatRequest.json")
+        val errors = JsonSchemaValidator.isValidObject(HeartbeatReq(), "HeartbeatRequest.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -226,7 +226,7 @@ class JsonSchemaTest {
     @Test
     fun `authorize request format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             AuthorizeReq(
                 idToken = IdTokenType("Tag1", IdTokenEnumType.Local)
             ), "AuthorizeRequest.json"
@@ -235,7 +235,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             AuthorizeReq(
                 idToken = IdTokenType("Tag1", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
                 certificate = "certificate1",
@@ -249,7 +249,7 @@ class JsonSchemaTest {
     @Test
     fun `meterValues request format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             MeterValuesReq(
                 evseId = 1,
                 meterValue = listOf(
@@ -264,7 +264,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             MeterValuesReq(
                 evseId = 1,
                 meterValue = listOf(
@@ -287,7 +287,7 @@ class JsonSchemaTest {
 
     @Test
     fun `transactionEvent request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             TransactionEventReq(
                 TransactionEventEnumType.Started,
                 Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -299,7 +299,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             TransactionEventReq(
                 TransactionEventEnumType.Started,
                 Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -324,7 +324,7 @@ class JsonSchemaTest {
 
     @Test
     fun `statusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             StatusNotificationReq(
                 connectorId = 2,
                 connectorStatus = ConnectorStatusEnumType.Available,
@@ -339,7 +339,7 @@ class JsonSchemaTest {
     @Test
     fun `dataTransfer request format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             DataTransferReq("vendor1"),
             "DataTransferRequest.json"
         )
@@ -347,7 +347,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             DataTransferReq(vendorId = "vendor1", messageId = "message1", data = "data1"),
             "DataTransferRequest.json"
         )
@@ -358,7 +358,7 @@ class JsonSchemaTest {
     @Test
     fun `bootNotification request format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             BootNotificationReq(
                 chargingStation = ChargingStationType(model = "model", vendorName = "vendor"),
                 reason = BootReasonEnumType.ApplicationReset
@@ -369,7 +369,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             BootNotificationReq(
                 chargingStation = ChargingStationType(
                     model = "model",
@@ -387,14 +387,14 @@ class JsonSchemaTest {
 
     @Test
     fun `changeAvailability request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ChangeAvailabilityReq(OperationalStatusEnumType.Operative),
             "ChangeAvailabilityRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ChangeAvailabilityReq(OperationalStatusEnumType.Operative, EVSEType(1, 1)),
             "ChangeAvailabilityRequest.json"
         )
@@ -404,7 +404,7 @@ class JsonSchemaTest {
 
     @Test
     fun `clearCache request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             ClearCacheReq(),
             "ClearCacheRequest.json"
         )
@@ -414,7 +414,7 @@ class JsonSchemaTest {
 
     @Test
     fun `unlockConnector request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             UnlockConnectorReq(1, 2),
             "UnlockConnectorRequest.json"
         )
@@ -424,7 +424,7 @@ class JsonSchemaTest {
 
     @Test
     fun `requestStartTransaction request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             RequestStartTransactionReq(
                 remoteStartId = 1,
                 idToken = IdTokenType("token", IdTokenEnumType.Central)
@@ -434,7 +434,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             RequestStartTransactionReq(
                 remoteStartId = 1,
                 idToken = IdTokenType("token", IdTokenEnumType.Central),
@@ -459,7 +459,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             RequestStartTransactionReq(
                 remoteStartId = 1,
                 idToken = IdTokenType("token", IdTokenEnumType.Central, listOf(AdditionalInfoType("", ""))),
@@ -494,7 +494,7 @@ class JsonSchemaTest {
 
     @Test
     fun `requestStopTransaction request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             RequestStopTransactionReq("tag1"),
             "RequestStopTransactionRequest.json"
         )
@@ -504,14 +504,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getVariables request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetVariablesReq(listOf(GetVariableDataType(ComponentType("component"), VariableType("variable")))),
             "GetVariablesRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetVariablesReq(
                 listOf(
                     GetVariableDataType(
@@ -529,7 +529,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setVariables request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SetVariablesReq(
                 listOf(
                     SetVariableDataType(
@@ -544,7 +544,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SetVariablesReq(
                 listOf(
                     SetVariableDataType(
@@ -563,11 +563,11 @@ class JsonSchemaTest {
 
     @Test
     fun `getReport request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(GetReportReq(1), "GetReportRequest.json")
+        var errors = JsonSchemaValidator.isValidObject(GetReportReq(1), "GetReportRequest.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetReportReq(
                 1, listOf(ComponentCriterionEnumType.Active),
                 listOf(ComponentVariableType(ComponentType("component")))
@@ -579,7 +579,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getBaseReport request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             GetBaseReportReq(1, ReportBaseEnumType.ConfigurationInventory),
             "GetBaseReportRequest.json"
         )
@@ -589,7 +589,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setChargingProfile request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             SetChargingProfileReq(
                 1, ChargingProfileType(
                     id = 1,
@@ -614,13 +614,13 @@ class JsonSchemaTest {
 
     @Test
     fun `sendLocalList request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SendLocalListReq(1, UpdateEnumType.Full), "SendLocalListRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SendLocalListReq(
                 1, UpdateEnumType.Full, listOf(
                     AuthorizationData(
@@ -647,7 +647,7 @@ class JsonSchemaTest {
 
     @Test
     fun `updatefirmware request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             UpdateFirmwareReq(
                 requestId = 2,
                 firmware = FirmwareType(
@@ -661,7 +661,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             UpdateFirmwareReq(
                 retries = 3,
                 retryInterval = 1,
@@ -684,14 +684,14 @@ class JsonSchemaTest {
     @Test
     fun `clearedChargingLimit request format`() {
 
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearedChargingLimitReq(ChargingLimitSourceEnumType.CSO),
             "ClearedChargingLimitRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearedChargingLimitReq(ChargingLimitSourceEnumType.EMS, 1),
             "ClearedChargingLimitRequest.json"
         )
@@ -701,7 +701,7 @@ class JsonSchemaTest {
 
     @Test
     fun `cancelReservation request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             CancelReservationReq(3), "CancelReservationRequest.json"
         )
         expectThat(errors)
@@ -710,7 +710,7 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             FirmwareStatusNotificationReq(FirmwareStatusEnumType.Downloaded),
             "FirmwareStatusNotificationRequest.json"
         )
@@ -720,13 +720,13 @@ class JsonSchemaTest {
 
     @Test
     fun `clearChargingProfile request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearChargingProfileReq(), "ClearChargingProfileRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearChargingProfileReq(
                 1,
                 ClearChargingProfileType(
@@ -742,13 +742,13 @@ class JsonSchemaTest {
 
     @Test
     fun `getCompositeSchedule request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetCompositeScheduleReq(1, 2), "GetCompositeScheduleRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetCompositeScheduleReq(1, 2, ChargingRateUnitEnumType.A), "GetCompositeScheduleRequest.json"
         )
         expectThat(errors)
@@ -757,14 +757,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getLocalListVersion request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(GetLocalListVersionReq(), "GetLocalListVersionRequest.json")
+        val errors = JsonSchemaValidator.isValidObject(GetLocalListVersionReq(), "GetLocalListVersionRequest.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `triggerMessage request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             TriggerMessageReq(
                 MessageTriggerEnumType.BootNotification
             ),
@@ -774,7 +774,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             TriggerMessageReq(
                 MessageTriggerEnumType.Heartbeat,
                 EVSEType(1, 1)
@@ -788,7 +788,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyChargingLimit request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyChargingLimitReq(ChargingLimitType(ChargingLimitSourceEnumType.CSO)),
             "NotifyChargingLimitRequest.json"
         )
@@ -796,7 +796,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyChargingLimitReq(
                 ChargingLimitType(ChargingLimitSourceEnumType.CSO, true), 1, listOf(
                     ChargingScheduleType(
@@ -815,7 +815,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getCertificateStatus request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             GetCertificateStatusReq(OCSPRequestDataType(HashAlgorithmEnumType.SHA256, "", "", "", "")),
             "GetCertificateStatusRequest.json"
         )
@@ -826,7 +826,7 @@ class JsonSchemaTest {
 
     @Test
     fun `reserveNow request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ReserveNowReq(
                 id = 1,
                 expiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -837,7 +837,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ReserveNowReq(
                 id = 1,
                 expiryDateTime = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -855,7 +855,7 @@ class JsonSchemaTest {
     @Test
     fun `notifyCustomerInformation request format`() {
 
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyCustomerInformationReq(
                 data = "Some data",
                 seqNo = 0,
@@ -867,7 +867,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyCustomerInformationReq(
                 data = "Some data",
                 tbc = true,
@@ -883,7 +883,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyDisplayMessage request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyDisplayMessagesReq(
                 requestId = 1
             ),
@@ -893,7 +893,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyDisplayMessagesReq(
                 requestId = 1,
                 tbc = false,
@@ -930,7 +930,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEVChargingNeeds request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingNeedsReq(1, ChargingNeedsType(EnergyTransferModeEnumType.AC_single_phase)),
             "NotifyEVChargingNeedsRequest.json"
         )
@@ -938,7 +938,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingNeedsReq(
                 1, ChargingNeedsType(
                     requestedEnergyTransfer = EnergyTransferModeEnumType.AC_single_phase,
@@ -956,7 +956,7 @@ class JsonSchemaTest {
     @Test
     fun `notify request response format`() {
         var errors =
-            JsonSchemaValidator.isValidObjectV6(
+            JsonSchemaValidator.isValidObject(
                 NotifyReportReq(
                     requestId = 1,
                     generatedAt = Clock.System.now(),
@@ -967,7 +967,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors =
-            JsonSchemaValidator.isValidObjectV6(
+            JsonSchemaValidator.isValidObject(
                 NotifyReportReq(
                     requestId = 1,
                     generatedAt = Clock.System.now(),
@@ -985,7 +985,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         errors =
-            JsonSchemaValidator.isValidObjectV6(
+            JsonSchemaValidator.isValidObject(
                 NotifyReportReq(
                     requestId = 1,
                     generatedAt = Clock.System.now(),
@@ -1015,7 +1015,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEvent request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyEventReq(
                 generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
                 seqNo = 0,
@@ -1035,7 +1035,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyEventReq(
                 generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
                 seqNo = 0,
@@ -1065,7 +1065,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEVChargingSchedule request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingScheduleReq(
                 timeBase = Instant.parse("2022-02-15T00:00:00.000Z"),
                 evseId = 123,
@@ -1088,14 +1088,14 @@ class JsonSchemaTest {
 
     @Test
     fun `securityEventNotification request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SecurityEventNotificationReq("type", Instant.parse("2022-02-15T00:00:00.000Z")),
             "SecurityEventNotificationRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SecurityEventNotificationReq(
                 type = "type",
                 timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -1109,7 +1109,7 @@ class JsonSchemaTest {
 
     @Test
     fun `logStatusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             LogStatusNotificationReq(
                 status = UploadLogStatusEnumType.Uploaded,
                 requestId = 1
@@ -1122,7 +1122,7 @@ class JsonSchemaTest {
 
     @Test
     fun `publishFirmwareStatusNotification request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             PublishFirmwareStatusNotificationReq(
                 status = PublishFirmwareStatusEnumType.Published,
                 location = listOf("location"),
@@ -1136,7 +1136,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyMonitoringReport request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyMonitoringReportReq(
                 requestId = 1,
                 generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -1147,7 +1147,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyMonitoringReportReq(
                 requestId = 1,
                 generatedAt = Instant.parse("2022-02-15T00:00:00.000Z"),
@@ -1177,7 +1177,7 @@ class JsonSchemaTest {
 
     @Test
     fun `reservationStatusUpdate request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             ReservationStatusUpdateReq(1, ReservationUpdateStatusEnumType.Expired),
             "ReservationStatusUpdateRequest.json"
         )
@@ -1187,20 +1187,20 @@ class JsonSchemaTest {
 
     @Test
     fun `clearDisplayMessage request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(ClearDisplayMessageReq(1), "ClearDisplayMessageRequest.json")
+        val errors = JsonSchemaValidator.isValidObject(ClearDisplayMessageReq(1), "ClearDisplayMessageRequest.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `certificateSigned request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             CertificateSignedReq("certificateChain"), "CertificateSignedRequest.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             CertificateSignedReq("certificateChain", CertificateSigningUseEnumType.V2GCertificate),
             "CertificateSignedRequest.json"
         )
@@ -1210,11 +1210,11 @@ class JsonSchemaTest {
 
     @Test
     fun `signCertificate request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(SignCertificateReq("csr"), "SignCertificateRequest.json")
+        var errors = JsonSchemaValidator.isValidObject(SignCertificateReq("csr"), "SignCertificateRequest.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SignCertificateReq(
                 "csr",
                 CertificateSigningUseEnumType.ChargingStationCertificate
@@ -1226,7 +1226,7 @@ class JsonSchemaTest {
 
     @Test
     fun `clearVariableMonitoring request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             ClearVariableMonitoringReq(
                 ids = listOf(1, 2)
             ),
@@ -1238,7 +1238,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getMonitoringReport request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetMonitoringReportReq(
                         243432,
                         listOf(MonitoringCriterionEnumType.DeltaMonitoring),
@@ -1253,7 +1253,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetMonitoringReportReq(
                         243432
                 ),
@@ -1272,7 +1272,7 @@ class JsonSchemaTest {
                 "1f40fc92da241694750979ee6cf582f2d5d7d28e18335de05abc54d0560e0f5302860c652bf08d560252aa5e74210546f369fbbbce8c12cfc7957b2652fe9a75",
                 "7683246784"
         )
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 DeleteCertificateReq(
                         certif
                 ),
@@ -1286,7 +1286,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setDisplayMessage request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetDisplayMessageReq(
                         MessageInfoType(
                                 id = 2,
@@ -1314,7 +1314,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetDisplayMessageReq(
                         MessageInfoType(
                                 id = 2,
@@ -1333,7 +1333,7 @@ class JsonSchemaTest {
 
     @Test
     fun `costUpdated request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 CostUpdatedReq(5465.2, "45465"),
                 "CostUpdatedRequest.json"
         )
@@ -1343,7 +1343,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getDisplayMessages request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetDisplayMessagesReq(
                         id=listOf(32,23),
                         requestId=2,
@@ -1354,7 +1354,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetDisplayMessagesReq(
                         requestId=2
                 ),
@@ -1366,7 +1366,7 @@ class JsonSchemaTest {
     @Test
     fun `getChargingProfiles request format`() {
         //without optionnal parameters
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetChargingProfilesReq(
                         78687,
                         chargingProfile = ChargingProfileCriterionType()
@@ -1377,7 +1377,7 @@ class JsonSchemaTest {
                 .and { get { this.size }.isEqualTo(0) }
 
         //with all parameters
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetChargingProfilesReq(
                         78687,
                         ChargingProfileCriterionType(
@@ -1397,7 +1397,7 @@ class JsonSchemaTest {
 
     @Test
     fun `unpublishFirmware request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 UnpublishFirmwareReq("checksum"),
                 "UnpublishFirmwareRequest.json")
         expectThat(errors)
@@ -1407,7 +1407,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getInstalledCertificateIds request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetInstalledCertificateIdsReq(
                         listOf(GetCertificateIdUseEnumType.CSMSRootCertificate)
                 ),
@@ -1416,7 +1416,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetInstalledCertificateIdsReq(
                 ),
                 "GetInstalledCertificateIdsRequest.json"
@@ -1424,7 +1424,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SetNetworkProfileReq(
                 2,
                 NetworkConnectionProfileType(
@@ -1444,7 +1444,7 @@ class JsonSchemaTest {
 
     @Test
     fun `installCertificate request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 InstallCertificateReq(
                         InstallCertificateUseEnumType.CSMSRootCertificate,
                         "certificate"
@@ -1459,7 +1459,7 @@ class JsonSchemaTest {
 
     @Test
     fun `customerInformation request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 CustomerInformationReq(
                         requestId = 3,
                         report = false,
@@ -1494,7 +1494,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 CustomerInformationReq(
                         requestId = 3,
                         report = false,
@@ -1510,7 +1510,7 @@ class JsonSchemaTest {
 
     @Test
     fun `reportChargingProfiles request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                  ReportChargingProfilesReq(
                          requestId = 2,
                          chargingLimitSource = ChargingLimitSourceEnumType.CSO,
@@ -1537,7 +1537,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ReportChargingProfilesReq(
                 requestId = 2,
                 chargingLimitSource = ChargingLimitSourceEnumType.CSO,
@@ -1567,7 +1567,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setNetworkProfile request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetNetworkProfileReq(
                         2,
                         NetworkConnectionProfileType(
@@ -1601,7 +1601,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SetNetworkProfileReq(
                 2,
                 NetworkConnectionProfileType(
@@ -1621,7 +1621,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEVChargingSchedule response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingScheduleResp(
                 status = GenericStatusEnumType.Accepted,
                 statusInfo = StatusInfoType("123")
@@ -1634,7 +1634,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getLog request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetLogReq(
                 requestId = 1,
                 logType = LogEnumType.DiagnosticsLog,
@@ -1649,7 +1649,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetLogReq(
                 requestId = 1,
                 logType = LogEnumType.DiagnosticsLog,
@@ -1669,7 +1669,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setMonitoringLevel request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringLevelReq(2),
                 "SetMonitoringLevelRequest.json"
         )
@@ -1679,7 +1679,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setVariableMonitoring request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetVariableMonitoringReq(
                         listOf (
                                 SetMonitoringDataType(
@@ -1699,7 +1699,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetVariableMonitoringReq(
                         listOf(
                             SetMonitoringDataType(
@@ -1720,7 +1720,7 @@ class JsonSchemaTest {
 
     @Test
     fun `publishFirmware request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             PublishFirmwareReq(
                     "location",
                     "identifier string",
@@ -1733,7 +1733,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 PublishFirmwareReq(
                         location="location",
                         checksum="identifier string",
@@ -1747,7 +1747,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setMonitoringBase request format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringBaseReq(
                         MonitoringBaseEnumType.All
                 ),
@@ -1761,7 +1761,7 @@ class JsonSchemaTest {
         val heartbeatResp = HeartbeatResp(
             currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
         )
-        val errors = JsonSchemaValidator.isValidObjectV6(heartbeatResp, "HeartbeatResponse.json")
+        val errors = JsonSchemaValidator.isValidObject(heartbeatResp, "HeartbeatResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1770,7 +1770,7 @@ class JsonSchemaTest {
     @Test
     fun `authorize response format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             AuthorizeResp(
                 idTokenInfo = IdTokenInfoType(AuthorizationStatusEnumType.Accepted)
             ), "AuthorizeResponse.json"
@@ -1779,7 +1779,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             AuthorizeResp(
                 idTokenInfo = IdTokenInfoType(AuthorizationStatusEnumType.Blocked),
                 certificateStatus = AuthorizeCertificateStatusEnumType.CertificateExpired
@@ -1791,7 +1791,7 @@ class JsonSchemaTest {
 
     @Test
     fun `meterValues response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             MeterValuesResp(), "MeterValuesResponse.json"
         )
         expectThat(errors)
@@ -1801,12 +1801,12 @@ class JsonSchemaTest {
     @Test
     fun `transactionEvent response format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(TransactionEventResp(), "TransactionEventResponse.json")
+        var errors = JsonSchemaValidator.isValidObject(TransactionEventResp(), "TransactionEventResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             TransactionEventResp(
                 200.0, 9,
                 IdTokenInfoType(
@@ -1829,7 +1829,7 @@ class JsonSchemaTest {
 
     @Test
     fun `statusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(StatusNotificationResp(), "StatusNotificationResponse.json")
+        val errors = JsonSchemaValidator.isValidObject(StatusNotificationResp(), "StatusNotificationResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -1837,7 +1837,7 @@ class JsonSchemaTest {
     @Test
     fun `dataTransfer response format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             DataTransferResp(DataTransferStatusEnumType.Accepted),
             "DataTransferResponse.json"
         )
@@ -1845,7 +1845,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             DataTransferResp(
                 status = DataTransferStatusEnumType.Accepted,
                 data = "data1",
@@ -1860,7 +1860,7 @@ class JsonSchemaTest {
     @Test
     fun `bootNotification response format`() {
         /* Required field only */
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             BootNotificationResp(
                 currentTime = Instant.parse("2022-02-15T00:00:00.000Z"),
                 interval = 10,
@@ -1872,7 +1872,7 @@ class JsonSchemaTest {
             .and { get { this.size }.isEqualTo(0) }
 
         /* Every field */
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             BootNotificationResp(
                 currentTime = Instant.parse("2022-02-15T00:00:00.000Z"),
                 interval = 10,
@@ -1887,14 +1887,14 @@ class JsonSchemaTest {
 
     @Test
     fun `changeAvailability response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted),
             "ChangeAvailabilityResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ChangeAvailabilityResp(ChangeAvailabilityStatusEnumType.Accepted, StatusInfoType("", "")),
             "ChangeAvailabilityResponse.json"
         )
@@ -1904,14 +1904,14 @@ class JsonSchemaTest {
 
     @Test
     fun `clearCache response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearCacheResp(ClearCacheStatusEnumType.Accepted),
             "ClearCacheResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearCacheResp(ClearCacheStatusEnumType.Accepted, StatusInfoType("", "")),
             "ClearCacheResponse.json"
         )
@@ -1921,14 +1921,14 @@ class JsonSchemaTest {
 
     @Test
     fun `unlockConnector response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             UnlockConnectorResp(UnlockStatusEnumType.Unlocked),
             "UnlockConnectorResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             UnlockConnectorResp(UnlockStatusEnumType.Unlocked, StatusInfoType("", "")),
             "UnlockConnectorResponse.json"
         )
@@ -1938,14 +1938,14 @@ class JsonSchemaTest {
 
     @Test
     fun `requestStopTransaction response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted),
             "RequestStopTransactionResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             RequestStopTransactionResp(RequestStartStopStatusEnumType.Accepted, StatusInfoType("reason", "additional")),
             "RequestStopTransactionResponse.json"
         )
@@ -1955,7 +1955,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getVariables response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetVariablesResp(
                 listOf(
                     GetVariableResultType(
@@ -1970,7 +1970,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetVariablesResp(
                 listOf(
                     GetVariableResultType(
@@ -1991,7 +1991,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setVariables response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SetVariablesResp(
                 listOf(
                     SetVariableResultType(
@@ -2006,7 +2006,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SetVariablesResp(
                 listOf(
                     SetVariableResultType(
@@ -2026,14 +2026,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getReport response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetReportResp(GenericDeviceModelStatusEnumType.Accepted),
             "GetReportResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetReportResp(
                 GenericDeviceModelStatusEnumType.EmptyResultSet,
                 StatusInfoType("reason", "additional")
@@ -2046,14 +2046,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getBaseReport response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetBaseReportResp(GenericDeviceModelStatusEnumType.Rejected),
             "GetBaseReportResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetBaseReportResp(
                 GenericDeviceModelStatusEnumType.Rejected,
                 StatusInfoType("reason", "additional")
@@ -2066,20 +2066,20 @@ class JsonSchemaTest {
 
     @Test
     fun `notify report response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(NotifyReportResp(), "NotifyReportResponse.json")
+        val errors = JsonSchemaValidator.isValidObject(NotifyReportResp(), "NotifyReportResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `setChargingProfile response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SetChargingProfileResp(ChargingProfileStatusEnumType.Accepted), "SetChargingProfileResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SetChargingProfileResp(
                 ChargingProfileStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2092,14 +2092,14 @@ class JsonSchemaTest {
 
     @Test
     fun `sendLocalList response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SendLocalListResp(SendLocalListStatusEnumType.Accepted),
             "SendLocalListResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SendLocalListResp(SendLocalListStatusEnumType.Accepted, StatusInfoType("reason", "additional")),
             "SendLocalListResponse.json"
         )
@@ -2109,13 +2109,13 @@ class JsonSchemaTest {
 
     @Test
     fun `cancelReservation response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             CancelReservationResp(CancelReservationStatusEnumType.Rejected), "CancelReservationResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             CancelReservationResp(
                 CancelReservationStatusEnumType.Rejected,
                 StatusInfoType("reason", "additional")
@@ -2128,7 +2128,7 @@ class JsonSchemaTest {
 
     @Test
     fun `firmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             FirmwareStatusNotificationResp(),
             "FirmwareStatusNotificationResponse.json"
         )
@@ -2138,13 +2138,13 @@ class JsonSchemaTest {
 
     @Test
     fun `clearChargingProfile response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearChargingProfileResp(ClearChargingProfileEnumType.Accepted), "ClearChargingProfileResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearChargingProfileResp(
                 ClearChargingProfileEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2156,7 +2156,7 @@ class JsonSchemaTest {
 
     @Test
     fun `clearedChargingLimit response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             ClearedChargingLimitResp(), "ClearedChargingLimitResponse.json"
         )
         expectThat(errors)
@@ -2165,13 +2165,13 @@ class JsonSchemaTest {
 
     @Test
     fun `getCompositeSchedule response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetCompositeScheduleResp(GenericStatusEnumType.Accepted), "GetCompositeScheduleResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetCompositeScheduleResp(
                 GenericStatusEnumType.Accepted,
                 CompositeScheduleType(
@@ -2191,14 +2191,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getLocalListVersion response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(GetLocalListVersionResp(1), "GetLocalListVersionResponse.json")
+        val errors = JsonSchemaValidator.isValidObject(GetLocalListVersionResp(1), "GetLocalListVersionResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `updatefirmware response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             UpdateFirmwareResp(
                 status = UpdateFirmwareStatusEnumType.Accepted
             ),
@@ -2208,7 +2208,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             UpdateFirmwareResp(
                 status = UpdateFirmwareStatusEnumType.Accepted,
                 statusInfo = StatusInfoType("reason", "additional")
@@ -2222,7 +2222,7 @@ class JsonSchemaTest {
 
     @Test
     fun `triggerMessage response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             TriggerMessageResp(
                 TriggerMessageStatusEnumType.Accepted
             ),
@@ -2232,7 +2232,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             TriggerMessageResp(
                 TriggerMessageStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2246,7 +2246,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyChargingLimit response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             NotifyChargingLimitResp(), "NotifyChargingLimitResponse.json"
         )
         expectThat(errors) {
@@ -2256,14 +2256,14 @@ class JsonSchemaTest {
 
     @Test
     fun `getCertificateStatus response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted), "GetCertificateStatusResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetCertificateStatusResp(GetCertificateStatusEnumType.Accepted, "", StatusInfoType("reason", "additional")),
             "GetCertificateStatusResponse.json"
         )
@@ -2274,7 +2274,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEVChargingNeeds response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingNeedsResp(NotifyEVChargingNeedsStatusEnumType.Accepted),
             "NotifyEVChargingNeedsResponse.json"
         )
@@ -2282,7 +2282,7 @@ class JsonSchemaTest {
             get { this.size }.isEqualTo(0)
         }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             NotifyEVChargingNeedsResp(
                 NotifyEVChargingNeedsStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2295,7 +2295,7 @@ class JsonSchemaTest {
 
     @Test
     fun `reserveNow response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             ReserveNowResp(ReserveNowStatusEnumType.Accepted), "ReserveNowResponse.json"
         )
         expectThat(errors) {
@@ -2305,7 +2305,7 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyDisplayMessages response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             NotifyDisplayMessagesResp(),
             "NotifyDisplayMessagesResponse.json"
         )
@@ -2316,18 +2316,18 @@ class JsonSchemaTest {
 
     @Test
     fun `notifyEvent response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(NotifyEventResp(), "NotifyEventResponse.json")
+        val errors = JsonSchemaValidator.isValidObject(NotifyEventResp(), "NotifyEventResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `getLog response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(GetLogResp(LogStatusEnumType.Accepted), "GetLogResponse.json")
+        var errors = JsonSchemaValidator.isValidObject(GetLogResp(LogStatusEnumType.Accepted), "GetLogResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             GetLogResp(
                 status = LogStatusEnumType.Accepted,
                 filename = "filename",
@@ -2340,7 +2340,7 @@ class JsonSchemaTest {
 
     @Test
     fun `securityEventNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             SecurityEventNotificationResp(),
             "SecurityEventNotificationResponse.json"
         )
@@ -2351,7 +2351,7 @@ class JsonSchemaTest {
     @Test
     fun `reservationStatusUpdate response format`() {
         val errors =
-            JsonSchemaValidator.isValidObjectV6(ReservationStatusUpdateResp(), "ReservationStatusUpdateResponse.json")
+            JsonSchemaValidator.isValidObject(ReservationStatusUpdateResp(), "ReservationStatusUpdateResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
@@ -2359,14 +2359,14 @@ class JsonSchemaTest {
     @Test
     fun `notifyMonitoringReport response format`() {
         val errors =
-            JsonSchemaValidator.isValidObjectV6(NotifyMonitoringReportResp(), "NotifyMonitoringReportResponse.json")
+            JsonSchemaValidator.isValidObject(NotifyMonitoringReportResp(), "NotifyMonitoringReportResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
     }
 
     @Test
     fun `logStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             LogStatusNotificationResp(),  "LogStatusNotificationResponse.json"
         )
         expectThat(errors)
@@ -2375,13 +2375,13 @@ class JsonSchemaTest {
 
     @Test
     fun `certificateSigned response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             CertificateSignedResp(CertificateSignedStatusEnumType.Accepted), "CertificateSignedResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             CertificateSignedResp(
                 CertificateSignedStatusEnumType.Accepted,
                 StatusInfoType("reason", "info")
@@ -2394,7 +2394,7 @@ class JsonSchemaTest {
 
     @Test
     fun `publishFirmwareStatusNotification response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
             PublishFirmwareStatusNotificationResp(),
             "PublishFirmwareStatusNotificationResponse.json"
         )
@@ -2404,14 +2404,14 @@ class JsonSchemaTest {
 
     @Test
     fun `signCertificate response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             SignCertificateResp(GenericStatusEnumType.Accepted),
             "SignCertificateResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             SignCertificateResp(
                 GenericStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2422,14 +2422,14 @@ class JsonSchemaTest {
     }
     @Test
     fun `clearDisplayMessage response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearDisplayMessageResp(ClearMessageStatusEnumType.Accepted),
             "ClearDisplayMessageResponse.json"
         )
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearDisplayMessageResp(
                 ClearMessageStatusEnumType.Accepted,
                 StatusInfoType("reason", "additional")
@@ -2442,7 +2442,7 @@ class JsonSchemaTest {
     @Test
     fun `getDisplayMessages response format`() {
         //without optionnal parameters
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetDisplayMessagesResp(GetDisplayMessagesStatusEnumType.Accepted),
                 "GetDisplayMessagesResponse.json"
         )
@@ -2451,7 +2451,7 @@ class JsonSchemaTest {
 
         //with all parameters
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetDisplayMessagesResp(
                         GetDisplayMessagesStatusEnumType.Accepted,
                         StatusInfoType("reason","info")
@@ -2465,7 +2465,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setMonitoringBase response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringBaseResp(
                         GenericDeviceModelStatusEnumType.Accepted,
                         StatusInfoType("reason","info")
@@ -2475,7 +2475,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringBaseResp(
                         GenericDeviceModelStatusEnumType.Accepted
                 ),
@@ -2488,7 +2488,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setNetworkProfile response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetNetworkProfileResp(
                         SetNetworkProfileStatusEnumType.Accepted
                 ),
@@ -2497,7 +2497,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetNetworkProfileResp(
                         SetNetworkProfileStatusEnumType.Accepted,
                         StatusInfoType("reason","info")
@@ -2511,7 +2511,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setMonitoringLevel response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringLevelResp(
                         GenericStatusEnumType.Accepted,
                         StatusInfoType("reason","additionnal")
@@ -2521,7 +2521,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetMonitoringLevelResp(
                         GenericStatusEnumType.Accepted
                 ),
@@ -2534,7 +2534,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getChargingProfiles response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetChargingProfilesResp(
                         GetChargingProfileStatusEnumType.NoProfiles,
                         StatusInfoType("reason","additionnal")),
@@ -2543,7 +2543,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetChargingProfilesResp(
                         GetChargingProfileStatusEnumType.NoProfiles),
                 "GetChargingProfilesResponse.json"
@@ -2555,7 +2555,7 @@ class JsonSchemaTest {
     @Test
     fun `getInstalledCertificateIds response format`() {
 
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetInstalledCertificateIdsResp(
                     GetInstalledCertificateStatusEnumType.Accepted,
                     listOf(
@@ -2570,7 +2570,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetInstalledCertificateIdsResp(
                         GetInstalledCertificateStatusEnumType.Accepted,
                 ),
@@ -2582,7 +2582,7 @@ class JsonSchemaTest {
 
     @Test
     fun `installCertificate response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 InstallCertificateResp(
                     InstallCertificateStatusEnumType.Accepted,
                     StatusInfoType("reason","info")
@@ -2592,7 +2592,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 InstallCertificateResp(
                         InstallCertificateStatusEnumType.Accepted
                 ),
@@ -2605,7 +2605,7 @@ class JsonSchemaTest {
 
     @Test
     fun `customerInformation response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 CustomerInformationResp(
                         CustomerInformationStatusEnumType.Accepted,
                         StatusInfoType("reason","code")
@@ -2615,7 +2615,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 CustomerInformationResp(
                         CustomerInformationStatusEnumType.Accepted
                 ),
@@ -2627,7 +2627,7 @@ class JsonSchemaTest {
 
     @Test
     fun `reportChargingProfiles response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 ReportChargingProfilesResp(),
                 "ReportChargingProfilesResponse.json"
         )
@@ -2637,7 +2637,7 @@ class JsonSchemaTest {
 
     @Test
     fun `unpublishFirmware response format`() {
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.Unpublished),
                 "UnpublishFirmwareResponse.json"
         )
@@ -2647,7 +2647,7 @@ class JsonSchemaTest {
 
     @Test
     fun `publishFirmware response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 PublishFirmwareResp(
                         GenericStatusEnumType.Accepted,
                         StatusInfoType("reason","info")
@@ -2657,7 +2657,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 PublishFirmwareResp(
                         GenericStatusEnumType.Accepted
                 ),
@@ -2669,7 +2669,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setVariableMonitoring response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetVariableMonitoringResp
                 (
                     setMonitoringResult =listOf(
@@ -2689,7 +2689,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetVariableMonitoringResp
                 (
                         setMonitoringResult =listOf(
@@ -2710,7 +2710,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getTransactionStatus response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetTransactionStatusResp(
                         true,
                         false
@@ -2720,7 +2720,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetTransactionStatusResp(
                         true,
                 ),
@@ -2732,7 +2732,7 @@ class JsonSchemaTest {
 
     @Test
     fun `getTransactionStatus request format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetTransactionStatusReq(
                     "id"
                 ),
@@ -2741,7 +2741,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetTransactionStatusReq(
                 ),
                 "GetTransactionStatusRequest.json"
@@ -2752,7 +2752,7 @@ class JsonSchemaTest {
 
     @Test
     fun `setDisplayMessage response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 SetDisplayMessageResp(
                         DisplayMessageStatusEnumType.Accepted,
                         StatusInfoType("reason","code")
@@ -2762,7 +2762,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 SetDisplayMessageResp(
                         DisplayMessageStatusEnumType.Accepted
                 ),
@@ -2775,7 +2775,7 @@ class JsonSchemaTest {
     @Test
     fun `costUpdated response format`() {
 
-        val errors = JsonSchemaValidator.isValidObjectV6(
+        val errors = JsonSchemaValidator.isValidObject(
                 CostUpdatedResp(),
                 "CostUpdatedResponse.json"
         )
@@ -2785,7 +2785,7 @@ class JsonSchemaTest {
 
     @Test
     fun `deleteCertificate response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 //Test without optional parameter
                 DeleteCertificateResp(
                         DeleteCertificateStatusEnumType.Accepted
@@ -2798,7 +2798,7 @@ class JsonSchemaTest {
         }
 
         //Test with all parameters
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 //Test without optional parameter
                 DeleteCertificateResp(
                         DeleteCertificateStatusEnumType.Accepted,
@@ -2812,7 +2812,7 @@ class JsonSchemaTest {
     }
     @Test
     fun `getMonitoringReport response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
                 GetMonitoringReportResp(
                         GenericDeviceModelStatusEnumType.Accepted,
                         StatusInfoType("reason","info")
@@ -2822,7 +2822,7 @@ class JsonSchemaTest {
         expectThat(errors)
                 .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
                 GetMonitoringReportResp(
                         GenericDeviceModelStatusEnumType.Accepted
                 ),
@@ -2834,7 +2834,7 @@ class JsonSchemaTest {
 
     @Test
     fun `clearVariableMonitoring response format`() {
-        var errors = JsonSchemaValidator.isValidObjectV6(
+        var errors = JsonSchemaValidator.isValidObject(
             ClearVariableMonitoringResp(
                 clearMonitoringResults =
                 listOf(
@@ -2853,7 +2853,7 @@ class JsonSchemaTest {
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
 
-        errors = JsonSchemaValidator.isValidObjectV6(
+        errors = JsonSchemaValidator.isValidObject(
             ClearVariableMonitoringResp(
                 clearMonitoringResults =
                 listOf(

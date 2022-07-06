@@ -17,7 +17,7 @@ dependencies {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
+        named<MavenPublication>("maven") {
             groupId = project.group.toString()
             artifactId = project.name
             version = project.version.toString()
