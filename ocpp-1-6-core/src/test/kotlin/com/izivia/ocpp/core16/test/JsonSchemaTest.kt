@@ -70,6 +70,10 @@ import com.izivia.ocpp.core16.model.setchargingprofile.enumeration.ChargingProfi
 import com.izivia.ocpp.core16.model.reservenow.ReserveNowReq
 import com.izivia.ocpp.core16.model.reservenow.ReserveNowResp
 import com.izivia.ocpp.core16.model.reservenow.enumeration.ReservationStatus
+import com.izivia.ocpp.core16.model.reset.ResetReq
+import com.izivia.ocpp.core16.model.reset.ResetResp
+import com.izivia.ocpp.core16.model.reset.enumeration.ResetStatus
+import com.izivia.ocpp.core16.model.reset.enumeration.ResetType
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionReq
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionResp
 import com.izivia.ocpp.core16.model.statusnotification.StatusNotificationReq
@@ -907,6 +911,40 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObjectV4(GetDiagnosticsResp("fileName"), "GetDiagnosticsResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `reset request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ResetReq(type = ResetType.Hard), "ResetRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ResetReq(type = ResetType.Soft), "ResetRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `reset response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ResetResp(status = ResetStatus.Accepted), "ResetResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ResetResp(status = ResetStatus.Rejected), "ResetResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
     }
 
 }
