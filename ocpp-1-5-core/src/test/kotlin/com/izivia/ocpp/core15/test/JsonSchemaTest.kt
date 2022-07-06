@@ -37,7 +37,6 @@ import com.izivia.ocpp.core15.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.core15.model.heartbeat.HeartbeatResp
 import com.izivia.ocpp.core15.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.core15.model.metervalues.MeterValuesResp
-import com.izivia.ocpp.core15.model.common.enumeration.ChargingRateUnitType
 import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
 import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
@@ -47,6 +46,10 @@ import com.izivia.ocpp.core15.model.remotestop.RemoteStopTransactionReq
 import com.izivia.ocpp.core15.model.remotestop.RemoteStopTransactionResp
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionResp
+import com.izivia.ocpp.core15.model.reset.ResetReq
+import com.izivia.ocpp.core15.model.reset.ResetResp
+import com.izivia.ocpp.core15.model.reset.enumeration.ResetType
+import com.izivia.ocpp.core15.model.reset.enumeration.ResetStatus
 import com.izivia.ocpp.core15.model.sendlocallist.AuthorisationData
 import com.izivia.ocpp.core15.model.sendlocallist.SendLocalListReq
 import com.izivia.ocpp.core15.model.sendlocallist.SendLocalListResp
@@ -735,6 +738,40 @@ class JsonSchemaTest {
             "GetDiagnosticsResponse.json")
         expectThat(errors)
             .and { get { this.size }.isEqualTo(0) }
+    }
+
+    @Test
+    fun `reset request format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ResetReq(type = ResetType.Hard), "ResetRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ResetReq(type = ResetType.Soft), "ResetRequest.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `reset response format`() {
+        var errors = JsonSchemaValidator.isValidObjectV4(
+            ResetResp(status = ResetStatus.Accepted), "Reset.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
+
+        errors = JsonSchemaValidator.isValidObjectV4(
+            ResetResp(status = ResetStatus.Rejected), "ResetResponse.json"
+        )
+        expectThat(errors) {
+            get { this.size }.isEqualTo(0)
+        }
     }
 
 }
