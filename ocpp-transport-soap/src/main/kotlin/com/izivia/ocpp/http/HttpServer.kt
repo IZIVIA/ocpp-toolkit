@@ -1,33 +1,70 @@
 package com.izivia.ocpp.http
 
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status.Companion.OK
-import org.http4k.server.Http4kServer
-import org.http4k.server.asServer
-import org.http4k.server.Undertow
-
+import com.izivia.ocpp.operation.information.ChargingStationConfig
+import com.izivia.ocpp.operation.information.RequestMetadata
+import com.izivia.ocpp.soap.OcppSoapParser
+import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
-
+import org.http4k.contract.ContractRoute
+import org.http4k.contract.contract
+import org.http4k.contract.div
+import org.http4k.core.HttpHandler
+import org.http4k.core.Method.POST
+import org.http4k.core.Request
+import org.http4k.core.Response
+import org.http4k.core.Status.Companion.NOT_FOUND
+import org.http4k.core.Status.Companion.OK
+import org.http4k.lens.Path
+import org.http4k.server.Http4kServer
+import org.http4k.server.Undertow
+import org.http4k.server.asServer
+import org.slf4j.LoggerFactory
+import java.util.*
 import kotlin.reflect.KClass
 
-
 class HttpServer(
+    private val ocppVersion: OcppVersion,
     private val port: Int,
     private val path: String,
-    private var server: Http4kServer?= null) : ServerTransport
-{
+    private var server: Http4kServer? = null,
+    private val ocppSoapParser: OcppSoapParser
+) : ServerTransport {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(HttpServer::class.java)
+    }
+
+    private val handlers = mutableListOf<OcppHttpServerHandler>()
+
     override fun start() {
-        // TODO("Implement app")
-        val app = { request: Request -> Response(OK).body("Hello") }
-        if(server == null) {
+        val route: ContractRoute = path / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
+        val app = contract {
+            routes += route
+        }
+        if (server == null) {
             server = app.asServer(Undertow(port = port)).start()
         }
+        logger.info("starting http server on port $port")
+    }
+
+    private fun routeHandler(action: String, ocppId: String): HttpHandler = { request: Request ->
+        val message = HttpMessage(
+            msgId = ocppId,
+            action = action,
+            payload = request.bodyString()
+        )
+        handlers
+            .asSequence()
+            .filter { it.accept(ocppId) }
+            .map { it.onAction(message) }
+            .firstOrNull()
+            ?.let { Response(OK).body(it.payload) }
+            ?: Response(NOT_FOUND).also { logger.warn("no action handler found for $message") }
     }
 
     override fun stop() {
-            server!!.stop()
+        server!!.stop()
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P {
@@ -38,13 +75,33 @@ class HttpServer(
         clazz: KClass<T>,
         action: String,
         ocppVersion: OcppVersion,
-        onAction: (com.izivia.ocpp.operation.information.RequestMetadata, T) -> P,
-        accept: (String) -> com.izivia.ocpp.operation.information.ChargingStationConfig
+        onAction: (RequestMetadata, T) -> P,
+        accept: (String) -> ChargingStationConfig
     ) {
-        TODO("Not yet implemented")
+        handlers.add(
+            object : OcppHttpServerHandler {
+                override fun accept(ocppId: String): Boolean = accept(ocppId).acceptConnection
+
+                override fun onAction(msg: HttpMessage): HttpMessage? =
+                    if (this@HttpServer.ocppVersion == ocppVersion && msg.action?.lowercase() == action.lowercase()) {
+                        val message = ocppSoapParser.parseRequestFromSoap<T>(msg.payload)
+                        val response = onAction(RequestMetadata(message.messageId), message.payload)
+                        val payload = ocppSoapParser.mapResponseToSoap(
+                            ResponseSoapMessage(
+                                messageId = "urn:uuid:${UUID.randomUUID()}",
+                                relatesTo = message.messageId,
+                                action = message.action,
+                                payload = response
+                            )
+                        )
+                        HttpMessage(msg.msgId, null, payload)
+                    } else {
+                        null
+                    }
+            }
+        )
     }
 
-    override fun canSendToChargingStation(chargingStationConfig: com.izivia.ocpp.operation.information.ChargingStationConfig): Boolean {
-        TODO("Not yet implemented")
-    }
+    override fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean =
+        chargingStationConfig.acceptConnection
 }
