@@ -10,7 +10,7 @@ import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
 import com.izivia.ocpp.core15.impl.RealCSMSOperations as RealCSMSOperations15
 import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
-import com.izivia.ocpp.core15.CMSOperations as CSMSOperations15
+import com.izivia.ocpp.core15.CSMSOperations as CSMSOperations15
 import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
 import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
 import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20

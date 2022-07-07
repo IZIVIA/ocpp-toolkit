@@ -1,21 +1,23 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "DiagnosticsStatusNotificationRequest",
+    "title": "ChangeAvailabilityRequest",
     "type": "object",
     "properties": {
-        "status": {
+        "connectorId": {
+            "type": "integer"
+        },
+        "type": {
             "type": "string",
             "additionalProperties": false,
             "enum": [
-                "Idle",
-                "Uploaded",
-                "UploadFailed",
-                "Uploading"
+                "Inoperative",
+                "Operative"
             ]
         }
     },
     "additionalProperties": false,
     "required": [
-        "status"
+        "connectorId",
+        "type"
     ]
 }

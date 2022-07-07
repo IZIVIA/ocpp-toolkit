@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "title": "HeartbeatRequest",
+    "title": "ClearCacheRequest",
     "type": "object",
     "properties": {},
     "additionalProperties": false
