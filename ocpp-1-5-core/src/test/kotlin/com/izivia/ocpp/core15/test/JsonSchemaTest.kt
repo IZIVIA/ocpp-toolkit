@@ -743,14 +743,14 @@ class JsonSchemaTest {
     @Test
     fun `reset request format`() {
         var errors = JsonSchemaValidator.isValidObjectV4(
-            ResetReq(type = ResetType.Hard), "ResetRequest.json"
+            ResetReq(type = ResetType.Hard), "Reset.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
 
         errors = JsonSchemaValidator.isValidObjectV4(
-            ResetReq(type = ResetType.Soft), "ResetRequest.json"
+            ResetReq(type = ResetType.Soft), "Reset.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
@@ -760,14 +760,14 @@ class JsonSchemaTest {
     @Test
     fun `reset response format`() {
         var errors = JsonSchemaValidator.isValidObjectV4(
-            ResetResp(status = ResetStatus.Accepted), "Reset.json"
+            ResetResp(status = ResetStatus.Accepted), "ResetResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
         }
 
         errors = JsonSchemaValidator.isValidObjectV4(
-            ResetResp(status = ResetStatus.Rejected), "Reset.json"
+            ResetResp(status = ResetStatus.Rejected), "ResetResponse.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
