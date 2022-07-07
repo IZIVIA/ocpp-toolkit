@@ -17,8 +17,16 @@ import com.izivia.ocpp.core20.model.transactionevent.TransactionType
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.ChargingStateEnumType
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.TransactionEventEnumType
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.TriggerReasonEnumType
-import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCode16
-import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointStatus as ChargePointStatus16
+import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp16ConnectionToCSMS
+import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp20ConnectionToCSMS
+import com.izivia.ocpp.integration.model.TransportEnum
+import com.izivia.ocpp.operation.information.RequestMetadata
+import kotlinx.datetime.Clock.System.now
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.condition.EnabledIfSystemProperty
+import java.lang.Thread.sleep
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 import com.izivia.ocpp.api16.OcppCSCallbacks as OcppCSCallbacks16
 import com.izivia.ocpp.core16.model.authorize.AuthorizeReq as AuthorizeReq16
 import com.izivia.ocpp.core16.model.authorize.AuthorizeResp as AuthorizeResp16
@@ -29,17 +37,8 @@ import com.izivia.ocpp.core16.model.remotestart.RemoteStartTransactionResp as Re
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionReq as StartTransactionReq16
 import com.izivia.ocpp.core16.model.starttransaction.StartTransactionResp as StartTransactionResp16
 import com.izivia.ocpp.core16.model.statusnotification.StatusNotificationReq as StatusNotificationReq16
-
-import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp16ConnectionToCSMS
-import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp20ConnectionToCSMS
-import com.izivia.ocpp.integration.model.TransportEnum
-import com.izivia.ocpp.operation.information.RequestMetadata
-import kotlinx.datetime.Clock.System.now
-import org.junit.jupiter.api.Test
-import java.lang.Thread.sleep
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
-import org.junit.jupiter.api.condition.EnabledIfSystemProperty
+import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCode16
+import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointStatus as ChargePointStatus16
 
 @EnabledIfSystemProperty(named = "has.local.steve", matches = "true")
 class ExampleTest {
@@ -52,10 +51,12 @@ class ExampleTest {
 
         //establish a connection to the CSMS
         val connection = ocpp16ConnectionToCSMS(
-                chargePointId = chargPointId,
-                csmsUrl = csmsUrl,
-                transportType = transport,
-                ocppCSCallbacks = object: OcppCSCallbacks16{}
+            chargePointId = chargPointId,
+            csmsUrl = csmsUrl,
+            clientPath = null,
+            clientPort = null,
+            transportType = transport,
+            ocppCSCallbacks = object: OcppCSCallbacks16{}
         )
         connection.connect()
 
@@ -144,10 +145,12 @@ class ExampleTest {
 
         //establish a connection to the CSMS
         val connection = ocpp16ConnectionToCSMS(
-                chargePointId = chargPointId,
-                csmsUrl = csmsUrl,
-                transportType = transport,
-                ocppCSCallbacks = ocppCSCallbacks
+            chargePointId = chargPointId,
+            csmsUrl = csmsUrl,
+            transportType = transport,
+            clientPath = null,
+            clientPort = null,
+            ocppCSCallbacks = ocppCSCallbacks
         )
         connection.connect()
 
@@ -211,10 +214,12 @@ class ExampleTest {
     @Test
     fun ocpp20Charge() {
         val connection = ocpp20ConnectionToCSMS(
-                chargePointId = chargPointId,
-                csmsUrl = csmsUrl,
-                transportType = transport,
-                ocppCSCallbacks = object : OcppCSCallbacks {}
+            chargePointId = chargPointId,
+            csmsUrl = csmsUrl,
+            transportType = transport,
+            clientPath = null,
+            clientPort = null,
+            ocppCSCallbacks = object : OcppCSCallbacks {}
         )
         connection.connect()
 
@@ -276,10 +281,12 @@ class ExampleTest {
         }
 
         val connection = ocpp20ConnectionToCSMS(
-                chargePointId = chargPointId,
-                csmsUrl = csmsUrl,
-                transportType = transport,
-                ocppCSCallbacks = ocppCSCallbacks
+            chargePointId = chargPointId,
+            csmsUrl = csmsUrl,
+            transportType = transport,
+            clientPath = null,
+            clientPort = null,
+            ocppCSCallbacks = ocppCSCallbacks
         )
         connection.connect()
 

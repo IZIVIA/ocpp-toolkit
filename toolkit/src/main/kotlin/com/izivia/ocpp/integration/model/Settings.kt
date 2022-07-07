@@ -9,14 +9,18 @@ data class Settings(
     val domain: String = "localhost",
     val port: String = "8080",
     val path: String = "",
-    val target : String = when (transportType) {
+    val target: String = when (transportType) {
         TransportEnum.WEBSOCKET -> "ws://${domain}:${port}/${path}"
-        else -> ""
-    })
+        TransportEnum.SOAP -> "http://$domain:$port/$path"
+    },
+    val clientPort: Int? = null,
+    val clientPath: String? = null
+)
 
 data class CSMSSettings(
     val servers: List<ServerSetting>,
 )
+
 data class ServerSetting(
     val port: Int,
     val path: String = "",

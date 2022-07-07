@@ -6,6 +6,7 @@ import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.adapter20.Ocpp20Adapter
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
+import com.izivia.ocpp.http.HttpClient
 import com.izivia.ocpp.http.HttpServer
 import com.izivia.ocpp.integration.model.CSMSSettings
 import com.izivia.ocpp.integration.model.Settings
@@ -19,6 +20,7 @@ import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
+import java.util.*
 import com.izivia.ocpp.api16.DefaultCSMSOperations as DefaultCSMSOperations16
 import com.izivia.ocpp.api16.OcppCSCallbacks as OcppCSCallbacks16
 import com.izivia.ocpp.api20.DefaultCSMSOperations as DefaultCSMSOperations20
@@ -31,16 +33,52 @@ import com.izivia.ocpp.transport.OcppVersion as OcppVersionTransport
 
 class ApiFactory {
     companion object {
+
         private fun createClientTransport(
-            ocppVersion: OcppVersionTransport,
-            ocppId: String,
+            clientPath: String?,
+            clientPort: Int?,
             transportType: TransportEnum,
-            target: String
+            ocppId: String,
+            ocppVersion: OcppVersionTransport,
+            target: String,
+            newMessageId: () -> String = { UUID.randomUUID().toString() }
         ): ClientTransport =
             when (transportType) {
-                WEBSOCKET -> WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
-                SOAP -> WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
+                WEBSOCKET -> createClientTransportWebsocket(
+                    ocppVersion,
+                    ocppId,
+                    target
+                )
+                SOAP -> createClientTransportSoap(
+                    clientPath!!,
+                    clientPort!!,
+                    ocppId,
+                    ocppVersion,
+                    target,
+                    newMessageId
+                )
             }
+
+        private fun createClientTransportWebsocket(
+            ocppVersion: OcppVersionTransport,
+            ocppId: String,
+            target: String
+        ): ClientTransport =
+            WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
+
+        private fun createClientTransportSoap(
+            path: String,
+            port: Int,
+            ocppId: String,
+            ocppVersion: OcppVersionTransport,
+            target: String,
+            newMessageId: () -> String
+        ): ClientTransport =
+            when (ocppVersion) {
+                OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
+                else -> TODO("Not yet implemented")
+            }
+                .let { parser -> HttpClient(path, port, ocppId, target, parser, newMessageId) }
 
         private fun createServerTransportWebsocket(
             port: Int,
@@ -63,8 +101,14 @@ class ApiFactory {
                 .let { parser -> HttpServer(ocppVersion, port, path, parser, newMessageId) }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
-            val transport: ClientTransport =
-                createClientTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
+            val transport: ClientTransport = createClientTransport(
+                settings.clientPath,
+                settings.clientPort,
+                settings.transportType,
+                ocppId,
+                settings.ocppVersion,
+                settings.target
+            )
             return if (settings.ocppVersion == OcppVersionTransport.OCPP_1_6) {
                 Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
             } else {
@@ -76,11 +120,15 @@ class ApiFactory {
             chargePointId: String,
             csmsUrl: String,
             transportType: TransportEnum,
+            clientPath: String?,
+            clientPort: Int?,
             ocppCSCallbacks: OcppCSCallbacks16
         ): ChargePointOperations16 =
             RealChargePointOperations16(
                 chargeStationId = chargePointId,
                 client = createClientTransport(
+                    clientPath = clientPath,
+                    clientPort = clientPort,
                     ocppVersion = OcppVersionTransport.OCPP_1_6,
                     ocppId = chargePointId,
                     transportType = transportType,
@@ -93,11 +141,15 @@ class ApiFactory {
             chargePointId: String,
             csmsUrl: String,
             transportType: TransportEnum,
+            clientPath: String?,
+            clientPort: Int?,
             ocppCSCallbacks: OcppCSCallbacks20
         ): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
                 client = createClientTransport(
+                    clientPath = clientPath,
+                    clientPort = clientPort,
                     ocppVersion = OcppVersionTransport.OCPP_2_0,
                     ocppId = chargePointId,
                     transportType = transportType,
