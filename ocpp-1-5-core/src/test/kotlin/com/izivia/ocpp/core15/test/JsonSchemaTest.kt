@@ -767,7 +767,7 @@ class JsonSchemaTest {
         }
 
         errors = JsonSchemaValidator.isValidObjectV4(
-            ResetResp(status = ResetStatus.Rejected), "ResetResponse.json"
+            ResetResp(status = ResetStatus.Rejected), "Reset.json"
         )
         expectThat(errors) {
             get { this.size }.isEqualTo(0)
