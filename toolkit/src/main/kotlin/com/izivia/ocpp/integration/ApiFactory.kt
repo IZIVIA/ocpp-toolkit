@@ -6,8 +6,8 @@ import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.adapter20.Ocpp20Adapter
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
-import com.izivia.ocpp.http.HttpClient
-import com.izivia.ocpp.http.HttpServer
+import com.izivia.ocpp.http.OcppSoapClientTransport
+import com.izivia.ocpp.http.OcppSoapServerTransport
 import com.izivia.ocpp.integration.model.CSMSSettings
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
@@ -78,7 +78,7 @@ class ApiFactory {
                 OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
                 else -> TODO("Not yet implemented")
             }
-                .let { parser -> HttpClient(path, port, ocppId, target, parser, newMessageId) }
+                .let { parser -> OcppSoapClientTransport(path, port, ocppId, target, parser, newMessageId) }
 
         private fun createServerTransportWebsocket(
             port: Int,
@@ -98,7 +98,7 @@ class ApiFactory {
                 OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
                 else -> TODO("Not yet implemented")
             }
-                .let { parser -> HttpServer(ocppVersion, port, path, parser, newMessageId) }
+                .let { parser -> OcppSoapServerTransport(ocppVersion, port, path, parser, newMessageId) }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
             val transport: ClientTransport = createClientTransport(

@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 
-class HttpServer(
+class OcppSoapServerTransport(
     private val ocppVersion: OcppVersion,
     private val port: Int,
     private val path: String,
@@ -34,7 +34,7 @@ class HttpServer(
 ) : ServerTransport {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(HttpServer::class.java)
+        private val logger = LoggerFactory.getLogger(OcppSoapServerTransport::class.java)
     }
 
     private val handlers = mutableListOf<OcppHttpServerHandler>()
@@ -85,7 +85,7 @@ class HttpServer(
                 override fun accept(ocppId: String): Boolean = accept(ocppId).acceptConnection
 
                 override fun onAction(msg: HttpMessage): HttpMessage? =
-                    if (this@HttpServer.ocppVersion == ocppVersion && msg.action?.lowercase() == action.lowercase()) {
+                    if (this@OcppSoapServerTransport.ocppVersion == ocppVersion && msg.action?.lowercase() == action.lowercase()) {
                         val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
                         val response = onAction(RequestMetadata(message.messageId), message.payload)
                         val payload = ocppSoapParser.mapResponseToSoap(

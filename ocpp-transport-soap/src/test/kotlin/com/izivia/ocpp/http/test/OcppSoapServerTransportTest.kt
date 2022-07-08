@@ -2,7 +2,7 @@ package com.izivia.ocpp.http.test
 
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatResp
-import com.izivia.ocpp.http.HttpServer
+import com.izivia.ocpp.http.OcppSoapServerTransport
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
@@ -19,11 +19,11 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.*
 
-class HttpServerTest {
+class OcppSoapServerTransportTest {
 
     @Test
     fun `should receive the OCPP 1-6 HeartBeat message`() {
-        val server = HttpServer(
+        val server = OcppSoapServerTransport(
             port = 5002,
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),
@@ -77,7 +77,7 @@ class HttpServerTest {
 
     @Test
     fun `should not receive the OCPP 1-5 HeartBeat message because server is for 1-6`() {
-        val server = HttpServer(
+        val server = OcppSoapServerTransport(
             port = 5002,
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),

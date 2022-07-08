@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 
-class HttpClient(
+class OcppSoapClientTransport(
     private val path: String,
     private val port: Int,
     private val ocppId: String,
@@ -25,7 +25,7 @@ class HttpClient(
 ) : ClientTransport {
 
     companion object {
-        private val logger = LoggerFactory.getLogger(HttpClient::class.java)
+        private val logger = LoggerFactory.getLogger(OcppSoapClientTransport::class.java)
     }
 
     private val server: Http4kServer

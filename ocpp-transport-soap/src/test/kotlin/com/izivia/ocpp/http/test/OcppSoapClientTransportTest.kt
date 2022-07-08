@@ -2,7 +2,7 @@ package com.izivia.ocpp.http.test
 
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatResp
-import com.izivia.ocpp.http.HttpClient
+import com.izivia.ocpp.http.OcppSoapClientTransport
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.receiveMessage
@@ -21,7 +21,7 @@ import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.*
 
-class HttpClientTest {
+class OcppSoapClientTransportTest {
 
     @Test
     fun `should send an OCPP 1-6 HeartBeat request`() {
@@ -45,7 +45,7 @@ class HttpClientTest {
             """.trimIndent()
         ).start()
 
-        val client = HttpClient(
+        val client = OcppSoapClientTransport(
             path = "/ocpp/soap",
             port = 5001,
             ocppId = "ocppChargePoint",
@@ -66,7 +66,7 @@ class HttpClientTest {
 
     @Test
     fun `should throw an OcppCallErrorException because the target is unreachable`() {
-        val client = HttpClient(
+        val client = OcppSoapClientTransport(
             path = "/ocpp/soap",
             port = 5001,
             ocppId = "ocppChargePoint",
@@ -86,7 +86,7 @@ class HttpClientTest {
     fun `should receive an OCPP 1-6 HeartBeat request`() {
         var received = false
         val time = Instant.parse("2022-05-17T15:42:00.503Z")
-        val client = HttpClient(
+        val client = OcppSoapClientTransport(
             path = "/ocpp/soap",
             port = 5001,
             ocppId = "ocppChargePoint",
@@ -141,7 +141,7 @@ class HttpClientTest {
     @Test
     fun `should not receive the OCPP 1-6 HeartBeat request because there is no handler`() {
         val received = false
-        val client = HttpClient(
+        val client = OcppSoapClientTransport(
             path = "/ocpp/soap",
             port = 5001,
             ocppId = "ocppChargePoint",
