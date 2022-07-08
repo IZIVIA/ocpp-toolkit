@@ -1287,13 +1287,11 @@ class Ocpp16SoapParserTest {
     }
 
     companion object {
-        private val parser = Ocpp16SoapParser()
-
-        private val mapper: ObjectReader = parser.mapper
+        private val reader: ObjectReader = Ocpp16Mapper
             .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
 
         private fun parseToEnvelope(messageStr: String): SoapEnvelope<Ocpp16SoapBody> =
-            mapper.readValue(messageStr)
+            reader.readValue(messageStr)
     }
 }
 
