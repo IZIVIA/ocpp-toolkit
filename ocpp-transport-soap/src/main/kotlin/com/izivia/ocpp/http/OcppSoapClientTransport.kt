@@ -16,8 +16,7 @@ import java.util.*
 import kotlin.reflect.KClass
 
 class OcppSoapClientTransport(
-    private val path: String,
-    private val port: Int,
+    private val clientSettings: SoapClientSettings,
     private val ocppId: String,
     private val target: String,
     private val ocppSoapParser: OcppSoapParser,
@@ -28,17 +27,19 @@ class OcppSoapClientTransport(
         private val logger = LoggerFactory.getLogger(OcppSoapClientTransport::class.java)
     }
 
-    private val server: Http4kServer
+    private val server: Http4kServer?
     private val client = JavaHttpClient()
 
     private val handlers = mutableListOf<(HttpMessage) -> HttpMessage?>()
 
     init {
-        val route = path / Path.of("action") / Path.of("ocppId") bindContract Method.POST to ::routeHandler
+
+        val route =
+            clientSettings.path / Path.of("action") / Path.of("ocppId") bindContract Method.POST to ::routeHandler
         val app = contract {
             routes += route
         }
-        server = app.asServer(Undertow(port = port))
+        server = app.asServer(Undertow(port = clientSettings.port))
     }
 
     private fun routeHandler(action: String, ocppId: String): HttpHandler = { request: Request ->
@@ -56,12 +57,12 @@ class OcppSoapClientTransport(
     }
 
     override fun connect() {
-        server.start()
-        logger.info("starting http server on port $port")
+        server?.start()
+            ?.also { logger.info("starting http server on port ${clientSettings.port}") }
     }
 
     override fun close() {
-        server.close()
+        server?.close()
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P {
@@ -72,7 +73,7 @@ class OcppSoapClientTransport(
                         messageId = newMessageId(),
                         chargingStationId = ocppId,
                         action = action,
-                        from = path,
+                        from = clientSettings.path,
                         to = target,
                         payload = message
                     )

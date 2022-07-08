@@ -2,6 +2,7 @@ package com.izivia.ocpp.http.test
 
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatResp
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.http.OcppSoapClientTransport
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.OcppCallErrorException
@@ -46,8 +47,10 @@ class OcppSoapClientTransportTest {
         ).start()
 
         val client = OcppSoapClientTransport(
-            path = "/ocpp/soap",
-            port = 5001,
+            SoapClientSettings(
+                path = "/ocpp/soap",
+                port = 5001,
+            ),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
@@ -67,8 +70,10 @@ class OcppSoapClientTransportTest {
     @Test
     fun `should throw an OcppCallErrorException because the target is unreachable`() {
         val client = OcppSoapClientTransport(
-            path = "/ocpp/soap",
-            port = 5001,
+            SoapClientSettings(
+                path = "/ocpp/soap",
+                port = 5001,
+            ),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
@@ -87,8 +92,10 @@ class OcppSoapClientTransportTest {
         var received = false
         val time = Instant.parse("2022-05-17T15:42:00.503Z")
         val client = OcppSoapClientTransport(
-            path = "/ocpp/soap",
-            port = 5001,
+            SoapClientSettings(
+                path = "/ocpp/soap",
+                port = 5001,
+            ),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
@@ -142,8 +149,10 @@ class OcppSoapClientTransportTest {
     fun `should not receive the OCPP 1-6 HeartBeat request because there is no handler`() {
         val received = false
         val client = OcppSoapClientTransport(
-            path = "/ocpp/soap",
-            port = 5001,
+            SoapClientSettings(
+                path = "/ocpp/soap",
+                port = 5001,
+            ),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
