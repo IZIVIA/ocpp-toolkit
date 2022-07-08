@@ -33,6 +33,7 @@ import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.soap.RequestSoapMessage
 import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.soap.SoapEnvelope
+import com.izivia.ocpp.soap.parseRequestFromSoap
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -112,7 +113,6 @@ class Ocpp16SoapParserTest {
             get { meterSerialNumber }.isNull()
             get { meterType }.isNull()
         }
-            .isA<BootNotificationReq>()
     }
 
     @Test
@@ -149,7 +149,6 @@ class Ocpp16SoapParserTest {
             get { messageId }.isEqualTo("Detection loop")
             get { data }.isEqualTo("{\"connectorId\":10,\"name\":\"Vehicle\",\"state\":\"1\",\"timestamp\":\"2022-05-17T15:42:03Z:\"}")
         }
-            .isA<DataTransferReq>()
     }
 
     @Test
@@ -188,7 +187,6 @@ class Ocpp16SoapParserTest {
         expectThat(Ocpp16SoapParser().parseRequestFromSoap<FirmwareStatusNotificationReq>(message).payload).and {
             get { status }.isEqualTo(FirmwareStatus.Installed)
         }
-            .isA<FirmwareStatusNotificationReq>()
     }
 
     @Test
@@ -218,7 +216,6 @@ class Ocpp16SoapParserTest {
             """.trimIndent()
 
         expectThat(Ocpp16SoapParser().parseRequestFromSoap<HeartbeatReq>(message).payload)
-            .isA<HeartbeatReq>()
     }
 
     @Test
@@ -274,7 +271,6 @@ class Ocpp16SoapParserTest {
                 }
             }
         }
-            .isA<MeterValuesReq>()
     }
 
     @Test
@@ -313,7 +309,6 @@ class Ocpp16SoapParserTest {
             get { timestamp }.isEqualTo(Instant.parse("2022-05-17T15:41:58.351Z"))
             get { reservationId }.isNull()
         }
-            .isA<StartTransactionReq>()
     }
 
     @Test
@@ -357,7 +352,6 @@ class Ocpp16SoapParserTest {
             get { vendorErrorCode }.isEqualTo("0x0")
             get { vendorId }.isNull()
         }
-            .isA<StatusNotificationReq>()
     }
 
     @Test
@@ -397,7 +391,6 @@ class Ocpp16SoapParserTest {
             get { reason }.isNull()
             get { transactionData }.isNull()
         }
-            .isA<StopTransactionReq>()
     }
 
     @Test
@@ -426,8 +419,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<AuthorizeReq>(message).payload as AuthorizeReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<AuthorizeReq>(message)
         }
     }
 
@@ -457,8 +450,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<BootNotificationReq>(message).payload as BootNotificationReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<BootNotificationReq>(message)
         }
     }
 
@@ -488,8 +481,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<DataTransferReq>(message).payload as DataTransferReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<DataTransferReq>(message)
         }
     }
 
@@ -519,8 +512,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<DiagnosticsStatusNotificationReq>(message).payload as DiagnosticsStatusNotificationReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<DiagnosticsStatusNotificationReq>(message)
         }
     }
 
@@ -550,8 +543,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<FirmwareStatusNotificationReq>(message).payload as FirmwareStatusNotificationReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<FirmwareStatusNotificationReq>(message)
         }
     }
 
@@ -582,8 +575,8 @@ class Ocpp16SoapParserTest {
                 </soap:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<HeartbeatReq>(message).payload as HeartbeatReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<HeartbeatReq>(message)
         }
     }
 
@@ -613,8 +606,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<MeterValuesReq>(message).payload as MeterValuesReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<MeterValuesReq>(message)
         }
     }
 
@@ -644,8 +637,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<StartTransactionReq>(message).payload as StartTransactionReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<StartTransactionReq>(message)
         }
     }
 
@@ -675,8 +668,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<StatusNotificationReq>(message).payload as StatusNotificationReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<StatusNotificationReq>(message)
         }
     }
 
@@ -706,8 +699,8 @@ class Ocpp16SoapParserTest {
                 </S:Envelope>
             """.trimIndent()
 
-        expectThrows<ClassCastException> {
-            Ocpp16SoapParser().parseRequestFromSoap<StopTransactionReq>(message).payload as StopTransactionReq
+        expectThrows<IllegalArgumentException> {
+            Ocpp16SoapParser().parseRequestFromSoap<StopTransactionReq>(message)
         }
     }
 

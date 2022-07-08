@@ -1,8 +1,6 @@
 package com.izivia.ocpp.http
 
-import com.izivia.ocpp.soap.OcppSoapParser
-import com.izivia.ocpp.soap.RequestSoapMessage
-import com.izivia.ocpp.soap.ResponseSoapMessage
+import com.izivia.ocpp.soap.*
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.OcppCallErrorException
 import org.http4k.client.JavaHttpClient
@@ -82,7 +80,7 @@ class HttpClient(
             )
         val response = client(request)
         return if (response.status == Status.OK)
-            ocppSoapParser.parseResponseFromSoap<P>(response.bodyString()).payload
+            ocppSoapParser.parseResponseFromSoap(response.bodyString(), clazz).payload
         else {
             logger.warn("Something went wrong, the request receive a http status ${response.status.code}")
             throw OcppCallErrorException(response.bodyString())
@@ -92,7 +90,7 @@ class HttpClient(
     override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, fn: (T) -> P) {
         handlers.add { msg ->
             if (msg.action?.lowercase() == action.lowercase()) {
-                val message = ocppSoapParser.parseRequestFromSoap<T>(msg.payload)
+                val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
                 val response = fn(message.payload)
                 val payload = ocppSoapParser.mapResponseToSoap(
                     ResponseSoapMessage(

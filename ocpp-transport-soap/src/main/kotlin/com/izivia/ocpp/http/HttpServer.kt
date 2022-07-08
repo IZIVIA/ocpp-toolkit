@@ -4,6 +4,7 @@ import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.soap.OcppSoapParser
 import com.izivia.ocpp.soap.ResponseSoapMessage
+import com.izivia.ocpp.soap.parseRequestFromSoap
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import org.http4k.contract.ContractRoute
@@ -85,7 +86,7 @@ class HttpServer(
 
                 override fun onAction(msg: HttpMessage): HttpMessage? =
                     if (this@HttpServer.ocppVersion == ocppVersion && msg.action?.lowercase() == action.lowercase()) {
-                        val message = ocppSoapParser.parseRequestFromSoap<T>(msg.payload)
+                        val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
                         val response = onAction(RequestMetadata(message.messageId), message.payload)
                         val payload = ocppSoapParser.mapResponseToSoap(
                             ResponseSoapMessage(

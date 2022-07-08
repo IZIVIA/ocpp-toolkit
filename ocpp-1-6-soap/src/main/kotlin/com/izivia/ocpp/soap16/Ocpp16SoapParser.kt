@@ -56,61 +56,61 @@ class Ocpp16SoapParser : OcppSoapParser {
         .addMixIn(StopTransactionResp::class.java, StopTransactionRespMixin::class.java)
         .addMixIn(StopTransactionReq::class.java, StopTransactionReqMixin::class.java)
 
-    override fun <T> parseRequestFromSoap(messageStr: String): RequestSoapMessage<T> {
+    override fun parseAnyRequestFromSoap(messageStr: String): RequestSoapMessage<Any> {
         val envelope: SoapEnvelope<Ocpp16SoapBody> = mapper
             .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
             .readValue(messageStr)
-        return when {
-            envelope.body.authorizeRequest != null -> envelope.body.authorizeRequest as T
-            envelope.body.bootNotificationRequest != null -> envelope.body.bootNotificationRequest as T
-            envelope.body.dataTransferRequest != null -> envelope.body.dataTransferRequest as T
-            envelope.body.diagnosticsStatusNotificationRequest != null -> envelope.body.diagnosticsStatusNotificationRequest as T
-            envelope.body.firmwareStatusNotificationRequest != null -> envelope.body.firmwareStatusNotificationRequest as T
-            envelope.body.heartbeatRequest != null -> envelope.body.heartbeatRequest as T
-            envelope.body.meterValuesRequest != null -> envelope.body.meterValuesRequest as T
-            envelope.body.startTransactionRequest != null -> envelope.body.startTransactionRequest as T
-            envelope.body.statusNotificationRequest != null -> envelope.body.statusNotificationRequest as T
-            envelope.body.stopTransactionRequest != null -> envelope.body.stopTransactionRequest as T
-            else -> throw IllegalArgumentException("Unknown request message operation.")
-        }.let {
-            RequestSoapMessage(
-                messageId = envelope.header.messageId,
-                chargingStationId = envelope.header.chargeBoxIdentity!!,
-                action = envelope.header.action.removePrefix("/"),
-                from = envelope.header.from?.address
-                    ?: throw IllegalArgumentException("Malformed envelope: missing <From> in the header"),
-                to = envelope.header.to
-                    ?: throw IllegalArgumentException("Malformed envelope: missing <To> in the header"),
-                payload = it
-            )
-        }
+        return RequestSoapMessage(
+            messageId = envelope.header.messageId,
+            chargingStationId = envelope.header.chargeBoxIdentity!!,
+            action = envelope.header.action.removePrefix("/"),
+            from = envelope.header.from?.address
+                ?: throw IllegalArgumentException("Malformed envelope: missing <From> in the header. envelope = $envelope"),
+            to = envelope.header.to
+                ?: throw IllegalArgumentException("Malformed envelope: missing <To> in the header. envelope = $envelope"),
+            payload = getRequestBodyContent(envelope)
+        )
     }
 
-    override fun <T> parseResponseFromSoap(messageStr: String): ResponseSoapMessage<T> {
+    private fun getRequestBodyContent(envelope: SoapEnvelope<Ocpp16SoapBody>): Any = when {
+        envelope.body.authorizeRequest != null -> envelope.body.authorizeRequest!!
+        envelope.body.bootNotificationRequest != null -> envelope.body.bootNotificationRequest!!
+        envelope.body.dataTransferRequest != null -> envelope.body.dataTransferRequest!!
+        envelope.body.diagnosticsStatusNotificationRequest != null -> envelope.body.diagnosticsStatusNotificationRequest!!
+        envelope.body.firmwareStatusNotificationRequest != null -> envelope.body.firmwareStatusNotificationRequest!!
+        envelope.body.heartbeatRequest != null -> envelope.body.heartbeatRequest!!
+        envelope.body.meterValuesRequest != null -> envelope.body.meterValuesRequest!!
+        envelope.body.startTransactionRequest != null -> envelope.body.startTransactionRequest!!
+        envelope.body.statusNotificationRequest != null -> envelope.body.statusNotificationRequest!!
+        envelope.body.stopTransactionRequest != null -> envelope.body.stopTransactionRequest!!
+        else -> throw IllegalArgumentException("Unknown request message operation. enveloppe = $envelope")
+    }
+
+    override fun parseAnyResponseFromSoap(messageStr: String): ResponseSoapMessage<Any> {
         val envelope: SoapEnvelope<Ocpp16SoapBody> = mapper
             .readerFor(object : TypeReference<SoapEnvelope<Ocpp16SoapBody>>() {})
             .readValue(messageStr)
-        return when {
-            envelope.body.authorizeResponse != null -> envelope.body.authorizeResponse as T
-            envelope.body.bootNotificationResponse != null -> envelope.body.bootNotificationResponse as T
-            envelope.body.dataTransferResponse != null -> envelope.body.dataTransferResponse as T
-            envelope.body.diagnosticsStatusNotificationResponse != null -> envelope.body.diagnosticsStatusNotificationResponse as T
-            envelope.body.firmwareStatusNotificationResponse != null -> envelope.body.firmwareStatusNotificationResponse as T
-            envelope.body.heartbeatResponse != null -> envelope.body.heartbeatResponse as T
-            envelope.body.meterValuesResponse != null -> envelope.body.meterValuesResponse as T
-            envelope.body.startTransactionResponse != null -> envelope.body.startTransactionResponse as T
-            envelope.body.statusNotificationResponse != null -> envelope.body.statusNotificationResponse as T
-            envelope.body.stopTransactionResponse != null -> envelope.body.stopTransactionResponse as T
-            else -> throw IllegalArgumentException("Unknown response message operation.")
-        }.let {
-            ResponseSoapMessage(
-                messageId = envelope.header.messageId,
-                relatesTo = envelope.header.relatesTo
-                    ?: throw IllegalArgumentException("Malformed envelope: missing <RelatesTo> in the header"),
-                action = envelope.header.action.removePrefix("/"),
-                payload = it
-            )
-        }
+        return ResponseSoapMessage(
+            messageId = envelope.header.messageId,
+            relatesTo = envelope.header.relatesTo
+                ?: throw IllegalArgumentException("Malformed envelope: missing <RelatesTo> in the header. envelope = $envelope"),
+            action = envelope.header.action.removePrefix("/"),
+            payload = getResponseBodyContent(envelope)
+        )
+    }
+
+    private fun getResponseBodyContent(envelope: SoapEnvelope<Ocpp16SoapBody>): Any = when {
+        envelope.body.authorizeResponse != null -> envelope.body.authorizeResponse!!
+        envelope.body.bootNotificationResponse != null -> envelope.body.bootNotificationResponse!!
+        envelope.body.dataTransferResponse != null -> envelope.body.dataTransferResponse!!
+        envelope.body.diagnosticsStatusNotificationResponse != null -> envelope.body.diagnosticsStatusNotificationResponse!!
+        envelope.body.firmwareStatusNotificationResponse != null -> envelope.body.firmwareStatusNotificationResponse!!
+        envelope.body.heartbeatResponse != null -> envelope.body.heartbeatResponse!!
+        envelope.body.meterValuesResponse != null -> envelope.body.meterValuesResponse!!
+        envelope.body.startTransactionResponse != null -> envelope.body.startTransactionResponse!!
+        envelope.body.statusNotificationResponse != null -> envelope.body.statusNotificationResponse!!
+        envelope.body.stopTransactionResponse != null -> envelope.body.stopTransactionResponse!!
+        else -> throw IllegalArgumentException("Unknown response message operation. enveloppe = $envelope")
     }
 
     override fun <T> mapResponseToSoap(response: ResponseSoapMessage<T>): String =
