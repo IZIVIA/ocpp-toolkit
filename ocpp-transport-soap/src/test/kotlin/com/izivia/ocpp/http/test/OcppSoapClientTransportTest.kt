@@ -108,7 +108,7 @@ class OcppSoapClientTransportTest {
 
         client.connect()
 
-        val request = Request(Method.POST, "http://127.0.0.1:5001/ocpp/soap/HeartBeat/1234")
+        val request = Request(Method.POST, "http://127.0.0.1:5001/ocpp/soap/HeartBeat")
             .body(
                 """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
@@ -159,7 +159,7 @@ class OcppSoapClientTransportTest {
         )
         client.connect()
 
-        val request = Request(Method.POST, "http://127.0.0.1:5001/ocpp/soap/HeartBeat/1234")
+        val request = Request(Method.POST, "http://127.0.0.1:5001/ocpp/soap/HeartBeat")
             .body(
                 """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">

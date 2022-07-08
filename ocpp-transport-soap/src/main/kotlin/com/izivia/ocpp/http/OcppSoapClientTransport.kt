@@ -35,16 +35,16 @@ class OcppSoapClientTransport(
     init {
 
         val route =
-            clientSettings.path / Path.of("action") / Path.of("ocppId") bindContract Method.POST to ::routeHandler
+            clientSettings.path / Path.of("action") bindContract Method.POST to ::routeHandler
         val app = contract {
             routes += route
         }
         server = app.asServer(Undertow(port = clientSettings.port))
     }
 
-    private fun routeHandler(action: String, ocppId: String): HttpHandler = { request: Request ->
+    private fun routeHandler(action: String): HttpHandler = { request: Request ->
         val message = HttpMessage(
-            msgId = ocppId,
+            ocppId = ocppId,
             action = action,
             payload = request.bodyString()
         )
@@ -101,7 +101,7 @@ class OcppSoapClientTransport(
                         payload = response
                     )
                 )
-                HttpMessage(msg.msgId, action, payload)
+                HttpMessage(msg.ocppId, action, payload)
             } else {
                 null
             }

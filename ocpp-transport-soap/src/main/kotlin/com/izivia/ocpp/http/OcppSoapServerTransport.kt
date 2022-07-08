@@ -52,7 +52,7 @@ class OcppSoapServerTransport(
 
     private fun routeHandler(action: String, ocppId: String): HttpHandler = { request: Request ->
         val message = HttpMessage(
-            msgId = ocppId,
+            ocppId = ocppId,
             action = action,
             payload = request.bodyString()
         )
@@ -96,7 +96,7 @@ class OcppSoapServerTransport(
                                 payload = response
                             )
                         )
-                        HttpMessage(msg.msgId, action, payload)
+                        HttpMessage(msg.ocppId, action, payload)
                     } else {
                         null
                     }
