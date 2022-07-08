@@ -7,7 +7,6 @@ import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.soap.parseRequestFromSoap
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
-import org.http4k.contract.ContractRoute
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.core.HttpHandler
@@ -24,10 +23,10 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 
-class OcppSoapServerTransport(
+class OcppSoapServerTransport private constructor(
     private val ocppVersion: OcppVersion,
     private val port: Int,
-    private val path: String,
+    private val path: String?,
     private val ocppSoapParser: OcppSoapParser,
     private val newMessageId: () -> String = { UUID.randomUUID().toString() },
     private var server: Http4kServer? = null
@@ -35,18 +34,34 @@ class OcppSoapServerTransport(
 
     companion object {
         private val logger = LoggerFactory.getLogger(OcppSoapServerTransport::class.java)
+
+        fun createServer(
+            ocppVersion: OcppVersion,
+            port: Int,
+            path: String,
+            ocppSoapParser: OcppSoapParser,
+            newMessageId: () -> String = { UUID.randomUUID().toString() }
+        ) = OcppSoapServerTransport(ocppVersion, port, path, ocppSoapParser, newMessageId)
+
+        fun createServer(
+            ocppVersion: OcppVersion,
+            ocppSoapParser: OcppSoapParser,
+            newMessageId: () -> String = { UUID.randomUUID().toString() },
+            server: Http4kServer
+        ) = OcppSoapServerTransport(ocppVersion, server.port(), null, ocppSoapParser, newMessageId, server)
     }
 
     private val handlers = mutableListOf<OcppHttpServerHandler>()
 
     override fun start() {
-        val route: ContractRoute = path / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
-        val app = contract {
-            routes += route
-        }
         if (server == null) {
-            server = app.asServer(Undertow(port = port)).start()
+            val route = path!! / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
+            val app = contract {
+                routes += route
+            }
+            server = app.asServer(Undertow(port = port))
         }
+        server!!.start()
         logger.info("starting http server on port $port")
     }
 

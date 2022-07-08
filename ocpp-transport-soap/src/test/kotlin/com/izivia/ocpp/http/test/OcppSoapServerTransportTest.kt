@@ -23,7 +23,7 @@ class OcppSoapServerTransportTest {
 
     @Test
     fun `should receive the OCPP 1-6 HeartBeat message`() {
-        val server = OcppSoapServerTransport(
+        val server = OcppSoapServerTransport.createServer(
             port = 5002,
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),
@@ -77,7 +77,7 @@ class OcppSoapServerTransportTest {
 
     @Test
     fun `should not receive the OCPP 1-5 HeartBeat message because server is for 1-6`() {
-        val server = OcppSoapServerTransport(
+        val server = OcppSoapServerTransport.createServer(
             port = 5002,
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),

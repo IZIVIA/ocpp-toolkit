@@ -107,7 +107,7 @@ class ApiFactory {
                 OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
                 else -> TODO("Not yet implemented")
             }
-                .let { parser -> OcppSoapServerTransport(ocppVersion, port, path, parser, newMessageId) }
+                .let { parser -> OcppSoapServerTransport.createServer(ocppVersion, port, path, parser, newMessageId) }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
             val transport: ClientTransport = createClientTransport(
