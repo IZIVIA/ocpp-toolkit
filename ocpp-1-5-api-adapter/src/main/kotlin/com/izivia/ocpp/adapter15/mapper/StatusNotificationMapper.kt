@@ -22,7 +22,7 @@ abstract class StatusNotificationMapper {
     @Named("convertConnectorStatus")
     fun convertConnectorStatus(status : ConnectorStatusEnumType): ChargePointStatus =
         when(status){
-            ConnectorStatusEnumType.Occupied -> ChargePointStatus.Preparing
+            ConnectorStatusEnumType.Occupied -> TODO()
             else -> ChargePointStatus.valueOf(status.name)
         }
 
@@ -32,7 +32,7 @@ abstract class StatusNotificationMapper {
     @Named("convertChargingState")
     fun convertChargingState(chargingState: ChargingStateEnumType?): ChargePointStatus =
         when(chargingState){
-            ChargingStateEnumType.EVConnected -> ChargePointStatus.Preparing
+            ChargingStateEnumType.EVConnected -> TODO()
             ChargingStateEnumType.Idle -> ChargePointStatus.Available
             null -> throw IllegalArgumentException("Argument transactionInfo.chargingState is required in OCPP 1.6 to update a transaction")
             else -> ChargePointStatus.valueOf(chargingState.name)

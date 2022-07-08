@@ -18,7 +18,7 @@ abstract class UnlockConnectorMapper {
     fun convertUnlockStatus(status: UnlockStatusEnumType): UnlockStatus =
         when(status){
             UnlockStatusEnumType.UnknownConnector,
-            UnlockStatusEnumType.OngoingAuthorizedTransaction -> UnlockStatus.NotSupported
+            UnlockStatusEnumType.OngoingAuthorizedTransaction -> TODO()
             else -> UnlockStatus.valueOf(status.name)
         }
 

@@ -13,14 +13,14 @@ abstract class RemoteStartTransactionMapper {
 
     abstract fun genToCoreResp(remoteStartResp: RequestStartTransactionResp?): RemoteStartTransactionResp
 
-    @Mapping(target = "remoteStartId", source = "remoteStartId")
+/*    @Mapping(target = "remoteStartId", source = "remoteStartId")
     @Mapping(target = "evseId", source = "remoteStartReq.connectorId")
     @Mapping(target = "idToken", source = "remoteStartReq.idTag", qualifiedByName = ["convertIdTag"])
     @Mapping(
         target = "chargingProfile",
         source = "remoteStartReq.chargingProfile",
         qualifiedByName = ["convertChargingProfile"]
-    )
+    )*/
     abstract fun coreToGenReq(remoteStartReq: RemoteStartTransactionReq, remoteStartId: Int): RequestStartTransactionReq
 
 }

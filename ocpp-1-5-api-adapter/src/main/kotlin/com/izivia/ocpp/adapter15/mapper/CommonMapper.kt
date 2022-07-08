@@ -1,18 +1,7 @@
 package com.izivia.ocpp.adapter15.mapper
 
-import com.izivia.ocpp.api.model.common.EVSEType
-import com.izivia.ocpp.api.model.common.IdTokenInfoType
-import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.MeterValueType
-import com.izivia.ocpp.api.model.common.SampledValueType
-import com.izivia.ocpp.api.model.common.SignedMeterValueType
-import com.izivia.ocpp.api.model.common.enumeration.AuthorizationStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingProfilePurposeEnumType
-import com.izivia.ocpp.api.model.common.enumeration.LocationEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
-import com.izivia.ocpp.api.model.common.enumeration.PhaseEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
-import com.izivia.ocpp.api.model.common.getTypeByIdToken
+import com.izivia.ocpp.api.model.common.*
+import com.izivia.ocpp.api.model.common.enumeration.*
 import com.izivia.ocpp.core15.model.common.IdTagInfo
 import com.izivia.ocpp.core15.model.common.MeterValue
 import com.izivia.ocpp.core15.model.common.enumeration.*
@@ -67,11 +56,6 @@ abstract class CommonMapper {
                 ReadingContext.valueOf(value.name)
             } else ReadingContext.SamplePeriodic
 
-
-        private fun convertPhase(value: PhaseEnumType?): Phase? =
-            if (value != null) {
-                Phase.valueOf(value.name)
-            } else null
 
         private fun convertLocation(value: LocationEnumType?): Location =
             if (value != null) {

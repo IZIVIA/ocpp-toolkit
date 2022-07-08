@@ -19,10 +19,10 @@ abstract class FirmwareStatusNotificationMapper {
     fun convertFirmwareStatus(status: FirmwareStatusEnumType): FirmwareStatus =
         when(status){
 
-            FirmwareStatusEnumType.InstallScheduled -> FirmwareStatus.Idle
+            FirmwareStatusEnumType.InstallScheduled -> TODO()
 
             FirmwareStatusEnumType.InstallRebooting,
-            FirmwareStatusEnumType.SignatureVerified -> FirmwareStatus.Installing
+            FirmwareStatusEnumType.SignatureVerified -> TODO()
 
             FirmwareStatusEnumType.InstallVerificationFailed,
             FirmwareStatusEnumType.InvalidSignature -> FirmwareStatus.InstallationFailed

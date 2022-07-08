@@ -11,14 +11,13 @@ import com.izivia.ocpp.api.model.transactionevent.enumeration.TriggerReasonEnumT
 import com.izivia.ocpp.core15.model.common.MeterValue
 import com.izivia.ocpp.core15.model.stoptransaction.StopTransactionReq
 import com.izivia.ocpp.core15.model.stoptransaction.StopTransactionResp
-import com.izivia.ocpp.core15.model.stoptransaction.enumeration.Reason
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
-abstract class StopTransactionMapper {
+abstract class StopTransactionMapper {/*
 
     @Named("convertStopReason")
     fun convertStopReason(transactionReq: TransactionEventReq?): Reason? =
@@ -80,7 +79,7 @@ abstract class StopTransactionMapper {
         target = "transactionData",
         source = "transactionReq.meterValue",
         qualifiedByName = ["convertToTransactionData"]
-    )
+    )*/
     abstract fun genToCoreReq(transactionReq: TransactionEventReq?, transactionId: Int): StopTransactionReq
 
     fun coreToGenResp(transactionResp: StopTransactionResp): TransactionEventResp {
