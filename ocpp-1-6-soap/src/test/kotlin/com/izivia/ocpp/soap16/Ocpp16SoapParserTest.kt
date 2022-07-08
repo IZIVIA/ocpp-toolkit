@@ -721,11 +721,30 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/Authorize</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/Authorize</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <authorizeRequest>
+                            <idTag>049E16B2EC7180</idTag>
+                        </authorizeRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.authorizeRequest }.isNotNull().and {
                 get { idTag }.isEqualTo("049E16B2EC7180")
@@ -751,11 +770,27 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action xmlns=\"http://www.w3.org/2005/08/addressing\">/AuthorizeResponse</Action>")
-            get { this }.contains("<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:739faeb1-da7c-4a50-8b61-2f631057fc2b</MessageID>")
-            get { this }.contains("<RelatesTo xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</RelatesTo>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+                    <soap:Header>
+                        <Action xmlns="http://www.w3.org/2005/08/addressing">/AuthorizeResponse</Action>
+                        <MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:739faeb1-da7c-4a50-8b61-2f631057fc2b</MessageID>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To>
+                        <RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</RelatesTo>
+                    </soap:Header>
+                    <soap:Body>
+                        <authorizeResponse xmlns="urn://Ocpp/Cs/2015/10/">
+                            <idTagInfo>
+                                <status>Accepted</status>
+                                <expiryDate>2022-05-16T15:42:05.128Z</expiryDate>
+                            </idTagInfo>
+                        </authorizeResponse>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.authorizeResponse }.isNotNull().and {
                 get { idTagInfo }.and {
@@ -786,11 +821,33 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/BootNotification</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/BootNotification</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <bootNotificationRequest>
+                            <chargePointModel>LEC-3030A-SPX1</chargePointModel>
+                            <chargePointVendor>Izivia</chargePointVendor>
+                            <chargePointSerialNumber>5aa469fd41344fe5a575368cd</chargePointSerialNumber>
+                            <firmwareVersion>1.5.1.d723fd5</firmwareVersion>
+                        </bootNotificationRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.bootNotificationRequest }.isNotNull().and {
                 get { chargePointVendor }.isEqualTo("Izivia")
@@ -837,7 +894,7 @@ class Ocpp16SoapParserTest {
         val request = DataTransferReq(
             vendorId = "Schneider Electric",
             messageId = "Detection loop",
-            data = "{\" connectorId \":10,\" name \":\" Vehicle \",\" state \":\"1\",\" timestamp \":\"2022 - 05 - 17 T15 :42:03Z:\"}"
+            data = "{\"connectorId\":10,\"name\":\"Vehicle\",\"state\":\"1\",\"timestamp\":\"2022-05-17T15:42:03Z:\"}"
         )
 
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
@@ -851,16 +908,37 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/DataTransfer</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/DataTransfer</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <dataTransferRequest>
+                            <vendorId>Schneider Electric</vendorId>
+                            <messageId>Detection loop</messageId>
+                            <data>{"connectorId":10,"name":"Vehicle","state":"1","timestamp":"2022-05-17T15:42:03Z:"}</data>
+                        </dataTransferRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.dataTransferRequest }.isNotNull().and {
                 get { vendorId }.isEqualTo("Schneider Electric")
                 get { messageId }.isEqualTo("Detection loop")
-                get { data }.isEqualTo("{\" connectorId \":10,\" name \":\" Vehicle \",\" state \":\"1\",\" timestamp \":\"2022 - 05 - 17 T15 :42:03Z:\"}")
+                get { data }.isEqualTo("{\"connectorId\":10,\"name\":\"Vehicle\",\"state\":\"1\",\"timestamp\":\"2022-05-17T15:42:03Z:\"}")
             }
         }
     }
@@ -921,11 +999,30 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/FirmwareStatusNotification</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/FirmwareStatusNotification</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <firmwareStatusNotificationRequest>
+                            <status>Installed</status>
+                        </firmwareStatusNotificationRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.firmwareStatusNotificationRequest }.isNotNull().and {
                 get { status }.isEqualTo(FirmwareStatus.Installed)
@@ -946,11 +1043,22 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action xmlns=\"http://www.w3.org/2005/08/addressing\">/FirmwareStatusNotificationResponse</Action>")
-            get { this }.contains("<MessageID xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:739faeb1-da7c-4a50-8b61-2f631057fc2b</MessageID>")
-            get { this }.contains("<RelatesTo xmlns=\"http://www.w3.org/2005/08/addressing\">urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</RelatesTo>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+                    <soap:Header>
+                        <Action xmlns="http://www.w3.org/2005/08/addressing">/FirmwareStatusNotificationResponse</Action>
+                        <MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:739faeb1-da7c-4a50-8b61-2f631057fc2b</MessageID>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://www.w3.org/2005/08/addressing/anonymous</To>
+                        <RelatesTo xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</RelatesTo>
+                    </soap:Header>
+                    <soap:Body>
+                        <firmwareStatusNotificationResponse xmlns="urn://Ocpp/Cs/2015/10/"/>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.firmwareStatusNotificationResponse }.isNotNull()
         }
@@ -971,11 +1079,28 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/Heartbeat</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/Heartbeat</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <heartbeatRequest/>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.heartbeatRequest }.isNotNull()
         }
@@ -1040,11 +1165,42 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/MeterValues</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/MeterValues</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <meterValuesRequest>
+                            <connectorId>1</connectorId>
+                            <meterValue>
+                                <sampledValue>
+                                    <value>15213716</value>
+                                    <context>Sample.Periodic</context>
+                                    <format>Raw</format>
+                                    <location>Inlet</location>
+                                    <measurand>Energy.Active.Import.Register</measurand>
+                                    <unit>Wh</unit>
+                                </sampledValue>
+                                <timestamp>2022-05-17T15:41:19.912Z</timestamp>
+                            </meterValue>
+                            <transactionId>15917</transactionId>
+                        </meterValuesRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.meterValuesRequest }.isNotNull().and {
                 get { connectorId }.isEqualTo(1)
@@ -1106,11 +1262,33 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/StartTransaction</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/StartTransaction</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <startTransactionRequest>
+                            <connectorId>1</connectorId>
+                            <idTag>046924C2D86485</idTag>
+                            <meterStart>18804500</meterStart>
+                            <timestamp>2022-05-17T15:41:58.351Z</timestamp>
+                        </startTransactionRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.startTransactionRequest }.isNotNull().and {
                 get { connectorId }.isEqualTo(1)
@@ -1178,11 +1356,35 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/StatusNotification</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/StatusNotification</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <statusNotificationRequest>
+                            <connectorId>1</connectorId>
+                            <errorCode>NoError</errorCode>
+                            <status>Available</status>
+                            <info>No error.</info>
+                            <timestamp>2022-05-17T15:41:59.486Z</timestamp>
+                            <vendorErrorCode>0x0</vendorErrorCode>
+                        </statusNotificationRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.statusNotificationRequest }.isNotNull().and {
                 get { connectorId }.isEqualTo(1)
@@ -1238,11 +1440,33 @@ class Ocpp16SoapParserTest {
             )
         )
 
-        expectThat(messageSoap.inline()) {
-            get { this }.contains("<Action soap:mustUnderstand=\"true\">/StopTransaction</Action>")
-            get { this }.contains("<From><Address>source</Address></From>")
-            get { this }.contains("<To soap:mustUnderstand=\"true\">destination</To>")
-        }
+        val expectedEnvelope =
+            """
+                <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
+                    <soap:Header>
+                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
+                        <From>
+                            <Address>source</Address>
+                        </From>
+                        <ReplyTo soap:mustUnderstand="true">
+                            <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
+                        </ReplyTo>
+                        <To soap:mustUnderstand="true">destination</To>
+                        <Action soap:mustUnderstand="true">/StopTransaction</Action>
+                    </soap:Header>
+                    <soap:Body>
+                        <stopTransactionRequest>
+                            <meterStop>19224</meterStop>
+                            <timestamp>2022-05-05T04:37:15Z</timestamp>
+                            <transactionId>16696</transactionId>
+                            <idTag>2D0E360A</idTag>
+                        </stopTransactionRequest>
+                    </soap:Body>
+                </soap:Envelope>
+            """.trimIndent()
+
+        expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.stopTransactionRequest }.isNotNull().and {
                 get { transactionId }.isEqualTo(16696)

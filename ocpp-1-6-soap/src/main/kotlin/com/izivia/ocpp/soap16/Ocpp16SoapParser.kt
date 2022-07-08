@@ -77,7 +77,7 @@ class Ocpp16SoapParser : OcppSoapParser {
                     <RelatesTo xmlns="http://www.w3.org/2005/08/addressing">${response.relatesTo}</RelatesTo>
                 </soap:Header>
                 <soap:Body>
-                    ${mapper.writeValueAsString(response.payload)}
+                    ${mapper.writeValueAsString(response.payload).addXmlNamespace()}
                 </soap:Body>
             </soap:Envelope>
         """.trimIndent()
@@ -87,10 +87,10 @@ class Ocpp16SoapParser : OcppSoapParser {
             <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                 <soap:Header>
                     <chargeBoxIdentity soap:mustUnderstand="true">${request.chargingStationId}</chargeBoxIdentity>
+                    <MessageID>${request.messageId}</MessageID>
                     <From>
                         <Address>${request.from}</Address>
                     </From>
-                    <MessageID>${request.messageId}</MessageID>
                     <ReplyTo soap:mustUnderstand="true">
                         <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
                     </ReplyTo>
@@ -103,3 +103,13 @@ class Ocpp16SoapParser : OcppSoapParser {
             </soap:Envelope>
         """.trimIndent()
 }
+
+private fun String.addXmlNamespace(): String =
+    if (matches(".*/>\$".toRegex()))
+        split("/")[0] + " xmlns=\"urn://Ocpp/Cs/2015/10/\"/>"
+    else
+        split(">".toRegex(), limit = 2)
+            .let { (first, second) ->
+                first.removeSuffix(">") + " xmlns=\"urn://Ocpp/Cs/2015/10/\">" + second
+            }
+
