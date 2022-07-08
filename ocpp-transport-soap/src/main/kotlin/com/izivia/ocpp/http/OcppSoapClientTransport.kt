@@ -83,7 +83,7 @@ class OcppSoapClientTransport(
         return if (response.status == Status.OK)
             ocppSoapParser.parseResponseFromSoap(response.bodyString(), clazz).payload
         else {
-            logger.warn("Something went wrong, the request receive a http status ${response.status.code}")
+            logger.warn("an error occurred. response = $response")
             throw OcppCallErrorException(response.bodyString())
         }
     }

@@ -27,7 +27,7 @@ class OcppSoapClientTransportTest {
     @Test
     fun `should send an OCPP 1-6 HeartBeat request`() {
         val time = Instant.parse("2022-05-17T15:42:00.503Z")
-        val server = createServer(
+        val server = createMockServerAndAlwaysRespond(
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
                     <soap:Header>
@@ -196,7 +196,7 @@ class OcppSoapClientTransportTest {
         client.close()
     }
 
-    private fun createServer(handlerBody: String) =
+    private fun createMockServerAndAlwaysRespond(handlerBody: String) =
         ("api" bind Method.POST to { Response(Status.OK).body(handlerBody) })
             .asServer(Undertow(5002))
 }
