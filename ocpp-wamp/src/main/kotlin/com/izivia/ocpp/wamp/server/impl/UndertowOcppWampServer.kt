@@ -53,12 +53,18 @@ class UndertowOcppWampServer(val port:Int, val ocppVersions:Set<OcppVersion>, pa
     }
 
     override fun sendBlocking(ocppId: CSOcppId, message: WampMessage): WampMessage =
-        (wsApp?:throw IllegalStateException("server not started"))
+        getWsApp()
             .sendBlocking(ocppId, message)?:WampMessage.CallError(message.msgId, "{}")
 
     override fun register(handler: OcppWampServerHandler) {
         handlers.add(handler)
     }
+
+    override fun getChargingStationOcppVersion(ocppId: CSOcppId): OcppVersion =
+        getWsApp()
+            .getChargingStationOcppVersion(ocppId)
+
+    private fun getWsApp() = (wsApp ?: throw IllegalStateException("server not started"))
 
     companion object {
         private val logger = LoggerFactory.getLogger(UndertowOcppWampServer::class.java)

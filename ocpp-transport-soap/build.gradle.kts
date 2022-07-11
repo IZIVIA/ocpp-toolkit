@@ -1,10 +1,22 @@
 plugins {
     kotlin("jvm")
-    java
     `maven-publish`
 }
 
-dependencies {}
+coreProject()
+
+dependencies {
+    implementation("org.http4k:http4k-core:_")
+    implementation("org.http4k:http4k-contract:_")
+    implementation("org.http4k:http4k-server-undertow:_")
+
+    implementation(project(":ocpp-soap"))
+    implementation(project(":ocpp-transport"))
+    implementation(project(":operation-information"))
+
+    testImplementation(project(":ocpp-1-6-soap"))
+    testImplementation(kotlin("test-junit"))
+}
 
 java {
     withJavadocJar()

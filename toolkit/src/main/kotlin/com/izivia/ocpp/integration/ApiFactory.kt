@@ -6,15 +6,22 @@ import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.adapter20.Ocpp20Adapter
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
+import com.izivia.ocpp.http.SoapClientSettings
+import com.izivia.ocpp.http.OcppSoapClientTransport
+import com.izivia.ocpp.http.OcppSoapServerTransport
 import com.izivia.ocpp.integration.model.CSMSSettings
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
+import com.izivia.ocpp.integration.model.TransportEnum.SOAP
+import com.izivia.ocpp.integration.model.TransportEnum.WEBSOCKET
 import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.ChargingStationConfig
+import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
+import java.util.*
 import com.izivia.ocpp.api15.DefaultCSMSOperations as DefaultCSMSOperations15
 import com.izivia.ocpp.api15.OcppCSCallbacks as OcppCSCallbacks15
 import com.izivia.ocpp.api16.DefaultCSMSOperations as DefaultCSMSOperations16
@@ -31,32 +38,90 @@ import com.izivia.ocpp.transport.OcppVersion as OcppVersionTransport
 
 class ApiFactory {
     companion object {
+
         private fun createClientTransport(
-            ocppVersion: OcppVersionTransport,
-            ocppId: String,
+            clientPath: String?,
+            clientPort: Int?,
             transportType: TransportEnum,
-            target: String
+            ocppId: String,
+            ocppVersion: OcppVersionTransport,
+            target: String,
+            newMessageId: () -> String = { UUID.randomUUID().toString() }
         ): ClientTransport =
             when (transportType) {
-                TransportEnum.WEBSOCKET -> WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
-                TransportEnum.SOAP -> WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
+                WEBSOCKET -> createClientTransportWebsocket(
+                    ocppVersion,
+                    ocppId,
+                    target
+                )
+                SOAP -> createClientTransportSoap(
+                    clientPath!!,
+                    clientPort!!,
+                    ocppId,
+                    ocppVersion,
+                    target,
+                    newMessageId
+                )
             }
 
-        private fun createServerTransport(
+        private fun createClientTransportWebsocket(
+            ocppVersion: OcppVersionTransport,
+            ocppId: String,
+            target: String
+        ): ClientTransport =
+            WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target)
+
+        private fun createClientTransportSoap(
+            path: String,
+            port: Int,
+            ocppId: String,
+            ocppVersion: OcppVersionTransport,
+            target: String,
+            newMessageId: () -> String
+        ): ClientTransport =
+            when (ocppVersion) {
+                OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
+                else -> TODO("Not yet implemented")
+            }
+                .let { parser ->
+                    OcppSoapClientTransport(
+                        SoapClientSettings(path, port),
+                        ocppId,
+                        target,
+                        parser,
+                        newMessageId
+                    )
+                }
+
+        private fun createServerTransportWebsocket(
             port: Int,
             path: String,
             ocppVersion: Set<OcppVersionTransport>,
-            transportType: TransportEnum,
             newMessageId: () -> String
         ): ServerTransport =
-            when (transportType) {
-                TransportEnum.WEBSOCKET -> WebsocketServer(port, ocppVersion, path, newMessageId)
-                TransportEnum.SOAP -> WebsocketServer(port, ocppVersion, path, newMessageId)
+            WebsocketServer(port, ocppVersion, path, newMessageId)
+
+        private fun createServerTransportSoap(
+            port: Int,
+            path: String,
+            ocppVersion: OcppVersionTransport,
+            newMessageId: () -> String
+        ): ServerTransport =
+            when (ocppVersion) {
+                OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
+                else -> TODO("Not yet implemented")
             }
+                .let { parser -> OcppSoapServerTransport.createServer(ocppVersion, port, path, parser, newMessageId) }
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
-            val transport: ClientTransport =
-                createClientTransport(settings.ocppVersion, ocppId, settings.transportType, settings.target)
+            val transport: ClientTransport = createClientTransport(
+                settings.clientPath,
+                settings.clientPort,
+                settings.transportType,
+                ocppId,
+                settings.ocppVersion,
+                settings.target
+            )
             return if (settings.ocppVersion == OcppVersionTransport.OCPP_1_6) {
                 Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
             } else {
@@ -64,10 +129,19 @@ class ApiFactory {
             }
         }
 
-        fun ocpp16ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks16): ChargePointOperations16 =
-             RealChargePointOperations16(
+        fun ocpp16ConnectionToCSMS(
+            chargePointId: String,
+            csmsUrl: String,
+            transportType: TransportEnum,
+            clientPath: String?,
+            clientPort: Int?,
+            ocppCSCallbacks: OcppCSCallbacks16
+        ): ChargePointOperations16 =
+            RealChargePointOperations16(
                 chargeStationId = chargePointId,
-                client= createClientTransport(
+                client = createClientTransport(
+                    clientPath = clientPath,
+                    clientPort = clientPort,
                     ocppVersion = OcppVersionTransport.OCPP_1_6,
                     ocppId = chargePointId,
                     transportType = transportType,
@@ -76,10 +150,15 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
 
-        fun ocpp15ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks15): ChargePointOperations15 =
+        fun ocpp15ConnectionToCSMS(chargePointId: String,
+                                   csmsUrl: String,
+                                   transportType: TransportEnum,
+                                   ocppCSCallbacks : OcppCSCallbacks15): ChargePointOperations15 =
             RealChargePointOperations15(
                 chargeStationId = chargePointId,
                 client= createClientTransport(
+                    clientPort = null,
+                    clientPath = null,
                     ocppVersion = OcppVersionTransport.OCPP_1_5,
                     ocppId = chargePointId,
                     transportType = transportType,
@@ -88,11 +167,19 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations15(ocppCSCallbacks)
             )
 
-
-        fun ocpp20ConnectionToCSMS(chargePointId: String, csmsUrl: String, transportType: TransportEnum, ocppCSCallbacks : OcppCSCallbacks20): ChargePointOperations20 =
+        fun ocpp20ConnectionToCSMS(
+            chargePointId: String,
+            csmsUrl: String,
+            transportType: TransportEnum,
+            clientPath: String?,
+            clientPort: Int?,
+            ocppCSCallbacks: OcppCSCallbacks20
+        ): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
-                client= createClientTransport(
+                client = createClientTransport(
+                    clientPath = clientPath,
+                    clientPort = clientPort,
                     ocppVersion = OcppVersionTransport.OCPP_2_0,
                     ocppId = chargePointId,
                     transportType = transportType,
@@ -106,18 +193,26 @@ class ApiFactory {
             csmsApiCallbacks: List<CSMSCallbacks>,
             fn: (String) -> ChargingStationConfig
         ): CSMS {
-            val transports: Map<ServerTransport, Set<OcppVersionTransport>> = mutableMapOf<ServerTransport, Set<OcppVersionTransport>>().also {
-                map -> csmsSettings.servers.map {
-                    map.put(createServerTransport(
-                        it.port,
-                        it.path,
-                        it.ocppVersion,
-                        it.transportType,
-                        it.newMessageId
-                    ), it.ocppVersion)
+            val transports: Map<ServerTransport, Set<OcppVersionTransport>> =
+                mutableMapOf<ServerTransport, Set<OcppVersionTransport>>().also { map ->
+                    csmsSettings.servers.map {
+                        when (it.transportType) {
+                            WEBSOCKET -> map.put(
+                                createServerTransportWebsocket(
+                                    it.port,
+                                    it.path,
+                                    it.ocppVersion,
+                                    it.newMessageId
+                                ), it.ocppVersion
+                            )
+                            SOAP -> it.ocppVersion.forEach { version ->
+                                map[createServerTransportSoap(it.port, it.path, version, it.newMessageId)] =
+                                    setOf(version)
+                            }
+                        }
+                    }
                 }
-            }
-            return CSMS(transports,csmsApiCallbacks.toSet(),fn)
+            return CSMS(transports, csmsApiCallbacks.toSet(), fn)
         }
     }
 }

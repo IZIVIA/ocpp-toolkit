@@ -1,6 +1,5 @@
 package com.izivia.ocpp.websocket
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
@@ -14,9 +13,9 @@ import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import mu.KotlinLogging
-import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 import java.util.*
 import kotlin.reflect.KClass
+import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,7 +28,7 @@ class WebsocketServer(
 
     private val server: OcppWampServer =
         OcppWampServer.newServer(port, ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path)
-    private val mapper = jacksonObjectMapper()
+
     override fun start(): Unit = server.start()
 
     override fun stop(): Unit = server.stop()
@@ -37,35 +36,50 @@ class WebsocketServer(
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P =
         try {
             val msgId: String = newMessageId()
-            val response = server.sendBlocking(csOcppId, WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
+            val version = server.getChargingStationOcppVersion(csOcppId)
+            val mapper = getJsonMapper(version)
+            val response =
+                server.sendBlocking(csOcppId, WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
             if (response.msgId != msgId) {
-                throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected\n"
-                        + "Request : $message\n" + "Response : ${response.payload}")
+                throw IllegalStateException(
+                    "Wrong response received : ${response.msgId} received, $msgId expected\n"
+                            + "Request : $message\n" + "Response : ${response.payload}"
+                )
             }
-            when(response.msgType) {
+            when (response.msgType) {
                 WampMessageType.CALL_RESULT -> mapper.readValue(response.payload, clazz.java)
                 WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
-                else -> throw IllegalStateException("The message received type ${response.msgType} is not the one expected\n"
-                        + "Request : $message\n" + "Response : ${response.payload}")
+                else -> throw IllegalStateException(
+                    "The message received type ${response.msgType} is not the one expected\n"
+                            + "Request : $message\n" + "Response : ${response.payload}"
+                )
             }
         } catch (e: Exception) {
             throw e
         }
 
-    override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, ocppVersion: OcppVersion,
-                                                  onAction: (RequestMetadata, T) -> P, accept: (CSOcppId) -> ChargingStationConfig) {
+    override fun <T : Any, P> receiveMessageClass(
+        clazz: KClass<T>, action: String, ocppVersion: OcppVersion,
+        onAction: (RequestMetadata, T) -> P, accept: (CSOcppId) -> ChargingStationConfig
+    ) {
         server.register(handler = object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = accept(ocppId).acceptConnection
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
+                    val mapper = getJsonMapper(OcppVersionWamp.valueOf(ocppVersion.name))
                     try {
                         val response = onAction(RequestMetadata(meta.ocppId), mapper.readValue(msg.payload, clazz.java))
                         val payload = mapper.writeValueAsString(response)
                         WampMessage(WampMessageType.CALL_RESULT, msg.msgId, null, payload)
                     } catch (e: Exception) {
                         logger.error(e.message)
-                        WampMessage(WampMessageType.CALL_ERROR, msg.msgId, null, OcppCallErrorPayload(e.message).toJson())
+                        WampMessage(
+                            WampMessageType.CALL_ERROR,
+                            msg.msgId,
+                            null,
+                            OcppCallErrorPayload(e.message).toJson(mapper)
+                        )
                     }
                 } else {
                     null
