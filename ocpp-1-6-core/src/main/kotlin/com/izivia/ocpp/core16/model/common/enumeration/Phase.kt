@@ -1,6 +1,5 @@
 package com.izivia.ocpp.core16.model.common.enumeration
 
-import com.fasterxml.jackson.annotation.JsonValue
 
 enum class Phase(val value: String) {
     L1("L1"),
@@ -21,8 +20,5 @@ enum class Phase(val value: String) {
 
     L2L3("L2-L3"),
 
-    L3L1("L3-L1");
-
-    @JsonValue
-    fun getEnumValue(): String = value
+    L3L1("L3-L1")
 }

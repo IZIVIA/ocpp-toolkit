@@ -54,7 +54,7 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
         }
 
         val chargingStationConnection = ChargingStationConnection(
-            wsConnectionId, chargingStationOcppId, ws, timeoutInMs, shutdown)
+            wsConnectionId, chargingStationOcppId, ws, ocppVersion, timeoutInMs, shutdown)
         connections[chargingStationOcppId] = chargingStationConnection
         ws.onClose {
             logger.info("""[$chargingStationOcppId] [$wsConnectionId] disconnected """)
@@ -126,10 +126,14 @@ class OcppWampServerApp(val ocppVersions:Set<OcppVersion>,
         return connection ?: throw IllegalStateException("no connection to $ocppId")
     }
 
+    fun getChargingStationOcppVersion(ocppId: CSOcppId): OcppVersion =
+        getChargingStationConnection(ocppId).ocppVersion
+
     fun newRoutingHandler() = websockets(ocppWsEndpoint.uriTemplate.toString() bind ::newConnection)
 
     private class ChargingStationConnection(val wsConnectionId:String,
                                                  val ocppId:CSOcppId, val ws: Websocket,
+                                                 val ocppVersion: OcppVersion,
                                                  timeoutInMs:Long, shutdown: AtomicBoolean
     ) {
         val callManager:WampCallManager = WampCallManager(logger, {m:String -> ws.send(WsMessage(m))}, timeoutInMs, shutdown)

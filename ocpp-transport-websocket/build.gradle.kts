@@ -8,12 +8,15 @@ coreProject()
 
 dependencies {
     implementation("org.http4k:http4k-core:_")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
+    implementation(project(":utils"))
     implementation(project(":ocpp-wamp"))
     implementation(project(":ocpp-transport"))
     implementation(project(":operation-information"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
+    implementation(project(":ocpp-2-0-json"))
+    implementation(project(":ocpp-1-6-json"))
 }
 
 java {

@@ -1,7 +1,5 @@
 package com.izivia.ocpp.core16.model.common.enumeration
 
-import com.fasterxml.jackson.annotation.JsonValue
-
 enum class Measurand(val value: String) {
     EnergyActiveExportRegister("Energy.Active.Export.Register"),
 
@@ -45,8 +43,5 @@ enum class Measurand(val value: String) {
 
     SoC("SoC"),
 
-    RPM("RPM");
-
-    @JsonValue
-    fun getEnumValue(): String = value
+    RPM("RPM")
 }

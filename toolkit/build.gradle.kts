@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":ocpp-1-6-api-adapter"))
     implementation(project(":ocpp-1-6-core"))
     implementation(project(":ocpp-1-6-api"))
+    implementation(project(":ocpp-1-6-soap"))
     implementation(project(":ocpp-2-0-api"))
     implementation(project(":ocpp-transport-soap"))
     implementation(project(":ocpp-2-0-api-adapter"))
