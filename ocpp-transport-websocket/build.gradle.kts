@@ -15,6 +15,8 @@ dependencies {
     implementation(project(":operation-information"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
+    implementation(project(":ocpp-2-0-json"))
+    implementation(project(":ocpp-1-6-json"))
 }
 
 java {

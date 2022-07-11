@@ -1,9 +1,7 @@
 package com.izivia.ocpp.websocket
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.OcppVersion
-import com.izivia.ocpp.utils.KotlinxInstantModule
+import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.wamp.client.OcppWampClient
@@ -22,8 +20,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
 
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
-    private val mapper = jacksonObjectMapper()
-        .registerModule(KotlinxInstantModule())
+    private val mapper = getJsonMapper(ocppVersion)
     private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 
     override fun connect(): Unit = client.connect()
@@ -36,14 +33,18 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             val msgId: String = UUID.randomUUID().toString()
             val response = client.sendBlocking(WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
             if (response.msgId != msgId) {
-                throw IllegalStateException("Wrong response received : ${response.msgId} received, $msgId expected\n"
-                        + "Request : $message\n" + "Response : ${response.payload}")
+                throw IllegalStateException(
+                    "Wrong response received : ${response.msgId} received, $msgId expected\n"
+                            + "Request : $message\n" + "Response : ${response.payload}"
+                )
             }
             when (response.msgType) {
                 WampMessageType.CALL_RESULT -> mapper.readValue(response.payload, clazz.java)
                 WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
-                else -> throw IllegalStateException("The message received type ${response.msgType} is not the one expected\n"
-                    + "Request : $message\n" + "Response : $response")
+                else -> throw IllegalStateException(
+                    "The message received type ${response.msgType} is not the one expected\n"
+                            + "Request : $message\n" + "Response : $response"
+                )
             }
         } catch (e: Exception) {
             throw e
@@ -59,7 +60,12 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
                         WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
                     } catch (e: Exception) {
                         logger.error(e.message)
-                        WampMessage(WampMessageType.CALL_ERROR, wampMsg.msgId, null,  OcppCallErrorPayload(e.message).toJson())
+                        WampMessage(
+                            WampMessageType.CALL_ERROR,
+                            wampMsg.msgId,
+                            null,
+                            OcppCallErrorPayload(e.message).toJson(mapper)
+                        )
                     }
                 } else {
                     null

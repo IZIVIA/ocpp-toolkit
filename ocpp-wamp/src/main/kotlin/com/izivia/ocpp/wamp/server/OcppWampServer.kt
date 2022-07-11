@@ -48,6 +48,12 @@ interface OcppWampServer {
      */
     fun register(handler: OcppWampServerHandler)
 
+    /**
+     * Get the charging station ocpp version from the ocpp id
+     * @throws IllegalStateException if no such ChargingStation is currently connected to this server
+     */
+    fun getChargingStationOcppVersion(ocppId: CSOcppId): OcppVersion
+
     companion object {
         fun newServer(port:Int, ocppVersions:Set<OcppVersion> = OcppVersion.values().toSet(), path: String = "ws", timeoutInMs:Long = 30_000)
             = UndertowOcppWampServer(port, ocppVersions, path, timeoutInMs)

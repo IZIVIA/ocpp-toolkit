@@ -8,7 +8,7 @@ import com.izivia.ocpp.soap.SoapEnvelope
 
 class Ocpp16SoapParser : OcppSoapParser {
 
-    private val mapper = Ocpp16Mapper
+    private val mapper = Ocpp16SoapMapper
 
     override fun parseAnyRequestFromSoap(messageStr: String): RequestSoapMessage<Any> {
         val envelope: SoapEnvelope<Ocpp16SoapBody> = mapper
