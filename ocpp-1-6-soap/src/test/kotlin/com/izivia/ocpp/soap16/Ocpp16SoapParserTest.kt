@@ -51,7 +51,7 @@ class Ocpp16SoapParserTest {
                                    xmlns:wsa5="http://www.w3.org/2005/08/addressing"
                 >
                     <SOAP-ENV:Header>
-                        <cs:chargeBoxIdentity>00:80:F4:44:13:AA</cs:chargeBoxIdentity>
+                        <cs:chargeBoxIdentity>CS1</cs:chargeBoxIdentity>
                         <wsa5:MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</wsa5:MessageID>
                         <wsa5:From>
                             <wsa5:Address>http://:8082/</wsa5:Address>
@@ -59,19 +59,19 @@ class Ocpp16SoapParserTest {
                         <wsa5:ReplyTo>
                             <wsa5:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa5:Address>
                         </wsa5:ReplyTo>
-                        <wsa5:To SOAP-ENV:mustUnderstand="true">http://prisedenice.vpn.l30.sodetrel.fr:80/ocpp/v15s/</wsa5:To>
+                        <wsa5:To SOAP-ENV:mustUnderstand="true">http://example.fr:80/ocpp/v15s/</wsa5:To>
                         <wsa5:Action SOAP-ENV:mustUnderstand="true">/Authorize</wsa5:Action>
                     </SOAP-ENV:Header>
                     <SOAP-ENV:Body>
                         <cs:authorizeRequest>
-                            <cs:idTag>049E16B2EC7180</cs:idTag>
+                            <cs:idTag>AAAAAAAA</cs:idTag>
                         </cs:authorizeRequest>
                     </SOAP-ENV:Body>
                 </SOAP-ENV:Envelope>
             """.trimIndent()
 
         expectThat(Ocpp16SoapParser().parseRequestFromSoap<AuthorizeReq>(message).payload).and {
-            get { idTag }.isEqualTo("049E16B2EC7180")
+            get { idTag }.isEqualTo("AAAAAAAA")
         }
             .isA<AuthorizeReq>()
     }
@@ -83,7 +83,7 @@ class Ocpp16SoapParserTest {
                 <ns0:Envelope xmlns:ns0="http://www.w3.org/2003/05/soap-envelope" xmlns:ns1="http://www.w3.org/2005/08/addressing"
                               xmlns:ns2="urn://Ocpp/Cs/2015/10/">
                     <ns0:Header>
-                        <ns1:To>http://ev100-edfsa.vpn.l30.sodetrel.fr/ocpp/v16s/</ns1:To>
+                        <ns1:To>http://example.fr/ocpp/v16s/</ns1:To>
                         <ns1:From>
                             <ns1:Address>http://172.40.94.5:8084/chargePointService/ocpp16soap/</ns1:Address>
                         </ns1:From>
@@ -131,7 +131,7 @@ class Ocpp16SoapParserTest {
                         <wsa5:ReplyTo>
                             <wsa5:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa5:Address>
                         </wsa5:ReplyTo>
-                        <wsa5:To SOAP-ENV:mustUnderstand="true">http://wiiz.vpn.l30.sodetrel.fr:80/ocpp/v15s/</wsa5:To>
+                        <wsa5:To SOAP-ENV:mustUnderstand="true">http://example.fr:80/ocpp/v15s/</wsa5:To>
                         <wsa5:Action SOAP-ENV:mustUnderstand="true">/DataTransfer</wsa5:Action>
                     </SOAP-ENV:Header>
                     <SOAP-ENV:Body>
@@ -173,7 +173,7 @@ class Ocpp16SoapParserTest {
                         <wsa5:ReplyTo soap:mustUnderstand="true">
                             <wsa5:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa5:Address>
                         </wsa5:ReplyTo>
-                        <wsa5:To soap:mustUnderstand="true">http://bretagne-sde35-ies.vpn.l30.sodetrel.fr/ocpp/v16s/</wsa5:To>
+                        <wsa5:To soap:mustUnderstand="true">http://example.fr/ocpp/v16s/</wsa5:To>
                         <wsa5:Action soap:mustUnderstand="true">/FirmwareStatusNotification</wsa5:Action>
                     </soap:Header>
                     <soap:Body>
@@ -195,11 +195,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -231,7 +231,7 @@ class Ocpp16SoapParserTest {
                         <a:From>
                             <a:Address>http://10.93.252.243/ocpp</a:Address>
                         </a:From>
-                        <a:To v:mustUnderstand="true">http://sde35-g2.vpn.l30.sodetrel.fr/ocpp/v16s</a:To>
+                        <a:To v:mustUnderstand="true">http://example.fr/ocpp/v16s</a:To>
                         <a:ReplyTo v:mustUnderstand="true">
                             <a:Address>http://www.w3.org/2005/08/addressing/anonymous</a:Address>
                         </a:ReplyTo>
@@ -286,7 +286,7 @@ class Ocpp16SoapParserTest {
                         <a:From>
                             <a:Address>http://10.93.252.224/ocpp</a:Address>
                         </a:From>
-                        <a:To v:mustUnderstand="true">http://sde35-g2.vpn.l30.sodetrel.fr/ocpp/v16s/</a:To>
+                        <a:To v:mustUnderstand="true">http://example.fr/ocpp/v16s/</a:To>
                         <a:ReplyTo v:mustUnderstand="true">
                             <a:Address>http://www.w3.org/2005/08/addressing/anonymous</a:Address>
                         </a:ReplyTo>
@@ -294,7 +294,7 @@ class Ocpp16SoapParserTest {
                     <v:Body>
                         <ocpp:startTransactionRequest>
                             <ocpp:connectorId>1</ocpp:connectorId>
-                            <ocpp:idTag>046924C2D86485</ocpp:idTag>
+                            <ocpp:idTag>AAAAAAAA</ocpp:idTag>
                             <ocpp:meterStart>18804500</ocpp:meterStart>
                             <ocpp:timestamp>2022-05-17T15:41:58.351Z</ocpp:timestamp>
                         </ocpp:startTransactionRequest>
@@ -304,7 +304,7 @@ class Ocpp16SoapParserTest {
 
         expectThat(Ocpp16SoapParser().parseRequestFromSoap<StartTransactionReq>(message).payload).and {
             get { connectorId }.isEqualTo(1)
-            get { idTag }.isEqualTo("046924C2D86485")
+            get { idTag }.isEqualTo("AAAAAAAA")
             get { meterStart }.isEqualTo(18804500)
             get { timestamp }.isEqualTo(Instant.parse("2022-05-17T15:41:58.351Z"))
             get { reservationId }.isNull()
@@ -327,7 +327,7 @@ class Ocpp16SoapParserTest {
                         <wsa5:ReplyTo soap:mustUnderstand="true">
                             <wsa5:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa5:Address>
                         </wsa5:ReplyTo>
-                        <wsa5:To soap:mustUnderstand="true">http://sigeif-ies.vpn.l30.sodetrel.fr/ocpp/v16s</wsa5:To>
+                        <wsa5:To soap:mustUnderstand="true">http://example.fr/ocpp/v16s</wsa5:To>
                         <wsa5:Action soap:mustUnderstand="true">/StatusNotification</wsa5:Action>
                     </soap:Header>
                     <soap:Body>
@@ -363,19 +363,19 @@ class Ocpp16SoapParserTest {
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/StopTransaction</Action>
                         <MessageID xmlns="http://www.w3.org/2005/08/addressing">urn:uuid:3b30544e-eafe-4fba-af6e-5ae00612f788
                         </MessageID>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://wiiz.vpn.l30.sodetrel.fr/ocpp/v15s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v15s/</To>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
                         </ReplyTo>
                         <From xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://192.168.0.102:8080</Address>
                         </From>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2012/06/">00:13:F6:01:8A:BB</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2012/06/">CS1</chargeBoxIdentity>
                     </SOAP-ENV:Header>
                     <SOAP-ENV:Body>
                         <stopTransactionRequest xmlns="urn://Ocpp/Cs/2012/06/">
                             <transactionId>16696</transactionId>
-                            <idTag>2D0E360A</idTag>
+                            <idTag>AAAAAAAA</idTag>
                             <timestamp>2022-05-05T04:37:15Z</timestamp>
                             <meterStop>19224</meterStop>
                         </stopTransactionRequest>
@@ -387,7 +387,7 @@ class Ocpp16SoapParserTest {
             get { meterStop }.isEqualTo(19224)
             get { timestamp }.isEqualTo(Instant.parse("2022-05-05T04:37:15Z"))
             get { transactionId }.isEqualTo(16696)
-            get { idTag }.isEqualTo("2D0E360A")
+            get { idTag }.isEqualTo("AAAAAAAA")
             get { reason }.isNull()
             get { transactionData }.isNull()
         }
@@ -399,11 +399,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -430,11 +430,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -461,11 +461,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -492,11 +492,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -523,11 +523,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -564,7 +564,7 @@ class Ocpp16SoapParserTest {
                         <wsa5:ReplyTo soap:mustUnderstand="true">
                             <wsa5:Address>http://www.w3.org/2005/08/addressing/anonymous</wsa5:Address>
                         </wsa5:ReplyTo>
-                        <wsa5:To soap:mustUnderstand="true">http://bretagne-sde35-ies.vpn.l30.sodetrel.fr/ocpp/v16s/</wsa5:To>
+                        <wsa5:To soap:mustUnderstand="true">http://example.fr/ocpp/v16s/</wsa5:To>
                         <wsa5:Action soap:mustUnderstand="true">/FirmwareStatusNotification</wsa5:Action>
                     </soap:Header>
                     <soap:Body>
@@ -586,11 +586,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -617,11 +617,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -648,11 +648,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -679,11 +679,11 @@ class Ocpp16SoapParserTest {
             """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -707,13 +707,13 @@ class Ocpp16SoapParserTest {
     @Test
     fun `should map AuthorizeReq to soap`() {
         val request = AuthorizeReq(
-            idTag = "049E16B2EC7180"
+            idTag = "AAAAAAAA"
         )
 
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "Authorize",
                 from = "source",
                 to = "destination",
@@ -725,7 +725,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -738,7 +738,7 @@ class Ocpp16SoapParserTest {
                     </soap:Header>
                     <soap:Body>
                         <authorizeRequest>
-                            <idTag>049E16B2EC7180</idTag>
+                            <idTag>AAAAAAAA</idTag>
                         </authorizeRequest>
                     </soap:Body>
                 </soap:Envelope>
@@ -747,7 +747,7 @@ class Ocpp16SoapParserTest {
         expectThat(messageSoap.inline()).isEqualTo(expectedEnvelope.inline())
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.authorizeRequest }.isNotNull().and {
-                get { idTag }.isEqualTo("049E16B2EC7180")
+                get { idTag }.isEqualTo("AAAAAAAA")
             }
         }
     }
@@ -813,7 +813,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "BootNotification",
                 from = "source",
                 to = "destination",
@@ -825,7 +825,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -900,7 +900,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "DataTransfer",
                 from = "source",
                 to = "destination",
@@ -912,7 +912,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -991,7 +991,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "FirmwareStatusNotification",
                 from = "source",
                 to = "destination",
@@ -1003,7 +1003,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1071,7 +1071,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "Heartbeat",
                 from = "source",
                 to = "destination",
@@ -1083,7 +1083,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1157,7 +1157,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "MeterValues",
                 from = "source",
                 to = "destination",
@@ -1169,7 +1169,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1246,7 +1246,7 @@ class Ocpp16SoapParserTest {
     fun `should map StartTransactionReq to soap`() {
         val response = StartTransactionReq(
             connectorId = 1,
-            idTag = "046924C2D86485",
+            idTag = "AAAAAAAA",
             meterStart = 18804500,
             timestamp = Instant.parse("2022-05-17T15:41:58.351Z")
         )
@@ -1254,7 +1254,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "StartTransaction",
                 from = "source",
                 to = "destination",
@@ -1266,7 +1266,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1280,7 +1280,7 @@ class Ocpp16SoapParserTest {
                     <soap:Body>
                         <startTransactionRequest>
                             <connectorId>1</connectorId>
-                            <idTag>046924C2D86485</idTag>
+                            <idTag>AAAAAAAA</idTag>
                             <meterStart>18804500</meterStart>
                             <timestamp>2022-05-17T15:41:58.351Z</timestamp>
                         </startTransactionRequest>
@@ -1292,7 +1292,7 @@ class Ocpp16SoapParserTest {
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.startTransactionRequest }.isNotNull().and {
                 get { connectorId }.isEqualTo(1)
-                get { idTag }.isEqualTo("046924C2D86485")
+                get { idTag }.isEqualTo("AAAAAAAA")
                 get { meterStart }.isEqualTo(18804500)
                 get { timestamp }.isEqualTo(Instant.parse("2022-05-17T15:41:58.351Z"))
             }
@@ -1348,7 +1348,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "StatusNotification",
                 from = "source",
                 to = "destination",
@@ -1360,7 +1360,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1424,7 +1424,7 @@ class Ocpp16SoapParserTest {
     fun `should map StopTransactionReq to soap`() {
         val response = StopTransactionReq(
             transactionId = 16696,
-            idTag = "2D0E360A",
+            idTag = "AAAAAAAA",
             timestamp = Instant.parse("2022-05-05T04:37:15Z"),
             meterStop = 19224
         )
@@ -1432,7 +1432,7 @@ class Ocpp16SoapParserTest {
         val messageSoap = Ocpp16SoapParser().mapRequestToSoap(
             RequestSoapMessage(
                 messageId = "urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49",
-                chargingStationId = "00:80:F4:44:13:AA",
+                chargingStationId = "CS1",
                 action = "StopTransaction",
                 from = "source",
                 to = "destination",
@@ -1444,7 +1444,7 @@ class Ocpp16SoapParserTest {
             """
                 <soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:cs="urn://Ocpp/Cs/2015/10/" xmlns:wsa5="http://www.w3.org/2005/08/addressing">
                     <soap:Header>
-                        <chargeBoxIdentity soap:mustUnderstand="true">00:80:F4:44:13:AA</chargeBoxIdentity>
+                        <chargeBoxIdentity soap:mustUnderstand="true">CS1</chargeBoxIdentity>
                         <MessageID>urn:uuid:a7ef37c1-2ac6-4247-a3ad-8ed5905a5b49</MessageID>
                         <From>
                             <Address>source</Address>
@@ -1460,7 +1460,7 @@ class Ocpp16SoapParserTest {
                             <meterStop>19224</meterStop>
                             <timestamp>2022-05-05T04:37:15Z</timestamp>
                             <transactionId>16696</transactionId>
-                            <idTag>2D0E360A</idTag>
+                            <idTag>AAAAAAAA</idTag>
                         </stopTransactionRequest>
                     </soap:Body>
                 </soap:Envelope>
@@ -1470,7 +1470,7 @@ class Ocpp16SoapParserTest {
         expectThat(parseToEnvelope(messageSoap)) {
             get { body.stopTransactionRequest }.isNotNull().and {
                 get { transactionId }.isEqualTo(16696)
-                get { idTag }.isEqualTo("2D0E360A")
+                get { idTag }.isEqualTo("AAAAAAAA")
                 get { timestamp }.isEqualTo(Instant.parse("2022-05-05T04:37:15Z"))
                 get { meterStop }.isEqualTo(19224)
             }

@@ -113,11 +113,11 @@ class OcppSoapClientTransportTest {
                 """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
@@ -164,11 +164,11 @@ class OcppSoapClientTransportTest {
                 """
                 <S:Envelope xmlns:S="http://www.w3.org/2003/05/soap-envelope">
                     <S:Header>
-                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">92073_05_04</chargeBoxIdentity>
+                        <chargeBoxIdentity xmlns="urn://Ocpp/Cs/2015/10/">CS1</chargeBoxIdentity>
                         <wsa:From xmlns:wsa="http://www.w3.org/2005/08/addressing">
                             <wsa:Address>http://192.168.0.3:12800/ws</wsa:Address>
                         </wsa:From>
-                        <To xmlns="http://www.w3.org/2005/08/addressing">http://sigeif-enovates.vpn.l30.sodetrel.fr/ocpp/v16s/</To>
+                        <To xmlns="http://www.w3.org/2005/08/addressing">http://example.fr/ocpp/v16s/</To>
                         <Action xmlns="http://www.w3.org/2005/08/addressing">/Heartbeat</Action>
                         <ReplyTo xmlns="http://www.w3.org/2005/08/addressing">
                             <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
