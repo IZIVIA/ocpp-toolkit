@@ -20,7 +20,7 @@ import com.izivia.ocpp.core15.model.clearcache.ClearCacheResp
 import com.izivia.ocpp.core15.model.clearcache.enumeration.ClearCacheStatus
 import com.izivia.ocpp.core15.model.common.IdTagInfo
 import com.izivia.ocpp.core15.model.common.MeterValue
-import com.izivia.ocpp.core15.model.common.enumeration.AuthorisationStatus
+import com.izivia.ocpp.core15.model.common.enumeration.AuthorizationStatus
 import com.izivia.ocpp.core15.model.common.enumeration.RemoteStartStopStatus
 import com.izivia.ocpp.core15.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.core15.model.datatransfer.DataTransferResp
@@ -474,7 +474,7 @@ class JsonSchemaTest {
         /* Required field only */
         var errors = JsonSchemaValidator.isValidObject(
             AuthorizeResp(
-                idTagInfo = IdTagInfo(status = AuthorisationStatus.Accepted)
+                idTagInfo = IdTagInfo(status = AuthorizationStatus.Accepted)
             ), "AuthorizeResponse.json"
         )
         expectThat(errors)
@@ -484,7 +484,7 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObject(
             AuthorizeResp(
                 idTagInfo = IdTagInfo(
-                    status = AuthorisationStatus.Accepted,
+                    status = AuthorizationStatus.Accepted,
                     expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
                     parentIdTag = "Parent"
                 )
@@ -507,7 +507,7 @@ class JsonSchemaTest {
     fun `startTransaction response format`() {
         /* Required field only */
         var errors = JsonSchemaValidator.isValidObject(
-            StartTransactionResp(IdTagInfo(status = AuthorisationStatus.Accepted), 12),
+            StartTransactionResp(IdTagInfo(status = AuthorizationStatus.Accepted), 12),
             "StartTransactionResponse.json"
         )
         expectThat(errors)
@@ -517,7 +517,7 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObject(
             StartTransactionResp(
                 idTagInfo = IdTagInfo(
-                    status = AuthorisationStatus.Accepted,
+                    status = AuthorizationStatus.Accepted,
                     expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
                     parentIdTag = "Tag1"
                 ), transactionId = 12
@@ -539,7 +539,7 @@ class JsonSchemaTest {
         errors = JsonSchemaValidator.isValidObject(
             StopTransactionResp(
                 IdTagInfo(
-                    status = AuthorisationStatus.Accepted,
+                    status = AuthorizationStatus.Accepted,
                     expiryDate = Instant.parse("2022-02-15T00:00:00.000Z"),
                     parentIdTag = "Tag1"
                 )
