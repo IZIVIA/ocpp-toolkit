@@ -20,13 +20,14 @@ object OcppSoapMapper : ObjectMapper(
 )
 
 fun getNewFactory(nsAware: Boolean) : XmlFactory {
-    val CustomXmlFactory: XMLInputFactory = XMLInputFactory.newFactory()
-    CustomXmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, nsAware)
-    return XmlFactory(CustomXmlFactory)
+    val customXmlFactory: XMLInputFactory = XMLInputFactory.newFactory()
+    customXmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, nsAware)
+    return XmlFactory(customXmlFactory)
 }
 
-object CustomXmlModule : JacksonXmlModule() {
+private object CustomXmlModule : JacksonXmlModule() {
     init {
         setDefaultUseWrapper(false)
     }
 }
+
