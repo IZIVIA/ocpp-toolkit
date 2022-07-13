@@ -1,8 +1,6 @@
 package com.izivia.ocpp.soap15
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core15.model.authorize.AuthorizeResp
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationReq
@@ -21,6 +19,8 @@ import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.DiagnosticsSta
 import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.core15.model.firmwarestatusnotification.FirmwareStatusNotificationReq
 import com.izivia.ocpp.core15.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import com.izivia.ocpp.core15.model.getconfiguration.GetConfigurationReq
+import com.izivia.ocpp.core15.model.getconfiguration.GetConfigurationResp
 import com.izivia.ocpp.core15.model.getdiagnostics.GetDiagnosticsReq
 import com.izivia.ocpp.core15.model.getdiagnostics.GetDiagnosticsResp
 import com.izivia.ocpp.core15.model.getlocallistversion.GetLocalListVersionReq
@@ -70,10 +70,12 @@ data class Ocpp15SoapBody(
     val diagnosticsStatusNotificationResponse: DiagnosticsStatusNotificationResp?,
     val firmwareStatusNotificationRequest: FirmwareStatusNotificationReq?,
     val firmwareStatusNotificationResponse: FirmwareStatusNotificationResp?,
+    val getConfigurationRequest: GetConfigurationReq?,
+    val getConfigurationResponse: GetConfigurationResp?,
     val getDiagnosticsRequest: GetDiagnosticsReq?,
     val getDiagnosticsResponse: GetDiagnosticsResp?,
     val getLocalListVersionResponse: GetLocalListVersionReq?,
-    val getLocalListVersionReuest: GetLocalListVersionReq?,
+    val getLocalListVersionRequest: GetLocalListVersionReq?,
     val heartbeatRequest: HeartbeatReq?,
     val heartbeatResponse: HeartbeatResp?,
     val meterValuesRequest: MeterValuesReq?,
