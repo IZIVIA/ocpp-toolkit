@@ -2,10 +2,9 @@ package com.izivia.ocpp.wamp.messages
 
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
-import org.http4k.core.UriTemplate
 
 data class WampMessage(val msgType:WampMessageType,val msgId:String,val action:String?,val payload:String) {
-    fun toJson() = """[${msgType.id},"$msgId",${action?.let { "\"$it\", " }?:""}$payload]"""
+    fun toJson() = """[${msgType.id},"$msgId",${action?.takeIf { it.isNotBlank() }?.let { "\"$it\", " }?:""}$payload]"""
 
     companion object {
         fun Call(msgId:String, action:String, payload: String) = WampMessage(WampMessageType.CALL, msgId, action, payload)
