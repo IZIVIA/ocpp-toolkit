@@ -1,0 +1,3 @@
+package com.izivia.ocpp.core15.model.firmwarestatusnotification
+
+class FirmwareStatusNotificationResp

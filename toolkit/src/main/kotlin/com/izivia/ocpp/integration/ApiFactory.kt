@@ -22,10 +22,14 @@ import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
 import java.util.*
+import com.izivia.ocpp.api15.DefaultCSMSOperations as DefaultCSMSOperations15
+import com.izivia.ocpp.api15.OcppCSCallbacks as OcppCSCallbacks15
 import com.izivia.ocpp.api16.DefaultCSMSOperations as DefaultCSMSOperations16
 import com.izivia.ocpp.api16.OcppCSCallbacks as OcppCSCallbacks16
 import com.izivia.ocpp.api20.DefaultCSMSOperations as DefaultCSMSOperations20
 import com.izivia.ocpp.api20.OcppCSCallbacks as OcppCSCallbacks20
+import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
+import com.izivia.ocpp.core15.impl.RealChargePointOperations as RealChargePointOperations15
 import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
 import com.izivia.ocpp.core16.impl.RealChargePointOperations as RealChargePointOperations16
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
@@ -144,6 +148,23 @@ class ApiFactory {
                     target = csmsUrl
                 ),
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
+            )
+
+        fun ocpp15ConnectionToCSMS(chargePointId: String,
+                                   csmsUrl: String,
+                                   transportType: TransportEnum,
+                                   ocppCSCallbacks : OcppCSCallbacks15): ChargePointOperations15 =
+            RealChargePointOperations15(
+                chargeStationId = chargePointId,
+                client= createClientTransport(
+                    clientPort = null,
+                    clientPath = null,
+                    ocppVersion = OcppVersionTransport.OCPP_1_5,
+                    ocppId = chargePointId,
+                    transportType = transportType,
+                    target = csmsUrl
+                ),
+                csmsOperations = DefaultCSMSOperations15(ocppCSCallbacks)
             )
 
         fun ocpp20ConnectionToCSMS(
