@@ -10,7 +10,7 @@ import java.io.InputStream
 class JsonSchemaValidator {
 
     companion object {
-        private val mapper = Ocpp16JsonMapper
+        private val mapper = Ocpp16JsonObjectMapper
 
         private fun <T> getJsonNodeObject(value: T): JsonNode = mapper.readTree(mapper.writeValueAsString(value))
 

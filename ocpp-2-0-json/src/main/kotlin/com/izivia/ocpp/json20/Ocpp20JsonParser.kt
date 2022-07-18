@@ -28,31 +28,31 @@ import com.izivia.ocpp.json.OcppJsonParser
 
 class Ocpp20JsonParser : OcppJsonParser(Ocpp20JsonObjectMapper) {
 
-    override fun getRequestPayloadClass(action: String, context: String) = when (action) {
-        "Authorize" -> AuthorizeReq::class.java
-        "BootNotification" -> BootNotificationReq::class.java
-        "ClearedChargingLimit" -> ClearedChargingLimitReq::class.java
-        "DataTransfer" -> DataTransferReq::class.java
-        "FirmwareStatusNotification" -> FirmwareStatusNotificationReq::class.java
-        "GetCertificateStatus" -> GetCertificateStatusReq::class.java
-        "Heartbeat" -> HeartbeatReq::class.java
-        "LogStatusNotification" -> LogStatusNotificationReq::class.java
-        "MeterValues" -> MeterValuesReq::class.java
-        "NotifyChargingLimit" -> NotifyChargingLimitReq::class.java
-        "NotifyCustomerInformation" -> NotifyCustomerInformationReq::class.java
-        "NotifyDisplayMessages" -> NotifyDisplayMessagesReq::class.java
-        "NotifyEVChargingNeeds" -> NotifyEVChargingNeedsReq::class.java
-        "NotifyEVChargingSchedule" -> NotifyEVChargingScheduleReq::class.java
-        "NotifyEvent" -> NotifyEventReq::class.java
-        "NotifyMonitoringReport" -> NotifyMonitoringReportReq::class.java
-        "NotifyReport" -> NotifyReportReq::class.java
-        "PublishFirmwareStatusNotification" -> PublishFirmwareStatusNotificationReq::class.java
-        "ReportChargingProfiles" -> ReportChargingProfilesReq::class.java
-        "ReservationStatusUpdate" -> ReservationStatusUpdateReq::class.java
-        "SecurityEventNotification" -> SecurityEventNotificationReq::class.java
-        "SignCertificate" -> SignCertificateReq::class.java
-        "StatusNotification" -> StatusNotificationReq::class.java
-        "TransactionEvent" -> TransactionEventReq::class.java
+    override fun getRequestPayloadClass(action: String, context: String) = when (action.lowercase()) {
+        "authorize" -> AuthorizeReq::class.java
+        "bootnotification" -> BootNotificationReq::class.java
+        "clearedcharginglimit" -> ClearedChargingLimitReq::class.java
+        "datatransfer" -> DataTransferReq::class.java
+        "firmwarestatusnotification" -> FirmwareStatusNotificationReq::class.java
+        "getcertificatestatus" -> GetCertificateStatusReq::class.java
+        "heartbeat" -> HeartbeatReq::class.java
+        "logstatusnotification" -> LogStatusNotificationReq::class.java
+        "metervalues" -> MeterValuesReq::class.java
+        "notifycharginglimit" -> NotifyChargingLimitReq::class.java
+        "notifycustomerinformation" -> NotifyCustomerInformationReq::class.java
+        "notifydisplaymessages" -> NotifyDisplayMessagesReq::class.java
+        "notifyevchargingneeds" -> NotifyEVChargingNeedsReq::class.java
+        "notifyevchargingschedule" -> NotifyEVChargingScheduleReq::class.java
+        "notifyevent" -> NotifyEventReq::class.java
+        "notifymonitoringreport" -> NotifyMonitoringReportReq::class.java
+        "notifyreport" -> NotifyReportReq::class.java
+        "publishfirmwarestatusnotification" -> PublishFirmwareStatusNotificationReq::class.java
+        "reportchargingprofiles" -> ReportChargingProfilesReq::class.java
+        "reservationstatusupdate" -> ReservationStatusUpdateReq::class.java
+        "securityeventnotification" -> SecurityEventNotificationReq::class.java
+        "signcertificate" -> SignCertificateReq::class.java
+        "statusnotification" -> StatusNotificationReq::class.java
+        "transactionevent" -> TransactionEventReq::class.java
         else -> throw IllegalArgumentException("Action not recognized. action = ${action}. message = $context")
     }
 }

@@ -47,13 +47,16 @@ abstract class OcppJsonParser(private val mapper: ObjectMapper) {
             )
         }
 
-    fun <T> mapToSoap(message: JsonMessage<T>): String =
+    fun <T> mapPayloadToString(payload: T): String =
+        mapper.writeValueAsString(payload)
+
+    fun <T> mapToJson(message: JsonMessage<T>): String =
         """
             [
                 ${message.msgType.id},
                 "${message.msgId}",
                 ${message.action?.let { "\"$it\", " } ?: ""}
-                ${mapper.writeValueAsString(message.payload)}
+                ${mapPayloadToString(message.payload)}
             ]
         """.trimIndent()
 

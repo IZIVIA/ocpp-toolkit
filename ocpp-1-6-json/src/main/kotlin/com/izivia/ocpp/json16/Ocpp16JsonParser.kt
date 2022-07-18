@@ -14,17 +14,17 @@ import com.izivia.ocpp.json.OcppJsonParser
 
 class Ocpp16JsonParser : OcppJsonParser(Ocpp16JsonObjectMapper) {
 
-    override fun getRequestPayloadClass(action: String, context: String) = when (action) {
-        "Authorize" -> AuthorizeReq::class.java
-        "BootNotification" -> BootNotificationReq::class.java
-        "DataTransfer" -> DataTransferReq::class.java
-        "DiagnosticsStatusNotification" -> DiagnosticsStatusNotificationReq::class.java
-        "FirmwareStatusNotification" -> FirmwareStatusNotificationReq::class.java
-        "Heartbeat" -> HeartbeatReq::class.java
-        "MeterValues" -> MeterValuesReq::class.java
-        "StartTransaction" -> StartTransactionReq::class.java
-        "StatusNotification" -> StatusNotificationReq::class.java
-        "StopTransaction" -> StopTransactionReq::class.java
+    override fun getRequestPayloadClass(action: String, context: String) = when (action.lowercase()) {
+        "authorize" -> AuthorizeReq::class.java
+        "bootnotification" -> BootNotificationReq::class.java
+        "datatransfer" -> DataTransferReq::class.java
+        "diagnosticsstatusnotification" -> DiagnosticsStatusNotificationReq::class.java
+        "firmwarestatusnotification" -> FirmwareStatusNotificationReq::class.java
+        "heartbeat" -> HeartbeatReq::class.java
+        "metervalues" -> MeterValuesReq::class.java
+        "starttransaction" -> StartTransactionReq::class.java
+        "statusnotification" -> StatusNotificationReq::class.java
+        "stoptransaction" -> StopTransactionReq::class.java
         else -> throw IllegalArgumentException("Action not recognized. action = ${action}. message = $context")
     }
 }
