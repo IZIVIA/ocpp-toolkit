@@ -19,9 +19,9 @@ object OcppSoapMapper : ObjectMapper(
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
 )
 
-fun getNewFactory(ns_aware: Boolean) : XmlFactory {
+fun getNewFactory(nsAware: Boolean) : XmlFactory {
     val CustomXmlFactory: XMLInputFactory = XMLInputFactory.newFactory()
-    CustomXmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, ns_aware)
+    CustomXmlFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, nsAware)
     return XmlFactory(CustomXmlFactory)
 }
 
