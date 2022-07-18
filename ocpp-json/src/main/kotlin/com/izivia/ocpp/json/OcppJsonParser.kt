@@ -47,6 +47,9 @@ abstract class OcppJsonParser(private val mapper: ObjectMapper) {
             )
         }
 
+    fun <T : Any> parsePayloadFromJson(payload: String, clazz: KClass<T>): T =
+        mapper.readValue(payload, clazz.java)
+
     fun <T> mapPayloadToString(payload: T): String =
         mapper.writeValueAsString(payload)
 

@@ -39,7 +39,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
                 )
             }
             when (response.msgType) {
-                WampMessageType.CALL_RESULT -> parser.parseFromJson(response.toJson(), clazz).payload
+                WampMessageType.CALL_RESULT -> parser.parsePayloadFromJson(response.payload, clazz)
                 WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
                 else -> throw IllegalStateException(
                     "The message received type ${response.msgType} is not the one expected\n"
@@ -55,7 +55,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
                 if (msgMeta == wampMessageMeta && wampMsg.action == action) {
                     try {
-                        val response = fn(parser.parseFromJson(wampMsg.toJson(), clazz).payload)
+                        val response = fn(parser.parsePayloadFromJson(wampMsg.payload, clazz))
                         val payload = parser.mapPayloadToString(response)
                         WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
                     } catch (e: Exception) {
