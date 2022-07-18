@@ -1,4 +1,4 @@
-package com.izivia.ocpp.validator15
+package com.izivia.ocpp.json15
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonValue
