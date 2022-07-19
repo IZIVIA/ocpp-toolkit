@@ -14,14 +14,25 @@ dependencies {
     testImplementation(kotlin("test-junit"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-json"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP JSON")
+                artifactId = "ocpp-json"
+                description.set("This module provides commun features for JSON parsers")
+            }
         }
     }
 }

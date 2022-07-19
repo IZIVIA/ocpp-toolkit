@@ -17,14 +17,25 @@ dependencies {
     testImplementation(kotlin("test-junit"))
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 publishing {
     publications {
         named<MavenPublication>("maven") {
             groupId = project.group.toString()
-            artifactId = project.name
+            artifactId = "ocpp-1-6-soap"
             version = project.version.toString()
 
             from(components["java"])
+
+            pom {
+                name.set("OCPP 1.6 SOAP")
+                artifactId = "ocpp-1-6-soap"
+                description.set("This module provides a SOAP parser for OCPP 1.6")
+            }
         }
     }
 }
