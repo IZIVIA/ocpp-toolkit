@@ -24,7 +24,7 @@ import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.soap.SoapBody
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Ocpp16SoapBody(
+internal data class Ocpp16SoapBody(
     val authorizeRequest: AuthorizeReq?,
     val authorizeResponse: AuthorizeResp?,
     val bootNotificationRequest: BootNotificationReq?,

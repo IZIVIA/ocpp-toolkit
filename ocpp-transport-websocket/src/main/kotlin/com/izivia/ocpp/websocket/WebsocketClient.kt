@@ -20,7 +20,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
 
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion)
-    private val mapper = getJsonMapper(ocppVersion)
+    private val parser = getJsonMapper(ocppVersion)
     private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 
     override fun connect(): Unit = client.connect()
@@ -31,7 +31,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P =
         try {
             val msgId: String = UUID.randomUUID().toString()
-            val response = client.sendBlocking(WampMessage.Call(msgId, action, mapper.writeValueAsString(message)))
+            val response = client.sendBlocking(WampMessage.Call(msgId, action, parser.mapPayloadToString(message)))
             if (response.msgId != msgId) {
                 throw IllegalStateException(
                     "Wrong response received : ${response.msgId} received, $msgId expected\n"
@@ -39,7 +39,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
                 )
             }
             when (response.msgType) {
-                WampMessageType.CALL_RESULT -> mapper.readValue(response.payload, clazz.java)
+                WampMessageType.CALL_RESULT -> parser.parsePayloadFromJson(response.payload, clazz)
                 WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
                 else -> throw IllegalStateException(
                     "The message received type ${response.msgType} is not the one expected\n"
@@ -55,8 +55,8 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
             { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
                 if (msgMeta == wampMessageMeta && wampMsg.action == action) {
                     try {
-                        val response = fn(mapper.readValue(wampMsg.payload, clazz.java))
-                        val payload = mapper.writeValueAsString(response)
+                        val response = fn(parser.parsePayloadFromJson(wampMsg.payload, clazz))
+                        val payload = parser.mapPayloadToString(response)
                         WampMessage(WampMessageType.CALL_RESULT, wampMsg.msgId, null, payload)
                     } catch (e: Exception) {
                         logger.error(e.message)
@@ -64,7 +64,7 @@ class WebsocketClient(ocppId: String, ocppVersion: OcppVersion, target: String) 
                             WampMessageType.CALL_ERROR,
                             wampMsg.msgId,
                             null,
-                            OcppCallErrorPayload(e.message).toJson(mapper)
+                            OcppCallErrorPayload(e.message).toJson(parser)
                         )
                     }
                 } else {

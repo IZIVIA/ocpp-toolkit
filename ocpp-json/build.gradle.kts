@@ -6,12 +6,10 @@ plugins {
 coreProject()
 
 dependencies {
-    api(project(":ocpp-1-6-core"))
-    api(project(":ocpp-json"))
+    implementation(project(":utils"))
 
-    implementation("com.fasterxml.jackson.core:jackson-databind:_")
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
-    implementation("com.networknt:json-schema-validator:_")
 
     testImplementation(kotlin("test-junit"))
 }

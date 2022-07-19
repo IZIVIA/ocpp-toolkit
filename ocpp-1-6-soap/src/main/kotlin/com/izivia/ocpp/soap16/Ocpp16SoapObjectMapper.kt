@@ -28,7 +28,7 @@ import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionReq
 import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.soap.OcppSoapMapper
 
-object Ocpp16SoapMapper : ObjectMapper(
+internal object Ocpp16SoapObjectMapper : ObjectMapper(
     OcppSoapMapper
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
         .addMixIn(ReadingContext::class.java, EnumMixin::class.java)
@@ -55,66 +55,66 @@ object Ocpp16SoapMapper : ObjectMapper(
         .addMixIn(StopTransactionReq::class.java, StopTransactionReqMixin::class.java)
 )
 
-abstract class EnumMixin(
+private abstract class EnumMixin(
     @JsonValue val value: String
 )
 
 @JsonRootName("authorizeResponse")
-abstract class AuthorizeRespMixin
+private abstract class AuthorizeRespMixin
 
 @JsonRootName("authorizeRequest")
-abstract class AuthorizeReqMixin
+private abstract class AuthorizeReqMixin
 
 @JsonRootName("bootNotificationResponse")
-abstract class BootNotificationRespMixin
+private abstract class BootNotificationRespMixin
 
 @JsonRootName("bootNotificationRequest")
-abstract class BootNotificationReqMixin
+private abstract class BootNotificationReqMixin
 
 @JsonRootName("dataTransferResponse")
-abstract class DataTransferRespMixin
+private abstract class DataTransferRespMixin
 
 @JsonRootName("dataTransferRequest")
-abstract class DataTransferReqMixin
+private abstract class DataTransferReqMixin
 
 @JsonRootName("diagnosticsStatusNotificationResponse")
-abstract class DiagnosticsStatusNotificationRespMixin
+private abstract class DiagnosticsStatusNotificationRespMixin
 
 @JsonRootName("diagnosticsStatusNotificationRequest")
-abstract class DiagnosticsStatusNotificationReqMixin
+private abstract class DiagnosticsStatusNotificationReqMixin
 
 @JsonRootName("firmwareStatusNotificationResponse")
-abstract class FirmwareStatusNotificationRespMixin
+private abstract class FirmwareStatusNotificationRespMixin
 
 @JsonRootName("firmwareStatusNotificationRequest")
-abstract class FirmwareStatusNotificationReqMixin
+private abstract class FirmwareStatusNotificationReqMixin
 
 @JsonRootName("heartbeatResponse")
-abstract class HeartbeatRespMixin
+private abstract class HeartbeatRespMixin
 
 @JsonRootName("heartbeatRequest")
-abstract class HeartbeatReqMixin
+private abstract class HeartbeatReqMixin
 
 @JsonRootName("meterValuesResponse")
-abstract class MeterValuesRespMixin
+private abstract class MeterValuesRespMixin
 
 @JsonRootName("meterValuesRequest")
-abstract class MeterValuesReqMixin
+private abstract class MeterValuesReqMixin
 
 @JsonRootName("startTransactionResponse")
-abstract class StartTransactionRespMixin
+private abstract class StartTransactionRespMixin
 
 @JsonRootName("startTransactionRequest")
-abstract class StartTransactionReqMixin
+private abstract class StartTransactionReqMixin
 
 @JsonRootName("statusNotificationResponse")
-abstract class StatusNotificationRespMixin
+private abstract class StatusNotificationRespMixin
 
 @JsonRootName("statusNotificationRequest")
-abstract class StatusNotificationReqMixin
+private abstract class StatusNotificationReqMixin
 
 @JsonRootName("stopTransactionResponse")
-abstract class StopTransactionRespMixin
+private abstract class StopTransactionRespMixin
 
 @JsonRootName("stopTransactionRequest")
-abstract class StopTransactionReqMixin
+private abstract class StopTransactionReqMixin

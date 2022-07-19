@@ -1,4 +1,4 @@
-package com.izivia.ocpp.core15.test
+package com.izivia.ocpp.json15
 
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core15.model.authorize.AuthorizeResp
@@ -71,7 +71,6 @@ import com.izivia.ocpp.core15.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core15.model.unlockconnector.enumeration.UnlockStatus
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareResp
-import com.izivia.ocpp.validator15.JsonSchemaValidator
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

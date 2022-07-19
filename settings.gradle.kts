@@ -17,6 +17,7 @@ include(
     "generic-api",
     "ocpp-wamp",
     "ocpp-soap",
+    "ocpp-json",
     "ocpp-transport-websocket",
     "ocpp-transport",
     "ocpp-1-6-api-adapter",

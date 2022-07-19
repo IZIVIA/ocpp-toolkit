@@ -51,7 +51,7 @@ import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.soap.SoapBody
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Ocpp15SoapBody(
+internal data class Ocpp15SoapBody(
     val authorizeRequest: AuthorizeReq?,
     val authorizeResponse: AuthorizeResp?,
     val bootNotificationRequest: BootNotificationReq?,

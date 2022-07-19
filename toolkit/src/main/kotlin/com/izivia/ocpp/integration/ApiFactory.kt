@@ -6,9 +6,9 @@ import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.adapter20.Ocpp20Adapter
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
-import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.http.OcppSoapClientTransport
 import com.izivia.ocpp.http.OcppSoapServerTransport
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.integration.model.CSMSSettings
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
@@ -16,6 +16,7 @@ import com.izivia.ocpp.integration.model.TransportEnum.SOAP
 import com.izivia.ocpp.integration.model.TransportEnum.WEBSOCKET
 import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.ChargingStationConfig
+import com.izivia.ocpp.soap15.Ocpp15SoapParser
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.ServerTransport
@@ -79,19 +80,13 @@ class ApiFactory {
             target: String,
             newMessageId: () -> String
         ): ClientTransport =
-            when (ocppVersion) {
-                OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
-                else -> TODO("Not yet implemented")
-            }
-                .let { parser ->
-                    OcppSoapClientTransport(
-                        SoapClientSettings(path, port),
-                        ocppId,
-                        target,
-                        parser,
-                        newMessageId
-                    )
-                }
+            OcppSoapClientTransport(
+                SoapClientSettings(path, port),
+                ocppId,
+                target,
+                getSoapParser(ocppVersion),
+                newMessageId
+            )
 
         private fun createServerTransportWebsocket(
             port: Int,
@@ -107,11 +102,7 @@ class ApiFactory {
             ocppVersion: OcppVersionTransport,
             newMessageId: () -> String
         ): ServerTransport =
-            when (ocppVersion) {
-                OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
-                else -> TODO("Not yet implemented")
-            }
-                .let { parser -> OcppSoapServerTransport.createServer(ocppVersion, port, path, parser, newMessageId) }
+            OcppSoapServerTransport.createServer(ocppVersion, port, path, getSoapParser(ocppVersion), newMessageId)
 
         fun getCSMSApi(settings: Settings, ocppId: String, csApi: CSApi): CSMSApi {
             val transport: ClientTransport = createClientTransport(
@@ -122,10 +113,10 @@ class ApiFactory {
                 settings.ocppVersion,
                 settings.target
             )
-            return if (settings.ocppVersion == OcppVersionTransport.OCPP_1_6) {
-                Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
-            } else {
-                Ocpp20Adapter(ocppId, transport, csApi)
+            return when (settings.ocppVersion) {
+                OcppVersionTransport.OCPP_1_5 -> throw NotImplementedError("Ocpp 1.5 api adapted not yet implemented")
+                OcppVersionTransport.OCPP_1_6 -> Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
+                OcppVersionTransport.OCPP_2_0 -> Ocpp20Adapter(ocppId, transport, csApi)
             }
         }
 
@@ -150,15 +141,19 @@ class ApiFactory {
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
 
-        fun ocpp15ConnectionToCSMS(chargePointId: String,
-                                   csmsUrl: String,
-                                   transportType: TransportEnum,
-                                   ocppCSCallbacks : OcppCSCallbacks15): ChargePointOperations15 =
+        fun ocpp15ConnectionToCSMS(
+            chargePointId: String,
+            csmsUrl: String,
+            transportType: TransportEnum,
+            clientPath: String?,
+            clientPort: Int?,
+            ocppCSCallbacks: OcppCSCallbacks15
+        ): ChargePointOperations15 =
             RealChargePointOperations15(
                 chargeStationId = chargePointId,
-                client= createClientTransport(
-                    clientPort = null,
-                    clientPath = null,
+                client = createClientTransport(
+                    clientPath = clientPath,
+                    clientPort = clientPort,
                     ocppVersion = OcppVersionTransport.OCPP_1_5,
                     ocppId = chargePointId,
                     transportType = transportType,
@@ -215,4 +210,10 @@ class ApiFactory {
             return CSMS(transports, csmsApiCallbacks.toSet(), fn)
         }
     }
+}
+
+private fun getSoapParser(version: OcppVersionTransport) = when (version) {
+    OcppVersionTransport.OCPP_1_5 -> Ocpp15SoapParser()
+    OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
+    else -> TODO("Not yet implemented")
 }

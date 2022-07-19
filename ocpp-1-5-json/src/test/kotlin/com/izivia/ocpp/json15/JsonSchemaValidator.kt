@@ -1,4 +1,4 @@
-package com.izivia.ocpp.json20
+package com.izivia.ocpp.json15
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.networknt.schema.JsonSchema
@@ -10,12 +10,12 @@ import java.io.InputStream
 class JsonSchemaValidator {
 
     companion object {
-        private val mapper = Ocpp20JsonObjectMapper
+        private val mapper = Ocpp15JsonObjectMapper
 
         private fun <T> getJsonNodeObject(value: T): JsonNode = mapper.readTree(mapper.writeValueAsString(value))
 
         private fun getJsonSchema(file: String): JsonSchema {
-            val factory: JsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V6)
+            val factory: JsonSchemaFactory = JsonSchemaFactory.getInstance(SpecVersion.VersionFlag.V4)
             val input: InputStream? = Thread.currentThread().contextClassLoader.getResourceAsStream(file)
             return factory.getSchema(input)
         }

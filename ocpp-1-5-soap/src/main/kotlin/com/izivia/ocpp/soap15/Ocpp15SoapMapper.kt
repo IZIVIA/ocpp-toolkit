@@ -1,13 +1,10 @@
 package com.izivia.ocpp.soap15
 
-import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.annotation.JsonRootName
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
-import com.fasterxml.jackson.dataformat.xml.XmlFactory
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq
 import com.izivia.ocpp.core15.model.authorize.AuthorizeResp
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationReq
@@ -78,12 +75,10 @@ import com.izivia.ocpp.core15.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.core15.model.unlockconnector.enumeration.UnlockStatus
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareResp
-import com.izivia.ocpp.soap.BaseResolver
 import com.izivia.ocpp.soap.OcppSoapMapper
 import kotlinx.datetime.Instant
-import javax.xml.stream.XMLInputFactory
 
-object Ocpp15SoapMapperIn : ObjectMapper(
+internal object Ocpp15SoapMapperIn : ObjectMapper(
     OcppSoapMapper
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
@@ -92,7 +87,7 @@ object Ocpp15SoapMapperIn : ObjectMapper(
 )
 
 
-object Ocpp15SoapMapper : ObjectMapper(
+internal object Ocpp15SoapMapper : ObjectMapper(
     OcppSoapMapper
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
@@ -152,11 +147,11 @@ object Ocpp15SoapMapper : ObjectMapper(
         .addMixIn(UpdateFirmwareResp::class.java, UpdateFirmwareRespMixin::class.java)
 )
 
-abstract class EnumMixin(
+private abstract class EnumMixin(
     @JsonValue val value: String
 )
 
-abstract class IdTagInfoMixin(
+private abstract class IdTagInfoMixin(
     @JacksonXmlProperty(localName = "o:expiryDate")
     val expiryDate: Instant? = null,
     @JacksonXmlProperty(localName = "o:parentIdTag")
@@ -166,19 +161,19 @@ abstract class IdTagInfoMixin(
 )
 
 @JsonRootName("authorizeResponse")
-abstract class AuthorizeRespMixin(
+private abstract class AuthorizeRespMixin(
     @JacksonXmlProperty(localName = "o:idTagInfo")
     val idTagInfo: IdTagInfo
 )
 
 @JsonRootName("authorizeRequest")
-abstract class AuthorizeReqMixin(
+private abstract class AuthorizeReqMixin(
     @JacksonXmlProperty(localName = "o:idTag")
     val idTag: String
 )
 
 @JsonRootName("bootNotificationResponse")
-abstract class BootNotificationRespMixin(
+private abstract class BootNotificationRespMixin(
     @JacksonXmlProperty(localName = "o:currentTime")
     val currentTime: Instant,
     @JacksonXmlProperty(localName = "o:heartbeatInterval")
@@ -188,7 +183,7 @@ abstract class BootNotificationRespMixin(
 )
 
 @JsonRootName("bootNotificationRequest")
-abstract class BootNotificationReqMixin(
+private abstract class BootNotificationReqMixin(
     @JacksonXmlProperty(localName = "o:chargeBoxSerialNumber")
     val chargeBoxSerialNumber: String? = null,
     @JacksonXmlProperty(localName = "o:chargePointModel")
@@ -210,19 +205,19 @@ abstract class BootNotificationReqMixin(
 )
 
 @JsonRootName("cancelReservationResponse")
-abstract class CancelReservationRespMixin(
+private abstract class CancelReservationRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: CancelReservationStatus
 )
 
 @JsonRootName("cancelReservationRequest")
-abstract class CancelReservationReqMixin(
+private abstract class CancelReservationReqMixin(
     @JacksonXmlProperty(localName = "o:reservationId")
     val reservationId: Int
 )
 
 @JsonRootName("changeAvailabilityRequest")
-abstract class ChangeAvailabilityReqMixin(
+private abstract class ChangeAvailabilityReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int,
     @JacksonXmlProperty(localName = "o:type")
@@ -230,19 +225,19 @@ abstract class ChangeAvailabilityReqMixin(
 )
 
 @JsonRootName("changeAvailabilityResponse")
-abstract class ChangeAvailabilityRespMixin(
+private abstract class ChangeAvailabilityRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: AvailabilityStatus
 )
 
 @JsonRootName("changeConfigurationResponse")
-abstract class ChangeConfigurationRespMixin(
+private abstract class ChangeConfigurationRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: ConfigurationStatus
 )
 
 @JsonRootName("changeConfigurationResponse")
-abstract class ChangeConfigurationReqMixin(
+private abstract class ChangeConfigurationReqMixin(
     @JacksonXmlProperty(localName = "o:key")
     val key: String,
     @JacksonXmlProperty(localName = "o:value")
@@ -250,16 +245,16 @@ abstract class ChangeConfigurationReqMixin(
 )
 
 @JsonRootName("clearCacheRequest")
-abstract class ClearCacheReqMixin
+private abstract class ClearCacheReqMixin
 
 @JsonRootName("clearCacheResponse")
-abstract class ClearCacheRespMixin(
+private abstract class ClearCacheRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: ClearCacheStatus
 )
 
 @JsonRootName("dataTransferResponse")
-abstract class DataTransferRespMixin(
+private abstract class DataTransferRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: DataTransferStatus,
     @JacksonXmlProperty(localName = "o:data")
@@ -267,7 +262,7 @@ abstract class DataTransferRespMixin(
 )
 
 @JsonRootName("dataTransferRequest")
-abstract class DataTransferReqMixin(
+private abstract class DataTransferReqMixin(
     @JacksonXmlProperty(localName = "o:vendorId")
     val vendorId: String,
     @JacksonXmlProperty(localName = "o:messageId")
@@ -277,25 +272,25 @@ abstract class DataTransferReqMixin(
 )
 
 @JsonRootName("diagnosticsStatusNotificationResponse")
-abstract class DiagnosticsStatusNotificationRespMixin
+private abstract class DiagnosticsStatusNotificationRespMixin
 
 @JsonRootName("diagnosticsStatusNotificationRequest")
-abstract class DiagnosticsStatusNotificationReqMixin(
+private abstract class DiagnosticsStatusNotificationReqMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: DiagnosticsStatus
 )
 
 @JsonRootName("firmwareStatusNotificationResponse")
-abstract class FirmwareStatusNotificationRespMixin
+private abstract class FirmwareStatusNotificationRespMixin
 
 @JsonRootName("firmwareStatusNotificationRequest")
-abstract class FirmwareStatusNotificationReqMixin(
+private abstract class FirmwareStatusNotificationReqMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: FirmwareStatus
 )
 
 @JsonRootName("getConfigurationResponse")
-abstract class GetConfigurationRespMixin(
+private abstract class GetConfigurationRespMixin(
     @JacksonXmlProperty(localName = "o:configurationKey")
     val configurationKey: List<KeyValue>? = null,
     @JacksonXmlProperty(localName = "o:unknownKey")
@@ -303,12 +298,12 @@ abstract class GetConfigurationRespMixin(
 )
 
 @JsonRootName("getConfigurationRequest")
-abstract class GetConfigurationReqMixin(
+private abstract class GetConfigurationReqMixin(
     @JacksonXmlProperty(localName = "o:key")
     val key: List<String>? = null
 )
 
-abstract class KeyValueMixin(
+private abstract class KeyValueMixin(
     @JacksonXmlProperty(localName = "o:key")
     val key: String,
     @JacksonXmlProperty(localName = "o:readonly")
@@ -318,7 +313,7 @@ abstract class KeyValueMixin(
 )
 
 @JsonRootName("getDiagnosticsRequest")
-abstract class GetDiagnosticsReqMixin(
+private abstract class GetDiagnosticsReqMixin(
     @JacksonXmlProperty(localName = "o:location")
     val location: String,
     @JacksonXmlProperty(localName = "o:retries")
@@ -332,34 +327,34 @@ abstract class GetDiagnosticsReqMixin(
 )
 
 @JsonRootName("getDiagnosticsResponse")
-abstract class GetDiagnosticsRespMixin(
+private abstract class GetDiagnosticsRespMixin(
     @JacksonXmlProperty(localName = "o:fileName")
     val fileName: String? = null
 )
 
 @JsonRootName("getLocalListVersionRequest")
-abstract class GetLocalListVersionReqMixin
+private abstract class GetLocalListVersionReqMixin
 
 @JsonRootName("getLocalListVersionResponse")
-abstract class GetLocalListVersionRespMixin(
+private abstract class GetLocalListVersionRespMixin(
     @JacksonXmlProperty(localName = "o:listVersion")
     val listVersion: Int
 )
 
 @JsonRootName("heartbeatResponse")
-abstract class HeartbeatRespMixin(
+private abstract class HeartbeatRespMixin(
     @JacksonXmlProperty(localName = "o:currentTime")
     val currentTime: Instant
 )
 
 @JsonRootName("heartbeatRequest")
-abstract class HeartbeatReqMixin
+private abstract class HeartbeatReqMixin
 
 @JsonRootName("meterValuesResponse")
-abstract class MeterValuesRespMixin
+private abstract class MeterValuesRespMixin
 
 @JsonRootName("meterValuesRequest")
-abstract class MeterValuesReqMixin(
+private abstract class MeterValuesReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int,
     @JacksonXmlProperty(localName = "o:values")
@@ -368,7 +363,7 @@ abstract class MeterValuesReqMixin(
     val transactionId: Int? = null
 )
 
-abstract class MeterValueMixin(
+private abstract class MeterValueMixin(
     @JacksonXmlProperty(isAttribute = true)
     val timestamp: Instant,
     @JacksonXmlProperty(localName = "o:value")
@@ -385,7 +380,7 @@ abstract class MeterValueMixin(
     val unit: UnitOfMeasure? = UnitOfMeasure.Wh
 )
 
-abstract class MeterValue15Mixin(
+private abstract class MeterValue15Mixin(
     @JacksonXmlProperty(isAttribute = true)
     val timestamp: Instant,
     @JacksonXmlProperty(localName = "value")
@@ -403,14 +398,14 @@ abstract class MeterValue15Mixin(
 )
 
 @JsonRootName("remoteStartTransactionResponse")
-abstract class RemoteStartTransactionRespMixin(
+private abstract class RemoteStartTransactionRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: RemoteStartStopStatus
 )
 
 
 @JsonRootName("remoteStartTransactionRequest")
-abstract class RemoteStartTransactionReqMixin(
+private abstract class RemoteStartTransactionReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int? = null,
     @JacksonXmlProperty(localName = "o:idTag")
@@ -418,25 +413,25 @@ abstract class RemoteStartTransactionReqMixin(
 )
 
 @JsonRootName("remoteStopTransactionResponse")
-abstract class RemoteStopTransactionRespMixin(
+private abstract class RemoteStopTransactionRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: RemoteStartStopStatus
 )
 
 @JsonRootName("remoteStopTransactionRequest")
-abstract class RemoteStopTransactionReqMixin(
+private abstract class RemoteStopTransactionReqMixin(
     @JacksonXmlProperty(localName = "o:transactionId")
     val transactionId: Int
 )
 
 @JsonRootName("reserveNowResponse")
-abstract class ReserveNowRespMixin(
+private abstract class ReserveNowRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: ReservationStatus
 )
 
 @JsonRootName("reserveNowReuest")
-abstract class ReserveNowReqMixin(
+private abstract class ReserveNowReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int,
     @JacksonXmlProperty(localName = "o:expiryDate")
@@ -450,19 +445,19 @@ abstract class ReserveNowReqMixin(
 )
 
 @JsonRootName("resetResponse")
-abstract class ResetRespMixin(
+private abstract class ResetRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: ResetStatus
 )
 
 @JsonRootName("resetRequest")
-abstract class ResetReqMixin(
+private abstract class ResetReqMixin(
     @JacksonXmlProperty(localName = "o:type")
     val type: ResetType
 )
 
 @JsonRootName("sendLocalListRequest")
-abstract class SendLocalListReqMixin(
+private abstract class SendLocalListReqMixin(
     @JacksonXmlProperty(localName = "o:hash")
     val hash: String? = null,
     @JacksonXmlProperty(localName = "o:listVersion")
@@ -474,14 +469,14 @@ abstract class SendLocalListReqMixin(
 )
 
 @JsonRootName("sendLocalListResponse")
-abstract class SendLocalListRespMixin(
+private abstract class SendLocalListRespMixin(
     @JacksonXmlProperty(localName = "o:hash")
     val hash: String? = null,
     @JacksonXmlProperty(localName = "o:status")
     val status: UpdateStatus
 )
 
-abstract class AuthorisationDataMixin(
+private abstract class AuthorisationDataMixin(
     @JacksonXmlProperty(localName = "o:idTag")
     val idTag: String,
     @JacksonXmlProperty(localName = "o:idTagInfo")
@@ -489,7 +484,7 @@ abstract class AuthorisationDataMixin(
 )
 
 @JsonRootName("startTransactionResponse")
-abstract class StartTransactionRespMixin(
+private abstract class StartTransactionRespMixin(
     @JacksonXmlProperty(localName = "o:idTagInfo")
     val idTagInfo: IdTagInfo,
     @JacksonXmlProperty(localName = "o:transactionId")
@@ -497,7 +492,7 @@ abstract class StartTransactionRespMixin(
 )
 
 @JsonRootName("startTransactionRequest")
-abstract class StartTransactionReqMixin(
+private abstract class StartTransactionReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int,
     @JacksonXmlProperty(localName = "o:idTag")
@@ -511,10 +506,10 @@ abstract class StartTransactionReqMixin(
 )
 
 @JsonRootName("statusNotificationResponse")
-abstract class StatusNotificationRespMixin
+private abstract class StatusNotificationRespMixin
 
 @JsonRootName("statusNotificationRequest")
-abstract class StatusNotificationReqMixin(
+private abstract class StatusNotificationReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int,
     @JacksonXmlProperty(localName = "o:errorCode")
@@ -532,13 +527,13 @@ abstract class StatusNotificationReqMixin(
 )
 
 @JsonRootName("stopTransactionResponse")
-abstract class StopTransactionRespMixin(
+private abstract class StopTransactionRespMixin(
     @JacksonXmlProperty(localName = "o:idTagInfo")
     val idTagInfo: IdTagInfo? = null
 )
 
 @JsonRootName("stopTransactionRequest")
-abstract class StopTransactionReqMixin(
+private abstract class StopTransactionReqMixin(
     @JacksonXmlProperty(localName = "o:idTag")
     val idTag: String? = null,
     @JacksonXmlProperty(localName = "o:meterStop")
@@ -552,19 +547,19 @@ abstract class StopTransactionReqMixin(
 )
 
 @JsonRootName("unlockConnectorRequest")
-abstract class UnlockConnectorReqMixin(
+private abstract class UnlockConnectorReqMixin(
     @JacksonXmlProperty(localName = "o:connectorId")
     val connectorId: Int
 )
 
 @JsonRootName("unlockConnectorResponse")
-abstract class UnlockConnectorRespMixin(
+private abstract class UnlockConnectorRespMixin(
     @JacksonXmlProperty(localName = "o:status")
     val status: UnlockStatus
 )
 
 @JsonRootName("updateFirmwareRequest")
-abstract class UpdateFirmwareReqMixin(
+private abstract class UpdateFirmwareReqMixin(
     @JacksonXmlProperty(localName = "o:location")
     val location: String,
     @JacksonXmlProperty(localName = "o:retries")
@@ -576,4 +571,4 @@ abstract class UpdateFirmwareReqMixin(
 )
 
 @JsonRootName("updateFirmwareRequest")
-abstract class UpdateFirmwareRespMixin
+private abstract class UpdateFirmwareRespMixin

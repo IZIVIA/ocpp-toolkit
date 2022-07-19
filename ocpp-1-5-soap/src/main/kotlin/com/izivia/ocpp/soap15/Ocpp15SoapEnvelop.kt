@@ -11,7 +11,7 @@ import com.izivia.ocpp.soap.BaseResolver
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JacksonXmlRootElement(localName = "s:Envelope")
-data class SoapEnvelopeOut<T>(
+internal data class SoapEnvelopeOut<T>(
     @JacksonXmlProperty(isAttribute = true, localName = "xmlns:s")
     val soap: String = "http://www.w3.org/2003/05/soap-envelope",
     @JacksonXmlProperty(isAttribute = true, localName = "xmlns:a")
@@ -27,7 +27,7 @@ data class SoapEnvelopeOut<T>(
 )
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class SoapHeaderOut(
+internal data class SoapHeaderOut(
     @JsonProperty("a:MessageID")
     val messageId: String,
     @JsonProperty("a:Action")
@@ -42,7 +42,7 @@ data class SoapHeaderOut(
     val relatesTo: String?
 )
 
-data class SoapHeaderFromOut(
+internal data class SoapHeaderFromOut(
     @JsonProperty("a:Address")
     val address: String
 )
