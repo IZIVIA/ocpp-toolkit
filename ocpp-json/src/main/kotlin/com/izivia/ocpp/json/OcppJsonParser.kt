@@ -37,12 +37,12 @@ abstract class OcppJsonParser(private val mapper: ObjectMapper) {
     }
 
     fun parseAsStringPayloadFromJson(messageStr: String): JsonMessage<String>? =
-        ocppMsgRegex.matchEntire(messageStr)?.let {
+        ocppMsgRegex.matchEntire(messageStr.replace("\n", ""))?.let {
             val (msgType, msgId, action, payload) = it.destructured
             JsonMessage(
                 msgType = JsonMessageType.fromId(msgType.toInt()),
                 msgId = msgId,
-                action = action,
+                action = action.takeIf { it.isNotBlank() },
                 payload = payload
             )
         }
