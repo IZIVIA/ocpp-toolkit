@@ -60,7 +60,7 @@ class Ocpp15SoapParser : OcppSoapParser {
             messageId = envelope.header.messageId,
             relatesTo = envelope.header.relatesTo
                 ?: throw IllegalArgumentException("Malformed envelope: missing <RelatesTo> in the header. envelope = $envelope"),
-            action = envelope.header.action.removePrefix("/"),
+            action = envelope.header.action.removePrefix("/").removeSuffix("Response"),
             payload = getResponseBodyContent(envelope)
         )
     }
