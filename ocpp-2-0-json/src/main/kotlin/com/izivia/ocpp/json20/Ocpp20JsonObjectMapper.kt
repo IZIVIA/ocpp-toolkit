@@ -8,7 +8,7 @@ import com.izivia.ocpp.core20.model.notifyreport.enumeration.DataEnumType
 import com.izivia.ocpp.json.OcppJsonMapper
 
 internal object Ocpp20JsonObjectMapper : ObjectMapper(
-    OcppJsonMapper
+    OcppJsonMapper()
         .addMixIn(MeasurandEnumType::class.java, EnumMixin::class.java)
         .addMixIn(ReadingContextEnumType::class.java, EnumMixin::class.java)
         .addMixIn(DataEnumType::class.java, EnumMixin::class.java)
