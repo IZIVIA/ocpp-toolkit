@@ -29,7 +29,7 @@ import com.izivia.ocpp.core16.model.stoptransaction.StopTransactionResp
 import com.izivia.ocpp.soap.OcppSoapMapper
 
 internal object Ocpp16SoapObjectMapper : ObjectMapper(
-    OcppSoapMapper
+    OcppSoapMapper()
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
         .addMixIn(ReadingContext::class.java, EnumMixin::class.java)
         .addMixIn(Phase::class.java, EnumMixin::class.java)

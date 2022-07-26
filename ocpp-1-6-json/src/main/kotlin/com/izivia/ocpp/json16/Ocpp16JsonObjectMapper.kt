@@ -8,7 +8,7 @@ import com.izivia.ocpp.core16.model.common.enumeration.ReadingContext
 import com.izivia.ocpp.json.OcppJsonMapper
 
 internal object Ocpp16JsonObjectMapper : ObjectMapper(
-    OcppJsonMapper
+    OcppJsonMapper()
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
         .addMixIn(ReadingContext::class.java, EnumMixin::class.java)
         .addMixIn(Phase::class.java, EnumMixin::class.java)

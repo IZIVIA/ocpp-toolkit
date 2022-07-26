@@ -11,7 +11,7 @@ import com.izivia.ocpp.utils.KotlinxInstantModule
 import javax.xml.stream.XMLInputFactory
 
 
-object OcppSoapMapper : ObjectMapper(
+class OcppSoapMapper : ObjectMapper(
     XmlMapper(getNewFactory(true),  CustomXmlModule)
         .registerModule(kotlinModule())
         .registerModule(KotlinxInstantModule())

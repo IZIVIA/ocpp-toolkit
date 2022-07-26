@@ -79,7 +79,7 @@ import com.izivia.ocpp.soap.OcppSoapMapper
 import kotlinx.datetime.Instant
 
 internal object Ocpp15SoapMapperIn : ObjectMapper(
-    OcppSoapMapper
+    OcppSoapMapper()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .addMixIn(ReadingContext::class.java, EnumMixin::class.java)
@@ -88,7 +88,7 @@ internal object Ocpp15SoapMapperIn : ObjectMapper(
 
 
 internal object Ocpp15SoapMapper : ObjectMapper(
-    OcppSoapMapper
+    OcppSoapMapper()
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
