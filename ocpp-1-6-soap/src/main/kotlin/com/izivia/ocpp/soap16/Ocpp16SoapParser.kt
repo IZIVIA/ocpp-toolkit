@@ -18,10 +18,8 @@ class Ocpp16SoapParser : OcppSoapParser {
             messageId = envelope.header.messageId,
             chargingStationId = envelope.header.chargeBoxIdentity!!,
             action = envelope.header.action.removePrefix("/"),
-            from = envelope.header.from?.address
-                ?: throw IllegalArgumentException("Malformed envelope: missing <From> in the header. envelope = $envelope"),
-            to = envelope.header.to
-                ?: throw IllegalArgumentException("Malformed envelope: missing <To> in the header. envelope = $envelope"),
+            from = envelope.header.from?.address,
+            to = envelope.header.to,
             payload = getRequestBodyContent(envelope)
         )
     }
@@ -88,13 +86,11 @@ class Ocpp16SoapParser : OcppSoapParser {
                 <soap:Header>
                     <chargeBoxIdentity soap:mustUnderstand="true">${request.chargingStationId}</chargeBoxIdentity>
                     <MessageID>${request.messageId}</MessageID>
-                    <From>
-                        <Address>${request.from}</Address>
-                    </From>
+                    ${request.from?.let { "<From><Address>$it</Address></From>" }}
                     <ReplyTo soap:mustUnderstand="true">
                         <Address>http://www.w3.org/2005/08/addressing/anonymous</Address>
                     </ReplyTo>
-                    <To soap:mustUnderstand="true">${request.to}</To>
+                    ${request.to?.let { "<To soap:mustUnderstand=\"true\">$it</To>" }}
                     <Action soap:mustUnderstand="true">/${request.action}</Action>
                 </soap:Header>
                 <soap:Body>

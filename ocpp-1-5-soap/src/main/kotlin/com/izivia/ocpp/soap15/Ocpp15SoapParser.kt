@@ -17,10 +17,8 @@ class Ocpp15SoapParser : OcppSoapParser {
             messageId = envelope.header.messageId,
             chargingStationId = envelope.header.chargeBoxIdentity!!,
             action = envelope.header.action.removePrefix("/"),
-            from = envelope.header.from?.address
-                ?: throw IllegalArgumentException("Malformed envelope: missing <From> in the header. envelope = $envelope"),
-            to = envelope.header.to
-                ?: throw IllegalArgumentException("Malformed envelope: missing <To> in the header. envelope = $envelope"),
+            from = envelope.header.from?.address,
+            to = envelope.header.to,
             payload = getRequestBodyContent(envelope)
         )
     }
@@ -112,7 +110,7 @@ class Ocpp15SoapParser : OcppSoapParser {
             action = "/" + request.action,
             to = "http://www.w3.org/2005/08/addressing/anonymous",
             relatesTo = null,
-            from = SoapHeaderFromOut(request.from),
+            from = request.from?.let { SoapHeaderFromOut(it) },
             chargeBoxIdentity = request.chargingStationId)
         val xmlMapper = Ocpp15SoapMapper
         val xmlBuilder = SoapEnvelopeOut(header = headers,
