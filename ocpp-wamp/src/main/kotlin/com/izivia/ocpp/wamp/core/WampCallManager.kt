@@ -6,6 +6,7 @@ import kotlinx.datetime.Instant
 import org.slf4j.Logger
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -51,7 +52,7 @@ class WampCallManager(
             return response
         } else {
             currentCall = null
-            throw IllegalStateException("$logContext timeout calling with $msgString")
+            throw TimeoutException("$logContext timeout calling with $msgString")
         }
     }
 
