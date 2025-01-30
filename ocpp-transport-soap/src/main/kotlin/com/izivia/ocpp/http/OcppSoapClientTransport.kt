@@ -12,7 +12,6 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
-import java.lang.IllegalStateException
 import java.util.*
 import kotlin.reflect.KClass
 
@@ -37,8 +36,7 @@ class OcppSoapClientTransport(
     private val handlers = mutableListOf<(HttpMessage) -> HttpMessage?>()
 
     init {
-        val route =
-            clientSettings.path bindContract Method.POST to ::routeHandler
+        val route = "/" bindContract Method.POST to ::routeHandler
         val app = contract {
             routes += route
         }
