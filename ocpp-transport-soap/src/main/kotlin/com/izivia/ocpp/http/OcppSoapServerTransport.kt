@@ -17,6 +17,7 @@ import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Path
 import org.http4k.server.Http4kServer
+import org.http4k.server.ServerConfig
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
@@ -25,12 +26,18 @@ import kotlin.reflect.KClass
 
 class OcppSoapServerTransport private constructor(
     private val ocppVersion: OcppVersion,
-    private val port: Int,
-    private val path: String?,
     private val ocppSoapParser: OcppSoapParser,
     private val newMessageId: () -> String = { UUID.randomUUID().toString() },
-    private var server: Http4kServer? = null
+    config: ServerConfig? = null,
+    path: String? = null,
+    server: Http4kServer? = null
 ) : ServerTransport {
+    private val handlers = mutableListOf<OcppHttpServerHandler>()
+    private val server: Http4kServer
+
+    init {
+        this.server = server ?: createHandler(path!!).asServer(config!!)
+    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(OcppSoapServerTransport::class.java)
@@ -41,28 +48,26 @@ class OcppSoapServerTransport private constructor(
             path: String,
             ocppSoapParser: OcppSoapParser,
             newMessageId: () -> String = { UUID.randomUUID().toString() }
-        ) = OcppSoapServerTransport(ocppVersion, port, path, ocppSoapParser, newMessageId)
+        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, config = Undertow(port = port), path = path)
 
         fun createServer(
             ocppVersion: OcppVersion,
             ocppSoapParser: OcppSoapParser,
             newMessageId: () -> String = { UUID.randomUUID().toString() },
             server: Http4kServer
-        ) = OcppSoapServerTransport(ocppVersion, server.port(), null, ocppSoapParser, newMessageId, server)
+        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, server = server)
     }
 
-    private val handlers = mutableListOf<OcppHttpServerHandler>()
-
     override fun start() {
-        if (server == null) {
-            val route = path!! / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
-            val app = contract {
-                routes += route
-            }
-            server = app.asServer(Undertow(port = port))
+        server.start()
+        logger.info("starting http server on port ${server.port()}")
+    }
+
+    private fun createHandler(path: String): HttpHandler {
+        val route = path / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
+        return contract {
+            routes += route
         }
-        server!!.start()
-        logger.info("starting http server on port $port")
     }
 
     private fun routeHandler(action: String, ocppId: String): HttpHandler = { request: Request ->
@@ -82,7 +87,7 @@ class OcppSoapServerTransport private constructor(
     }
 
     override fun stop() {
-        server!!.stop()
+        server.stop()
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P {
