@@ -32,12 +32,6 @@ class OcppSoapServerTransport private constructor(
     path: String? = null,
     server: Http4kServer? = null
 ) : ServerTransport {
-    private val handlers = mutableListOf<OcppHttpServerHandler>()
-    private val server: Http4kServer
-
-    init {
-        this.server = server ?: createHandler(path!!).asServer(config!!)
-    }
 
     companion object {
         private val logger = LoggerFactory.getLogger(OcppSoapServerTransport::class.java)
@@ -58,9 +52,12 @@ class OcppSoapServerTransport private constructor(
         ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, server = server)
     }
 
-    override fun start() {
-        server.start()
-        logger.info("starting http server on port ${server.port()}")
+    private val server: Http4kServer
+
+    private val handlers = mutableListOf<OcppHttpServerHandler>()
+
+    init {
+        this.server = server ?: createHandler(path!!).asServer(config!!)
     }
 
     private fun createHandler(path: String): HttpHandler {
@@ -84,6 +81,11 @@ class OcppSoapServerTransport private constructor(
             .firstOrNull()
             ?.let { Response(OK).body(it.payload) }
             ?: Response(NOT_FOUND).also { logger.warn("no action handler found for $message") }
+    }
+
+    override fun start() {
+        server.start()
+        logger.info("starting http server on port ${server.port()}")
     }
 
     override fun stop() {
