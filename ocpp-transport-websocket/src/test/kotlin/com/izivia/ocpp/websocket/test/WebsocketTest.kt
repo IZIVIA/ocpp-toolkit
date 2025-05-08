@@ -44,22 +44,19 @@ class WebsocketTest {
     @Test
     fun `sendMessageClass success`() {
         val id = "a727d144-82bb-497a-a0c7-4ef2295910d4"
-        val uuid = UUID.fromString(id)
-        mockkStatic(UUID::class)
-        every { UUID.randomUUID() } returns uuid
 
         val ocppWampClient = mockk<OkHttpOcppWampClient>()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
         every { ocppWampClient.onAction(any()) } returns Unit
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = id,
             payload = "{\"currentTime\":\"2022-02-15T00:00:00.000Z\"}"
         )
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
-        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "")
+        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "", newMessageId = { id })
         val heartbeatResponse =
             websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq())
         expectThat(heartbeatResponse)
@@ -69,9 +66,6 @@ class WebsocketTest {
     @Test
     fun `wrong msgId`() {
         val id = "00000000-0000-0000-0000-000000000000"
-        val uuid = UUID.fromString(id)
-        mockkStatic(UUID::class)
-        every { UUID.randomUUID() } returns uuid
 
         val ocppWampClient = mockk<OkHttpOcppWampClient>()
         every { ocppWampClient.connect() } returns Unit
@@ -84,7 +78,7 @@ class WebsocketTest {
         mockkObject(OcppWampClient.Companion)
         every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
 
-        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "")
+        val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "", newMessageId = { id })
         expectCatching { websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq()) }
             .isFailure()
             .isA<IllegalStateException>()
