@@ -16,10 +16,7 @@ import org.http4k.core.Response
 import org.http4k.core.Status.Companion.NOT_FOUND
 import org.http4k.core.Status.Companion.OK
 import org.http4k.lens.Path
-import org.http4k.server.Http4kServer
-import org.http4k.server.ServerConfig
-import org.http4k.server.Undertow
-import org.http4k.server.asServer
+import org.http4k.routing.RoutingHttpHandler
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
@@ -28,39 +25,33 @@ class OcppSoapServerTransport private constructor(
     private val ocppVersion: OcppVersion,
     private val ocppSoapParser: OcppSoapParser,
     private val newMessageId: () -> String = { UUID.randomUUID().toString() },
-    config: ServerConfig? = null,
-    path: String? = null,
-    server: Http4kServer? = null
+    private val path: String,
 ) : ServerTransport {
 
     companion object {
         private val logger = LoggerFactory.getLogger(OcppSoapServerTransport::class.java)
 
-        fun createServer(
+        fun create(
             ocppVersion: OcppVersion,
-            port: Int,
             path: String,
             ocppSoapParser: OcppSoapParser,
             newMessageId: () -> String = { UUID.randomUUID().toString() }
-        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, config = Undertow(port = port), path = path)
-
-        fun createServer(
-            ocppVersion: OcppVersion,
-            ocppSoapParser: OcppSoapParser,
-            newMessageId: () -> String = { UUID.randomUUID().toString() },
-            server: Http4kServer
-        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, server = server)
+        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, path = path)
     }
 
-    private val server: Http4kServer
-
+    private val handler: RoutingHttpHandler
     private val handlers = mutableListOf<OcppHttpServerHandler>()
 
     init {
-        this.server = server ?: createHandler(path!!).asServer(config!!)
+        this.handler = createHandler(path)
     }
 
-    private fun createHandler(path: String): HttpHandler {
+    val serverConfig = object : ServerConfig {
+        override val handler: RoutingHttpHandler
+            get() = this@OcppSoapServerTransport.handler
+    }
+
+    private fun createHandler(path: String): RoutingHttpHandler {
         val route = path / Path.of("action") / Path.of("ocppId") bindContract POST to ::routeHandler
         return contract {
             routes += route
@@ -81,15 +72,6 @@ class OcppSoapServerTransport private constructor(
             .firstOrNull()
             ?.let { Response(OK).body(it.payload) }
             ?: Response(NOT_FOUND).also { logger.warn("no action handler found for $message") }
-    }
-
-    override fun start() {
-        server.start()
-        logger.info("starting http server on port ${server.port()}")
-    }
-
-    override fun stop() {
-        server.stop()
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P {

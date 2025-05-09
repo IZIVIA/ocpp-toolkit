@@ -98,21 +98,19 @@ class ApiFactory {
             )
 
         private fun createServerTransportWebsocket(
-            port: Int,
             path: String,
             ocppVersion: Set<OcppVersionTransport>,
             newMessageId: () -> String,
             listeners: EventsListeners = EventsListeners()
         ): ServerTransport =
-            WebsocketServer(port, ocppVersion, path, newMessageId, listeners)
+            WebsocketServer(ocppVersion, path, newMessageId, listeners)
 
         private fun createServerTransportSoap(
-            port: Int,
             path: String,
             ocppVersion: OcppVersionTransport,
             newMessageId: () -> String
         ): ServerTransport =
-            OcppSoapServerTransport.createServer(ocppVersion, port, path, getSoapParser(ocppVersion), newMessageId)
+            OcppSoapServerTransport.create(ocppVersion, path, getSoapParser(ocppVersion), newMessageId)
 
         fun getCSMSApi(
             settings: Settings,
@@ -210,26 +208,26 @@ class ApiFactory {
             csmsApiCallbacks: List<CSMSCallbacks>,
             fn: (String) -> ChargingStationConfig
         ): CSMS {
-            val transports: Map<ServerTransport, Set<OcppVersionTransport>> =
-                mutableMapOf<ServerTransport, Set<OcppVersionTransport>>().also { map ->
-                    csmsSettings.servers.map {
-                        when (it.transportType) {
-                            WEBSOCKET -> map.put(
-                                createServerTransportWebsocket(
-                                    it.port,
-                                    it.path,
-                                    it.ocppVersion,
-                                    it.newMessageId,
-                                    it.listeners
-                                ), it.ocppVersion
-                            )
-                            SOAP -> it.ocppVersion.forEach { version ->
-                                map[createServerTransportSoap(it.port, it.path, version, it.newMessageId)] =
-                                    setOf(version)
-                            }
+            val transports: Map<ServerTransport, Pair<Int, Set<OcppVersionTransport>>> =
+                csmsSettings.servers.flatMap { s ->
+                    when (s.transportType) {
+                        WEBSOCKET -> listOf(
+                            createServerTransportWebsocket(
+                                s.path,
+                                s.ocppVersion,
+                                s.newMessageId,
+                                s.listeners
+                            ) to (s.port to s.ocppVersion)
+                        )
+                        SOAP -> s.ocppVersion.map { version ->
+                            createServerTransportSoap(
+                                s.path,
+                                version,
+                                s.newMessageId
+                            ) to (s.port to setOf(version))
                         }
                     }
-                }
+                }.toMap()
             return CSMS(transports, csmsApiCallbacks.toSet(), fn)
         }
     }

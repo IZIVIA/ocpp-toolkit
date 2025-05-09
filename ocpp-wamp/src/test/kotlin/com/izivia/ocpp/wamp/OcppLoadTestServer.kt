@@ -7,6 +7,7 @@ import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import kotlinx.datetime.Clock
 import java.net.ServerSocket
 
@@ -15,8 +16,9 @@ fun getFreePort(): Int =
 
 fun main() {
     val port = getFreePort()
-    val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
-    server.register(object : OcppWampServerHandler {
+    val transport = OcppWampServer.newServer(setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+    val server = transport.asServer(port)
+    transport.register(object : OcppWampServerHandler {
         override fun accept(ocppId: CSOcppId): Boolean = true
 
         override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =

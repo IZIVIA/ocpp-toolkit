@@ -10,6 +10,7 @@ import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import kotlinx.datetime.Clock
@@ -31,8 +32,9 @@ class WampIntegrationTest {
     fun `should heartbeat`() {
         val heartbeatResponsePayload = """{"currentTime":"${Clock.System.now()}"}"""
 
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val wampServer = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = wampServer.asServer(port)
+        wampServer.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
@@ -77,8 +79,7 @@ class WampIntegrationTest {
         val connectedEvents: MutableList<CSOcppId> = ArrayList()
         val closeEvents: MutableList<CSOcppId> = ArrayList()
         val reconnectedEvents: MutableList<CSOcppId> = ArrayList()
-        val server = OcppWampServer.newServer(
-            port,
+        val wampServer = OcppWampServer.newServer(
             setOf(OCPP_1_6),
             listeners = EventsListeners(
                 onWsConnectHandler = { id, headers ->
@@ -92,7 +93,8 @@ class WampIntegrationTest {
                 }
             )
         )
-        server.register(object : OcppWampServerHandler {
+        val server = wampServer.asServer(port)
+        wampServer.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
@@ -172,8 +174,9 @@ class WampIntegrationTest {
 
     @Test
     fun `should timeout when calling server`() {
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? {
@@ -206,8 +209,9 @@ class WampIntegrationTest {
     fun `should call from server to charging station`() {
         val heartbeatResponsePayload = """{"currentTime":"${Clock.System.now()}"}"""
 
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })
@@ -238,7 +242,7 @@ class WampIntegrationTest {
             }
             client.connect()
 
-            val r = server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+            val r = transport.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
 
             expectThat(r) {
                 get { msgId }.isEqualTo("1")
@@ -254,9 +258,10 @@ class WampIntegrationTest {
 
     @Test
     fun `should call from server to charging station timeout`() {
-        val server =
-            OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0), "ws", OcppWampServerSettings(200))
-        server.register(object : OcppWampServerHandler {
+        val transport =
+            OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0), "ws", OcppWampServerSettings(200))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })
@@ -271,7 +276,7 @@ class WampIntegrationTest {
             client.connect()
 
             expectCatching {
-                server.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
+                transport.sendBlocking("TEST1", WampMessage.Call("1", "remotebeat", "{}"))
             }.isFailure()
 
             client.close()
@@ -283,8 +288,9 @@ class WampIntegrationTest {
     @Disabled("Disabled until it has been resolved")
     @Test
     fun `should 404 on unknown ocpp id`() {
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
@@ -311,8 +317,9 @@ class WampIntegrationTest {
 
     @Test
     fun `should cleanly fail on server close`() {
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })
@@ -353,8 +360,9 @@ class WampIntegrationTest {
 
     @Test
     fun `should client be resilient to intermittent server lost`() {
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })
@@ -393,8 +401,9 @@ class WampIntegrationTest {
 
     @Test
     fun `should client immediately force reconnect attempt on send message`() {
-        val server = OcppWampServer.newServer(port, setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
         })

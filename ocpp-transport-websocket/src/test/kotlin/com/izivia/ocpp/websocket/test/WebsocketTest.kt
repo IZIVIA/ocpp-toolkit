@@ -13,11 +13,11 @@ import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.websocket.WebsocketClient
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
-import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -29,7 +29,6 @@ import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFailure
 import java.net.ServerSocket
-import java.util.*
 
 class WebsocketTest {
 
@@ -88,8 +87,9 @@ class WebsocketTest {
     fun `receiveMessageClass success`() {
         val port = getFreePort()
 
-        val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        val transport = OcppWampServer.newServer(setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: String): Boolean = "chargePoint2" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
@@ -109,12 +109,12 @@ class WebsocketTest {
             websocketClient.connect()
             Thread.sleep(100) // wait for connection to be fully established, it seems to cause issues on GH action
 
-            server.sendBlocking(
+            transport.sendBlocking(
                 "chargePoint2",
                 WampMessage.Call("1", "authorize", "{\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}")
             )
 
-            server.sendBlocking("chargePoint2", WampMessage.Call("2", "heartbeat", "{}"))
+            transport.sendBlocking("chargePoint2", WampMessage.Call("2", "heartbeat", "{}"))
 
             websocketClient.close()
         } finally {

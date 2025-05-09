@@ -6,13 +6,32 @@ import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
+import com.izivia.ocpp.wamp.server.impl.Undertow
 import com.izivia.ocpp.wamp.server.impl.UndertowOcppWampServer
+import io.undertow.server.HttpServerExchange
+import org.http4k.routing.RoutingWsHandler
+import org.http4k.server.Http4kServer
+import org.http4k.server.asServer
+
+interface WsServerConfig {
+    val handler: RoutingWsHandler
+    val acceptWebSocketPredicate:(HttpServerExchange) -> Boolean
+    val wsSubprotocols:Set<String>
+}
+
+fun OcppWampServer.asServer(port: Int = 8000): Http4kServer {
+    val config = this.config()
+    return config.handler.asServer(Undertow(
+        port,
+        enableHttp2 = true,
+        acceptWebSocketPredicate = config.acceptWebSocketPredicate,
+        wsSubprotocols = config.wsSubprotocols,
+    ))
+}
 
 interface OcppWampServer {
-    /**
-     * Starts the wamp server.
-     */
-    fun start()
+
+    fun config(): WsServerConfig
 
     /**
      * attempt a graceful shutdown of the server:
@@ -21,13 +40,6 @@ interface OcppWampServer {
      * - close opened connections when pending calls are done
      */
     fun shutdown()
-
-    /**
-     * Stops the server.
-     * This will close all opened web sockets.
-     * A stopped server cannot be reused.
-     */
-    fun stop()
 
     /**
      * Sends a WampMessage call to a ChargingStation, identified by its ocpp id.
@@ -59,12 +71,11 @@ interface OcppWampServer {
 
     companion object {
         fun newServer(
-            port: Int,
             ocppVersions: Set<OcppVersion> = OcppVersion.values().toSet(),
             path: String = "ws",
             settings: OcppWampServerSettings = OcppWampServerSettings(),
             listeners: EventsListeners = EventsListeners()
-        ) = UndertowOcppWampServer(port, ocppVersions, path, settings, listeners)
+        ) = UndertowOcppWampServer(ocppVersions, path, settings, listeners)
     }
 }
 

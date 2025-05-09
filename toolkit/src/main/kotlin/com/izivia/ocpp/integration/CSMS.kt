@@ -1,12 +1,20 @@
 package com.izivia.ocpp.integration
 
 import com.izivia.ocpp.api.CSApi
+import com.izivia.ocpp.http.OcppSoapServerTransport
 import com.izivia.ocpp.operation.information.CSCallbacks
 import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.OcppVersion.*
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.wamp.server.impl.Undertow
+import com.izivia.ocpp.websocket.WebsocketServer
+import org.http4k.routing.routes
+import org.http4k.routing.websockets
+import org.http4k.server.PolyHandler
+import org.http4k.server.asServer
+import org.slf4j.LoggerFactory
 import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
 import com.izivia.ocpp.core15.impl.RealCSMSOperations as RealCSMSOperations15
 import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
@@ -19,43 +27,73 @@ import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
 
 
 class CSMS(
-    private val transports: Map<ServerTransport, Set<OcppVersion>>,
+    transports: Map<ServerTransport, Pair<Int, Set<OcppVersion>>>,
     csmsApis: Set<CSMSCallbacks>,
     fn: (String) -> ChargingStationConfig
 ) {
-
-    private val transportByVersion: Map<OcppVersion, Set<ServerTransport>> =
-        mutableMapOf<OcppVersion, Set<ServerTransport>>().also { map ->
-            transports.forEach { transport ->
-                transport.value.forEach {
-                    map[it] = ((map[it]?.toList() ?: listOf()) + transport.key).toSet()
-                }
-            }
-        }
-
-    private val csApi: Map<CsApiType, CSCallbacks> = mutableMapOf<CsApiType, CSCallbacks>().also { csApis ->
-        csmsApis.forEach {
-            when (it) {
-                is ChargePointOperations16 -> transportByVersion[OCPP_1_6]?.let { transports16 ->
-                    csApis[CsApiType.OcppCsApiType(OCPP_1_6)] = RealCSMSOperations16(transports16, fn, it)
-                }
-                is ChargePointOperations15 -> transportByVersion[OCPP_1_5]?.let { transports15 ->
-                    csApis[CsApiType.OcppCsApiType(OCPP_1_5)] = RealCSMSOperations15(transports15, fn, it)
-                }
-                is ChargePointOperations20 -> transportByVersion[OCPP_2_0]?.let { transports20 ->
-                    csApis[CsApiType.OcppCsApiType(OCPP_2_0)] = RealCSMSOperations20(transports20, fn, it)
-                }
-                else -> throw IllegalStateException("Unknow csms callbacks")
-            }
-        }
+    companion object {
+        private val logger = LoggerFactory.getLogger(CSMS::class.java)
     }
 
+    private val serverByVersion: Map<OcppVersion, Set<ServerTransport>> =
+        transports
+            .flatMap { (server, pair) -> pair.second.map { it to server } }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, servers) -> servers.toSet() }
+
+    private val csApi: Map<CsApiType, CSCallbacks> = csmsApis.associate { csmsApi ->
+        when (csmsApi) {
+            is ChargePointOperations16 -> serverByVersion[OCPP_1_6]?.let { transports16 ->
+                CsApiType.OcppCsApiType(OCPP_1_6) to RealCSMSOperations16(transports16, fn, csmsApi)
+            }
+            is ChargePointOperations15 -> serverByVersion[OCPP_1_5]?.let { transports15 ->
+                CsApiType.OcppCsApiType(OCPP_1_5) to RealCSMSOperations15(transports15, fn, csmsApi)
+            }
+            is ChargePointOperations20 -> serverByVersion[OCPP_2_0]?.let { transports20 ->
+                CsApiType.OcppCsApiType(OCPP_2_0) to RealCSMSOperations20(transports20, fn, csmsApi)
+            }
+            else -> error("Unknown csms callbacks")
+        } ?: error("No transport found for csmsApi ${csmsApi::class.simpleName}")
+    }
+
+    private val servers = transports
+        .map { t -> t.value.first to Pair(t.key, t.value.second) }
+        .groupBy { it.first }
+        .mapValues { (_, servers) -> servers.map { it.second } }
+        .map { t ->
+            val port = t.key
+            val wsServerConfigs = t.value.filter { it.first is WebsocketServer }.map { (it.first as WebsocketServer).serverConfig to it.second}
+            val soapServerConfigs = t.value.filter { it.first is OcppSoapServerTransport }.map { (it.first as OcppSoapServerTransport).serverConfig to it.second }
+            val app = PolyHandler(
+                http = routes(soapServerConfigs.map { it.first.handler }),
+                ws = websockets(*(wsServerConfigs.map { it.first.handler }).toTypedArray()),
+            )
+            app.asServer(
+                Undertow(
+                    port,
+                    enableHttp2 = wsServerConfigs.isNotEmpty(),
+                    acceptWebSocketPredicate = { exch ->
+                        wsServerConfigs.any { it.first.acceptWebSocketPredicate(exch) }
+                    },
+                    wsSubprotocols = wsServerConfigs.flatMap { c -> c.first.wsSubprotocols }.toSet(),
+                )
+            ) to wsServerConfigs.flatMap { it.second } + soapServerConfigs.flatMap { it.second }
+        }
+
     fun start() {
-        transports.forEach { server -> server.key.start() }
+        servers.forEach {
+            server -> server.first.start()
+            logger.info(
+                "starting on port ${server.first.port()} -- ocpp versions=${server.second}"
+            )
+        }
     }
 
     fun stop() {
-        transports.forEach { server -> server.key.stop() }
+        servers.forEach {
+            server -> server.first.stop()
+            logger.info("stopping on port ${server.first.port()}")
+        }
     }
 
     fun getCSApiGeneric(): CSApi =
