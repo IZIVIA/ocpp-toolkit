@@ -801,6 +801,7 @@ class AdapterTest {
 
         val operations = Ocpp20Adapter("c1", transport, csApi)
         val request = MeterValuesReq(
+            connectorId = 11,
             evseId = 1,
             meterValue = listOf(
                 MeterValueType(

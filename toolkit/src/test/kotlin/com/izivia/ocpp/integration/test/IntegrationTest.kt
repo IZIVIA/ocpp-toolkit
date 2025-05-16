@@ -25,40 +25,8 @@ import com.izivia.ocpp.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import com.izivia.ocpp.api.model.clearedcharginglimit.ClearedChargingLimitReq
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
-import com.izivia.ocpp.api.model.common.CertificateHashDataType
-import com.izivia.ocpp.api.model.common.ChargingProfileType
-import com.izivia.ocpp.api.model.common.ChargingSchedulePeriodType
-import com.izivia.ocpp.api.model.common.ChargingScheduleType
-import com.izivia.ocpp.api.model.common.ComponentType
-import com.izivia.ocpp.api.model.common.EVSEType
-import com.izivia.ocpp.api.model.common.IdTokenInfoType
-import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.MessageContentType
-import com.izivia.ocpp.api.model.common.MessageInfoType
-import com.izivia.ocpp.api.model.common.MeterValueType
-import com.izivia.ocpp.api.model.common.OCSPRequestDataType
-import com.izivia.ocpp.api.model.common.SampledValueType
-import com.izivia.ocpp.api.model.common.SignedMeterValueType
-import com.izivia.ocpp.api.model.common.StatusInfoType
-import com.izivia.ocpp.api.model.common.VariableType
-import com.izivia.ocpp.api.model.common.enumeration.AuthorizationStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.CertificateSigningUseEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingLimitSourceEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingProfilePurposeEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingRateUnitEnumType
-import com.izivia.ocpp.api.model.common.enumeration.GenericDeviceModelStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.HashAlgorithmEnumType
-import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
-import com.izivia.ocpp.api.model.common.enumeration.LocationEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MessageFormatEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MessagePriorityEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MessageStateEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MonitorEnumType
-import com.izivia.ocpp.api.model.common.enumeration.PhaseEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
-import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
+import com.izivia.ocpp.api.model.common.*
+import com.izivia.ocpp.api.model.common.enumeration.*
 import com.izivia.ocpp.api.model.costupdated.CostUpdatedReq
 import com.izivia.ocpp.api.model.costupdated.CostUpdatedResp
 import com.izivia.ocpp.api.model.customerinformation.CustomerInformationReq
@@ -210,11 +178,7 @@ import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.mockkObject
-import io.mockk.mockkStatic
-import io.mockk.unmockkAll
+import io.mockk.*
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -744,6 +708,7 @@ class IntegrationTest {
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = MeterValuesReq(
+            connectorId = 31,
             evseId = 3,
             meterValue = listOf(
                 MeterValueType(
@@ -768,6 +733,7 @@ class IntegrationTest {
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
 
         val request2 = MeterValuesReq(
+            connectorId = 31,
             evseId = 3,
             meterValue = listOf(
                 MeterValueType(
