@@ -13,7 +13,7 @@ abstract class MeterValuesMapper {
 
     @Throws(IllegalStateException::class)
     fun genToCoreReq(meterValuesReq: MeterValuesReqGen): MeterValuesReq {
-        val connectorId: Int = meterValuesReq.evseId
+        val connectorId: Int = meterValuesReq.connectorId ?: meterValuesReq.evseId
         val meterValue = meterValuesReq.meterValue
         val transactionId = meterValuesReq.transactionId?.toInt()
         val meterValueList = meterValue.map { (s, t) ->

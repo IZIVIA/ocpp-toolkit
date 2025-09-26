@@ -1,5 +1,7 @@
 package com.izivia.ocpp.adapter16.test
 
+import com.izivia.ocpp.adapter16.Ocpp16Adapter
+import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.model.bootnotification.ChargingStationType
 import com.izivia.ocpp.api.model.bootnotification.ModemType
@@ -23,25 +25,8 @@ import com.izivia.ocpp.api.model.cleardisplaymessage.ClearDisplayMessageReq
 import com.izivia.ocpp.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
-import com.izivia.ocpp.api.model.common.ComponentType
-import com.izivia.ocpp.api.model.common.EVSEType
-import com.izivia.ocpp.api.model.common.IdTokenInfoType
-import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.MeterValueType
-import com.izivia.ocpp.api.model.common.SampledValueType
-import com.izivia.ocpp.api.model.common.SignedMeterValueType
-import com.izivia.ocpp.api.model.common.StatusInfoType
-import com.izivia.ocpp.api.model.common.UnitOfMeasure
-import com.izivia.ocpp.api.model.common.VariableType
-import com.izivia.ocpp.api.model.common.enumeration.AuthorizationStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.GenericDeviceModelStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
-import com.izivia.ocpp.api.model.common.enumeration.LocationEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
-import com.izivia.ocpp.api.model.common.enumeration.PhaseEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
-import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
+import com.izivia.ocpp.api.model.common.*
+import com.izivia.ocpp.api.model.common.enumeration.*
 import com.izivia.ocpp.api.model.costupdated.CostUpdatedReq
 import com.izivia.ocpp.api.model.costupdated.CostUpdatedResp
 import com.izivia.ocpp.api.model.customerinformation.CustomerInformationReq
@@ -135,8 +120,6 @@ import com.izivia.ocpp.api.model.unpublishfirmware.UnpublishFirmwareResp
 import com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
-import com.izivia.ocpp.adapter16.Ocpp16Adapter
-import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.core16.ChargePointOperations
 import com.izivia.ocpp.core16.impl.RealChargePointOperations
 import com.izivia.ocpp.core16.model.authorize.AuthorizeReq
@@ -513,7 +496,10 @@ class AdapterTest {
             throw NotImplementedError()
         }
 
-        override fun costUpdated(meta: RequestMetadata, req: CostUpdatedReq): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
+        override fun costUpdated(
+            meta: RequestMetadata,
+            req: CostUpdatedReq
+        ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
             throw NotImplementedError()
         }
 
@@ -619,6 +605,7 @@ class AdapterTest {
 
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
         val request = com.izivia.ocpp.api.model.metervalues.MeterValuesReq(
+            connectorId = 11,
             evseId = 1,
             meterValue = listOf(
                 MeterValueType(

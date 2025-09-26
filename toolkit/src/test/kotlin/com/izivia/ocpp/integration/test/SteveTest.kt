@@ -1,10 +1,8 @@
 package com.izivia.ocpp.integration.test
 
-import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
 import com.izivia.ocpp.api.model.authorize.AuthorizeReq
-import com.izivia.ocpp.api.model.common.enumeration.HashAlgorithmEnumType
 import com.izivia.ocpp.api.model.bootnotification.BootNotificationReq
 import com.izivia.ocpp.api.model.bootnotification.ChargingStationType
 import com.izivia.ocpp.api.model.bootnotification.enumeration.BootReasonEnumType
@@ -13,7 +11,6 @@ import com.izivia.ocpp.api.model.cancelreservation.CancelReservationResp
 import com.izivia.ocpp.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import com.izivia.ocpp.api.model.certificateSigned.CertificateSignedReq
 import com.izivia.ocpp.api.model.certificateSigned.CertificateSignedResp
-import com.izivia.ocpp.api.model.common.MeterValueType
 import com.izivia.ocpp.api.model.changeavailability.ChangeAvailabilityReq
 import com.izivia.ocpp.api.model.changeavailability.ChangeAvailabilityResp
 import com.izivia.ocpp.api.model.changeavailability.enumeration.ChangeAvailabilityStatusEnumType
@@ -23,59 +20,45 @@ import com.izivia.ocpp.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import com.izivia.ocpp.api.model.clearchargingprofile.ClearChargingProfileReq
 import com.izivia.ocpp.api.model.clearchargingprofile.ClearChargingProfileResp
 import com.izivia.ocpp.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
-import com.izivia.ocpp.api.model.common.SampledValueType
 import com.izivia.ocpp.api.model.cleardisplaymessage.ClearDisplayMessageReq
-import com.izivia.ocpp.api.model.common.StatusInfoType
-import com.izivia.ocpp.api.model.common.enumeration.GenericDeviceModelStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MonitorEnumType
 import com.izivia.ocpp.api.model.cleardisplaymessage.ClearDisplayMessageResp
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearMonitoringResultType
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringReq
 import com.izivia.ocpp.api.model.clearvariablemonitoring.ClearVariableMonitoringResp
-import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
 import com.izivia.ocpp.api.model.clearvariablemonitoring.enumeration.ClearMonitoringStatusEnumType
-import com.izivia.ocpp.api.model.common.CertificateHashDataType
-import com.izivia.ocpp.api.model.common.ComponentType
-import com.izivia.ocpp.api.model.common.EVSEType
-import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.SignedMeterValueType
-import com.izivia.ocpp.api.model.common.VariableType
-import com.izivia.ocpp.api.model.common.enumeration.LocationEnumType
-import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
-import com.izivia.ocpp.api.model.common.enumeration.PhaseEnumType
-import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
+import com.izivia.ocpp.api.model.common.*
+import com.izivia.ocpp.api.model.common.enumeration.*
+import com.izivia.ocpp.api.model.costupdated.CostUpdatedReq
+import com.izivia.ocpp.api.model.costupdated.CostUpdatedResp
+import com.izivia.ocpp.api.model.customerinformation.CustomerInformationReq
+import com.izivia.ocpp.api.model.customerinformation.CustomerInformationResp
+import com.izivia.ocpp.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
 import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.datatransfer.DataTransferResp
 import com.izivia.ocpp.api.model.datatransfer.enumeration.DataTransferStatusEnumType
+import com.izivia.ocpp.api.model.deletecertificate.DeleteCertificateReq
+import com.izivia.ocpp.api.model.deletecertificate.DeleteCertificateResp
+import com.izivia.ocpp.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
 import com.izivia.ocpp.api.model.getallvariables.GetAllVariablesReq
 import com.izivia.ocpp.api.model.getallvariables.GetAllVariablesResp
 import com.izivia.ocpp.api.model.getallvariables.KeyValue
 import com.izivia.ocpp.api.model.getbasereport.GetBaseReportReq
 import com.izivia.ocpp.api.model.getbasereport.GetBaseReportResp
-import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleReq
-import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleResp
-import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionReq
-import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionResp
-import com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType
-import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesReq
-import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesResp
-import com.izivia.ocpp.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import com.izivia.ocpp.api.model.getchargingprofiles.GetChargingProfilesReq
 import com.izivia.ocpp.api.model.getchargingprofiles.GetChargingProfilesResp
 import com.izivia.ocpp.api.model.getchargingprofiles.enumeration.GetChargingProfileStatusEnumType
+import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleReq
+import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleResp
+import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesReq
+import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesResp
+import com.izivia.ocpp.api.model.getdisplaymessages.enumeration.GetDisplayMessagesStatusEnumType
 import com.izivia.ocpp.api.model.getinstalledcertificateids.CertificateHashDataChainType
 import com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
 import com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp
 import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
 import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
-import com.izivia.ocpp.api.model.customerinformation.CustomerInformationReq
-import com.izivia.ocpp.api.model.customerinformation.CustomerInformationResp
-import com.izivia.ocpp.api.model.customerinformation.enumeration.CustomerInformationStatusEnumType
-import com.izivia.ocpp.api.model.costupdated.CostUpdatedReq
-import com.izivia.ocpp.api.model.costupdated.CostUpdatedResp
-import com.izivia.ocpp.api.model.deletecertificate.DeleteCertificateReq
-import com.izivia.ocpp.api.model.deletecertificate.DeleteCertificateResp
-import com.izivia.ocpp.api.model.deletecertificate.enumerations.DeleteCertificateStatusEnumType
+import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionReq
+import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionResp
 import com.izivia.ocpp.api.model.getlog.GetLogReq
 import com.izivia.ocpp.api.model.getlog.GetLogResp
 import com.izivia.ocpp.api.model.getlog.enumeration.LogStatusEnumType
@@ -115,19 +98,20 @@ import com.izivia.ocpp.api.model.sendlocallist.enumeration.SendLocalListStatusEn
 import com.izivia.ocpp.api.model.setchargingprofile.SetChargingProfileReq
 import com.izivia.ocpp.api.model.setchargingprofile.SetChargingProfileResp
 import com.izivia.ocpp.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
-import com.izivia.ocpp.api.model.setvariablemonitoring.SetMonitoringResultType
-import com.izivia.ocpp.api.model.setvariablemonitoring.SetVariableMonitoringReq
-import com.izivia.ocpp.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import com.izivia.ocpp.api.model.setdisplaymessage.SetDisplayMessageReq
+import com.izivia.ocpp.api.model.setdisplaymessage.SetDisplayMessageResp
+import com.izivia.ocpp.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
+import com.izivia.ocpp.api.model.setmonitoringbase.SetMonitoringBaseReq
+import com.izivia.ocpp.api.model.setmonitoringbase.SetMonitoringBaseResp
 import com.izivia.ocpp.api.model.setmonitoringlevel.SetMonitoringLevelReq
 import com.izivia.ocpp.api.model.setmonitoringlevel.SetMonitoringLevelResp
 import com.izivia.ocpp.api.model.setnetworkprofile.SetNetworkProfileReq
 import com.izivia.ocpp.api.model.setnetworkprofile.SetNetworkProfileResp
 import com.izivia.ocpp.api.model.setnetworkprofile.enumeration.SetNetworkProfileStatusEnumType
-import com.izivia.ocpp.api.model.setmonitoringbase.SetMonitoringBaseReq
-import com.izivia.ocpp.api.model.setmonitoringbase.SetMonitoringBaseResp
-import com.izivia.ocpp.api.model.setdisplaymessage.SetDisplayMessageReq
-import com.izivia.ocpp.api.model.setdisplaymessage.SetDisplayMessageResp
-import com.izivia.ocpp.api.model.setdisplaymessage.enumeration.DisplayMessageStatusEnumType
+import com.izivia.ocpp.api.model.setvariablemonitoring.SetMonitoringResultType
+import com.izivia.ocpp.api.model.setvariablemonitoring.SetVariableMonitoringReq
+import com.izivia.ocpp.api.model.setvariablemonitoring.SetVariableMonitoringResp
+import com.izivia.ocpp.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import com.izivia.ocpp.api.model.setvariables.SetVariableResultType
 import com.izivia.ocpp.api.model.setvariables.SetVariablesReq
 import com.izivia.ocpp.api.model.setvariables.SetVariablesResp
@@ -152,7 +136,6 @@ import com.izivia.ocpp.api.model.unpublishfirmware.enumeration.UnpublishFirmware
 import com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.api.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
-import com.izivia.ocpp.api.model.setvariablemonitoring.enumeration.SetMonitoringStatusEnumType
 import com.izivia.ocpp.integration.ApiFactory
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
@@ -480,84 +463,90 @@ fun main(args: Array<String>) {
         }
 
         override fun installCertificate(
-                meta: RequestMetadata,
-                req: InstallCertificateReq
+            meta: RequestMetadata,
+            req: InstallCertificateReq
         ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
             val response = InstallCertificateResp(
-                    InstallCertificateStatusEnumType.Accepted,
-                    StatusInfoType("reason","info")
+                InstallCertificateStatusEnumType.Accepted,
+                StatusInfoType("reason", "info")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun customerInformation(
-                meta: RequestMetadata,
-                req: CustomerInformationReq
+            meta: RequestMetadata,
+            req: CustomerInformationReq
         ): OperationExecution<CustomerInformationReq, CustomerInformationResp> {
             val response = CustomerInformationResp(
-                    CustomerInformationStatusEnumType.Accepted,
+                CustomerInformationStatusEnumType.Accepted,
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getInstalledCertificateIds(
-                meta: RequestMetadata,
-                req: GetInstalledCertificateIdsReq
+            meta: RequestMetadata,
+            req: GetInstalledCertificateIdsReq
         ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
             val response = GetInstalledCertificateIdsResp(
-                    GetInstalledCertificateStatusEnumType.Accepted,
-                    listOf(
-                            CertificateHashDataChainType(GetCertificateIdUseEnumType.CSMSRootCertificate, CertificateHashDataType(
-                                HashAlgorithmEnumType.SHA512, "", "", ""), listOf(CertificateHashDataType(
-                                HashAlgorithmEnumType.SHA512, "", "", ""), CertificateHashDataType(HashAlgorithmEnumType.SHA512, "", "", ""))),
+                GetInstalledCertificateStatusEnumType.Accepted,
+                listOf(
+                    CertificateHashDataChainType(
+                        GetCertificateIdUseEnumType.CSMSRootCertificate, CertificateHashDataType(
+                            HashAlgorithmEnumType.SHA512, "", "", ""
+                        ), listOf(
+                            CertificateHashDataType(
+                                HashAlgorithmEnumType.SHA512, "", "", ""
+                            ), CertificateHashDataType(HashAlgorithmEnumType.SHA512, "", "", "")
+                        )
                     ),
-                    StatusInfoType("reason", "info")
+                ),
+                StatusInfoType("reason", "info")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun unpublishFirmware(
-                meta: RequestMetadata,
-                req: UnpublishFirmwareReq
+            meta: RequestMetadata,
+            req: UnpublishFirmwareReq
         ): OperationExecution<UnpublishFirmwareReq, UnpublishFirmwareResp> {
             val response = UnpublishFirmwareResp(UnpublishFirmwareStatusEnumType.DownloadOngoing)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getChargingProfiles(
-                meta: RequestMetadata,
-                req: GetChargingProfilesReq
+            meta: RequestMetadata,
+            req: GetChargingProfilesReq
         ): OperationExecution<GetChargingProfilesReq, GetChargingProfilesResp> {
-            val response = GetChargingProfilesResp (
+            val response = GetChargingProfilesResp(
                 GetChargingProfileStatusEnumType.Accepted,
-                StatusInfoType("reason","info")
+                StatusInfoType("reason", "info")
             )
 
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun publishFirmware(
-                meta: RequestMetadata,
-                req: PublishFirmwareReq
+            meta: RequestMetadata,
+            req: PublishFirmwareReq
         ): OperationExecution<PublishFirmwareReq, PublishFirmwareResp> {
             val response = PublishFirmwareResp(GenericStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun setVariableMonitoring(
-                meta: RequestMetadata,
-                req: SetVariableMonitoringReq
+            meta: RequestMetadata,
+            req: SetVariableMonitoringReq
         ): OperationExecution<SetVariableMonitoringReq, SetVariableMonitoringResp> {
             val response = SetVariableMonitoringResp(
                 listOf(
-                    SetMonitoringResultType (
-                            id = 23,
-                            status = SetMonitoringStatusEnumType.Accepted,
-                            type = MonitorEnumType.Delta,
-                            severity = 3,
-                            component = ComponentType("name"),
-                            variable = VariableType("name"),
-                            statusInfo = StatusInfoType("reason", "info")
+                    SetMonitoringResultType(
+                        id = 23,
+                        status = SetMonitoringStatusEnumType.Accepted,
+                        type = MonitorEnumType.Delta,
+                        severity = 3,
+                        component = ComponentType("name"),
+                        variable = VariableType("name"),
+                        statusInfo = StatusInfoType("reason", "info")
                     )
                 )
             )
@@ -565,78 +554,78 @@ fun main(args: Array<String>) {
         }
 
         override fun setMonitoringLevel(
-                meta: RequestMetadata,
-                req: SetMonitoringLevelReq
+            meta: RequestMetadata,
+            req: SetMonitoringLevelReq
         ): OperationExecution<SetMonitoringLevelReq, SetMonitoringLevelResp> {
             val response = SetMonitoringLevelResp(
                 GenericStatusEnumType.Accepted,
-                StatusInfoType("reason","additionnal")
+                StatusInfoType("reason", "additionnal")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun setNetworkProfile(
-                meta: RequestMetadata,
-                req: SetNetworkProfileReq
+            meta: RequestMetadata,
+            req: SetNetworkProfileReq
         ): OperationExecution<SetNetworkProfileReq, SetNetworkProfileResp> {
             val response = SetNetworkProfileResp(SetNetworkProfileStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getTransactionStatus(
-                meta: RequestMetadata,
-                req: GetTransactionStatusReq
+            meta: RequestMetadata,
+            req: GetTransactionStatusReq
         ): OperationExecution<GetTransactionStatusReq, GetTransactionStatusResp> {
-            val response = GetTransactionStatusResp(false,true)
+            val response = GetTransactionStatusResp(false, true)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun setMonitoringBase(
-                meta: RequestMetadata,
-                req: SetMonitoringBaseReq
+            meta: RequestMetadata,
+            req: SetMonitoringBaseReq
         ): OperationExecution<SetMonitoringBaseReq, SetMonitoringBaseResp> {
             val response = SetMonitoringBaseResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getDisplayMessages(
-                meta: RequestMetadata,
-                req: GetDisplayMessagesReq
+            meta: RequestMetadata,
+            req: GetDisplayMessagesReq
         ): OperationExecution<GetDisplayMessagesReq, GetDisplayMessagesResp> {
             val response = GetDisplayMessagesResp(
                 GetDisplayMessagesStatusEnumType.Accepted,
-                StatusInfoType("reason","more")
+                StatusInfoType("reason", "more")
             )
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun setDisplayMessage(
-                meta: RequestMetadata,
-                req: SetDisplayMessageReq
+            meta: RequestMetadata,
+            req: SetDisplayMessageReq
         ): OperationExecution<SetDisplayMessageReq, SetDisplayMessageResp> {
             val response = SetDisplayMessageResp(DisplayMessageStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun costUpdated(
-                meta: RequestMetadata,
-                req: CostUpdatedReq
+            meta: RequestMetadata,
+            req: CostUpdatedReq
         ): OperationExecution<CostUpdatedReq, CostUpdatedResp> {
             val response = CostUpdatedResp()
-            return OperationExecution(ExecutionMetadata(meta,RequestStatus.SUCCESS),req,response)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun deleteCertificate(
-                meta: RequestMetadata,
-                req: DeleteCertificateReq
+            meta: RequestMetadata,
+            req: DeleteCertificateReq
         ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
             val response = DeleteCertificateResp(DeleteCertificateStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
         }
 
         override fun getMonitoringReport(
-                meta: RequestMetadata,
-                req: GetMonitoringReportReq
+            meta: RequestMetadata,
+            req: GetMonitoringReportReq
         ): OperationExecution<GetMonitoringReportReq, GetMonitoringReportResp> {
             val response = GetMonitoringReportResp(GenericDeviceModelStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
@@ -661,6 +650,7 @@ fun main(args: Array<String>) {
 
     meterValues(
         csmsApi, ocppId, MeterValuesReq(
+            connectorId = 31,
             evseId = 3,
             meterValue = listOf(
                 MeterValueType(
