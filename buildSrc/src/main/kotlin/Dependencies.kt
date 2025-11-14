@@ -28,6 +28,7 @@ fun Project.coreProject() {
         "implementation"("org.slf4j:slf4j-api:_")
 
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:_")
+        "testImplementation"("org.junit.jupiter:junit-jupiter-params:_")
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:_")
 
         "testImplementation"("io.strikt:strikt-core:_")
