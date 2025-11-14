@@ -16,6 +16,7 @@ dependencies {
     implementation("org.mapstruct:mapstruct:_")
     kapt("org.mapstruct:mapstruct-processor:_")
     runtimeOnly("ch.qos.logback:logback-classic:_")
+    testImplementation(testFixtures(project(":generic-api")))
 }
 
 java {

@@ -1,25 +1,6 @@
 package com.izivia.ocpp.adapter16.test
 
-import com.izivia.ocpp.adapter16.mapper.CancelReservationMapper
-import com.izivia.ocpp.adapter16.mapper.ChangeAvailabilityMapper
-import com.izivia.ocpp.adapter16.mapper.ChangeConfigurationMapper
-import com.izivia.ocpp.adapter16.mapper.ClearCacheMapper
-import com.izivia.ocpp.adapter16.mapper.ClearChargingProfileMapper
-import com.izivia.ocpp.adapter16.mapper.DataTransferMapper
-import com.izivia.ocpp.adapter16.mapper.DiagnosticsStatusNotificationMapper
-import com.izivia.ocpp.adapter16.mapper.FirmwareStatusNotificationMapper
-import com.izivia.ocpp.adapter16.mapper.GetCompositeScheduleMapper
-import com.izivia.ocpp.adapter16.mapper.GetConfigurationMapper
-import com.izivia.ocpp.adapter16.mapper.GetDiagnosticsMapper
-import com.izivia.ocpp.adapter16.mapper.GetLocalListVersionMapper
-import com.izivia.ocpp.adapter16.mapper.RemoteStartTransactionMapper
-import com.izivia.ocpp.adapter16.mapper.RemoteStopTransactionMapper
-import com.izivia.ocpp.adapter16.mapper.ReserveNowMapper
-import com.izivia.ocpp.adapter16.mapper.SendLocalListMapper
-import com.izivia.ocpp.adapter16.mapper.SetChargingProfileMapper
-import com.izivia.ocpp.adapter16.mapper.TriggerMessageMapper
-import com.izivia.ocpp.adapter16.mapper.UnlockConnectorMapper
-import com.izivia.ocpp.adapter16.mapper.UpdateFirmwareMapper
+import com.izivia.ocpp.adapter16.mapper.*
 import com.izivia.ocpp.api.model.cancelreservation.CancelReservationResp
 import com.izivia.ocpp.api.model.cancelreservation.enumeration.CancelReservationStatusEnumType
 import com.izivia.ocpp.api.model.changeavailability.ChangeAvailabilityResp
@@ -30,18 +11,8 @@ import com.izivia.ocpp.api.model.clearcache.ClearCacheResp
 import com.izivia.ocpp.api.model.clearcache.enumeration.ClearCacheStatusEnumType
 import com.izivia.ocpp.api.model.clearchargingprofile.ClearChargingProfileResp
 import com.izivia.ocpp.api.model.clearchargingprofile.enumeration.ClearChargingProfileStatusEnumType
-import com.izivia.ocpp.api.model.common.ChargingSchedulePeriodType
-import com.izivia.ocpp.api.model.common.ChargingScheduleType
-import com.izivia.ocpp.api.model.common.ComponentType
-import com.izivia.ocpp.api.model.common.EVSEType
-import com.izivia.ocpp.api.model.common.IdTokenType
-import com.izivia.ocpp.api.model.common.StatusInfoType
-import com.izivia.ocpp.api.model.common.VariableType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingProfilePurposeEnumType
-import com.izivia.ocpp.api.model.common.enumeration.ChargingRateUnitEnumType
-import com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType
-import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
-import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
+import com.izivia.ocpp.api.model.common.*
+import com.izivia.ocpp.api.model.common.enumeration.*
 import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -73,12 +44,15 @@ import com.izivia.ocpp.api.model.setchargingprofile.enumeration.ChargingProfileS
 import com.izivia.ocpp.api.model.setvariables.SetVariableResultType
 import com.izivia.ocpp.api.model.setvariables.SetVariablesResp
 import com.izivia.ocpp.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumType
+import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
 import com.izivia.ocpp.api.model.triggermessage.TriggerMessageResp
 import com.izivia.ocpp.api.model.triggermessage.enumeration.MessageTriggerEnumType
 import com.izivia.ocpp.api.model.triggermessage.enumeration.TriggerMessageStatusEnumType
 import com.izivia.ocpp.api.model.unlockconnector.UnlockConnectorResp
 import com.izivia.ocpp.api.model.unlockconnector.enumeration.UnlockStatusEnumType
 import com.izivia.ocpp.api.model.updatefirmware.FirmwareType
+import com.izivia.ocpp.api.transactionEventReq
 import com.izivia.ocpp.core16.model.cancelreservation.CancelReservationReq
 import com.izivia.ocpp.core16.model.cancelreservation.enumeration.CancelReservationStatus
 import com.izivia.ocpp.core16.model.changeavailability.ChangeAvailabilityReq
@@ -116,6 +90,8 @@ import com.izivia.ocpp.core16.model.sendlocallist.enumeration.UpdateStatus
 import com.izivia.ocpp.core16.model.sendlocallist.enumeration.UpdateType
 import com.izivia.ocpp.core16.model.setchargingprofile.SetChargingProfileReq
 import com.izivia.ocpp.core16.model.setchargingprofile.enumeration.ChargingProfileStatus
+import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointErrorCode
+import com.izivia.ocpp.core16.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core16.model.triggermessage.TriggerMessageReq
 import com.izivia.ocpp.core16.model.triggermessage.enumeration.MessageTrigger
 import com.izivia.ocpp.core16.model.triggermessage.enumeration.TriggerMessageStatus
@@ -124,11 +100,17 @@ import com.izivia.ocpp.core16.model.unlockconnector.enumeration.UnlockStatus
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareReq
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.ArgumentsProvider
+import org.junit.jupiter.params.provider.ArgumentsSource
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import java.util.stream.Stream
 
 class MapperTest {
     @Test
@@ -675,4 +657,46 @@ class MapperTest {
             .and { get { retries }.isEqualTo(2) }
             .and { get { retryInterval }.isEqualTo(3) }
     }
+
+    @ParameterizedTest
+    @ArgumentsSource(StatusNotificationReqArgumentsProvider::class)
+    fun requestStatusNotificationMapper(
+        eventType: TransactionEventEnumType,
+        chargingState: ChargingStateEnumType,
+        expectedStatus: ChargePointStatus
+    ) {
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val instant = Instant.parse("2022-02-15T00:00:00.000Z")
+        val conId = 1
+
+        val transactionReq = transactionEventReq {
+            eventType(eventType)
+            timestamp(instant)
+            evse {
+                connectorId(conId)
+            }
+            transactionInfo {
+                transactionId("0")
+                chargingState(chargingState)
+            }
+        }
+
+        val req = mapper.genToCoreReq(transactionReq)
+
+        expectThat(req)
+            .and {
+                get { status }.isEqualTo(expectedStatus)
+                get { connectorId }.isEqualTo(conId)
+                get { errorCode }.isEqualTo(ChargePointErrorCode.NoError)
+                get { timestamp }.isEqualTo(instant)
+            }
+    }
 }
+
+class StatusNotificationReqArgumentsProvider : ArgumentsProvider {
+    override fun provideArguments(context: ExtensionContext): Stream<Arguments> = Stream.of(
+        Arguments.of(TransactionEventEnumType.Started, ChargingStateEnumType.EVConnected, ChargePointStatus.Preparing),
+        Arguments.of(TransactionEventEnumType.Ended, ChargingStateEnumType.EVConnected, ChargePointStatus.Finishing)
+    )
+}
+

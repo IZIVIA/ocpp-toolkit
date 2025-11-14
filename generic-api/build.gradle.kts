@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     java
     `maven-publish`
+    `java-test-fixtures`
 }
 
 coreProject()
