@@ -1,3 +1,5 @@
 package com.izivia.ocpp.core15.model.statusnotification
 
-class StatusNotificationResp
+import com.izivia.ocpp.core15.model.Response
+
+class StatusNotificationResp: Response

@@ -1,3 +1,5 @@
 package com.izivia.ocpp.core15.model.updatefirmware
 
-class UpdateFirmwareResp
+import com.izivia.ocpp.core15.model.Response
+
+class UpdateFirmwareResp: Response

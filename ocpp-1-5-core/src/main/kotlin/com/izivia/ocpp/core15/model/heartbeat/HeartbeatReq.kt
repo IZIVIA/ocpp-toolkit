@@ -1,3 +1,5 @@
 package com.izivia.ocpp.core15.model.heartbeat
 
-class HeartbeatReq
+import com.izivia.ocpp.core15.model.Request
+
+class HeartbeatReq: Request

@@ -1,5 +1,6 @@
 package com.izivia.ocpp.core15.model.sendlocallist
 
+import com.izivia.ocpp.core15.model.Request
 import com.izivia.ocpp.core15.model.sendlocallist.enumeration.UpdateType
 
 data class SendLocalListReq(
@@ -7,4 +8,4 @@ data class SendLocalListReq(
     val listVersion: Int,
     val localAuthorizationList: List<AuthorisationData>? = null,
     val updateType: UpdateType
-)
+): Request

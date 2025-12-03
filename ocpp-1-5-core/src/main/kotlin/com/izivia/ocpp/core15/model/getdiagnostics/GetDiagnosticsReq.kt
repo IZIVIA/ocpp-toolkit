@@ -1,5 +1,6 @@
 package com.izivia.ocpp.core15.model.getdiagnostics
 
+import com.izivia.ocpp.core15.model.Request
 import kotlinx.datetime.Instant
 
 data class GetDiagnosticsReq(
@@ -8,4 +9,4 @@ data class GetDiagnosticsReq(
     val retryInterval: Int? = null,
     val startTime: Instant? = null,
     val stopTime: Instant? = null
-)
+): Request

@@ -1,5 +1,6 @@
 package com.izivia.ocpp.core15.model.reservenow
 
+import com.izivia.ocpp.core15.model.Request
 import kotlinx.datetime.Instant
 
 data class ReserveNowReq(
@@ -8,4 +9,4 @@ data class ReserveNowReq(
     val idTag: String,
     val parentIdTag: String? = null,
     val reservationId: Int
-)
+): Request

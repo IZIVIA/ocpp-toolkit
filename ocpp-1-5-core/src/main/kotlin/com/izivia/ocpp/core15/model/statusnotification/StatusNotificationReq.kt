@@ -1,5 +1,6 @@
 package com.izivia.ocpp.core15.model.statusnotification
 
+import com.izivia.ocpp.core15.model.Request
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.utils.HasActionTimestamp
@@ -13,4 +14,4 @@ data class StatusNotificationReq(
     override val timestamp: Instant? = null,
     val vendorId: String? = null,
     val vendorErrorCode: String? = null
-) : HasActionTimestamp
+) : HasActionTimestamp, Request
