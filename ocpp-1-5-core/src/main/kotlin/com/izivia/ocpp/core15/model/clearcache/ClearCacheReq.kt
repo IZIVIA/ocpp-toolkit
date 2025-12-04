@@ -1,3 +1,5 @@
 package com.izivia.ocpp.core15.model.clearcache
 
-class ClearCacheReq
+import com.izivia.ocpp.core15.model.Request
+
+class ClearCacheReq: Request

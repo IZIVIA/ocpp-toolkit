@@ -1,3 +1,5 @@
 package com.izivia.ocpp.core15.model.diagnosticsstatusnotification
 
-class DiagnosticsStatusNotificationResp
+import com.izivia.ocpp.core15.model.Response
+
+class DiagnosticsStatusNotificationResp: Response

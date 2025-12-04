@@ -1,5 +1,7 @@
 package com.izivia.ocpp.core15.model.bootnotification
 
+import com.izivia.ocpp.core15.model.Request
+
 data class BootNotificationReq(
     val chargeBoxSerialNumber: String? = null,
     val chargePointModel: String,
@@ -10,4 +12,4 @@ data class BootNotificationReq(
     val imsi: String? = null,
     val meterSerialNumber: String? = null,
     val meterType: String? = null
-)
+): Request
