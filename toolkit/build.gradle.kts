@@ -28,12 +28,12 @@ dependencies {
     api(project(":ocpp-transport-soap"))
     api(project(":ocpp-2-0-api-adapter"))
     api(project(":ocpp-2-0-core"))
-    api(project(":utils"))
     api(project(":ocpp-transport"))
     api(project(":operation-information"))
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:_")
     testImplementation("org.mockito:mockito-inline:_")
+    testImplementation(project(":utils"))
 }
 
 java {
