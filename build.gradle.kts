@@ -32,6 +32,11 @@ subprojects {
         plugin("signing")
     }
 
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+    }
+
     tasks.withType<KotlinCompile>().all {
         kotlinOptions {
             jvmTarget = "17"
