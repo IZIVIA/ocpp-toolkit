@@ -9,6 +9,7 @@ import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import kotlinx.datetime.Clock
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
@@ -205,9 +206,10 @@ class WampLoadTest {
     }
 
     class LocalServerManager(val port: Int) : ServerManager {
-        private val server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        private val transport = OcppWampServer.newServer(setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        private val server = transport.asServer(port)
         override fun start() {
-            server.register(object : OcppWampServerHandler {
+            transport.register(object : OcppWampServerHandler {
                 override fun accept(ocppId: CSOcppId): Boolean = true
 
                 override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
@@ -230,7 +232,8 @@ class WampLoadTest {
         }
 
         override fun shutdown() {
-            server.shutdown()
+            transport.shutdown()
+            server.stop()
         }
 
         override fun stop() {

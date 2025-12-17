@@ -137,7 +137,9 @@ import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import kotlinx.datetime.Clock
+import org.http4k.server.Http4kServer
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -154,14 +156,15 @@ class IntegrationTestCSApi {
     fun getFreePort(): Int =
         ServerSocket(0).use { it.localPort }
 
-    private lateinit var server: OcppWampServer
+    private lateinit var transport: OcppWampServer
     private val port = getFreePort()
+    private lateinit var server: Http4kServer
     private lateinit var csApi: CSApi
 
     @BeforeEach
     fun init() {
-        server = OcppWampServer.newServer(port, setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
-        server.register(object : OcppWampServerHandler {
+        transport = OcppWampServer.newServer(setOf(OcppVersion.OCPP_1_6, OcppVersion.OCPP_2_0))
+        transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: String): Boolean = "chargePoint2" == ocppId
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage =
@@ -175,6 +178,7 @@ class IntegrationTestCSApi {
                     }
                 }
         })
+        server = transport.asServer(port)
 
         server.start()
 
@@ -632,7 +636,7 @@ class IntegrationTestCSApi {
 
         csmsApi.connect()
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -640,7 +644,7 @@ class IntegrationTestCSApi {
                 "{\"connectorId\": 1,\"type\": \"Operative\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -648,7 +652,7 @@ class IntegrationTestCSApi {
                 "{\"key\": \"key\",\"value\": \"empty\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -656,7 +660,7 @@ class IntegrationTestCSApi {
                 "{}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -664,7 +668,7 @@ class IntegrationTestCSApi {
                 "{\"idTag\": \"Tag1\",\"connectorId\": 2}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -672,7 +676,7 @@ class IntegrationTestCSApi {
                 "{\"transactionId\": 15}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -680,7 +684,7 @@ class IntegrationTestCSApi {
                 "{\"connectorId\": 2}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -689,7 +693,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -698,7 +702,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -706,7 +710,7 @@ class IntegrationTestCSApi {
                 "{\"key\": [\"AllowOfflineTxForUnknownId\",\"AuthorizationCacheEnabled\"]}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -714,7 +718,7 @@ class IntegrationTestCSApi {
                 "{\"reservationId\": 3}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -722,7 +726,7 @@ class IntegrationTestCSApi {
                 "{\"id\": 4}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -730,7 +734,7 @@ class IntegrationTestCSApi {
                 "{\"connectorId\": 1, \"duration\": 2}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -738,7 +742,7 @@ class IntegrationTestCSApi {
                 "{}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -746,7 +750,7 @@ class IntegrationTestCSApi {
                 "{\"location\": \"http://www.ietf.org/rfc/rfc2396.txt\",\"retrieveDate\": \"2022-02-15T00:00:00.000Z\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -755,7 +759,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -763,7 +767,7 @@ class IntegrationTestCSApi {
                 "{\"requestedMessage\": \"BootNotification\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
 
@@ -773,7 +777,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -781,7 +785,7 @@ class IntegrationTestCSApi {
                 "{\"connectorId\": 1, \"expiryDate\": \"2022-02-15T00:00:00.000Z\", \"idTag\": \"Tag1\", \"parentIdTag\": \"Tag2\", \"reservationId\": 2}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -790,7 +794,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -799,7 +803,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -843,7 +847,7 @@ class IntegrationTestCSApi {
 
         csmsApi.connect()
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -851,7 +855,7 @@ class IntegrationTestCSApi {
                 "{\"operationalStatus\": \"Operative\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
 
@@ -860,7 +864,7 @@ class IntegrationTestCSApi {
                 "{\"setVariableData\": [ {\"attributeValue\": \"value\", \"component\": {\"name\": \"component1\"}, \"variable\": {\"name\":\"variable1\"}} ]}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -868,7 +872,7 @@ class IntegrationTestCSApi {
                 "{}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
 
@@ -877,7 +881,7 @@ class IntegrationTestCSApi {
                 "{\"remoteStartId\": 12,\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -885,7 +889,7 @@ class IntegrationTestCSApi {
                 "{\"transactionId\": \"15\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -893,11 +897,11 @@ class IntegrationTestCSApi {
                 "{\"connectorId\": 2,\"evseId\": 0}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call("1", "Reset", "{\"type\": \"OnIdle\"}")
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -905,11 +909,11 @@ class IntegrationTestCSApi {
                 "{\"getVariableData\": [{\"component\": {\"name\": \"component\"}, \"variable\": {\"name\":\"AllowOfflineTxForUnknownId\"}}]}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call("1", "GetReport", "{\"requestId\": 1}")
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
 
@@ -918,11 +922,11 @@ class IntegrationTestCSApi {
                 "{\"requestId\": 1, \"reportBase\": \"ConfigurationInventory\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call("1", "CancelReservation", "{\"reservationId\": 3}")
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -930,7 +934,7 @@ class IntegrationTestCSApi {
                 "{\"chargingProfileId\": 4}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -938,7 +942,7 @@ class IntegrationTestCSApi {
                 "{\"evseId\": 1, \"duration\": 2}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -946,7 +950,7 @@ class IntegrationTestCSApi {
                 "{}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -954,7 +958,7 @@ class IntegrationTestCSApi {
                 "{\"requestId\": 1, \"firmware\": { \"location\": \"http://www.ietf.org/rfc/rfc2396.txt\", \"retrieveDateTime\": \"2022-02-15T00:00:00.000Z\"}}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -962,7 +966,7 @@ class IntegrationTestCSApi {
                 "{\"versionNumber\": 1, \"updateType\": \"Full\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -970,7 +974,7 @@ class IntegrationTestCSApi {
                 "{\"requestedMessage\": \"BootNotification\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
 
@@ -979,7 +983,7 @@ class IntegrationTestCSApi {
                 "{\"evseId\": 1, \"chargingProfile\": {\"id\": 1, \"stackLevel\": 1, \"chargingProfilePurpose\": \"TxProfile\", \"chargingProfileKind\": \"Absolute\", \"chargingSchedule\": [{\"id\": 1, \"chargingRateUnit\": \"W\", \"chargingSchedulePeriod\": [{\"startPeriod\": 1, \"limit\": 1.5}]}]}}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -987,7 +991,7 @@ class IntegrationTestCSApi {
                 "{\"id\": 1, \"expiryDateTime\": \"2022-02-15T00:00:00.000Z\", \"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -996,7 +1000,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1004,7 +1008,7 @@ class IntegrationTestCSApi {
                 "{\"vendorId\": \"vendorId\", \"messageId\": \"messageId\", \"data\": \"Some data\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1013,7 +1017,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1022,7 +1026,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1042,7 +1046,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1058,7 +1062,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1066,7 +1070,7 @@ class IntegrationTestCSApi {
                 "{\"certificateType\": \"CSMSRootCertificate\", \"certificate\": \"certificateString\"}"
             )
         )
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1091,7 +1095,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1100,7 +1104,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1117,7 +1121,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1144,7 +1148,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1153,7 +1157,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1191,7 +1195,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1200,7 +1204,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1209,7 +1213,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1218,7 +1222,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1227,7 +1231,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1252,7 +1256,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1270,7 +1274,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",
@@ -1298,7 +1302,7 @@ class IntegrationTestCSApi {
             )
         )
 
-        server.sendBlocking(
+        transport.sendBlocking(
             "chargePoint2",
             WampMessage.Call(
                 "1",

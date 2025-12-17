@@ -46,7 +46,7 @@ class OcppSoapClientTransportTest {
             """.trimIndent()
         ).start()
 
-        val client = OcppSoapClientTransport(
+        val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 path = "/ocpp/soap",
                 port = 5001
@@ -69,7 +69,7 @@ class OcppSoapClientTransportTest {
 
     @Test
     fun `should throw an OcppCallErrorException because the target is unreachable`() {
-        val client = OcppSoapClientTransport(
+        val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 path = "/ocpp/soap",
                 port = 5001
@@ -91,7 +91,7 @@ class OcppSoapClientTransportTest {
     fun `should receive an OCPP 1-6 HeartBeat request`() {
         var received = false
         val time = Instant.parse("2022-05-17T15:42:00.503Z")
-        val client = OcppSoapClientTransport(
+        val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 path = "",
                 port = 5001
@@ -148,7 +148,7 @@ class OcppSoapClientTransportTest {
     @Test
     fun `should not receive the OCPP 1-6 HeartBeat request because there is no handler`() {
         val received = false
-        val client = OcppSoapClientTransport(
+        val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 path = "/ocpp/soap",
                 port = 5001

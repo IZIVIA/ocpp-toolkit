@@ -22,7 +22,6 @@ import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 private val logger = KotlinLogging.logger {}
 
 class WebsocketServer(
-    port: Int,
     ocppVersions: Set<OcppVersion>,
     path: String,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
@@ -30,11 +29,8 @@ class WebsocketServer(
 ) : ServerTransport {
 
     private val server: OcppWampServer =
-        OcppWampServer.newServer(port = port, ocppVersions = ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path = path, listeners = listeners)
-
-    override fun start(): Unit = server.start()
-
-    override fun stop(): Unit = server.stop()
+        OcppWampServer.newServer(ocppVersions = ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path = path, listeners = listeners)
+    val serverConfig = server.config()
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P =
         try {

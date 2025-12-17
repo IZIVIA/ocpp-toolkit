@@ -7,14 +7,15 @@ import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.WsServerConfig
+import com.izivia.ocpp.wamp.server.asServer
+import io.undertow.server.HttpServerExchange
 import kotlinx.datetime.Clock
-import org.http4k.server.Http4kServer
-import org.http4k.server.asServer
+import org.http4k.routing.RoutingWsHandler
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
 class UndertowOcppWampServer(
-    val port: Int,
     val ocppVersions: Set<OcppVersion>,
     path: String = "ws",
     val settings: OcppWampServerSettings = OcppWampServerSettings(),
@@ -22,11 +23,11 @@ class UndertowOcppWampServer(
 ) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
     private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
-    private var server: Http4kServer? = null
-    private var wsApp: OcppWampServerApp? = null
-    private var ocppWsEndpoint = OcppWsEndpoint(path)
+    private val wsApp: OcppWampServerApp
+    private val serverConfig: WsServerConfig
+    private val ocppWsEndpoint = OcppWsEndpoint(path)
 
-    override fun start() {
+    init {
         wsApp = OcppWampServerApp(
             ocppVersions = ocppVersions,
             handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
@@ -34,55 +35,44 @@ class UndertowOcppWampServer(
             ocppWsEndpoint = ocppWsEndpoint,
             settings = settings
         )
-            .also {
-                server = it.newRoutingHandler().asServer(
-                    Undertow(
-                        port = port,
-                        enableHttp2 = true,
-                        acceptWebSocketPredicate = { exch ->
-                            // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-                            ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId ->
-                                handlers
-                                    .filter { h -> h.accept(ocppId) }
-                                    .also { selectedHandler[ocppId] = it }
-                            } != null
-                        },
-                        wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
-                    )
-                ).start()
-            }
-        logger.info(
-            "starting ocpp wamp server 1.0.2 on port $port" +
-                " -- ocpp versions=$ocppVersions - timeout=${settings.timeoutInMs} ms"
-        )
+        val handler = wsApp.newRoutingHandler()
+        val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean = { exch ->
+            // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
+            ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId ->
+                handlers
+                    .filter { h -> h.accept(ocppId) }
+                    .also { selectedHandler[ocppId] = it }
+            } != null
+        }
+        val wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
+        serverConfig = object : WsServerConfig {
+            override val handler: RoutingWsHandler
+                get() = handler
+            override val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean
+                get() = acceptWebSocketPredicate
+            override val wsSubprotocols: Set<String>
+                get() = wsSubprotocols
+        }
+    }
+
+    override fun config(): WsServerConfig {
+        return serverConfig
     }
 
     override fun shutdown() {
-        logger.info("shutting down ocpp wamp server of port $port")
-        wsApp?.shutdown()
-        stop()
-    }
-
-    override fun stop() {
-        logger.info("stopping ocpp wamp server of port $port")
-        server?.stop()
-        server = null
-        wsApp = null
+        logger.info("shutting down ocpp wamp server")
+        wsApp.shutdown()
     }
 
     override fun sendBlocking(ocppId: CSOcppId, message: WampMessage, timeoutInMs: Long?): WampMessage =
-        getWsApp()
-            .sendBlocking(ocppId, message, timeoutInMs = timeoutInMs)
+        wsApp.sendBlocking(ocppId, message, timeoutInMs = timeoutInMs)
 
     override fun register(handler: OcppWampServerHandler) {
         handlers.add(handler)
     }
 
     override fun getChargingStationOcppVersion(ocppId: CSOcppId): OcppVersion =
-        getWsApp()
-            .getChargingStationOcppVersion(ocppId)
-
-    private fun getWsApp() = (wsApp ?: throw IllegalStateException("server not started"))
+        wsApp.getChargingStationOcppVersion(ocppId)
 
     companion object {
         private val logger = LoggerFactory.getLogger(UndertowOcppWampServer::class.java)
@@ -91,8 +81,9 @@ class UndertowOcppWampServer(
 
 // example only
 fun main() {
-    val server = UndertowOcppWampServer(5000, setOf(OcppVersion.OCPP_1_6))
-    server.register(object : OcppWampServerHandler {
+    val transport = UndertowOcppWampServer(setOf(OcppVersion.OCPP_1_6))
+    val server = transport.asServer(5000)
+    transport.register(object : OcppWampServerHandler {
         override fun accept(ocppId: CSOcppId): Boolean = listOf("TEST1", "TEST2").contains(ocppId)
 
         override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =

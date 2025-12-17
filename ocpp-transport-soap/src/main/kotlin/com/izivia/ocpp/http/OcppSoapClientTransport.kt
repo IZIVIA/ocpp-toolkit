@@ -9,28 +9,39 @@ import org.http4k.contract.bindContract
 import org.http4k.contract.contract
 import org.http4k.core.*
 import org.http4k.server.Http4kServer
+import org.http4k.server.ServerConfig
 import org.http4k.server.Undertow
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 
-class OcppSoapClientTransport(
-    private val clientSettings: SoapClientSettings,
+class OcppSoapClientTransport private constructor(
     private val ocppId: String,
     target: String,
     private val ocppSoapParser: OcppSoapParser,
-    private val headers: RequestHeaders = listOf(
-        "Content-Type" to "application/soap+xml;charset=utf-8;"
-    ),
-    private val newMessageId: () -> String = { UUID.randomUUID().toString() }
+    private val headers: RequestHeaders,
+    private val newMessageId: () -> String,
+    private val path: String,
+    config: ServerConfig,
 ) : ClientTransport {
 
     companion object {
         private val logger = LoggerFactory.getLogger(OcppSoapClientTransport::class.java)
+
+        fun createClient(
+            clientSettings: SoapClientSettings,
+            ocppId: String,
+            target: String,
+            ocppSoapParser: OcppSoapParser,
+            headers: RequestHeaders = listOf(
+                "Content-Type" to "application/soap+xml;charset=utf-8;"
+            ),
+            newMessageId: () -> String = { UUID.randomUUID().toString() }
+        ) = OcppSoapClientTransport(ocppId, target, ocppSoapParser, headers, newMessageId, clientSettings.path, Undertow(port = clientSettings.port))
     }
 
-    private val server: Http4kServer?
+    private val server: Http4kServer
     private val client = JavaHttpClient()
 
     private val handlers = mutableListOf<(HttpMessage) -> HttpMessage?>()
@@ -40,7 +51,7 @@ class OcppSoapClientTransport(
         val app = contract {
             routes += route
         }
-        server = app.asServer(Undertow(port = clientSettings.port))
+        server = app.asServer(config)
     }
 
     private val targetRoute = target.removeSuffix("/") + "/"
@@ -61,12 +72,12 @@ class OcppSoapClientTransport(
         ocppSoapParser.readToEnvelop(payload).header.action?.value?.removePrefix("/") ?: ""
 
     override fun connect() {
-        server?.start()
-            ?.also { logger.info("starting http server on port ${clientSettings.port}") }
+        server.start()
+        logger.info("starting http server on port ${server.port()}")
     }
 
     override fun close() {
-        server?.close()
+        server.close()
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P {
@@ -78,7 +89,7 @@ class OcppSoapClientTransport(
                         messageId = newMessageId(),
                         chargingStationId = ocppId,
                         action = action,
-                        from = clientSettings.path + ":" + clientSettings.port,
+                        from = path + ":" + server.port(),
                         to = targetRoute,
                         payload = message
                     )

@@ -6,10 +6,6 @@ import kotlin.reflect.KClass
 
 interface ServerTransport {
 
-    fun start()
-
-    fun stop()
-
     fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P
 
     fun <T : Any, P> receiveMessageClass(clazz: KClass<T>,

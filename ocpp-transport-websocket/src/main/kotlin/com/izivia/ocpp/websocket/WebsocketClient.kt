@@ -21,7 +21,8 @@ private val logger = KotlinLogging.logger {}
 class WebsocketClient(ocppId: String,
                       ocppVersion: OcppVersion,
                       target: String,
-                      headers: RequestHeaders = emptyList()
+                      headers: RequestHeaders = emptyList(),
+                      val newMessageId: () -> String = { UUID.randomUUID().toString() },
 ) : ClientTransport {
     private val client: OcppWampClient =
         OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion, headers = headers)
@@ -35,7 +36,7 @@ class WebsocketClient(ocppId: String,
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P =
         try {
-            val msgId: String = UUID.randomUUID().toString()
+            val msgId: String = newMessageId()
             val response = client.sendBlocking(WampMessage.Call(msgId, action, parser.mapPayloadToString(message)))
             if (response.msgId != msgId) {
                 throw IllegalStateException(

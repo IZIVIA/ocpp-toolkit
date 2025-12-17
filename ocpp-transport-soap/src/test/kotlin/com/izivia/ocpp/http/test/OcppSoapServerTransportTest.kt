@@ -3,6 +3,7 @@ package com.izivia.ocpp.http.test
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatResp
 import com.izivia.ocpp.http.OcppSoapServerTransport
+import com.izivia.ocpp.http.asServer
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
@@ -23,16 +24,16 @@ class OcppSoapServerTransportTest {
 
     @Test
     fun `should receive the OCPP 1-6 HeartBeat message`() {
-        val server = OcppSoapServerTransport.createServer(
-            port = 5002,
+        val transport = OcppSoapServerTransport.create(
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),
             ocppVersion = OcppVersion.OCPP_1_6
         )
+        val server = transport.asServer(5002)
         server.start()
         var received = false
 
-        server.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
+        transport.receiveMessage("Heartbeat", OcppVersion.OCPP_1_6, { meta: RequestMetadata, req: HeartbeatReq ->
             received = true
             HeartbeatResp(currentTime = Instant.parse("2022-05-17T15:42:00.503Z"))
         }, { ChargingStationConfig(true, null) })
@@ -77,16 +78,16 @@ class OcppSoapServerTransportTest {
 
     @Test
     fun `should not receive the OCPP 1-5 HeartBeat message because server is for 1-6`() {
-        val server = OcppSoapServerTransport.createServer(
-            port = 5002,
+        val transport = OcppSoapServerTransport.create(
             path = "/ocpp/soap/",
             ocppSoapParser = Ocpp16SoapParser(),
             ocppVersion = OcppVersion.OCPP_1_6
         )
+        val server = transport.asServer(5002)
         server.start()
         var received = false
 
-        server.receiveMessage("Heartbeat", OcppVersion.OCPP_1_5, { meta: RequestMetadata, req: HeartbeatReq ->
+        transport.receiveMessage("Heartbeat", OcppVersion.OCPP_1_5, { meta: RequestMetadata, req: HeartbeatReq ->
             received = true
             HeartbeatResp(currentTime = Instant.parse("2022-05-17T15:42:00.503Z"))
         }, { ChargingStationConfig(true, null) })
