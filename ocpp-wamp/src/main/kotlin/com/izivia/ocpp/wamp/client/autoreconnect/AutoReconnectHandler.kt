@@ -43,6 +43,10 @@ internal class AutoReconnectHandler(
         planConnectionAttempt(clock.now())
     }
 
+    fun planConnectionAttemptAfterDelay(delay: Duration) {
+        planConnectionAttempt(clock.now() + delay)
+    }
+
     fun planConnectionAttempt(scheduleAt: Instant, checkCurrentAttempt: Boolean = true) {
         withLock {
             val lastAttemptOrNull = lastConnectionAttempts.lastOrNull()

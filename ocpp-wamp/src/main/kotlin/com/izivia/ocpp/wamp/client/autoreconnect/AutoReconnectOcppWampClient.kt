@@ -103,7 +103,7 @@ class AutoReconnectOcppWampClient(
         autoReconnectState.onDisconnected()
         when (autoReconnectState) {
             is AutoReconnectIdleState, is AutoReconnectConnectingState -> {}
-            is AutoReconnectConnectedState -> moveTo(autoReconnectState, connectingState())
+            is AutoReconnectConnectedState -> moveTo(autoReconnectState, connectingState(isReconnect = true))
         }
         connectionListener?.onConnectionLost(t)
     }
@@ -117,7 +117,7 @@ class AutoReconnectOcppWampClient(
         connectionListener?.onConnectionFailure(t)
     }
 
-    private fun connectingState() =
+    private fun connectingState(isReconnect: Boolean = false) =
         AutoReconnectConnectingState(
             debugContext,
             config,
@@ -134,7 +134,8 @@ class AutoReconnectOcppWampClient(
                 override fun onConnectionLost(t: Throwable?) {
                     emitConnectionLost(t)
                 }
-            }
+            },
+            isReconnect = isReconnect
         )
 
     private fun moveTo(from: AutoReconnectState, to: AutoReconnectState) {

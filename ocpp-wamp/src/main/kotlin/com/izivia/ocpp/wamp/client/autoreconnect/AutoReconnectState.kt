@@ -49,7 +49,8 @@ internal class AutoReconnectConnectingState(
     private val debugContext: String,
     private val config: AutoReconnectConfig,
     doConnect: (l: ConnectionListener) -> Unit,
-    connectionListener: ConnectionListener
+    connectionListener: ConnectionListener,
+    private val isReconnect: Boolean = false
 ) : AutoReconnectState {
     private val handler = AutoReconnectHandler(
         debugContext,
@@ -83,7 +84,11 @@ internal class AutoReconnectConnectingState(
         }
 
         logger.info("[$debugContext] connecting [auto-reconnect ON]")
-        handler.planConnectionAttemptNow()
+        if (isReconnect) {
+            handler.planConnectionAttemptAfterDelay(config.baseAutoReconnectDelay)
+        } else {
+            handler.planConnectionAttemptNow()
+        }
     }
 
     override fun onConnected() {

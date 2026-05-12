@@ -141,12 +141,15 @@ class OkHttpOcppWampClient(
                     logger.warn("[$ocppId] web socket closing $code $reason - state = $connectionState")
                     if (code == CLEANUP_CLOSURE_STATUS) {
                         logger.info("[$ocppId] connection closed to $serverUri due to reconnection")
+                        closingWebSocket.close(code, reason)
                         return
                     }
 
+                    closingWebSocket.close(code, reason)
+                    val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
-                    when (connectionState) {
+                    when (previousState) {
                         ConnectionState.CONNECTING -> {
                             listener.onConnectionFailure(
                                 IOException(
