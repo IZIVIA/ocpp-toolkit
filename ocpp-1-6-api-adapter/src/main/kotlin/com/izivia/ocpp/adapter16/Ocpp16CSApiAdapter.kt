@@ -121,7 +121,8 @@ class Ocpp16CSApiAdapter(
         req: RemoteStopTransactionReq
     ): OperationExecution<RemoteStopTransactionReq, RemoteStopTransactionResp> {
         val mapper: RemoteStopTransactionMapper = Mappers.getMapper(RemoteStopTransactionMapper::class.java)
-        val transactionId = transactionIds.getLocalIdByTransactionId(req.transactionId).localId
+        val transactionId = transactionIds.getLocalIdByTransactionId(req.transactionId)?.localId
+            ?: req.transactionId.toString()
         val response = csApi.requestStopTransaction(meta, mapper.coreToGenReq(req, transactionId))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
@@ -263,9 +264,13 @@ class Ocpp16CSApiAdapter(
         req: SetChargingProfileReq
     ): OperationExecution<SetChargingProfileReq, SetChargingProfileResp> {
         val mapper: SetChargingProfileMapper = Mappers.getMapper(SetChargingProfileMapper::class.java)
-        val transactionId = req.csChargingProfiles.transactionId
-            ?.let { transactionIds.getLocalIdByTransactionId(it) }
-            ?.localId
+        val csmsTransactionId = req.csChargingProfiles.transactionId
+        val transactionId = if (csmsTransactionId != null) {
+            transactionIds.getLocalIdByTransactionId(csmsTransactionId)?.localId
+                ?: csmsTransactionId.toString()
+        } else {
+            null
+        }
         val response = csApi.setChargingProfile(
             meta,
             mapper.coreToGenReq(req)

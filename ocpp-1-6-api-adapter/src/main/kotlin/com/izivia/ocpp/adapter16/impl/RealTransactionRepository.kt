@@ -2,9 +2,10 @@ package com.izivia.ocpp.adapter16.impl
 
 import com.izivia.ocpp.adapter16.Ocpp16TransactionIds
 import com.izivia.ocpp.adapter16.TransactionRepository
+import java.util.concurrent.ConcurrentHashMap
 
 class RealTransactionRepository : TransactionRepository {
-    val hashMap: HashMap<String, Int> = HashMap()
+    val hashMap: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
 
     override fun saveTransactionIds(ids: Ocpp16TransactionIds) {
         hashMap.put(ids.localId, ids.csmsId)
@@ -19,12 +20,8 @@ class RealTransactionRepository : TransactionRepository {
         }
     }
 
-    override fun getLocalIdByTransactionId(transactionId: Int): Ocpp16TransactionIds {
+    override fun getLocalIdByTransactionId(transactionId: Int): Ocpp16TransactionIds? {
         val localId = hashMap.toList().find { it.second == transactionId }?.first
-        return if (localId != null) {
-            Ocpp16TransactionIds(localId, transactionId)
-        } else {
-            Ocpp16TransactionIds(transactionId.toString(), transactionId)
-        }
+        return localId?.let { Ocpp16TransactionIds(it, transactionId) }
     }
 }
