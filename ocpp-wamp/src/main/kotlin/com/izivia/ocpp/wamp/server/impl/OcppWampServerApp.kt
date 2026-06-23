@@ -12,7 +12,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.http4k.core.Request
 import org.http4k.routing.websockets
-import org.http4k.routing.ws.bind
+import org.http4k.routing.websocket.bind
 import org.http4k.websocket.Websocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsResponse

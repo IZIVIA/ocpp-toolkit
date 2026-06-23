@@ -9,6 +9,11 @@ coreProject()
 
 dependencies {
     implementation(project(":operation-information"))
+
+    // KGP 2.x no longer makes testFixturesImplementation extend implementation,
+    // so kotlinx-datetime (added as implementation by coreProject) must be declared
+    // explicitly for the testFixtures source set.
+    testFixturesImplementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.2")
 }
 
 java {
