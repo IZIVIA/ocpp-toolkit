@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.util.*
 
 plugins {
-    kotlin("jvm") version "2.4.0" apply true
+    kotlin("jvm") apply true
     id("com.google.protobuf") version "0.8.18" apply false
     id("maven-publish")
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"

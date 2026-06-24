@@ -24,15 +24,15 @@ fun Project.coreProject() {
         "implementation"("org.http4k:http4k-bom:_")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:_")
         "implementation"("io.github.microutils:kotlin-logging:_")
-        "implementation"("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.4.1")
+        "implementation"("org.jetbrains.kotlinx:kotlinx-datetime:_")
         "implementation"("org.slf4j:slf4j-api:_")
 
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:_")
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:_")
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:_")
         // Gradle 9 no longer puts the JUnit Platform launcher on the test runtime
-        // classpath implicitly; declare it explicitly (version aligned with Jupiter 6.1.0).
-        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:6.1.0")
+        // classpath implicitly; declare it explicitly.
+        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:_")
 
         "testImplementation"("io.strikt:strikt-core:_")
         "testImplementation"("io.mockk:mockk:_")
