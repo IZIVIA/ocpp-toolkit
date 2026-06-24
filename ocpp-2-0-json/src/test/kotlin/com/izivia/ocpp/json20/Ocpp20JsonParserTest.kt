@@ -60,7 +60,12 @@ class Ocpp20JsonParserTest {
                                     }
                                 get { get(2) }
                                     .and {
-                                        get { code }.isEqualTo(ValidatorTypeCode.REQUIRED.errorCode)
+                                        get { code }.isEqualTo(ValidatorTypeCode.ADDITIONAL_PROPERTIES.errorCode)
+                                        get { detail }.contains("Validations error")
+                                    }
+                                get { get(3) }
+                                    .and {
+                                        get { code }.isEqualTo(ValidatorTypeCode.ADDITIONAL_PROPERTIES.errorCode)
                                         get { detail }.contains("Validations error")
                                     }
                                 get { get(4) }
@@ -75,12 +80,12 @@ class Ocpp20JsonParserTest {
                                     }
                                 get { get(6) }
                                     .and {
-                                        get { code }.isEqualTo(ValidatorTypeCode.ADDITIONAL_PROPERTIES.errorCode)
+                                        get { code }.isEqualTo(ValidatorTypeCode.REQUIRED.errorCode)
                                         get { detail }.contains("Validations error")
                                     }
                                 get { get(7) }
                                     .and {
-                                        get { code }.isEqualTo(ValidatorTypeCode.ADDITIONAL_PROPERTIES.errorCode)
+                                        get { code }.isEqualTo(ValidatorTypeCode.REQUIRED.errorCode)
                                         get { detail }.contains("Validations error")
                                     }
                             }
