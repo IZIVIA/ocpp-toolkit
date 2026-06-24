@@ -14,6 +14,11 @@ import com.fasterxml.jackson.module.kotlin.kotlinModule
 import com.izivia.ocpp.utils.KotlinxInstantModule
 import javax.xml.stream.XMLInputFactory
 
+// enable(MapperFeature) on a built mapper is deprecated, but the builder-based
+// alternatives (XmlMapper.builder / rebuild) do not reproduce the
+// XmlMapper(factory, CustomXmlModule) construction this mapper relies on, so the
+// post-construction form is kept deliberately.
+@Suppress("DEPRECATION")
 class OcppSoapMapper : ObjectMapper(
     XmlMapper(getNewFactory(true), CustomXmlModule)
         .registerModule(
@@ -22,7 +27,6 @@ class OcppSoapMapper : ObjectMapper(
             }
         )
         .registerModule(KotlinxInstantModule())
-        .setSerializationInclusion(Include.NON_EMPTY)
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .setDefaultPropertyInclusion(Include.NON_EMPTY)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
