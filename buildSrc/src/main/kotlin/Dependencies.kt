@@ -31,8 +31,8 @@ fun Project.coreProject() {
         "testImplementation"("org.junit.jupiter:junit-jupiter-params:_")
         "testRuntimeOnly"("org.junit.jupiter:junit-jupiter-engine:_")
         // Gradle 9 no longer puts the JUnit Platform launcher on the test runtime
-        // classpath implicitly; declare it explicitly (version aligned with Jupiter 5.11.4).
-        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:1.11.4")
+        // classpath implicitly; declare it explicitly (version aligned with Jupiter 6.1.0).
+        "testRuntimeOnly"("org.junit.platform:junit-platform-launcher:6.1.0")
 
         "testImplementation"("io.strikt:strikt-core:_")
         "testImplementation"("io.mockk:mockk:_")
