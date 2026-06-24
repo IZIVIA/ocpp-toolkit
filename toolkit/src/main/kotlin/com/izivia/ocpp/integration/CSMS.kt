@@ -12,7 +12,7 @@ import com.izivia.ocpp.wamp.server.impl.Undertow
 import com.izivia.ocpp.websocket.WebsocketServer
 import org.http4k.routing.routes
 import org.http4k.routing.websockets
-import org.http4k.server.PolyHandler
+import org.http4k.core.PolyHandler
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
