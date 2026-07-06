@@ -141,12 +141,15 @@ class OkHttpOcppWampClient(
                     logger.warn("[$ocppId] web socket closing $code $reason - state = $connectionState")
                     if (code == CLEANUP_CLOSURE_STATUS) {
                         logger.info("[$ocppId] connection closed to $serverUri due to reconnection")
+                        closingWebSocket.closeSafely(code, reason)
                         return
                     }
 
+                    closingWebSocket.closeSafely(code, reason)
+                    val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
-                    when (connectionState) {
+                    when (previousState) {
                         ConnectionState.CONNECTING -> {
                             listener.onConnectionFailure(
                                 IOException(
@@ -287,6 +290,22 @@ class OkHttpOcppWampClient(
     private fun getCallManager(): WampCallManager {
         return wampConnection?.callManager
             ?: throw IllegalStateException("not connected to $serverUri")
+    }
+
+    /**
+     * Closes the web socket, mapping reserved close codes to [NORMAL_CLOSURE_STATUS].
+     *
+     * OkHttp's [WebSocket.close] throws when given a reserved code. Notably, a peer closing
+     * without a status code is reported as 1005 (CLOSE_NO_STATUS_CODE), which is reserved, so
+     * echoing it back here would throw. We map any reserved/out-of-range code to 1000.
+     */
+    private fun WebSocket.closeSafely(code: Int, reason: String?) {
+        val safeCode = if (code in 1000..4999 && code !in 1004..1006 && code !in 1015..2999) {
+            code
+        } else {
+            NORMAL_CLOSURE_STATUS
+        }
+        close(safeCode, reason)
     }
 
     companion object {
