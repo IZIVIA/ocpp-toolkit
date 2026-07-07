@@ -633,14 +633,23 @@ class IntegrationTest {
         unmockkAll()
     }
 
+    private fun websocketSettings(ocppVersion: OcppVersion, ocpp16SecurityExtensions: Boolean = false) =
+        Settings(
+            ocppVersion,
+            TransportEnum.WEBSOCKET,
+            target = "",
+            ocpp16SecurityExtensions = ocpp16SecurityExtensions,
+            newMessageId = { messageId }
+        )
+
     @Test
     fun `heartbeat request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"currentTime\":\"2022-02-15T00:00:00.000Z\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -654,11 +663,11 @@ class IntegrationTest {
     @Test
     fun `heartbeat request send`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"currentTime\":\"2022-02-15T00:00:00.000Z\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -672,11 +681,11 @@ class IntegrationTest {
     @Test
     fun `authorize 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"idTagInfo\":{\"status\" : \"Accepted\", \"expiryDate\" : \"2022-02-15T00:00:00.000Z\", \"parentIdTag\" : \"Tag2\" }}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -696,11 +705,11 @@ class IntegrationTest {
     @Test
     fun `meterValues request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -759,11 +768,11 @@ class IntegrationTest {
     @Test
     fun `dataTransfer 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\" : \"Accepted\", \"data\" : \"2022-02-15T00:00:00.000Z\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -780,11 +789,11 @@ class IntegrationTest {
     @Test
     fun `bootNotification 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"currentTime\" : \"2022-02-15T00:00:00.000Z\", \"interval\" : 10, \"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -802,11 +811,11 @@ class IntegrationTest {
     @Test
     fun `start transaction 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"idTagInfo\" : { \"expiryDate\" : \"2022-02-15T00:00:00.000Z\", \"status\" : \"Accepted\"}, \"transactionId\" : 100}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -845,11 +854,11 @@ class IntegrationTest {
     @Test
     fun `status notification request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -868,11 +877,11 @@ class IntegrationTest {
     @Test
     fun `notifyReport 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -888,11 +897,11 @@ class IntegrationTest {
     @Test
     fun `notifyReport 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -919,11 +928,11 @@ class IntegrationTest {
     @Test
     fun `firmwareStatusNotification 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -939,11 +948,11 @@ class IntegrationTest {
     @Test
     fun `firmwareStatusNotification 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -959,11 +968,11 @@ class IntegrationTest {
     @Test
     fun `clearedChargingLimit 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -978,11 +987,11 @@ class IntegrationTest {
     @Test
     fun `clearedChargingLimit 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -999,11 +1008,11 @@ class IntegrationTest {
     @Test
     fun `getCertificateStatus 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1017,11 +1026,11 @@ class IntegrationTest {
     @Test
     fun `getCertificateStatus 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1038,11 +1047,11 @@ class IntegrationTest {
     @Test
     fun `notifyCustomerInformation 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1062,11 +1071,11 @@ class IntegrationTest {
     @Test
     fun `notifyCustomerInformation 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1087,11 +1096,11 @@ class IntegrationTest {
     @Test
     fun `notifyEvent 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1128,11 +1137,11 @@ class IntegrationTest {
     @Test
     fun `notifyEVChargingSchedule 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\", \"statusInfo\": {\"reasonCode\": \"123\"}}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1158,11 +1167,11 @@ class IntegrationTest {
     @Test
     fun `notifyEVChargingSchedule 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\", \"statusInfo\": {\"reasonCode\": \"123\"}}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1189,11 +1198,11 @@ class IntegrationTest {
     @Test
     fun `notifyChargingLimit 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1208,11 +1217,11 @@ class IntegrationTest {
     @Test
     fun `notifyChargingLimit 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1230,16 +1239,11 @@ class IntegrationTest {
     fun `logStatusNotification 1-6 request sends LogStatusNotification when the security extensions are on`() {
         val sent = slot<WampMessage>()
         every { ocppWampClient.sendBlocking(capture(sent)) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(
-            OcppVersion.OCPP_1_6,
-            TransportEnum.WEBSOCKET,
-            target = "",
-            ocpp16SecurityExtensions = true
-        )
+        val settings = websocketSettings(OcppVersion.OCPP_1_6, ocpp16SecurityExtensions = true)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1258,11 +1262,11 @@ class IntegrationTest {
     fun `logStatusNotification 1-6 request sends DiagnosticsStatusNotification by default`() {
         val sent = slot<WampMessage>()
         every { ocppWampClient.sendBlocking(capture(sent)) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1282,11 +1286,11 @@ class IntegrationTest {
     @Test
     fun `logStatusNotification 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1303,11 +1307,11 @@ class IntegrationTest {
     @Test
     fun `publishFirmwareStatusNotification 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1323,11 +1327,11 @@ class IntegrationTest {
     @Test
     fun `publishFirmwareStatusNotification 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1346,11 +1350,11 @@ class IntegrationTest {
     @Test
     fun `notifyDisplayMessages 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1391,11 +1395,11 @@ class IntegrationTest {
     @Test
     fun `notifyEVChargingNeeds 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1410,11 +1414,11 @@ class IntegrationTest {
     @Test
     fun `notifyEVChargingNeeds 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1443,11 +1447,11 @@ class IntegrationTest {
     @Test
     fun `notifyMonitoringReport 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1463,11 +1467,11 @@ class IntegrationTest {
     @Test
     fun `notifyMonitoringReport 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1525,11 +1529,11 @@ class IntegrationTest {
     @Test
     fun `reservationStatusUpdate 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1544,11 +1548,11 @@ class IntegrationTest {
     @Test
     fun `reservationStatusUpdate 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1565,16 +1569,11 @@ class IntegrationTest {
     @Test
     fun `securityEventNotification 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(
-            OcppVersion.OCPP_1_6,
-            TransportEnum.WEBSOCKET,
-            target = "",
-            ocpp16SecurityExtensions = true
-        )
+        val settings = websocketSettings(OcppVersion.OCPP_1_6, ocpp16SecurityExtensions = true)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1591,7 +1590,7 @@ class IntegrationTest {
 
     @Test
     fun `securityEventNotification 1-6 request is rejected when the security extensions are off`() {
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1609,11 +1608,11 @@ class IntegrationTest {
     @Test
     fun `securityEventNotification 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1631,16 +1630,11 @@ class IntegrationTest {
     @Test
     fun `signCertificate 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(
-            OcppVersion.OCPP_1_6,
-            TransportEnum.WEBSOCKET,
-            target = "",
-            ocpp16SecurityExtensions = true
-        )
+        val settings = websocketSettings(OcppVersion.OCPP_1_6, ocpp16SecurityExtensions = true)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1658,11 +1652,11 @@ class IntegrationTest {
     @Test
     fun `signCertificate 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1681,11 +1675,11 @@ class IntegrationTest {
     @Test
     fun `reportChargingProfiles 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_1_6)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1718,11 +1712,11 @@ class IntegrationTest {
     @Test
     fun `reportChargingProfiles 2-0 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
-            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            msgId = messageId,
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
+        val settings = websocketSettings(OcppVersion.OCPP_2_0)
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 

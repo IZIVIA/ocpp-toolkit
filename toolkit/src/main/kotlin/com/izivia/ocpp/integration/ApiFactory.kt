@@ -129,8 +129,7 @@ class ApiFactory {
             settings: Settings,
             ocppId: String,
             csApi: CSApi,
-            headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String = { UUID.randomUUID().toString() }
+            headers: RequestHeaders = emptyList()
         ): CSMSApi {
             val transport: ClientTransport = createClientTransport(
                 settings.clientPath,
@@ -140,7 +139,7 @@ class ApiFactory {
                 settings.ocppVersion,
                 settings.target,
                 headers,
-                newMessageId
+                settings.newMessageId
             )
             return when (settings.ocppVersion) {
                 OcppVersionTransport.OCPP_2_0 -> Ocpp20Adapter(ocppId, transport, csApi)
