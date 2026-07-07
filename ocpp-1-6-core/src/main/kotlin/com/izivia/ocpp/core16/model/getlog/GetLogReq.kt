@@ -2,7 +2,7 @@ package com.izivia.ocpp.core16.model.getlog
 
 import com.izivia.ocpp.core16.model.Request
 import com.izivia.ocpp.core16.model.getlog.enumeration.LogEnumType
-import java.sql.Timestamp
+import kotlin.time.Instant
 
 data class GetLogReq(
     val logType: LogEnumType,
@@ -14,6 +14,6 @@ data class GetLogReq(
 
 data class LogParametersType(
     val remoteLocation: String,
-    val oldestTimestamp: Timestamp?,
-    val latestTimestamp: Timestamp?
+    val oldestTimestamp: Instant?,
+    val latestTimestamp: Instant?
 )

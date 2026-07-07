@@ -194,6 +194,7 @@ class IntegrationTest {
     private fun newMessageId(): String = fixedMessageId
 
     private lateinit var ocppWampClient: OkHttpOcppWampClient
+
     private val csApi: CSApi = object : CSApi {
 
         override fun start() = throw NotImplementedError("ChargePoint can't start a server")
@@ -696,7 +697,7 @@ class IntegrationTest {
     fun `meterValues request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
-            payload = "{}"
+            payload = "{\"status\": \"Accepted\"}"
         )
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
@@ -1546,7 +1547,9 @@ class IntegrationTest {
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
             techInfo = "techInfo"
         )
-        expectThrows<IllegalStateException> { csmsApi.securityEventNotification(requestMetadata, request) }
+        val response = csmsApi.securityEventNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
     }
 
     @Test
@@ -1575,7 +1578,7 @@ class IntegrationTest {
     fun `signCertificate 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
-            payload = "{}"
+            payload = "{\"status\": \"Accepted\"}"
         )
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
@@ -1587,7 +1590,10 @@ class IntegrationTest {
             csr = "csr",
             certificateType = CertificateSigningUseEnumType.V2GCertificate
         )
-        expectThrows<IllegalStateException> { csmsApi.signCertificate(requestMetadata, request) }
+        val response = csmsApi.signCertificate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(GenericStatusEnumType.Accepted) }
     }
 
     @Test

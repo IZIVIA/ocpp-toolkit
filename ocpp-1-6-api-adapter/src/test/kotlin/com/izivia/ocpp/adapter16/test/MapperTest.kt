@@ -627,6 +627,99 @@ class MapperTest {
     }
 
     @Test
+    fun securityMapperPreservesWhitepaperStatuses() {
+        expectThat(
+            SecurityMapper.genToCoreReq(
+                LogStatusNotificationReq(
+                    status = UploadLogStatusEnumType.AcceptedCanceled,
+                    requestId = 1
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.logstatusnotification.enumeration.UpdateLogStatusEnumType.UploadFailure
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp(
+                    status = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType.NotFound
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType.NotFound
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.certificateSigned.CertificateSignedResp(
+                    com.izivia.ocpp.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType.Rejected
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.certificatesigned.enumeration.CertificateSignedStatusEnumType.Rejected
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.installcertificate.InstallCertificateResp(
+                    com.izivia.ocpp.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType.Failed
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.installcertificate.enumeration.CertificateStatusEnumType.Failed
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                TriggerMessageResp(TriggerMessageStatusEnumType.NotImplemented)
+            )
+        ).and {
+            get { status }.isEqualTo(TriggerMessageStatus.NotImplemented)
+        }
+    }
+
+    @Test
+    fun securityMapperPreservesRequiredSerialNumber() {
+        val request = SecurityMapper.coreToGenReq(
+            com.izivia.ocpp.core16.model.deletecertificate.DeleteCertificateReq(
+                com.izivia.ocpp.core16.model.deletecertificate.CertificateHashDataType(
+                    hashAlgorithm = com.izivia.ocpp.core16.model.deletecertificate.enumeration.HashAlgorithmEnumType.SHA256,
+                    issuerNameHash = "issuer",
+                    issuerKeyHash = "key",
+                    serialNumber = "serial"
+                )
+            )
+        )
+
+        expectThat(request)
+            .and { get { certificateHashData.serialNumber }.isEqualTo("serial") }
+    }
+
+    @Test
+    fun securityMapperMapsExtendedTriggerMessage() {
+        val request = SecurityMapper.coreToGenReq(
+            com.izivia.ocpp.core16.model.extendedtriggermessage.ExtendedTriggerMessageReq(
+                requestedMessage =
+                    com.izivia.ocpp.core16.model.extendedtriggermessage.enumeration.ExtendedMessageTriggerEnumType
+                        .SignChargePointCertificate,
+                connectorId = 2
+            )
+        )
+
+        expectThat(request)
+            .and { get { requestedMessage }.isEqualTo(MessageTriggerEnumType.SignChargingStationCertificate) }
+            .and { get { evse }.isEqualTo(EVSEType(2, 2)) }
+    }
+
+    @Test
     fun getDiagnosticsMapper() {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
         val resp = mapper.genToCoreResp(
@@ -699,4 +792,3 @@ class StatusNotificationReqArgumentsProvider : ArgumentsProvider {
         Arguments.of(TransactionEventEnumType.Ended, ChargingStateEnumType.EVConnected, ChargePointStatus.Finishing)
     )
 }
-

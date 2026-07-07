@@ -22,6 +22,7 @@ include(
     "ocpp-transport",
     "ocpp-1-6-api-adapter",
     "ocpp-1-6-core",
+    "ocpp-1-6-security",
     "ocpp-1-6-json",
     "ocpp-1-6-soap",
     "ocpp-1-5-core",

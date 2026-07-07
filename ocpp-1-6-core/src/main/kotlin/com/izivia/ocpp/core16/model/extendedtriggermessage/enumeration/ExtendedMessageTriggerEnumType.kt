@@ -1,7 +1,8 @@
-package com.izivia.ocpp.core16.model.triggermessage.enumeration
+package com.izivia.ocpp.core16.model.extendedtriggermessage.enumeration
 
-enum class MessageTriggerEnumType(val value: String) {
+enum class ExtendedMessageTriggerEnumType(val value: String) {
     BootNotification("BootNotification"),
+
     LogStatusNotification("LogStatusNotification"),
 
     FirmwareStatusNotification("FirmwareStatusNotification"),
@@ -9,7 +10,8 @@ enum class MessageTriggerEnumType(val value: String) {
     Heartbeat("Heartbeat"),
 
     MeterValues("MeterValues"),
-    SignedChargePointCertificate("SignedChargePointCertificate"),
+
+    SignChargePointCertificate("SignChargePointCertificate"),
 
     StatusNotification("StatusNotification");
 }

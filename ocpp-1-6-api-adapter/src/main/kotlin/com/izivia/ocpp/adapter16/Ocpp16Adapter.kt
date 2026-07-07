@@ -53,6 +53,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
+import com.izivia.ocpp.security16.SecurityChargePointOperations
 import com.izivia.ocpp.transport.ClientTransport
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
@@ -76,6 +77,9 @@ class Ocpp16Adapter(
 
     private val operations: ChargePointOperations = ChargePointOperations
         .newChargePointOperations(chargingStationId, transport, Ocpp16CSApiAdapter(csApi, transactionIds))
+    private val securityOperations: SecurityChargePointOperations =
+        SecurityChargePointOperations
+        .newSecurityChargePointOperations(chargingStationId, transport, Ocpp16SecurityCSApiAdapter(csApi))
 
     override fun connect() {
         transport.connect()
@@ -294,9 +298,8 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
-        val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
-        val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        val response = securityOperations.logStatusNotification(meta, SecurityMapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
 
     override fun publishFirmwareStatusNotification(
@@ -324,14 +327,16 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
-        throw IllegalStateException("SecurityEventNotification can't be call in OCPP 1.6")
+        val response = securityOperations.securityEventNotification(meta, SecurityMapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
 
     override fun signCertificate(
         meta: RequestMetadata,
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> {
-        throw IllegalStateException("SignCertificate can't be call in OCPP 1.6")
+        val response = securityOperations.signCertificate(meta, SecurityMapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
 
     override fun reportChargingProfiles(
