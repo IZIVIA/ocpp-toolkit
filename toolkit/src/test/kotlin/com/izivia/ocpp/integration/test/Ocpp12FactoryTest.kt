@@ -13,19 +13,9 @@ import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.soap.OcppSoapParser
-import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.soap12.Ocpp12SoapParser
 import com.izivia.ocpp.transport.OcppVersion
 import io.mockk.mockk
-import kotlinx.datetime.Instant
-import org.http4k.core.Method
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.routing.bind
-import org.http4k.routing.routes
-import org.http4k.server.Undertow
-import org.http4k.server.asServer
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -33,9 +23,6 @@ import strikt.assertions.isEqualTo
 import com.izivia.ocpp.core12.model.heartbeat.HeartbeatResp as HeartbeatResp12
 
 class Ocpp12FactoryTest {
-    private val messageId = "a727d144-82bb-497a-a0c7-4ef2295910d4"
-    private val currentTime = Instant.parse("2022-02-15T00:00:00.000Z")
-
     @Test
     fun `creates OCPP 1-2 SOAP charge point connection`() {
         val operations = ApiFactory.ocpp12ConnectionToCSMS(
@@ -99,7 +86,7 @@ class Ocpp12FactoryTest {
         val receivedActions = mutableListOf<String>()
         val server = soapServer(
             parser = Ocpp12SoapParser(),
-            payload = HeartbeatResp12(currentTime),
+            payload = HeartbeatResp12(TEST_CURRENT_TIME),
             receivedActions = receivedActions
         )
 
@@ -109,7 +96,7 @@ class Ocpp12FactoryTest {
                 api.connect()
                 val response = api.heartbeat(RequestMetadata("CP001"), HeartbeatReq())
 
-                expectThat(response.response.currentTime).isEqualTo(currentTime)
+                expectThat(response.response.currentTime).isEqualTo(TEST_CURRENT_TIME)
                 expectThat(receivedActions.toList()).isEqualTo(listOf("Heartbeat"))
             } finally {
                 api.close()
@@ -118,42 +105,4 @@ class Ocpp12FactoryTest {
             server.close()
         }
     }
-
-    private fun soapApi(ocppVersion: OcppVersion, port: Int) =
-        ApiFactory.getCSMSApi(
-            settings = Settings(
-                ocppVersion = ocppVersion,
-                transportType = TransportEnum.SOAP,
-                target = "http://localhost:$port/ocpp",
-                clientPath = "/cp",
-                clientPort = 0,
-                newMessageId = { messageId }
-            ),
-            ocppId = "CP001",
-            csApi = mockk<CSApi>(relaxed = true)
-        )
-
-    private fun soapServer(
-        parser: OcppSoapParser,
-        payload: Any,
-        receivedActions: MutableList<String>
-    ) = routes(
-        "/ocpp/" bind Method.POST to { request ->
-            val soapRequest = parser.parseAnyRequestFromSoap(request.bodyString())
-            receivedActions += soapRequest.action
-            Response(Status.OK).body(
-                parser.mapResponseToSoap(
-                    ResponseSoapMessage(
-                        action = soapRequest.action,
-                        messageId = "response-$messageId",
-                        relatesTo = soapRequest.messageId,
-                        to = soapRequest.from,
-                        from = soapRequest.to,
-                        chargeBoxIdentity = soapRequest.chargingStationId,
-                        payload = payload
-                    )
-                )
-            )
-        }
-    ).asServer(Undertow(0)).start()
 }
