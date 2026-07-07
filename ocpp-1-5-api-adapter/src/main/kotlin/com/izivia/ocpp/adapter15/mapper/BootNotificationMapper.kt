@@ -4,6 +4,7 @@ package com.izivia.ocpp.adapter15.mapper
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationReq
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationResp
 import org.mapstruct.Mapper
+import org.mapstruct.Mapping
 import org.mapstruct.ReportingPolicy
 import com.izivia.ocpp.api.model.bootnotification.BootNotificationReq as BootNotificationReqGen
 import com.izivia.ocpp.api.model.bootnotification.BootNotificationResp as BootNotificationRespGen
@@ -21,6 +22,7 @@ abstract class BootNotificationMapper {
             imsi = bootNotificationReq.chargingStation.modem?.imsi
         )
 
+    @Mapping(source = "heartbeatInterval", target = "interval")
     abstract fun coreToGenResp(bootNotificationResp: BootNotificationResp?): BootNotificationRespGen
 
 }

@@ -16,10 +16,11 @@ abstract class UnlockConnectorMapper {
 
     @Named("convertUnlockStatus")
     fun convertUnlockStatus(status: UnlockStatusEnumType): UnlockStatus =
-        when(status){
+        when (status) {
+            UnlockStatusEnumType.Unlocked -> UnlockStatus.Accepted
+            UnlockStatusEnumType.UnlockFailed,
             UnlockStatusEnumType.UnknownConnector,
             UnlockStatusEnumType.OngoingAuthorizedTransaction -> UnlockStatus.Rejected
-            else -> UnlockStatus.valueOf(status.name)
         }
 
     @Mapping(target = "status", source = "status", qualifiedByName = ["convertUnlockStatus"])
