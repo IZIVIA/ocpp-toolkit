@@ -13,12 +13,15 @@ import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy
+import org.slf4j.LoggerFactory
 import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import com.izivia.ocpp.api.model.statusnotification.StatusNotificationResp as StatusNotificationRespGen
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = [CommonMapper::class])
 abstract class StatusNotificationMapper {
+    private val logger = LoggerFactory.getLogger(StatusNotificationMapper::class.java)
+
     data class ChargingStateWrapper(
         val chargingState: ChargingStateEnumType?,
         val type: TransactionEventEnumType?
@@ -32,13 +35,38 @@ abstract class StatusNotificationMapper {
     @Named("convertConnectorStatus")
     fun convertConnectorStatus(status: ConnectorStatusEnumType): ChargePointStatus =
         when (status) {
+            ConnectorStatusEnumType.Available -> ChargePointStatus.Available
             ConnectorStatusEnumType.Occupied -> ChargePointStatus.Occupied
-            else -> ChargePointStatus.valueOf(status.name)
+            ConnectorStatusEnumType.Reserved -> ChargePointStatus.Reserved
+            ConnectorStatusEnumType.Unavailable -> ChargePointStatus.Unavailable
+            ConnectorStatusEnumType.Faulted -> ChargePointStatus.Faulted
         }
 
     @Named("convertErrorCode")
     fun convertErrorCode(errorCode: ChargePointErrorCodeGen): ChargePointErrorCode =
-        ChargePointErrorCode.valueOf(errorCode.name)
+        when (errorCode) {
+            ChargePointErrorCodeGen.ConnectorLockFailure -> ChargePointErrorCode.ConnectorLockFailure
+            ChargePointErrorCodeGen.GroundFailure -> ChargePointErrorCode.GroundFailure
+            ChargePointErrorCodeGen.HighTemperature -> ChargePointErrorCode.HighTemperature
+            ChargePointErrorCodeGen.NoError -> ChargePointErrorCode.NoError
+            ChargePointErrorCodeGen.OtherError -> ChargePointErrorCode.OtherError
+            ChargePointErrorCodeGen.OverCurrentFailure -> ChargePointErrorCode.OverCurrentFailure
+            ChargePointErrorCodeGen.PowerMeterFailure -> ChargePointErrorCode.PowerMeterFailure
+            ChargePointErrorCodeGen.PowerSwitchFailure -> ChargePointErrorCode.PowerSwitchFailure
+            ChargePointErrorCodeGen.ReaderFailure -> ChargePointErrorCode.ReaderFailure
+            ChargePointErrorCodeGen.ResetFailure -> ChargePointErrorCode.ResetFailure
+            ChargePointErrorCodeGen.UnderVoltage -> ChargePointErrorCode.UnderVoltage
+            ChargePointErrorCodeGen.WeakSignal -> ChargePointErrorCode.WeakSignal
+
+            // Generic error codes with no OCPP 1.5 equivalent fall back to the OtherError catch-all.
+            ChargePointErrorCodeGen.EVCommunicationError,
+            ChargePointErrorCodeGen.InternalError,
+            ChargePointErrorCodeGen.LocalListConflict,
+            ChargePointErrorCodeGen.OverVoltage -> {
+                logger.warn("ChargePointErrorCode ${errorCode.name} has no OCPP 1.5 equivalent, mapped to OtherError")
+                ChargePointErrorCode.OtherError
+            }
+        }
 
     @Named("convertChargingState")
     fun convertChargingState(wrapper: ChargingStateWrapper): ChargePointStatus =
@@ -48,9 +76,12 @@ abstract class StatusNotificationMapper {
                 else -> ChargePointStatus.Occupied
             }
 
+            ChargingStateEnumType.Charging,
+            ChargingStateEnumType.SuspendedEV,
+            ChargingStateEnumType.SuspendedEVSE -> ChargePointStatus.Occupied
+
             ChargingStateEnumType.Idle -> ChargePointStatus.Available
             null -> throw IllegalArgumentException("Argument transactionInfo.chargingState is required in OCPP 1.5 to update a transaction")
-            else -> ChargePointStatus.valueOf(wrapper.chargingState.name)
         }
 
     @Mapping(target = "connectorId", source = "evse", qualifiedByName = ["convertEVSEType"])

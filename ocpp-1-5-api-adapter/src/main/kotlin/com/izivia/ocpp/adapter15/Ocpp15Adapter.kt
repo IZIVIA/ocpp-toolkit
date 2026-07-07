@@ -231,6 +231,10 @@ class Ocpp15Adapter(
         request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> {
         val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
+        if (!mapper.isSupported(request.status)) {
+            logger.warn("FirmwareStatus ${request.status} has no OCPP 1.5 equivalent, notification ignored")
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, FirmwareStatusNotificationResp())
+        }
         val response = operations.firmwareStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
@@ -296,6 +300,10 @@ class Ocpp15Adapter(
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
         val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+        if (!mapper.isSupported(request.status)) {
+            logger.warn("DiagnosticsStatus ${request.status} has no OCPP 1.5 equivalent, notification ignored")
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, LogStatusNotificationResp())
+        }
         val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }

@@ -17,10 +17,13 @@ abstract class ChangeConfigurationMapper {
 
     private fun convertVariableEnum(value: SetVariableStatusEnumType): ConfigurationStatus =
         when (value) {
+            SetVariableStatusEnumType.Accepted -> ConfigurationStatus.Accepted
+            SetVariableStatusEnumType.Rejected -> ConfigurationStatus.Rejected
             SetVariableStatusEnumType.UnknownComponent,
             SetVariableStatusEnumType.UnknownVariable,
             SetVariableStatusEnumType.NotSupportedAttributeType -> ConfigurationStatus.NotSupported
-            else -> ConfigurationStatus.valueOf(value.name)
+            // OCPP 1.2 has no RebootRequired status: the value was accepted, a reboot is needed to apply it.
+            SetVariableStatusEnumType.RebootRequired -> ConfigurationStatus.Accepted
         }
 
     fun genToCoreResp(changeConfigResp: SetVariablesRespGen): ChangeConfigurationResp =

@@ -280,6 +280,34 @@ class AdapterTest {
     }
 
     @Test
+    fun `transient firmware status is ignored and not forwarded in OCPP 1_2`() {
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = FirmwareStatusNotificationReqGen(FirmwareStatusEnumType.Installing)
+
+        val response = adapter.firmwareStatusNotification(RequestMetadata("CP001"), request)
+
+        expectThat(response) {
+            get { this.request }.isEqualTo(request)
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND)
+        }
+        verify(exactly = 0) { chargePointOperations.firmwareStatusNotification(any(), any()) }
+    }
+
+    @Test
+    fun `transient diagnostics status is ignored and not forwarded in OCPP 1_2`() {
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = LogStatusNotificationReqGen(UploadLogStatusEnumType.Uploading, requestId = 1)
+
+        val response = adapter.logStatusNotification(RequestMetadata("CP001"), request)
+
+        expectThat(response) {
+            get { this.request }.isEqualTo(request)
+            get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND)
+        }
+        verify(exactly = 0) { chargePointOperations.diagnosticsStatusNotification(any(), any()) }
+    }
+
+    @Test
     fun `unsupported OCPP 1_2 generic requests are rejected`() {
         val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
         val meta = RequestMetadata("CP001")

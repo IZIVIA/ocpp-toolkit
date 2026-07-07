@@ -10,8 +10,10 @@ import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
+import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumType
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
+import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeCore
 import kotlinx.datetime.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
@@ -62,6 +64,37 @@ class MapperTest {
         val core = mapper.genToCoreReq(request)
 
         expectThat(core.status).isEqualTo(ChargePointStatus.Occupied)
+    }
+
+    @Test
+    fun `ongoing transaction charging states map to OCPP 1_5 occupied status`() {
+        val mapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+
+        listOf(
+            ChargingStateEnumType.Charging,
+            ChargingStateEnumType.SuspendedEV,
+            ChargingStateEnumType.SuspendedEVSE
+        ).forEach { state ->
+            val status = mapper.convertChargingState(mapper.createChargingStateWrapper(state, null))
+            expectThat(status).isEqualTo(ChargePointStatus.Occupied)
+        }
+    }
+
+    @Test
+    fun `error codes without OCPP 1_5 equivalent fall back to OtherError`() {
+        val mapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+
+        listOf(
+            ChargePointErrorCode.EVCommunicationError,
+            ChargePointErrorCode.InternalError,
+            ChargePointErrorCode.LocalListConflict,
+            ChargePointErrorCode.OverVoltage
+        ).forEach { code ->
+            expectThat(mapper.convertErrorCode(code)).isEqualTo(ChargePointErrorCodeCore.OtherError)
+        }
+        // A code that exists in 1.5 is preserved.
+        expectThat(mapper.convertErrorCode(ChargePointErrorCode.GroundFailure))
+            .isEqualTo(ChargePointErrorCodeCore.GroundFailure)
     }
 
     @Test
