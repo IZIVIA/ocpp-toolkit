@@ -12,7 +12,7 @@ import com.izivia.ocpp.wamp.server.impl.Undertow
 import com.izivia.ocpp.websocket.WebsocketServer
 import org.http4k.routing.routes
 import org.http4k.routing.websockets
-import org.http4k.server.PolyHandler
+import org.http4k.core.PolyHandler
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
 import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
@@ -64,9 +64,16 @@ class CSMS(
             val port = t.key
             val wsServerConfigs = t.value.filter { it.first is WebsocketServer }.map { (it.first as WebsocketServer).serverConfig to it.second}
             val soapServerConfigs = t.value.filter { it.first is OcppSoapServerTransport }.map { (it.first as OcppSoapServerTransport).serverConfig to it.second }
+            // http4k 6 throws "No routes added!" when routes()/websockets() get an empty
+            // list, so only build a handler for a protocol that actually has routes and
+            // leave the other side null (PolyHandler and the custom Undertow accept null).
             val app = PolyHandler(
-                http = routes(soapServerConfigs.map { it.first.handler }),
-                ws = websockets(*(wsServerConfigs.map { it.first.handler }).toTypedArray()),
+                http = soapServerConfigs.map { it.first.handler }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { routes(it) },
+                ws = wsServerConfigs.map { it.first.handler }
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { websockets(*it.toTypedArray()) },
             )
             app.asServer(
                 Undertow(

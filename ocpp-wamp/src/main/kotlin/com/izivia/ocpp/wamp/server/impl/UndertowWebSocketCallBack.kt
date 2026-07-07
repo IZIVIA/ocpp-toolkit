@@ -76,7 +76,7 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
                 message: BufferedTextMessage
             ) {
                 try {
-                    socket.triggerMessage(WsMessage(Body(message.data)))
+                    socket.triggerMessage(WsMessage(message.data))
                 } catch (e: IOException) {
                     logger.error("$logContext - IOException on $message - $e", e)
                     throw e
@@ -91,7 +91,7 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
                 channel: WebSocketChannel,
                 message: BufferedBinaryMessage
             ) =
-                message.data.resource.forEach { socket.triggerMessage(WsMessage(Body(it))) }
+                message.data.resource.forEach { socket.triggerMessage(WsMessage(it)) }
 
             override fun onError(channel: WebSocketChannel, error: Throwable) {
                 logger.warn("$logContext - Exception $error", error)

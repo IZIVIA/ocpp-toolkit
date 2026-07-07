@@ -7,7 +7,7 @@ coreProject()
 
 dependencies {
     implementation("org.http4k:http4k-core:_")
-    implementation("org.http4k:http4k-contract:_")
+    implementation("org.http4k:http4k-api-openapi:_")
     implementation("org.http4k:http4k-server-undertow:_")
 
     implementation(project(":ocpp-soap"))

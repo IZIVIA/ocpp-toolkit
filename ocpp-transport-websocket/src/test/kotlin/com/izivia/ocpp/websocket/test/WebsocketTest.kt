@@ -40,6 +40,22 @@ class WebsocketTest {
     fun getFreePort(): Int =
         ServerSocket(0).use { it.localPort }
 
+    /**
+     * Retries [action] until the charging station connection is registered server-side
+     * (sendBlocking throws NoConnectionException, an IllegalStateException, while absent).
+     */
+    private fun <T> awaitConnected(timeoutMs: Long = 5_000, action: () -> T): T {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (true) {
+            try {
+                return action()
+            } catch (e: IllegalStateException) {
+                if (System.currentTimeMillis() >= deadline) throw e
+                Thread.sleep(50)
+            }
+        }
+    }
+
     @Test
     fun `sendMessageClass success`() {
         val id = "a727d144-82bb-497a-a0c7-4ef2295910d4"
@@ -107,12 +123,16 @@ class WebsocketTest {
             websocketClient.receiveMessageClass(AuthorizeReq::class, "authorize", authorizeFun)
 
             websocketClient.connect()
-            Thread.sleep(100) // wait for connection to be fully established, it seems to cause issues on GH action
 
-            transport.sendBlocking(
-                "chargePoint2",
-                WampMessage.Call("1", "authorize", "{\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}")
-            )
+            // Wait until the WebSocket connection is registered server-side before pushing
+            // a server-initiated CALL. The connection is established asynchronously, so a
+            // fixed sleep is racy under load (e.g. GH Actions); retry until connected.
+            awaitConnected {
+                transport.sendBlocking(
+                    "chargePoint2",
+                    WampMessage.Call("1", "authorize", "{\"idToken\": {\"idToken\": \"Tag1\", \"type\": \"Central\"}}")
+                )
+            }
 
             transport.sendBlocking("chargePoint2", WampMessage.Call("2", "heartbeat", "{}"))
 

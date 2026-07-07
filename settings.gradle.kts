@@ -1,14 +1,14 @@
 rootProject.name = "ocpp-toolkit"
 
 plugins {
-    id("com.gradle.enterprise").version("3.13.1")
-    id("de.fayard.refreshVersions") version "0.51.0"
+    id("com.gradle.develocity") version "4.4.3"
+    id("de.fayard.refreshVersions") version "0.60.6"
 }
 
-gradleEnterprise {
+develocity {
     buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
+        termsOfUseUrl = "https://gradle.com/terms-of-service"
+        termsOfUseAgree = "yes"
     }
 }
 

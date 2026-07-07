@@ -102,8 +102,6 @@ internal object Ocpp16SoapMapperIn : ObjectMapper(
 
 internal object Ocpp16SoapMapper : ObjectMapper(
     OcppSoapMapper()
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
-        .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS)
         .addMixIn(Measurand::class.java, EnumMixin::class.java)
         .addMixIn(Phase::class.java, EnumMixin::class.java)
         .addMixIn(IdTagInfo::class.java, IdTagInfoMixin::class.java)

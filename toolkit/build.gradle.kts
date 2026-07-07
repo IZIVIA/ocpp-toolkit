@@ -33,7 +33,6 @@ dependencies {
     api(project(":operation-information"))
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:_")
-    testImplementation("org.mockito:mockito-inline:_")
     testImplementation(project(":utils"))
 }
 
