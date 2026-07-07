@@ -1,8 +1,12 @@
 package com.izivia.ocpp.integration
 
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.adapter12.Ocpp12Adapter
+import com.izivia.ocpp.adapter12.impl.RealTransactionRepository as RealTransactionRepository12
+import com.izivia.ocpp.adapter15.Ocpp15Adapter
+import com.izivia.ocpp.adapter15.impl.RealTransactionRepository as RealTransactionRepository15
 import com.izivia.ocpp.adapter16.Ocpp16Adapter
-import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
+import com.izivia.ocpp.adapter16.impl.RealTransactionRepository as RealTransactionRepository16
 import com.izivia.ocpp.adapter20.Ocpp20Adapter
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.CSMSApi
@@ -144,11 +148,11 @@ class ApiFactory {
                     ocppId,
                     transport,
                     csApi,
-                    RealTransactionRepository(),
+                    RealTransactionRepository16(),
                     settings.ocpp16SecurityExtensions
                 )
-                OcppVersionTransport.OCPP_1_5 -> throw NotImplementedError("Ocpp 1.5 api adapted not yet implemented")
-                OcppVersionTransport.OCPP_1_2 -> throw NotImplementedError("Ocpp 1.2 api adapted not implemented")
+                OcppVersionTransport.OCPP_1_5 -> Ocpp15Adapter(ocppId, transport, csApi, RealTransactionRepository15())
+                OcppVersionTransport.OCPP_1_2 -> Ocpp12Adapter(ocppId, transport, csApi, RealTransactionRepository12())
             }
         }
 

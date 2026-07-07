@@ -19,6 +19,7 @@ dependencies {
     api(project(":ocpp-transport-websocket"))
     api(project(":ocpp-1-2-core"))
     api(project(":ocpp-1-2-api"))
+    api(project(":ocpp-1-2-api-adapter"))
     api(project(":ocpp-1-2-soap"))
     api(project(":ocpp-1-5-api-adapter"))
     api(project(":ocpp-1-5-core"))

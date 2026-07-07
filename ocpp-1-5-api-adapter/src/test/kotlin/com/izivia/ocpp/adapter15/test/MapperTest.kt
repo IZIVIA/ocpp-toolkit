@@ -1,0 +1,79 @@
+package com.izivia.ocpp.adapter15.test
+
+import com.izivia.ocpp.adapter15.mapper.MeterValuesMapper
+import com.izivia.ocpp.adapter15.mapper.RemoteStartTransactionMapper
+import com.izivia.ocpp.adapter15.mapper.StatusNotificationMapper
+import com.izivia.ocpp.api.model.common.MeterValueType
+import com.izivia.ocpp.api.model.common.SampledValueType
+import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
+import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
+import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq
+import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
+import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
+import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
+import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
+import kotlinx.datetime.Instant
+import org.junit.jupiter.api.Test
+import org.mapstruct.factory.Mappers
+import strikt.api.expectThat
+import strikt.assertions.isEqualTo
+
+class MapperTest {
+    @Test
+    fun `meter values are mapped to OCPP 1_5 sampled values`() {
+        val mapper = Mappers.getMapper(MeterValuesMapper::class.java)
+        val timestamp = Instant.parse("2026-01-01T00:00:00Z")
+
+        val request = MeterValuesReq(
+            evseId = 1,
+            connectorId = 2,
+            transactionId = "42",
+            meterValue = listOf(
+                MeterValueType(
+                    timestamp = timestamp,
+                    sampledValue = listOf(
+                        SampledValueType(10.0, measurand = MeasurandEnumType.EnergyActiveImportRegister)
+                    )
+                )
+            )
+        )
+
+        val core = mapper.genToCoreReq(request)
+
+        expectThat(core) {
+            get { connectorId }.isEqualTo(2)
+            get { transactionId }.isEqualTo(42)
+            get { values!![0].timestamp }.isEqualTo(timestamp)
+            get { values!![0].value[0].value }.isEqualTo("10.0")
+        }
+    }
+
+    @Test
+    fun `occupied status is mapped to OCPP 1_5 occupied status`() {
+        val mapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val request = StatusNotificationReq(
+            connectorId = 1,
+            evseId = 1,
+            connectorStatus = ConnectorStatusEnumType.Occupied,
+            errorCode = ChargePointErrorCode.NoError,
+            timestamp = Instant.parse("2026-01-01T00:00:00Z")
+        )
+
+        val core = mapper.genToCoreReq(request)
+
+        expectThat(core.status).isEqualTo(ChargePointStatus.Occupied)
+    }
+
+    @Test
+    fun `remote start keeps connector id for OCPP 1_5`() {
+        val mapper = Mappers.getMapper(RemoteStartTransactionMapper::class.java)
+
+        val generic = mapper.coreToGenReq(RemoteStartTransactionReq(connectorId = 3, idTag = "ABC123"), 99)
+
+        expectThat(generic) {
+            get { remoteStartId }.isEqualTo(99)
+            get { evseId }.isEqualTo(3)
+            get { idToken.idToken }.isEqualTo("ABC123")
+        }
+    }
+}

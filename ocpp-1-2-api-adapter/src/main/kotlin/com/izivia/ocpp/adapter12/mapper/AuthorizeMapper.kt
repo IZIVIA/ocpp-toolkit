@@ -1,0 +1,19 @@
+package com.izivia.ocpp.adapter12.mapper
+
+import com.izivia.ocpp.core12.model.authorize.AuthorizeReq
+import com.izivia.ocpp.core12.model.authorize.AuthorizeResp
+import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.ReportingPolicy
+import com.izivia.ocpp.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import com.izivia.ocpp.api.model.authorize.AuthorizeResp as AuthorizeRespGen
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+abstract class AuthorizeMapper {
+
+    @Mapping(source = "idToken.idToken", target = "idTag")
+    abstract fun genToCoreReq(authorizeReq: AuthorizeReqGen?): AuthorizeReq
+
+    fun coreToGenResp(authorizeResp: AuthorizeResp): AuthorizeRespGen =
+        AuthorizeRespGen(CommonMapper.convertIdTagInfo(authorizeResp.idTagInfo))
+}

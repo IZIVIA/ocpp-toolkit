@@ -1,14 +1,19 @@
 package com.izivia.ocpp.integration.test
 
+import com.izivia.ocpp.adapter12.Ocpp12Adapter
+import com.izivia.ocpp.adapter15.Ocpp15Adapter
+import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api12.OcppCSCallbacks
 import com.izivia.ocpp.core12.CSMSOperations
 import com.izivia.ocpp.core12.ChargePointOperations
 import com.izivia.ocpp.integration.ApiFactory
 import com.izivia.ocpp.integration.model.CSMSSettings
 import com.izivia.ocpp.integration.model.ServerSetting
+import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
+import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isA
@@ -54,5 +59,37 @@ class Ocpp12FactoryTest {
         )
 
         expectThat(csms.getCSApi12()).isA<CSMSOperations>()
+    }
+
+    @Test
+    fun `creates generic API adapter for OCPP 1-5`() {
+        val api = ApiFactory.getCSMSApi(
+            settings = Settings(
+                ocppVersion = OcppVersion.OCPP_1_5,
+                transportType = TransportEnum.SOAP,
+                clientPath = "/cp",
+                clientPort = 8081
+            ),
+            ocppId = "CP001",
+            csApi = mockk<CSApi>(relaxed = true)
+        )
+
+        expectThat(api).isA<Ocpp15Adapter>()
+    }
+
+    @Test
+    fun `creates generic API adapter for OCPP 1-2`() {
+        val api = ApiFactory.getCSMSApi(
+            settings = Settings(
+                ocppVersion = OcppVersion.OCPP_1_2,
+                transportType = TransportEnum.SOAP,
+                clientPath = "/cp",
+                clientPort = 8081
+            ),
+            ocppId = "CP001",
+            csApi = mockk<CSApi>(relaxed = true)
+        )
+
+        expectThat(api).isA<Ocpp12Adapter>()
     }
 }
