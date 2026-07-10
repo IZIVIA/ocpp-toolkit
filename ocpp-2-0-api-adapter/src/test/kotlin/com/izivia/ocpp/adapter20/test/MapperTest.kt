@@ -163,7 +163,7 @@ import com.izivia.ocpp.core20.model.unpublishfirmware.enumeration.UnpublishFirmw
 import com.izivia.ocpp.core20.model.updatefirmware.FirmwareType
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat

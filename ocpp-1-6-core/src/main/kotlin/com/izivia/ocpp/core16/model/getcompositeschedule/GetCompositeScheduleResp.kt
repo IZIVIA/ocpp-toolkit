@@ -3,7 +3,7 @@ package com.izivia.ocpp.core16.model.getcompositeschedule
 import com.izivia.ocpp.core16.model.Response
 import com.izivia.ocpp.core16.model.common.ChargingSchedule
 import com.izivia.ocpp.core16.model.getcompositeschedule.enumeration.GetCompositeScheduleStatus
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class GetCompositeScheduleResp(
     val status: GetCompositeScheduleStatus,

@@ -54,11 +54,10 @@ import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.ClientTransport
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.plus
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
+import kotlin.time.Duration.Companion.milliseconds
 import com.izivia.ocpp.api.model.authorize.AuthorizeReq as AuthorizeReqGen
 import com.izivia.ocpp.api.model.authorize.AuthorizeResp as AuthorizeRespGen
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
@@ -158,7 +157,7 @@ class Ocpp16Adapter(
         if (request.transactionInfo.chargingState != null) {
             // Add 1ms to the timestamp so that the statusNotification request timestamp
             // is the latest one compare to the previous request timestamp
-            request.timestamp = request.timestamp.plus(1, DateTimeUnit.MILLISECOND)
+            request.timestamp += 1.milliseconds
             val updateResponse = updateTransactionEvent(meta, request)
             executionMetadata = executionMetadata.combine(updateResponse.executionMeta)
         }

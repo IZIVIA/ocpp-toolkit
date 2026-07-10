@@ -1,7 +1,7 @@
 package com.izivia.ocpp.api.model.notifyevchargingneeds
 
 import com.izivia.ocpp.api.model.notifyevchargingneeds.enumeration.EnergyTransferModeEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ChargingNeedsType(
     val requestedEnergyTransfer: EnergyTransferModeEnumType,

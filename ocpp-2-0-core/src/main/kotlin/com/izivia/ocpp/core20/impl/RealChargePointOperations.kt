@@ -97,7 +97,7 @@ import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class RealChargePointOperations(
     private val chargeStationId: String,

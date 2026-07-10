@@ -3,7 +3,7 @@ package com.izivia.ocpp.api.model.reservenow
 import com.izivia.ocpp.api.model.Request
 import com.izivia.ocpp.api.model.common.IdTokenType
 import com.izivia.ocpp.api.model.reservenow.enumeration.ConnectorEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ReserveNowReq(
     val id: Int,

@@ -1,7 +1,7 @@
 package com.izivia.ocpp.api.model.notifyevent
 
 import com.izivia.ocpp.api.model.Request
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class NotifyEventReq(
     val generatedAt: Instant,

@@ -10,7 +10,7 @@ import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.WsServerConfig
 import com.izivia.ocpp.wamp.server.asServer
 import io.undertow.server.HttpServerExchange
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.http4k.routing.RoutingWsHandler
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap

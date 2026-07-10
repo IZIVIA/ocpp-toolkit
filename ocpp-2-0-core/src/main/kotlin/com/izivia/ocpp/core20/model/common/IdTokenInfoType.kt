@@ -1,7 +1,7 @@
 package com.izivia.ocpp.core20.model.common
 
 import com.izivia.ocpp.core20.model.common.enumeration.AuthorizationStatusEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class IdTokenInfoType(
     val status: AuthorizationStatusEnumType,

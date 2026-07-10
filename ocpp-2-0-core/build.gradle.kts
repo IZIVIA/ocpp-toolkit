@@ -7,9 +7,9 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation(project(":ocpp-transport"))
-    implementation(project(":operation-information"))
-    implementation(project(":utils"))
+    api(project(":ocpp-transport"))
+    api(project(":operation-information"))
+    api(project(":utils"))
 }
 
 java {

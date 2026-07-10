@@ -22,6 +22,18 @@ The aim is to be a strict implementation of OCPP protocol, with no business logi
 
 We also attempt to provide a generic API, trying to make switching between ocpp versions transparent. The design between versions of OCPP being sometimes very different, the generic API may not cover all aspects with high fidelity.
 
+## Requirements
+
+Published APIs use `kotlin.time.Instant` and `kotlin.time.Clock`. Consumers need Kotlin 2.3 or newer to compile code that references these types, and `kotlin-stdlib` 2.3 or newer at runtime.
+
+Consumers using `kotlinx-datetime` 0.7 or newer already get `kotlinx.datetime.Instant` as a typealias to `kotlin.time.Instant`. Consumers on older `kotlinx-datetime` versions must migrate their call sites to `kotlin.time`.
+
+## Timestamp Handling
+
+Outbound timestamps are serialized in a canonical UTC ISO-8601 form and truncated to milliseconds.
+
+Inbound timestamp parsing is intentionally more tolerant for OCPP interoperability. The toolkit accepts canonical `Z` timestamps, full timezone offsets such as `+02:00`, incomplete offsets such as `+02`, and timestamps without timezone information. When a timestamp omits the timezone, it is interpreted as UTC and a warning is logged. This avoids depending on the CSMS JVM default timezone, but a charge point sending local time without a timezone may still produce shifted transaction timestamps.
+
 ## Status
 
 Currently the ChargingStation side of versions 1.6 and 2.0.1 are fully supported in OCPP-J flavor - except the security requirements besides support for http basic auth. This includes all the data structures described by the specification, with json serialisation verified against the json schemas provided in the specification.
@@ -323,4 +335,3 @@ Plus, you will find:
 - `operation-information`, used to described operations in whatever version of apis
 - `utils`, used to ease some common needs between apis
 - `ocpp-wamp`, a client & server implementation of the WAMP-like RPC-over-websocket system defined in the OCPP-J protcols
-

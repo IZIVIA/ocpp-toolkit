@@ -144,8 +144,8 @@ import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.OcppVersion
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import java.lang.Thread.sleep
 
 fun heartbeat(csmsApi: CSMSApi, ocppId: String, request: HeartbeatReq) {

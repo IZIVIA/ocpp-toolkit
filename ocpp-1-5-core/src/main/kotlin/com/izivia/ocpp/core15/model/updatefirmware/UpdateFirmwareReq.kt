@@ -1,7 +1,7 @@
 package com.izivia.ocpp.core15.model.updatefirmware
 
 import com.izivia.ocpp.core15.model.Request
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class UpdateFirmwareReq(
     val location: String,

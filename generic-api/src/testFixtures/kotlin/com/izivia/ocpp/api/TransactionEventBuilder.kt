@@ -10,8 +10,8 @@ import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumT
 import com.izivia.ocpp.api.model.transactionevent.enumeration.ReasonEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.TriggerReasonEnumType
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 @DslMarker
 annotation class TransactionDsl

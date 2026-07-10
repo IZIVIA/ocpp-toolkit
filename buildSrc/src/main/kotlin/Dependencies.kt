@@ -24,7 +24,6 @@ fun Project.coreProject() {
         "implementation"("org.http4k:http4k-bom:_")
         "implementation"("org.jetbrains.kotlin:kotlin-reflect:_")
         "implementation"("io.github.microutils:kotlin-logging:_")
-        "implementation"("org.jetbrains.kotlinx:kotlinx-datetime:_")
         "implementation"("org.slf4j:slf4j-api:_")
 
         "testImplementation"("org.junit.jupiter:junit-jupiter-api:_")

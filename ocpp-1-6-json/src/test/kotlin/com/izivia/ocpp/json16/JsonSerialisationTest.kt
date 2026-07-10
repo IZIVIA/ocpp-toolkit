@@ -1,7 +1,7 @@
 package com.izivia.ocpp.json16
 
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatResp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isEqualTo

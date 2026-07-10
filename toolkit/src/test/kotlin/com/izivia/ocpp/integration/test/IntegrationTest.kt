@@ -179,17 +179,19 @@ import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
 import io.mockk.*
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
-import java.util.*
 import com.izivia.ocpp.api.model.publishfirmwarestatusnotification.enumeration.PublishFirmwareStatusEnumType as PublishFirmwareStatusEnumTypeGen
 
 class IntegrationTest {
+    private val fixedMessageId = "a727d144-82bb-497a-a0c7-4ef2295910d4"
+
+    private fun newMessageId(): String = fixedMessageId
 
     private lateinit var ocppWampClient: OkHttpOcppWampClient
     private val csApi: CSApi = object : CSApi {
@@ -617,11 +619,6 @@ class IntegrationTest {
 
     @BeforeEach
     fun init() {
-        val id = "a727d144-82bb-497a-a0c7-4ef2295910d4"
-        val uuid = UUID.fromString(id)
-        mockkStatic(UUID::class)
-        every { UUID.randomUUID() } returns uuid
-
         ocppWampClient = mockk()
         every { ocppWampClient.connect() } returns Unit
         every { ocppWampClient.close() } returns Unit
@@ -644,7 +641,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = HeartbeatReq()
@@ -662,7 +659,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = HeartbeatReq()
@@ -680,7 +677,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = AuthorizeReq(idToken = IdTokenType("Tag1", IdTokenEnumType.Central))
@@ -704,7 +701,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = MeterValuesReq(
@@ -767,7 +764,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = DataTransferReq("vendor", "msgId12", "Hello")
@@ -788,7 +785,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request =
@@ -810,7 +807,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = TransactionEventReq(
@@ -853,7 +850,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = StatusNotificationReq(
@@ -876,7 +873,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyReportReq(
@@ -896,7 +893,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyReportReq(
@@ -927,7 +924,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = FirmwareStatusNotificationReq(
@@ -947,7 +944,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = FirmwareStatusNotificationReq(
@@ -967,7 +964,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ClearedChargingLimitReq(
@@ -986,7 +983,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ClearedChargingLimitReq(
@@ -1007,7 +1004,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = GetCertificateStatusReq(
@@ -1025,7 +1022,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = GetCertificateStatusReq(
@@ -1046,7 +1043,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyCustomerInformationReq(
@@ -1070,7 +1067,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyCustomerInformationReq(
@@ -1095,7 +1092,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyEventReq(
@@ -1136,7 +1133,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyEVChargingScheduleReq(
@@ -1166,7 +1163,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyEVChargingScheduleReq(
@@ -1197,7 +1194,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyChargingLimitReq(
@@ -1216,7 +1213,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyChargingLimitReq(
@@ -1237,7 +1234,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = LogStatusNotificationReq(
@@ -1258,7 +1255,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = LogStatusNotificationReq(
@@ -1279,7 +1276,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = PublishFirmwareStatusNotificationReq(
@@ -1299,7 +1296,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = PublishFirmwareStatusNotificationReq(
@@ -1322,7 +1319,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyDisplayMessagesReq(
@@ -1367,7 +1364,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyEVChargingNeedsReq(
@@ -1386,7 +1383,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         var request = NotifyEVChargingNeedsReq(
@@ -1419,7 +1416,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = NotifyMonitoringReportReq(
@@ -1439,7 +1436,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         var request = NotifyMonitoringReportReq(
@@ -1501,7 +1498,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ReservationStatusUpdateReq(
@@ -1520,7 +1517,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ReservationStatusUpdateReq(
@@ -1541,7 +1538,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = SecurityEventNotificationReq(
@@ -1561,7 +1558,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = SecurityEventNotificationReq(
@@ -1583,7 +1580,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = SignCertificateReq(
@@ -1602,7 +1599,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = SignCertificateReq(
@@ -1625,7 +1622,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ReportChargingProfilesReq(
@@ -1662,7 +1659,7 @@ class IntegrationTest {
 
         val settings = Settings(OcppVersion.OCPP_2_0, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
-        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi)
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
         val requestMetadata = RequestMetadata(ocppId)
         val request = ReportChargingProfilesReq(

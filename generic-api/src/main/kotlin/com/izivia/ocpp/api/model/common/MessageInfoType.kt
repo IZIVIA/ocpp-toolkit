@@ -2,7 +2,7 @@ package com.izivia.ocpp.api.model.common
 
 import com.izivia.ocpp.api.model.common.enumeration.MessagePriorityEnumType
 import com.izivia.ocpp.api.model.common.enumeration.MessageStateEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class MessageInfoType(
     val id: Int,

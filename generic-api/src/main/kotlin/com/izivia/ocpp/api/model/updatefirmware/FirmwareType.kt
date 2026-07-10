@@ -1,6 +1,6 @@
 package com.izivia.ocpp.api.model.updatefirmware
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class FirmwareType(
     val location: String,

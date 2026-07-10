@@ -79,7 +79,7 @@ import com.izivia.ocpp.core15.model.unlockconnector.enumeration.UnlockStatus
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.soap.*
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 internal object Ocpp15SoapMapperIn : ObjectMapper(
     OcppSoapMapper()

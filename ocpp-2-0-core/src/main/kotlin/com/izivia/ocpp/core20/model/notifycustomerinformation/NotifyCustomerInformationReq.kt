@@ -1,7 +1,7 @@
 package com.izivia.ocpp.core20.model.notifycustomerinformation
 
 import com.izivia.ocpp.utils.HasActionTimestamp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class NotifyCustomerInformationReq(
     val data: String,

@@ -4,7 +4,7 @@ import com.izivia.ocpp.api.model.common.ComponentType
 import com.izivia.ocpp.api.model.common.VariableType
 import com.izivia.ocpp.api.model.notifyevent.enumeration.EventNotificationEnumType
 import com.izivia.ocpp.api.model.notifyevent.enumeration.EventTriggerEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class EventDataType(
     val eventId: Int,

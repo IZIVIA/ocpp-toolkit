@@ -4,7 +4,7 @@ import com.izivia.ocpp.core16.model.Request
 import com.izivia.ocpp.core16.model.common.MeterValue
 import com.izivia.ocpp.core16.model.stoptransaction.enumeration.Reason
 import com.izivia.ocpp.utils.HasActionTimestamp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class StopTransactionReq(
     val meterStop: Int,

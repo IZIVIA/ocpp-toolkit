@@ -1,9 +1,9 @@
 package com.izivia.ocpp.utils
 
 import com.fasterxml.jackson.databind.module.SimpleModule
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
-class KotlinxInstantModule : SimpleModule() {
+open class KotlinInstantModule : SimpleModule() {
     init {
         addSerializer(Instant::class.java, InstantSerializer())
         addDeserializer(Instant::class.java, InstantDeserializer())

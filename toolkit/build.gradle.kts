@@ -34,6 +34,7 @@ dependencies {
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:_")
     testImplementation(project(":utils"))
+    testImplementation("ch.qos.logback:logback-classic:_")
 }
 
 java {

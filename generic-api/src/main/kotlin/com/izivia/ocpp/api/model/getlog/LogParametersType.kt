@@ -1,6 +1,6 @@
 package com.izivia.ocpp.api.model.getlog
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class LogParametersType(
     val remoteLocation: String,
