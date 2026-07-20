@@ -28,7 +28,7 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: CertificateSignedReq
     ): OperationExecution<CertificateSignedReq, CertificateSignedResp> {
         val response = csApi.certificateSigned(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun deleteCertificate(
@@ -36,7 +36,7 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: DeleteCertificateReq
     ): OperationExecution<DeleteCertificateReq, DeleteCertificateResp> {
         val response = csApi.deleteCertificate(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun extendedTriggerMessage(
@@ -44,7 +44,7 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: ExtendedTriggerMessageReq
     ): OperationExecution<ExtendedTriggerMessageReq, ExtendedTriggerMessageResp> {
         val response = csApi.triggerMessage(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun getInstalledCertificateIds(
@@ -52,12 +52,12 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: GetInstalledCertificateIdsReq
     ): OperationExecution<GetInstalledCertificateIdsReq, GetInstalledCertificateIdsResp> {
         val response = csApi.getInstalledCertificateIds(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp> {
         val response = csApi.getLog(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun installCertificate(
@@ -65,7 +65,7 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: InstallCertificateReq
     ): OperationExecution<InstallCertificateReq, InstallCertificateResp> {
         val response = csApi.installCertificate(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
     override fun signedUpdateFirmware(
@@ -73,6 +73,9 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         req: SignedUpdateFirmwareReq
     ): OperationExecution<SignedUpdateFirmwareReq, SignedUpdateFirmwareResp> {
         val response = csApi.updateFirmware(meta, SecurityMapper.coreToGenReq(req))
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, SecurityMapper.genToCoreResp(response.response))
+        return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
+
+    private fun <Q, S> ok(meta: RequestMetadata, req: Q, resp: S) =
+        OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, resp)
 }

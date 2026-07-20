@@ -141,7 +141,9 @@ class RealSecurityCSMSOperations(
         )
     }
 
-    private fun getTransport(ocppId: String): ServerTransport =
-        servers.firstOrNull { it.canSendToChargingStation(acceptConnection(ocppId)) }
+    private fun getTransport(ocppId: String): ServerTransport {
+        val config = acceptConnection(ocppId)
+        return servers.firstOrNull { it.canSendToChargingStation(config) }
             ?: throw IllegalStateException("No transport to send a message to $ocppId")
+    }
 }
