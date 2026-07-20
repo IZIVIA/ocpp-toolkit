@@ -24,6 +24,8 @@ import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
 import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
 import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+import com.izivia.ocpp.security16.SecurityCSMSOperations as SecurityCSMSOperations16
+import com.izivia.ocpp.security16.SecurityChargePointOperations as SecurityChargePointOperations16
 
 
 class CSMS(
@@ -45,6 +47,10 @@ class CSMS(
         when (csmsApi) {
             is ChargePointOperations16 -> serverByVersion[OCPP_1_6]?.let { transports16 ->
                 CsApiType.OcppCsApiType(OCPP_1_6) to RealCSMSOperations16(transports16, fn, csmsApi)
+            }
+            is SecurityChargePointOperations16 -> serverByVersion[OCPP_1_6]?.let { transports16 ->
+                CsApiType.OcppSecurityCsApiType(OCPP_1_6) to
+                    SecurityCSMSOperations16.newSecurityCSMSOperations(transports16, fn, csmsApi)
             }
             is ChargePointOperations15 -> serverByVersion[OCPP_1_5]?.let { transports15 ->
                 CsApiType.OcppCsApiType(OCPP_1_5) to RealCSMSOperations15(transports15, fn, csmsApi)
@@ -112,6 +118,10 @@ class CSMS(
     fun getCSApi16(): CSMSOperations16 =
         csApi[CsApiType.OcppCsApiType(OCPP_1_6)] as CSMSOperations16? ?: throw IllegalStateException("No 1.6 api is available")
 
+    fun getSecurityCSApi16(): SecurityCSMSOperations16 =
+        csApi[CsApiType.OcppSecurityCsApiType(OCPP_1_6)] as SecurityCSMSOperations16?
+            ?: throw IllegalStateException("No 1.6 security api is available")
+
     fun getCSApi20(): CSMSOperations20 =
         csApi[CsApiType.OcppCsApiType(OCPP_2_0)] as CSMSOperations20? ?: throw IllegalStateException("No 2.0.1 api is available")
 
@@ -120,4 +130,5 @@ class CSMS(
 sealed class CsApiType {
     class GenericCsApiType: CsApiType()
     data class OcppCsApiType(val ocppVersion:OcppVersion): CsApiType()
+    data class OcppSecurityCsApiType(val ocppVersion: OcppVersion): CsApiType()
 }
