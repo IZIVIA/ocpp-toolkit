@@ -1,6 +1,6 @@
 package com.izivia.ocpp.integration.test
 
-import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
+import com.izivia.ocpp.core16.ChargePointOperations
 import com.izivia.ocpp.core16.model.certificatesigned.CertificateSignedReq
 import com.izivia.ocpp.core16.model.certificatesigned.CertificateSignedResp
 import com.izivia.ocpp.core16.model.certificatesigned.enumeration.CertificateSignedStatusEnumType
@@ -14,6 +14,7 @@ import com.izivia.ocpp.core16.model.signcertificate.SignCertificateResp
 import com.izivia.ocpp.core16.model.signedfirmwarestatusnotification.SignedFirmwareStatusNotificationReq
 import com.izivia.ocpp.core16.model.signedfirmwarestatusnotification.SignedFirmwareStatusNotificationResp
 import com.izivia.ocpp.integration.CSMS
+import com.izivia.ocpp.operation.information.CSMSCallbacks
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
@@ -34,7 +35,7 @@ class CSMSSecurityWiringTest {
 
     private val meta = RequestMetadata("CP001")
 
-    private fun buildCsms(vararg apis: com.izivia.ocpp.operation.information.CSMSCallbacks): CSMS {
+    private fun buildCsms(vararg apis: CSMSCallbacks): CSMS {
         val server = mockk<ServerTransport>()
         every { server.receiveMessageClass<Any, Any>(any(), any(), any(), any(), any()) } returns Unit
         every { server.canSendToChargingStation(any()) } returns true
@@ -49,7 +50,7 @@ class CSMSSecurityWiringTest {
     }
 
     @Test
-    fun `csms exposes the 1_6 security api when a security callback is registered`() {
+    fun `getSecurityCSApi16 round-trips a CSMS-initiated security message when a security callback is registered`() {
         val csms = buildCsms(securityCallback())
 
         val response = csms.getSecurityCSApi16()
@@ -60,11 +61,39 @@ class CSMSSecurityWiringTest {
     }
 
     @Test
-    fun `csms without a security callback does not expose the 1_6 security api`() {
+    fun `getCSApi16 throws when only a security callback is registered`() {
         val csms = buildCsms(securityCallback())
 
-        // The core 1.6 api was never registered, so it must not be reachable...
-        expectThrows<IllegalStateException> { csms.getCSApi16() as CSMSOperations16 }
+        expectThrows<IllegalStateException> { csms.getCSApi16() }
+    }
+
+    @Test
+    fun `getSecurityCSApi16 throws when no security callback is registered`() {
+        val csms = buildCsms(mockk<ChargePointOperations>(relaxed = true))
+
+        expectThrows<IllegalStateException> { csms.getSecurityCSApi16() }
+    }
+
+    @Test
+    fun `a single callback implementing both core and security interfaces exposes both apis`() {
+        val core = mockk<ChargePointOperations>(relaxed = true)
+        val combined = object :
+            ChargePointOperations by core,
+            SecurityChargePointOperations by securityCallback() {
+            override fun connect() = Unit
+            override fun close() = Unit
+        }
+
+        val csms = buildCsms(combined)
+
+        // Security facet is registered despite the object also being a core callback...
+        expectThat(
+            csms.getSecurityCSApi16()
+                .certificateSigned(meta, CertificateSignedReq("cert"))
+                .response.status
+        ).isEqualTo(CertificateSignedStatusEnumType.Accepted)
+        // ...and the core facet is still available (would throw if it had been dropped).
+        csms.getCSApi16()
     }
 
     private fun responseFor(clazz: KClass<*>): Any =

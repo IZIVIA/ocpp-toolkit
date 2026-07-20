@@ -720,6 +720,48 @@ class MapperTest {
     }
 
     @Test
+    fun securityMapperRejectsSignedFirmwareUpdateWithoutSignature() {
+        val requestWithoutSignature = com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareReq(
+            requestId = 1,
+            firmware = com.izivia.ocpp.api.model.updatefirmware.FirmwareType(
+                location = "https://example.test/firmware.bin",
+                retrieveDateTime = Instant.parse("2022-02-15T00:00:00Z"),
+                signingCertificate = "cert",
+                signature = null
+            )
+        )
+
+        // The 1.6 signed firmware update requires both signingCertificate and signature;
+        // a generic request missing either must fail-closed rather than map to a partial core request.
+        expectThrows<IllegalArgumentException> { SecurityMapper.genToCoreReq(requestWithoutSignature) }
+    }
+
+    @Test
+    fun securityMapperMapsMultipleInstalledCertificates() {
+        val response = SecurityMapper.genToCoreResp(
+            com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp(
+                status = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                    .GetInstalledCertificateStatusEnumType.Accepted,
+                certificateHashDataChain = listOf(
+                    com.izivia.ocpp.api.model.getinstalledcertificateids.CertificateHashDataChainType(
+                        certificateType = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                            .GetCertificateIdUseEnumType.CSMSRootCertificate,
+                        certificateHashData = CertificateHashDataType(HashAlgorithmEnumType.SHA256, "issuer-1", "key-1", "serial-1")
+                    ),
+                    com.izivia.ocpp.api.model.getinstalledcertificateids.CertificateHashDataChainType(
+                        certificateType = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                            .GetCertificateIdUseEnumType.ManufacturerRootCertificate,
+                        certificateHashData = CertificateHashDataType(HashAlgorithmEnumType.SHA384, "issuer-2", "key-2", "serial-2")
+                    )
+                )
+            )
+        )
+
+        expectThat(response.certificateHashData!!.map { it.serialNumber })
+            .isEqualTo(listOf("serial-1", "serial-2"))
+    }
+
+    @Test
     fun getDiagnosticsMapper() {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
         val resp = mapper.genToCoreResp(
