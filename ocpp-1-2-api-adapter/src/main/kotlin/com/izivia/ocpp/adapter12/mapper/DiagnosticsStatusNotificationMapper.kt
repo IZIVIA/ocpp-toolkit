@@ -15,7 +15,7 @@ import org.mapstruct.ReportingPolicy
 abstract class DiagnosticsStatusNotificationMapper {
 
     /**
-     * Transient states with no OCPP 1.2 equivalent; kept in sync with the throw branch of convertFirmwareStatus.
+     * Transient states with no OCPP 1.2 equivalent; kept in sync with the throw branch of convertDiagnosticsStatus.
      */
     private val unsupportedStatuses = setOf(UploadLogStatusEnumType.Idle, UploadLogStatusEnumType.Uploading)
 
@@ -27,7 +27,7 @@ abstract class DiagnosticsStatusNotificationMapper {
         status !in unsupportedStatuses
 
     @Named("convertDiagnosticsStatus")
-    fun convertFirmwareStatus(status: UploadLogStatusEnumType): DiagnosticsStatus =
+    fun convertDiagnosticsStatus(status: UploadLogStatusEnumType): DiagnosticsStatus =
         when (status) {
             UploadLogStatusEnumType.Uploaded -> DiagnosticsStatus.Uploaded
 

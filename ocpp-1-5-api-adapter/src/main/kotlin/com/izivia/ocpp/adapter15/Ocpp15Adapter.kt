@@ -158,8 +158,8 @@ class Ocpp15Adapter(
         if (request.transactionInfo.chargingState != null) {
             // Add 1ms to the timestamp so that the statusNotification request timestamp
             // is the latest one compare to the previous request timestamp
-            request.timestamp = request.timestamp.plus(1, DateTimeUnit.MILLISECOND)
-            val updateResponse = updateTransactionEvent(meta, request)
+            val updatedRequest = request.copy(timestamp = request.timestamp.plus(1, DateTimeUnit.MILLISECOND))
+            val updateResponse = updateTransactionEvent(meta, updatedRequest)
             executionMetadata = executionMetadata.combine(updateResponse.executionMeta)
         }
         return executionMetadata

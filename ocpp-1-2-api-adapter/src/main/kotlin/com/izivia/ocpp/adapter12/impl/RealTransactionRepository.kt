@@ -4,8 +4,13 @@ import com.izivia.ocpp.adapter12.Ocpp12TransactionIds
 import com.izivia.ocpp.adapter12.TransactionRepository
 import java.util.concurrent.ConcurrentHashMap
 
+/**
+ * In-memory, non-persistent [TransactionRepository]: the local-id/csms-id mappings are lost on restart.
+ * A StopTransaction/MeterValues whose StartTransaction was not recorded (e.g. after a restart) will fail
+ * the local-id lookup. Inject a persistent [TransactionRepository] if durability across restarts is required.
+ */
 class RealTransactionRepository : TransactionRepository {
-    val hashMap: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
+    private val hashMap: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
 
     override fun saveTransactionIds(ids: Ocpp12TransactionIds) {
         hashMap.put(ids.localId, ids.csmsId)

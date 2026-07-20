@@ -282,5 +282,5 @@ private fun getSoapParser(version: OcppVersionTransport) = when (version) {
     OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
     OcppVersionTransport.OCPP_1_5 -> Ocpp15SoapParser()
     OcppVersionTransport.OCPP_1_2 -> Ocpp12SoapParser()
-    else -> TODO("Not yet implemented")
+    OcppVersionTransport.OCPP_2_0 -> throw IllegalArgumentException("OCPP 2.0 has no SOAP transport")
 }
