@@ -141,7 +141,8 @@ class Ocpp15CSApiAdapter(
         req: GetConfigurationReq
     ): OperationExecution<GetConfigurationReq, GetConfigurationResp> {
         val mapper: GetConfigurationMapper = Mappers.getMapper(GetConfigurationMapper::class.java)
-        return if (req.key != null && req.key!!.isNotEmpty()) {
+        val key = req.key
+        return if (!key.isNullOrEmpty()) {
             val response = csApi.getVariables(meta, mapper.coreToGenGetVariablesReq(req))
             OperationExecution(
                 ExecutionMetadata(meta, RequestStatus.SUCCESS),

@@ -54,12 +54,7 @@ abstract class StopTransactionMapper {
     abstract fun genToCoreReq(transactionReq: TransactionEventReq?, transactionId: Int): StopTransactionReq
 
     fun coreToGenResp(transactionResp: StopTransactionResp): TransactionEventResp {
-        val idTokenInfo =
-            if (transactionResp.idTagInfo != null) {
-                CommonMapper.convertIdTagInfo(transactionResp.idTagInfo!!)
-            } else {
-                null
-            }
+        val idTokenInfo = transactionResp.idTagInfo?.let { CommonMapper.convertIdTagInfo(it) }
         return TransactionEventResp(idTokenInfo = idTokenInfo)
 
     }

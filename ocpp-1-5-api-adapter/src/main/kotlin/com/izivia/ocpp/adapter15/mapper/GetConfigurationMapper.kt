@@ -58,11 +58,13 @@ abstract class GetConfigurationMapper {
         return GetConfigurationResp(knownKeys, unknownKeys)
     }
 
-    fun coreToGenGetVariablesReq(getConfigReq: GetConfigurationReq): GetVariablesReqGen =
-        if (getConfigReq.key != null && getConfigReq.key!!.isNotEmpty()) {
-            GetVariablesReqGen(getConfigReq.key!!.map { GetVariableDataType(ComponentType(it), VariableType(it)) })
+    fun coreToGenGetVariablesReq(getConfigReq: GetConfigurationReq): GetVariablesReqGen {
+        val key = getConfigReq.key
+        return if (!key.isNullOrEmpty()) {
+            GetVariablesReqGen(key.map { GetVariableDataType(ComponentType(it), VariableType(it)) })
         } else {
             throw IllegalArgumentException("key attribute can't be null or empty")
         }
+    }
 
 }

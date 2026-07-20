@@ -26,12 +26,12 @@ abstract class ChangeConfigurationMapper {
             SetVariableStatusEnumType.RebootRequired -> ConfigurationStatus.Accepted
         }
 
-    fun genToCoreResp(changeConfigResp: SetVariablesRespGen): ChangeConfigurationResp =
-        if (changeConfigResp.setVariableResult.size != 1) {
-            throw IllegalStateException("SetVariables must return exactly 1 SetVariableResultType : ${changeConfigResp.setVariableResult.size} != 1")
-        } else {
-            ChangeConfigurationResp(convertVariableEnum(changeConfigResp.setVariableResult[0].attributeStatus))
+    fun genToCoreResp(changeConfigResp: SetVariablesRespGen): ChangeConfigurationResp {
+        check(changeConfigResp.setVariableResult.size == 1) {
+            "SetVariables must return exactly 1 SetVariableResultType : ${changeConfigResp.setVariableResult.size} != 1"
         }
+        return ChangeConfigurationResp(convertVariableEnum(changeConfigResp.setVariableResult[0].attributeStatus))
+    }
 
 
     fun coreToGenReq(changeConfigReq: ChangeConfigurationReq): SetVariablesReqGen =
