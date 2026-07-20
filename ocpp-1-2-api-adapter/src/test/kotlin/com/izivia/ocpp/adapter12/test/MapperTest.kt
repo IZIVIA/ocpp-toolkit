@@ -2,6 +2,7 @@ package com.izivia.ocpp.adapter12.test
 
 import com.izivia.ocpp.adapter12.Ocpp12Adapter
 import com.izivia.ocpp.adapter12.impl.RealTransactionRepository
+import com.izivia.ocpp.adapter12.mapper.CommonMapper
 import com.izivia.ocpp.adapter12.mapper.MeterValuesMapper
 import com.izivia.ocpp.adapter12.mapper.RemoteStartTransactionMapper
 import com.izivia.ocpp.adapter12.mapper.StatusNotificationMapper
@@ -9,6 +10,7 @@ import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.model.common.MeterValueType
 import com.izivia.ocpp.api.model.common.SampledValueType
 import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
+import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
 import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
@@ -81,6 +83,26 @@ class MapperTest {
         ).forEach { state ->
             val status = mapper.convertChargingState(mapper.createChargingStateWrapper(state, null))
             expectThat(status).isEqualTo(ChargePointStatus.Occupied)
+        }
+    }
+
+    @Test
+    fun `singleEnergyRegister selects the EnergyActiveImportRegister reading with the same rule on both paths`() {
+        val energy = SampledValueType(10.0, measurand = MeasurandEnumType.EnergyActiveImportRegister)
+        val voltage = SampledValueType(230.0, measurand = MeasurandEnumType.Voltage)
+
+        // picks the energy register among other measurands, context ignored by default
+        expectThat(CommonMapper.singleEnergyRegister(listOf(voltage, energy))).isEqualTo(10)
+        // none present -> null
+        expectThat(CommonMapper.singleEnergyRegister(listOf(voltage))).isNull()
+
+        val begin = SampledValueType(1.0, ReadingContextEnumType.TransactionBegin, MeasurandEnumType.EnergyActiveImportRegister)
+        val end = SampledValueType(2.0, ReadingContextEnumType.TransactionEnd, MeasurandEnumType.EnergyActiveImportRegister)
+        // a context restricts the selection (Start/Stop path)
+        expectThat(CommonMapper.singleEnergyRegister(listOf(begin, end), ReadingContextEnumType.TransactionEnd)).isEqualTo(2)
+        // ambiguous (>1 match, no context) is rejected
+        assertThrows(IllegalArgumentException::class.java) {
+            CommonMapper.singleEnergyRegister(listOf(begin, end))
         }
     }
 

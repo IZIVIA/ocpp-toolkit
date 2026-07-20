@@ -1,6 +1,5 @@
 package com.izivia.ocpp.adapter12.mapper
 
-import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
 import com.izivia.ocpp.core12.model.common.MeterValue
 import com.izivia.ocpp.core12.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.core12.model.metervalues.MeterValuesResp
@@ -18,7 +17,7 @@ abstract class MeterValuesMapper {
         val meterValue = meterValuesReq.meterValue
         val meterValueList = meterValue.map { (s, t) ->
             MeterValue(
-                value = s.singleOrNull { it.measurand == MeasurandEnumType.EnergyActiveImportRegister }?.value?.toInt()
+                value = CommonMapper.singleEnergyRegister(s)
                     ?: throw IllegalArgumentException("A meter value MUST have one EnergyActiveImportRegister sampled value in OCPP 1.2"),
                 timestamp = t
             )

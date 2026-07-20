@@ -4,6 +4,7 @@ import com.izivia.ocpp.api.model.common.EVSEType
 import com.izivia.ocpp.api.model.common.IdTokenInfoType
 import com.izivia.ocpp.api.model.common.IdTokenType
 import com.izivia.ocpp.api.model.common.MeterValueType
+import com.izivia.ocpp.api.model.common.SampledValueType
 import com.izivia.ocpp.api.model.common.enumeration.AuthorizationStatusEnumType
 import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
 import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
@@ -28,26 +29,33 @@ abstract class CommonMapper {
             )
         }
 
+        /**
+         * Extracts the single EnergyActiveImportRegister reading (as OCPP 1.2 integer Wh) from a set of
+         * sampled values, optionally restricted to a reading [context]. Returns null when none is present
+         * and throws when more than one matches (ambiguous). Shared by the MeterValues and Start/Stop paths
+         * so both select the reading with the same rule.
+         */
+        fun singleEnergyRegister(sampledValues: List<SampledValueType>, context: ReadingContextEnumType? = null): Int? {
+            val matches = sampledValues.filter {
+                it.measurand == MeasurandEnumType.EnergyActiveImportRegister && (context == null || it.context == context)
+            }
+            return when (matches.size) {
+                0 -> null
+                1 -> matches[0].value.toInt()
+                else -> throw IllegalArgumentException("At most 1 EnergyActiveImportRegister sampled value expected: ${matches.size} > 1")
+            }
+        }
+
         fun filterMeterValues(meterValues: List<MeterValueType>?, action: String, context: ReadingContextEnumType): Int {
             val values = meterValues
                 ?: throw IllegalArgumentException("Argument meterValue is required in OCPP 1.2 to $action a transaction")
 
-            val filteredValues = values.map { (sampledValues, timestamp) ->
-                val filteredSampledValues = sampledValues
-                    .filter { it.context == context && it.measurand == MeasurandEnumType.EnergyActiveImportRegister }
-                    .also {
-                        when {
-                            it.size <= 1 -> Unit
-                            else -> throw IllegalArgumentException("A meter value MUST have at most 1 sampled value with the context ${context.value} : ${it.size} > 1")
-                        }
-                    }
-                MeterValueType(sampledValue = filteredSampledValues, timestamp = timestamp)
-            }.filter { it.sampledValue.isNotEmpty() }
+            val readings = values.mapNotNull { (sampledValues, _) -> singleEnergyRegister(sampledValues, context) }
 
-            return when {
-                filteredValues.size == 1 -> filteredValues[0].sampledValue[0].value.toInt()
-                filteredValues.isEmpty() -> throw IllegalArgumentException("At least 1 sampled value with the context ${context.value} MUST be given in property meterValues")
-                else -> throw IllegalArgumentException("Multiple meter values have a sampled value with the context ${context.value} : ${filteredValues.size} > 1")
+            return when (readings.size) {
+                1 -> readings[0]
+                0 -> throw IllegalArgumentException("At least 1 sampled value with the context ${context.value} MUST be given in property meterValues")
+                else -> throw IllegalArgumentException("Multiple meter values have a sampled value with the context ${context.value} : ${readings.size} > 1")
             }
         }
 
