@@ -107,7 +107,7 @@ class Ocpp16CSApiAdapter(
         req: RemoteStartTransactionReq
     ): OperationExecution<RemoteStartTransactionReq, RemoteStartTransactionResp> {
         val mapper: RemoteStartTransactionMapper = Mappers.getMapper(RemoteStartTransactionMapper::class.java)
-        val remoteStartId: Int = Random.nextInt()
+        val remoteStartId: Int = Random.nextInt(1, Int.MAX_VALUE)
         val response = csApi.requestStartTransaction(meta, mapper.coreToGenReq(req, remoteStartId))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
