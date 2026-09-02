@@ -22,6 +22,7 @@ import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
+import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
 import java.util.*
@@ -101,9 +102,10 @@ class ApiFactory {
             path: String,
             ocppVersion: Set<OcppVersionTransport>,
             newMessageId: () -> String,
+            settings: OcppWampServerSettings,
             listeners: EventsListeners = EventsListeners()
         ): ServerTransport =
-            WebsocketServer(ocppVersion, path, newMessageId, listeners)
+            WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
 
         private fun createServerTransportSoap(
             path: String,
@@ -216,6 +218,7 @@ class ApiFactory {
                                 s.path,
                                 s.ocppVersion,
                                 s.newMessageId,
+                                s.wampSettings,
                                 s.listeners
                             ) to (s.port to s.ocppVersion)
                         )

@@ -2,6 +2,7 @@ package com.izivia.ocpp.integration.model
 
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
+import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import java.util.*
 
 data class Settings(
@@ -28,5 +29,6 @@ data class ServerSetting(
     val ocppVersion: Set<OcppVersion>,
     val transportType: TransportEnum,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    val wampSettings: OcppWampServerSettings = OcppWampServerSettings(),
     var listeners: EventsListeners = EventsListeners()
 )

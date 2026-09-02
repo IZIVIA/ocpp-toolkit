@@ -13,8 +13,11 @@ import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
+import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import mu.KotlinLogging
+import org.http4k.server.Http4kServer
 import java.util.*
 import kotlin.reflect.KClass
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
@@ -25,11 +28,17 @@ class WebsocketServer(
     ocppVersions: Set<OcppVersion>,
     path: String,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    settings: OcppWampServerSettings = OcppWampServerSettings(),
     listeners: EventsListeners = EventsListeners(),
 ) : ServerTransport {
 
-    private val server: OcppWampServer =
-        OcppWampServer.newServer(ocppVersions = ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(), path = path, listeners = listeners)
+    internal val server: OcppWampServer =
+        OcppWampServer.newServer(
+            ocppVersions = ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(),
+            path = path,
+            settings = settings,
+            listeners = listeners
+        )
     val serverConfig = server.config()
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P =
@@ -94,3 +103,4 @@ class WebsocketServer(
         chargingStationConfig.acceptConnection
 }
 
+fun WebsocketServer.asServer(port: Int = 8000): Http4kServer = server.asServer(port)
