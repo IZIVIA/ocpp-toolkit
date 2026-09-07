@@ -15,6 +15,8 @@ import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotifi
 import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -252,6 +254,13 @@ class Ocpp20Adapter(chargingStationId: String, private val transport: ClientTran
         val response = operations.logStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> =
+        // OCPP 2.0.1 replaced DiagnosticsStatusNotification by LogStatusNotification.
+        throw IllegalStateException("diagnosticsStatusNotification can't be call in OCPP 2.0")
 
     override fun publishFirmwareStatusNotification(
         meta: RequestMetadata,

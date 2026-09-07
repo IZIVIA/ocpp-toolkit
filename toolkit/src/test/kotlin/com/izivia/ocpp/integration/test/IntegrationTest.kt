@@ -80,6 +80,8 @@ import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp
 import com.izivia.ocpp.api.model.installcertificate.InstallCertificateReq
 import com.izivia.ocpp.api.model.installcertificate.InstallCertificateResp
 import com.izivia.ocpp.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -183,6 +185,7 @@ import kotlin.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
@@ -1262,7 +1265,7 @@ class IntegrationTest {
     }
 
     @Test
-    fun `logStatusNotification 1-6 request sends DiagnosticsStatusNotification by default`() {
+    fun `diagnosticsStatusNotification 1-6 request sends DiagnosticsStatusNotification`() {
         val sent = slot<WampMessage>()
         every { ocppWampClient.sendBlocking(capture(sent)) } returns WampMessage.CallResult(
             msgId = fixedMessageId,
@@ -1274,16 +1277,24 @@ class IntegrationTest {
         val csmsApi = getCSMSApi(settings, ocppId)
 
         val requestMetadata = RequestMetadata(ocppId)
-        // A requestId is present even for the core flow: GetDiagnosticsMapper synthesises one when it
-        // adapts GetDiagnostics onto the generic GetLog, so it cannot select the action.
-        val request = LogStatusNotificationReq(
-            status = UploadLogStatusEnumType.Uploaded,
-            requestId = 1
-        )
-        val response = csmsApi.logStatusNotification(requestMetadata, request)
+        val request = DiagnosticsStatusNotificationReq(DiagnosticsStatusEnumType.Uploaded)
+        val response = csmsApi.diagnosticsStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
         expectThat(sent.captured.action).isEqualTo("DiagnosticsStatusNotification")
+    }
+
+    @Test
+    fun `logStatusNotification 1-6 request is rejected without the security extensions`() {
+        val csmsApi = getCSMSApi(websocketSettings(OcppVersion.OCPP_1_6), "chargePoint2")
+
+        // The core GetDiagnostics flow goes through diagnosticsStatusNotification instead.
+        assertThrows<IllegalStateException> {
+            csmsApi.logStatusNotification(
+                RequestMetadata("chargePoint2"),
+                LogStatusNotificationReq(status = UploadLogStatusEnumType.Uploaded, requestId = 1)
+            )
+        }
     }
 
     @Test

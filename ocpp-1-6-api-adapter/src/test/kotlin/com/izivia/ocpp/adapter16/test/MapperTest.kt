@@ -71,6 +71,9 @@ import com.izivia.ocpp.core16.model.common.enumeration.RemoteStartStopStatus
 import com.izivia.ocpp.core16.model.datatransfer.DataTransferResp
 import com.izivia.ocpp.core16.model.datatransfer.enumeration.DataTransferStatus
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq as DiagnosticsStatusNotificationReqGen
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp as DiagnosticsStatusNotificationRespGen
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import com.izivia.ocpp.core16.model.firmwarestatusnotification.enumeration.FirmwareStatus
 import com.izivia.ocpp.core16.model.getcompositeschedule.GetCompositeScheduleReq
@@ -612,17 +615,14 @@ class MapperTest {
             DiagnosticsStatusNotificationResp()
         )
         expectThat(resp) {
-            get { resp }.isA<LogStatusNotificationResp>()
+            get { resp }.isA<DiagnosticsStatusNotificationRespGen>()
         }
 
-        val req = mapper.genToCoreReq(
-            LogStatusNotificationReq(
-                status = UploadLogStatusEnumType.Uploaded,
-                requestId = 1
-            )
-        )
-        expectThat(req) {
-            get { status }.isEqualTo(DiagnosticsStatus.Uploaded)
+        // OCPP 1.6 models every generic diagnostics status, transient ones included.
+        DiagnosticsStatusEnumType.entries.forEach { status ->
+            expectThat(mapper.genToCoreReq(DiagnosticsStatusNotificationReqGen(status))) {
+                get { this.status }.isEqualTo(DiagnosticsStatus.valueOf(status.name))
+            }
         }
     }
 

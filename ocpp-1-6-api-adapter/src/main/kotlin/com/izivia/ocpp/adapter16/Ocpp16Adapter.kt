@@ -13,6 +13,8 @@ import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotifi
 import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -321,25 +323,23 @@ class Ocpp16Adapter(
     override fun logStatusNotification(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
-    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
-        // The generic API has a single log status operation, so it has to serve both 1.6 flows:
-        // GetDiagnostics -> DiagnosticsStatusNotification (core) and GetLog -> LogStatusNotification
-        // (whitepaper). Which one a charge point speaks is a station capability, not a per-message
-        // property: requestId cannot arbitrate, since it is absent from a whitepaper notification
-        // triggered while idle and synthesised by GetDiagnosticsMapper for the core flow.
-        if (securityExtensions) {
-            val response =
-                securityOperations("LogStatusNotification").logStatusNotification(
-                    meta,
-                    SecurityMapper.genToCoreReq(request)
-                )
-            OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
-        } else {
-            val mapper: DiagnosticsStatusNotificationMapper =
-                Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
-            val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
-            OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-        }
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
+        // LogStatusNotification is a whitepaper message, like the other security operations, and the
+        // core GetDiagnostics flow now has its own generic operation: diagnosticsStatusNotification.
+        // The caller therefore picks the flow explicitly, and no per-message heuristic is needed.
+        val response = securityOperations("LogStatusNotification")
+            .logStatusNotification(meta, SecurityMapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
+    }
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> {
+        val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+        val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
 
     override fun publishFirmwareStatusNotification(
         meta: RequestMetadata,

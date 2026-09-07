@@ -16,6 +16,8 @@ import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -140,6 +142,15 @@ interface CSMSApi {
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp>
 
+    /**
+     * DiagnosticsStatusNotification, an OCPP 1.x message. OCPP 2.0.1 replaced it by
+     * LogStatusNotification, so the 2.0 adapter rejects it.
+     */
+    fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp>
+
     fun publishFirmwareStatusNotification(
         meta: RequestMetadata,
         request: PublishFirmwareStatusNotificationReq
@@ -195,6 +206,7 @@ fun CSMSApi.send(
         is NotifyDisplayMessagesReq -> notifyDisplayMessages(meta, request)
         is NotifyEVChargingNeedsReq -> notifyEVChargingNeeds(meta, request)
         is LogStatusNotificationReq -> logStatusNotification(meta, request)
+        is DiagnosticsStatusNotificationReq -> diagnosticsStatusNotification(meta, request)
         is PublishFirmwareStatusNotificationReq -> publishFirmwareStatusNotification(meta, request)
         is NotifyMonitoringReportReq -> notifyMonitoringReport(meta, request)
         is ReservationStatusUpdateReq -> reservationStatusUpdate(meta, request)

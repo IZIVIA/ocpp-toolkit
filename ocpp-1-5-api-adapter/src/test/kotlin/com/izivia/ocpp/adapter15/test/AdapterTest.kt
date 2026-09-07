@@ -15,6 +15,7 @@ import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
 import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import com.izivia.ocpp.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType
 import com.izivia.ocpp.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -54,6 +55,7 @@ import com.izivia.ocpp.api.model.metervalues.MeterValuesReq as MeterValuesReqGen
 import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq as StatusNotificationReqGen
 import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq as FirmwareStatusNotificationReqGen
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq as DiagnosticsStatusNotificationReqGen
 import com.izivia.ocpp.core15.model.authorize.AuthorizeReq as AuthorizeReqCore
 import com.izivia.ocpp.core15.model.authorize.AuthorizeResp as AuthorizeRespCore
 import com.izivia.ocpp.core15.model.bootnotification.BootNotificationReq as BootNotificationReqCore
@@ -286,7 +288,7 @@ class AdapterTest {
     }
 
     @Test
-    fun `log status notification maps to diagnostics status notification request`() {
+    fun `diagnostics status notification request`() {
         val requestMetadata = RequestMetadata("CP001")
         every { chargePointOperations.diagnosticsStatusNotification(any(), any()) } returns success(
             requestMetadata,
@@ -295,8 +297,8 @@ class AdapterTest {
         )
 
         val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = LogStatusNotificationReqGen(UploadLogStatusEnumType.Uploaded, requestId = 1)
-        val response = adapter.logStatusNotification(requestMetadata, request)
+        val request = DiagnosticsStatusNotificationReqGen(DiagnosticsStatusEnumType.Uploaded)
+        val response = adapter.diagnosticsStatusNotification(requestMetadata, request)
 
         expectThat(response) {
             get { this.request }.isEqualTo(request)
@@ -321,9 +323,9 @@ class AdapterTest {
     @Test
     fun `transient diagnostics status is ignored and not forwarded in OCPP 1_5`() {
         val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = LogStatusNotificationReqGen(UploadLogStatusEnumType.Uploading, requestId = 1)
+        val request = DiagnosticsStatusNotificationReqGen(DiagnosticsStatusEnumType.Uploading)
 
-        val response = adapter.logStatusNotification(RequestMetadata("CP001"), request)
+        val response = adapter.diagnosticsStatusNotification(RequestMetadata("CP001"), request)
 
         expectThat(response) {
             get { this.request }.isEqualTo(request)
@@ -431,6 +433,18 @@ class AdapterTest {
 
         expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
         verify(exactly = 0) { chargePointOperations.statusNotification(any(), any()) }
+    }
+
+    @Test
+    fun `log status notification is rejected in OCPP 1_5`() {
+        val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
+
+        assertUnsupported {
+            adapter.logStatusNotification(
+                RequestMetadata("CP001"),
+                LogStatusNotificationReqGen(UploadLogStatusEnumType.Uploaded, requestId = 1)
+            )
+        }
     }
 
     private fun transactionEvent(eventType: TransactionEventEnumType, meterValue: Double) =

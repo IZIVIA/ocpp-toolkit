@@ -11,6 +11,8 @@ import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotifi
 import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -315,11 +317,21 @@ class Ocpp12Adapter(
     override fun logStatusNotification(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
-    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
+        throw IllegalStateException("logStatusNotification can't be call in OCPP 1.2")
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> {
         val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
         if (!mapper.isSupported(request.status)) {
             logger.warn("DiagnosticsStatus ${request.status} has no OCPP 1.2 equivalent, notification ignored")
-            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, LogStatusNotificationResp())
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.NOT_SEND),
+                request,
+                DiagnosticsStatusNotificationResp()
+            )
         }
         val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
