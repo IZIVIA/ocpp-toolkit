@@ -67,14 +67,6 @@ class RealSecurityChargePointOperations(
         }
     }
 
-    override fun connect() {
-        client.connect()
-    }
-
-    override fun close() {
-        client.close()
-    }
-
     override fun logStatusNotification(
         meta: RequestMetadata,
         req: LogStatusNotificationReq

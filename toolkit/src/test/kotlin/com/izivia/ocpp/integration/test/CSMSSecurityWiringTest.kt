@@ -104,9 +104,6 @@ class CSMSSecurityWiringTest {
 
     private fun securityCallback(): SecurityChargePointOperations =
         object : SecurityChargePointOperations {
-            override fun connect() = Unit
-            override fun close() = Unit
-
             override fun logStatusNotification(meta: RequestMetadata, req: LogStatusNotificationReq) =
                 execution(meta, req, LogStatusNotificationResp())
 

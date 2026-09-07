@@ -687,6 +687,46 @@ class MapperTest {
     }
 
     @Test
+    fun securityMapperMapsSecurityEventNotification() {
+        val request = SecurityMapper.genToCoreReq(
+            com.izivia.ocpp.api.model.securityeventnotification.SecurityEventNotificationReq(
+                type = "InvalidTLSCipherSuite",
+                timestamp = Instant.parse("2022-02-15T00:00:00Z"),
+                techInfo = "techInfo"
+            )
+        )
+
+        expectThat(request)
+            .and { get { type }.isEqualTo("InvalidTLSCipherSuite") }
+            .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00Z")) }
+            .and { get { techInfo }.isEqualTo("techInfo") }
+    }
+
+    @Test
+    fun securityMapperDropsSignCertificateType() {
+        val request = SecurityMapper.genToCoreReq(
+            com.izivia.ocpp.api.model.signcertificate.SignCertificateReq(
+                csr = "csr",
+                certificateType = com.izivia.ocpp.api.model.common.enumeration
+                    .CertificateSigningUseEnumType.V2GCertificate
+            )
+        )
+
+        // OCPP 1.6 SignCertificate.req has no certificateType field: it can only be dropped.
+        expectThat(request.csr).isEqualTo("csr")
+
+        expectThat(
+            SecurityMapper.coreToGenResp(
+                com.izivia.ocpp.core16.model.signcertificate.SignCertificateResp(
+                    com.izivia.ocpp.core16.model.common.enumeration.GenericStatusEnumType.Rejected
+                )
+            ).status
+        ).isEqualTo(
+            com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType.Rejected
+        )
+    }
+
+    @Test
     fun securityMapperPreservesRequiredSerialNumber() {
         val request = SecurityMapper.coreToGenReq(
             com.izivia.ocpp.core16.model.deletecertificate.DeleteCertificateReq(
@@ -717,23 +757,6 @@ class MapperTest {
         expectThat(request)
             .and { get { requestedMessage }.isEqualTo(MessageTriggerEnumType.SignChargingStationCertificate) }
             .and { get { evse }.isEqualTo(EVSEType(2, 2)) }
-    }
-
-    @Test
-    fun securityMapperRejectsSignedFirmwareUpdateWithoutSignature() {
-        val requestWithoutSignature = com.izivia.ocpp.api.model.updatefirmware.UpdateFirmwareReq(
-            requestId = 1,
-            firmware = com.izivia.ocpp.api.model.updatefirmware.FirmwareType(
-                location = "https://example.test/firmware.bin",
-                retrieveDateTime = Instant.parse("2022-02-15T00:00:00Z"),
-                signingCertificate = "cert",
-                signature = null
-            )
-        )
-
-        // The 1.6 signed firmware update requires both signingCertificate and signature;
-        // a generic request missing either must fail-closed rather than map to a partial core request.
-        expectThrows<IllegalArgumentException> { SecurityMapper.genToCoreReq(requestWithoutSignature) }
     }
 
     @Test

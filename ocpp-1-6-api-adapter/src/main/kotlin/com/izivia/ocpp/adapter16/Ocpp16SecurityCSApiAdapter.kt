@@ -76,6 +76,13 @@ class Ocpp16SecurityCSApiAdapter(private val csApi: CSApi) : SecurityCSMSOperati
         return ok(meta, req, SecurityMapper.genToCoreResp(response.response))
     }
 
+    /**
+     * Wraps a callback answer as a successfully executed operation.
+     *
+     * Only the transport-level outcome is reported: the [com.izivia.ocpp.operation.information.RequestStatus]
+     * returned by the application callback is not propagated, so a callback answering `NOT_SEND` still
+     * yields `SUCCESS` here. This matches [Ocpp16CSApiAdapter], which behaves the same way for core 1.6.
+     */
     private fun <Q, S> ok(meta: RequestMetadata, req: Q, resp: S) =
         OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, resp)
 }

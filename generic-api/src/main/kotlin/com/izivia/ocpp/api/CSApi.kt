@@ -121,6 +121,13 @@ interface CSApi {
 
     fun getLocalListVersion(meta: RequestMetadata, req: GetLocalListVersionReq): OperationExecution<GetLocalListVersionReq, GetLocalListVersionResp>
 
+    /**
+     * Receives a firmware update request, signed or not.
+     *
+     * In OCPP 1.6 both the core `UpdateFirmware` and the security whitepaper `SignedUpdateFirmware`
+     * are routed here. A signed update carries `req.firmware.signingCertificate` and
+     * `req.firmware.signature`; both are null for an unsigned one.
+     */
     fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp>
 
     fun sendLocalList(meta: RequestMetadata, req: SendLocalListReq): OperationExecution<SendLocalListReq, SendLocalListResp>

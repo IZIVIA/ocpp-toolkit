@@ -13,7 +13,6 @@ import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.security16.impl.RealSecurityChargePointOperations
 import com.izivia.ocpp.transport.ClientTransport
-import java.net.ConnectException
 
 interface SecurityChargePointOperations : CSMSCallbacks {
     companion object {
@@ -24,12 +23,6 @@ interface SecurityChargePointOperations : CSMSCallbacks {
         ): SecurityChargePointOperations =
             RealSecurityChargePointOperations(chargingStationId, transport, csmsOperations)
     }
-
-    @Throws(IllegalStateException::class, ConnectException::class)
-    fun connect()
-
-    @Throws(IllegalStateException::class, ConnectException::class)
-    fun close()
 
     fun logStatusNotification(
         meta: RequestMetadata,

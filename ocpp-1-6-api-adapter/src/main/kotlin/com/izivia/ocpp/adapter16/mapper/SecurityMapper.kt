@@ -5,7 +5,6 @@ import com.izivia.ocpp.api.model.common.EVSEType
 import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetCertificateIdUseEnumType
 import com.izivia.ocpp.api.model.updatefirmware.FirmwareType as GenFirmwareType
 import com.izivia.ocpp.core16.model.deletecertificate.CertificateHashDataType
-import com.izivia.ocpp.core16.model.signedupdatefirmware.FirmwareType
 import com.izivia.ocpp.api.model.certificateSigned.CertificateSignedReq as GenCertificateSignedReq
 import com.izivia.ocpp.api.model.certificateSigned.CertificateSignedResp as GenCertificateSignedResp
 import com.izivia.ocpp.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType as GenCertificateSignedStatusEnumType
@@ -79,8 +78,11 @@ object SecurityMapper {
     fun genToCoreReq(req: GenSecurityEventNotificationReq) =
         CoreSecurityEventNotificationReq(req.type, req.timestamp, req.techInfo)
 
+    // SecurityEventNotification.conf is empty in OCPP 1.6: there is nothing to read from resp.
     fun coreToGenResp(resp: CoreSecurityEventNotificationResp?) = GenSecurityEventNotificationResp()
 
+    // OCPP 1.6 SignCertificate.req only carries the csr: certificateType has no equivalent and is
+    // dropped. The whitepaper knows a single use case, the charge point certificate.
     fun genToCoreReq(req: GenSignCertificateReq) = CoreSignCertificateReq(req.csr)
 
     fun coreToGenResp(resp: CoreSignCertificateResp) =
@@ -108,6 +110,7 @@ object SecurityMapper {
             requestId = req.requestId
         )
 
+    // LogStatusNotification.conf is empty in OCPP 1.6: there is nothing to read from resp.
     fun coreToGenResp(resp: CoreLogStatusNotificationResp?) = GenLogStatusNotificationResp()
 
     fun coreToGenReq(req: CoreCertificateSignedReq) = GenCertificateSignedReq(req.certificateChain)
@@ -141,6 +144,8 @@ object SecurityMapper {
                 GenGetInstalledCertificateStatusEnumType.Accepted -> CoreGetInstalledCertificateStatusEnumType.Accepted
                 GenGetInstalledCertificateStatusEnumType.NotFound -> CoreGetInstalledCertificateStatusEnumType.NotFound
             },
+            // OCPP 1.6 only knows a flat list of hashes: the chain structure is lost, so
+            // childCertificateHashData and certificateType of each link are dropped.
             certificateHashData = resp.certificateHashDataChain?.map { genToCore(it.certificateHashData) }
         )
 
@@ -218,6 +223,11 @@ object SecurityMapper {
                 CoreExtendedMessageTriggerEnumType.SignChargePointCertificate -> GenMessageTriggerEnumType.SignChargingStationCertificate
                 CoreExtendedMessageTriggerEnumType.StatusNotification -> GenMessageTriggerEnumType.StatusNotification
             },
+            // OCPP 1.6 is a 2-tier model (Charge Point + Connectors) and has no EVSE tier, so the
+            // EVSE id has to be synthesised. OCA Application Note "Multiple Connectors per EVSE in
+            // OCPP 1.x implementations" (v1.2, 2024-03-25), section 4: "The TWG's advice is to
+            // implement each connector as if it has its own EVSE." One EVSE per connector therefore
+            // maps connectorId onto both tiers.
             evse = req.connectorId?.let { EVSEType(it, it) }
         )
 
@@ -227,36 +237,6 @@ object SecurityMapper {
                 GenTriggerMessageStatusEnumType.Accepted -> CoreTriggerMessageStatus.Accepted
                 GenTriggerMessageStatusEnumType.Rejected -> CoreTriggerMessageStatus.Rejected
                 GenTriggerMessageStatusEnumType.NotImplemented -> CoreTriggerMessageStatus.NotImplemented
-            }
-        )
-
-    fun genToCoreReq(req: GenUpdateFirmwareReq): CoreSignedUpdateFirmwareReq {
-        val signingCertificate = req.firmware.signingCertificate
-            ?: throw IllegalArgumentException("signingCertificate is required for OCPP 1.6 signed firmware update")
-        val signature = req.firmware.signature
-            ?: throw IllegalArgumentException("signature is required for OCPP 1.6 signed firmware update")
-        return CoreSignedUpdateFirmwareReq(
-            firmware = FirmwareType(
-                location = req.firmware.location,
-                retrieveDateTime = req.firmware.retrieveDateTime,
-                installDateTime = req.firmware.installDateTime,
-                signingCertificate = signingCertificate,
-                signature = signature
-            ),
-            retries = req.retries,
-            requestId = req.requestId,
-            retryInterval = req.retryInterval
-        )
-    }
-
-    fun coreToGenResp(resp: CoreSignedUpdateFirmwareResp) =
-        GenUpdateFirmwareResp(
-            when (resp.status) {
-                CoreUpdateFirmwareStatusEnumType.Accepted -> GenUpdateFirmwareStatusEnumType.Accepted
-                CoreUpdateFirmwareStatusEnumType.Rejected -> GenUpdateFirmwareStatusEnumType.Rejected
-                CoreUpdateFirmwareStatusEnumType.AcceptedCanceled -> GenUpdateFirmwareStatusEnumType.AcceptedCanceled
-                CoreUpdateFirmwareStatusEnumType.InvalidCertificate -> GenUpdateFirmwareStatusEnumType.InvalidCertificate
-                CoreUpdateFirmwareStatusEnumType.RevokedCertificate -> GenUpdateFirmwareStatusEnumType.RevokedCertificate
             }
         )
 

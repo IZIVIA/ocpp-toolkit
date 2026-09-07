@@ -10,7 +10,7 @@ coreProject()
 dependencies {
     implementation(project(":generic-api"))
     implementation(project(":ocpp-1-6-core"))
-    implementation(project(":ocpp-1-6-security"))
+    api(project(":ocpp-1-6-security"))
     implementation(project(":ocpp-transport"))
     implementation(project(":operation-information"))
     implementation(project(":utils"))
