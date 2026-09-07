@@ -17,6 +17,7 @@ import com.izivia.ocpp.core15.model.common.enumeration.*
 import org.mapstruct.Mapper
 import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy
+import org.slf4j.LoggerFactory
 import com.izivia.ocpp.api.model.common.UnitOfMeasure as UnitOfMeasureGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
@@ -57,31 +58,92 @@ abstract class CommonMapper {
             }
         }
 
-        private fun convertReadingContext(value: ReadingContextEnumType?): ReadingContext =
-            value?.let { ReadingContext.valueOf(it.name) } ?: ReadingContext.SamplePeriodic
+        private val logger = LoggerFactory.getLogger(CommonMapper::class.java)
 
+        /**
+         * OCPP 1.5 spells a few units differently from the generic (2.0-shaped) model, which uses the
+         * SI symbols. Aliased explicitly so that e.g. an ampere reading is not relabelled as Wh.
+         */
+        private val unitAliases = mapOf(
+            "A" to UnitOfMeasure.Amp,
+            "V" to UnitOfMeasure.Volt
+        )
+
+        private fun convertReadingContext(value: ReadingContextEnumType?): ReadingContext =
+            when (value) {
+                null -> ReadingContext.SamplePeriodic
+                ReadingContextEnumType.InterruptionBegin -> ReadingContext.InterruptionBegin
+                ReadingContextEnumType.InterruptionEnd -> ReadingContext.InterruptionEnd
+                ReadingContextEnumType.SampleClock -> ReadingContext.SampleClock
+                ReadingContextEnumType.SamplePeriodic -> ReadingContext.SamplePeriodic
+                ReadingContextEnumType.TransactionBegin -> ReadingContext.TransactionBegin
+                ReadingContextEnumType.TransactionEnd -> ReadingContext.TransactionEnd
+
+                // OCPP 1.5 only models the six contexts above; there is no reasonable stand-in for these,
+                // so reject rather than mislabel the reading.
+                ReadingContextEnumType.Trigger,
+                ReadingContextEnumType.Other ->
+                    throw IllegalArgumentException("INVALID REQUEST : ReadingContext.${value.name} doesn't exists in OCPP 1.5")
+            }
 
         private fun convertLocation(value: LocationEnumType?): Location =
-            value?.let { Location.valueOf(it.name) } ?: Location.Outlet
+            when (value) {
+                null -> Location.Outlet
+                LocationEnumType.Inlet -> Location.Inlet
+                LocationEnumType.Outlet -> Location.Outlet
+                LocationEnumType.Body -> Location.Body
 
-        @Throws(IllegalStateException::class)
+                // OCPP 1.5 only knows Inlet/Outlet/Body: a measurement taken on the cable or in the vehicle
+                // has no equivalent, and mapping it to Outlet would misreport where it was taken.
+                LocationEnumType.Cable,
+                LocationEnumType.EV ->
+                    throw IllegalArgumentException("INVALID REQUEST : Location.${value.name} doesn't exists in OCPP 1.5")
+            }
+
+        @Throws(IllegalArgumentException::class)
         private fun convertMeasurand(value: MeasurandEnumType?): Measurand =
             when (value) {
                 null -> Measurand.EnergyActiveImportRegister
+                MeasurandEnumType.EnergyActiveExportRegister -> Measurand.EnergyActiveExportRegister
+                MeasurandEnumType.EnergyActiveImportRegister -> Measurand.EnergyActiveImportRegister
+                MeasurandEnumType.EnergyReactiveExportRegister -> Measurand.EnergyReactiveExportRegister
+                MeasurandEnumType.EnergyReactiveImportRegister -> Measurand.EnergyReactiveImportRegister
+                MeasurandEnumType.EnergyActiveExportInterval -> Measurand.EnergyActiveExportInterval
+                MeasurandEnumType.EnergyActiveImportInterval -> Measurand.EnergyActiveImportInterval
+                MeasurandEnumType.EnergyReactiveExportInterval -> Measurand.EnergyReactiveExportInterval
+                MeasurandEnumType.EnergyReactiveImportInterval -> Measurand.EnergyReactiveImportInterval
+                MeasurandEnumType.PowerActiveExport -> Measurand.PowerActiveExport
+                MeasurandEnumType.PowerActiveImport -> Measurand.PowerActiveImport
+                MeasurandEnumType.PowerReactiveExport -> Measurand.PowerReactiveExport
+                MeasurandEnumType.PowerReactiveImport -> Measurand.PowerReactiveImport
+                MeasurandEnumType.CurrentImport -> Measurand.CurrentImport
+                MeasurandEnumType.CurrentExport -> Measurand.CurrentExport
+                MeasurandEnumType.Voltage -> Measurand.Voltage
+                MeasurandEnumType.Temperature -> Measurand.Temperature
+
+                // Measurands introduced after OCPP 1.5: no equivalent, and no catch-all to degrade to.
                 MeasurandEnumType.EnergyActiveNet,
                 MeasurandEnumType.EnergyReactiveNet,
-                MeasurandEnumType.EnergyApparentExport,
+                MeasurandEnumType.EnergyApparentNet,
                 MeasurandEnumType.EnergyApparentImport,
-                MeasurandEnumType.EnergyApparentNet -> throw IllegalStateException("INVALID REQUEST : Measurand.${value.name} doesn't exists in OCPP 1.5")
-                else -> Measurand.valueOf(value.name)
+                MeasurandEnumType.EnergyApparentExport,
+                MeasurandEnumType.PowerOffered,
+                MeasurandEnumType.PowerFactor,
+                MeasurandEnumType.CurrentOffered,
+                MeasurandEnumType.Frequency,
+                MeasurandEnumType.SoC,
+                MeasurandEnumType.RPM ->
+                    throw IllegalArgumentException("INVALID REQUEST : Measurand.${value.name} doesn't exists in OCPP 1.5")
             }
 
-        private fun convertUnit(value: UnitOfMeasureGen?): UnitOfMeasure =
-            if (value != null && enumValues<UnitOfMeasure>().any { it.value == value.unit }) {
-                UnitOfMeasure.valueOf(value.unit!!)
-            } else {
-                UnitOfMeasure.Wh
-            }
+        private fun convertUnit(value: UnitOfMeasureGen?): UnitOfMeasure {
+            val unit = value?.unit ?: return UnitOfMeasure.Wh
+            return enumValues<UnitOfMeasure>().firstOrNull { it.value == unit }
+                ?: unitAliases[unit]
+                ?: UnitOfMeasure.Wh.also {
+                    logger.warn("UnitOfMeasure $unit has no OCPP 1.5 equivalent, defaulted to Wh")
+                }
+        }
 
         private fun convertFormat(value: SignedMeterValueType?): ValueFormat =
             if (value != null) {
