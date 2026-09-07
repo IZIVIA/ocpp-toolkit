@@ -17,6 +17,7 @@ import com.izivia.ocpp.soap12.Ocpp12SoapParser
 import com.izivia.ocpp.transport.OcppVersion
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
@@ -104,5 +105,44 @@ class Ocpp12FactoryTest {
         } finally {
             server.close()
         }
+    }
+
+    @Test
+    fun `rejects OCPP 1-2 over websocket with an actionable message`() {
+        val error = assertThrows<IllegalArgumentException> {
+            ApiFactory.getCSMSApi(
+                settings = Settings(
+                    ocppVersion = OcppVersion.OCPP_1_2,
+                    transportType = TransportEnum.WEBSOCKET,
+                    target = "ws://localhost:8080/ocpp"
+                ),
+                ocppId = "CP001",
+                csApi = mockk<CSApi>(relaxed = true)
+            )
+        }
+
+        expectThat(error.message).isEqualTo("OCPP 1.2 has no WebSocket transport")
+    }
+
+    @Test
+    fun `rejects an OCPP 1-2 websocket server with an actionable message`() {
+        val error = assertThrows<IllegalArgumentException> {
+            ApiFactory.csmsOcppServer(
+                csmsSettings = CSMSSettings(
+                    listOf(
+                        ServerSetting(
+                            port = 0,
+                            path = "/ocpp",
+                            ocppVersion = setOf(OcppVersion.OCPP_1_2),
+                            transportType = TransportEnum.WEBSOCKET
+                        )
+                    )
+                ),
+                csmsApiCallbacks = listOf(mockk<ChargePointOperations>(relaxed = true)),
+                fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+            )
+        }
+
+        expectThat(error.message).isEqualTo("OCPP 1.2 has no WebSocket transport")
     }
 }

@@ -89,7 +89,7 @@ class ApiFactory {
             headers: RequestHeaders = emptyList(),
             newMessageId: () -> String
         ): ClientTransport =
-            WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target, headers, newMessageId)
+            WebsocketClient(ocppId, getWampVersion(ocppVersion), target, headers, newMessageId)
 
         private fun createClientTransportSoap(
             path: String,
@@ -115,8 +115,11 @@ class ApiFactory {
             newMessageId: () -> String,
             settings: OcppWampServerSettings,
             listeners: EventsListeners = EventsListeners()
-        ): ServerTransport =
-            WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
+        ): ServerTransport {
+            // Fail fast with an actionable message rather than on the valueOf inside WebsocketServer.
+            ocppVersion.forEach { getWampVersion(it) }
+            return WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
+        }
 
         private fun createServerTransportSoap(
             path: String,
@@ -276,6 +279,17 @@ class ApiFactory {
             return CSMS(transports, csmsApiCallbacks.toSet(), fn)
         }
     }
+}
+
+/**
+ * Maps a transport version onto the WAMP subprotocol enum, mirroring [getSoapParser]. Exhaustive so a
+ * version without a WebSocket binding reports what is wrong instead of failing on a `No enum constant`.
+ */
+private fun getWampVersion(version: OcppVersionTransport): OcppVersion = when (version) {
+    OcppVersionTransport.OCPP_1_6 -> OcppVersion.OCPP_1_6
+    OcppVersionTransport.OCPP_1_5 -> OcppVersion.OCPP_1_5
+    OcppVersionTransport.OCPP_2_0 -> OcppVersion.OCPP_2_0
+    OcppVersionTransport.OCPP_1_2 -> throw IllegalArgumentException("OCPP 1.2 has no WebSocket transport")
 }
 
 private fun getSoapParser(version: OcppVersionTransport) = when (version) {
