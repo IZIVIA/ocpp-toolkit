@@ -178,6 +178,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
 import io.mockk.*
@@ -1262,6 +1263,25 @@ class IntegrationTest {
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
         expectThat(sent.captured.action).isEqualTo("LogStatusNotification")
+    }
+
+    @Test
+    fun `the websocket transport negotiates the subprotocol matching the settings version`() {
+        // ApiFactory maps the transport version onto the WAMP subprotocol enum by hand, so an
+        // inverted entry would go unnoticed for any version no other test connects with.
+        val negotiated = mutableListOf<OcppVersionWamp>()
+        every { OcppWampClient.newClient(any(), any(), capture(negotiated), any()) } returns ocppWampClient
+
+        mapOf(
+            OcppVersion.OCPP_1_5 to OcppVersionWamp.OCPP_1_5,
+            OcppVersion.OCPP_1_6 to OcppVersionWamp.OCPP_1_6,
+            OcppVersion.OCPP_2_0 to OcppVersionWamp.OCPP_2_0
+        ).forEach { (settingsVersion, expected) ->
+            negotiated.clear()
+            getCSMSApi(websocketSettings(settingsVersion), "chargePoint2")
+
+            expectThat(negotiated.single()).isEqualTo(expected)
+        }
     }
 
     @Test

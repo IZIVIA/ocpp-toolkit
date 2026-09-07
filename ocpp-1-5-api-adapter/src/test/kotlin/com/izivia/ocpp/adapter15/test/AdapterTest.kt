@@ -16,6 +16,7 @@ import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.datatransfer.enumeration.DataTransferStatusEnumType
 import com.izivia.ocpp.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
 import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType
+import com.izivia.ocpp.core15.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import com.izivia.ocpp.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
@@ -297,12 +298,20 @@ class AdapterTest {
         )
 
         val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = DiagnosticsStatusNotificationReqGen(DiagnosticsStatusEnumType.Uploaded)
-        val response = adapter.diagnosticsStatusNotification(requestMetadata, request)
 
-        expectThat(response) {
-            get { this.request }.isEqualTo(request)
-            get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+        // The two terminal states OCPP 1.5 models are forwarded as such.
+        mapOf(
+            DiagnosticsStatusEnumType.Uploaded to DiagnosticsStatus.Uploaded,
+            DiagnosticsStatusEnumType.UploadFailed to DiagnosticsStatus.UploadFailed
+        ).forEach { (generic, expected) ->
+            val request = DiagnosticsStatusNotificationReqGen(generic)
+            val response = adapter.diagnosticsStatusNotification(requestMetadata, request)
+
+            expectThat(response) {
+                get { this.request }.isEqualTo(request)
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+            verify { chargePointOperations.diagnosticsStatusNotification(any(), match { it.status == expected }) }
         }
     }
 
@@ -323,13 +332,17 @@ class AdapterTest {
     @Test
     fun `transient diagnostics status is ignored and not forwarded in OCPP 1_5`() {
         val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = DiagnosticsStatusNotificationReqGen(DiagnosticsStatusEnumType.Uploading)
 
-        val response = adapter.diagnosticsStatusNotification(RequestMetadata("CP001"), request)
+        // OCPP 1.5 has no transient diagnostics state, so neither is forwarded.
+        listOf(DiagnosticsStatusEnumType.Idle, DiagnosticsStatusEnumType.Uploading).forEach { status ->
+            val request = DiagnosticsStatusNotificationReqGen(status)
 
-        expectThat(response) {
-            get { this.request }.isEqualTo(request)
-            get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND)
+            val response = adapter.diagnosticsStatusNotification(RequestMetadata("CP001"), request)
+
+            expectThat(response) {
+                get { this.request }.isEqualTo(request)
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.NOT_SEND)
+            }
         }
         verify(exactly = 0) { chargePointOperations.diagnosticsStatusNotification(any(), any()) }
     }
