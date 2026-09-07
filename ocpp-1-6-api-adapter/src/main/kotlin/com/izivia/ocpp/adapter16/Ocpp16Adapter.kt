@@ -64,11 +64,20 @@ import com.izivia.ocpp.api.model.authorize.AuthorizeResp as AuthorizeRespGen
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
 
+/**
+ * Adapts the generic (OCPP 2.x shaped) [CSMSApi] onto OCPP 1.6.
+ *
+ * @param securityExtensions whether the charge point speaks the OCPP 1.6-J Security Whitepaper.
+ * Off by default, so a plain 1.6 charge point keeps emitting core actions only. When off, the
+ * operations that exist solely in the whitepaper are rejected instead of being put on the wire,
+ * where a plain 1.6 CSMS would answer `NotImplemented`.
+ */
 class Ocpp16Adapter(
     chargingStationId: String,
     private val transport: ClientTransport,
     csApi: CSApi,
-    private val transactionIds: TransactionRepository
+    private val transactionIds: TransactionRepository,
+    private val securityExtensions: Boolean = false
 ) : CSMSApi {
 
     companion object {
@@ -80,6 +89,12 @@ class Ocpp16Adapter(
     private val securityOperations: SecurityChargePointOperations =
         SecurityChargePointOperations
         .newSecurityChargePointOperations(chargingStationId, transport, Ocpp16SecurityCSApiAdapter(csApi))
+
+    private fun checkSecurityExtensions(action: String) {
+        check(securityExtensions) {
+            "$action requires the OCPP 1.6 security whitepaper, which is disabled on this charge point"
+        }
+    }
 
     override fun connect() {
         transport.connect()
@@ -297,10 +312,21 @@ class Ocpp16Adapter(
     override fun logStatusNotification(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
-    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
-        val response = securityOperations.logStatusNotification(meta, SecurityMapper.genToCoreReq(request))
-        return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
-    }
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
+        // The generic API has a single log status operation, so it has to serve both 1.6 flows:
+        // GetDiagnostics -> DiagnosticsStatusNotification (core) and GetLog -> LogStatusNotification
+        // (whitepaper). Which one a charge point speaks is a station capability, not a per-message
+        // property: requestId cannot arbitrate, since it is absent from a whitepaper notification
+        // triggered while idle and synthesised by GetDiagnosticsMapper for the core flow.
+        if (securityExtensions) {
+            val response = securityOperations.logStatusNotification(meta, SecurityMapper.genToCoreReq(request))
+            OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
+        } else {
+            val mapper: DiagnosticsStatusNotificationMapper =
+                Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+            val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
+            OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+        }
 
     override fun publishFirmwareStatusNotification(
         meta: RequestMetadata,
@@ -327,6 +353,7 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
+        checkSecurityExtensions("SecurityEventNotification")
         val response = securityOperations.securityEventNotification(meta, SecurityMapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
@@ -335,6 +362,7 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> {
+        checkSecurityExtensions("SignCertificate")
         val response = securityOperations.signCertificate(meta, SecurityMapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }

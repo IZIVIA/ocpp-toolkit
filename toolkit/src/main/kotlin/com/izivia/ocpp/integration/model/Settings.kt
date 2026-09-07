@@ -16,7 +16,12 @@ data class Settings(
         TransportEnum.SOAP -> "http://$domain:$port/$path"
     },
     val clientPort: Int? = null,
-    val clientPath: String? = null
+    val clientPath: String? = null,
+    /**
+     * Whether the OCPP 1.6 charge point speaks the OCPP 1.6-J Security Whitepaper.
+     * Ignored for the other OCPP versions.
+     */
+    val ocpp16SecurityExtensions: Boolean = false
 )
 
 data class CSMSSettings(

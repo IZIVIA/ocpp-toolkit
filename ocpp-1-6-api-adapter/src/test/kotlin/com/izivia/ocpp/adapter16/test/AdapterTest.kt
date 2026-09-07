@@ -164,6 +164,7 @@ import kotlin.time.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
 
 class AdapterTest {
@@ -917,6 +918,30 @@ class AdapterTest {
     @Test
     fun `diagnosticsStatusNotification request`() {
         val requestMetadata = RequestMetadata("")
+        every { chargePointOperations.diagnosticsStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            DiagnosticsStatusNotificationReq(
+                status = DiagnosticsStatus.Uploaded
+            ),
+            DiagnosticsStatusNotificationResp()
+        )
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val request = LogStatusNotificationReq(
+            status = UploadLogStatusEnumType.Uploaded,
+            requestId = 1
+        )
+        val response = operations.logStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.request }.isEqualTo(request) }
+            .and {
+                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
+            }
+    }
+
+    @Test
+    fun `logStatusNotification request sends LogStatusNotification when the security extensions are on`() {
+        val requestMetadata = RequestMetadata("")
         every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
         every {
             transport.sendMessageClass<Any, Any>(
@@ -926,7 +951,7 @@ class AdapterTest {
             )
         } returns com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp()
 
-        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = LogStatusNotificationReq(
             status = UploadLogStatusEnumType.Uploaded,
             requestId = 1
@@ -951,7 +976,7 @@ class AdapterTest {
             )
         } returns com.izivia.ocpp.core16.model.securityeventnotification.SecurityEventNotificationResp()
 
-        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = SecurityEventNotificationReq(
             type = "InvalidTLSCipherSuite",
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
@@ -976,12 +1001,35 @@ class AdapterTest {
             com.izivia.ocpp.core16.model.common.enumeration.GenericStatusEnumType.Accepted
         )
 
-        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = SignCertificateReq(csr = "csr")
         val response = operations.signCertificate(requestMetadata, request)
         expectThat(response)
             .and { get { this.request }.isEqualTo(request) }
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
             .and { get { this.response.status }.isEqualTo(GenericStatusEnumType.Accepted) }
+    }
+
+    @Test
+    fun `signCertificate request is rejected when the security extensions are off`() {
+        val requestMetadata = RequestMetadata("")
+        every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val request = SignCertificateReq(csr = "csr")
+        expectThrows<IllegalStateException> { operations.signCertificate(requestMetadata, request) }
+    }
+
+    @Test
+    fun `securityEventNotification request is rejected when the security extensions are off`() {
+        val requestMetadata = RequestMetadata("")
+        every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        val request = SecurityEventNotificationReq(
+            type = "InvalidTLSCipherSuite",
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
+        )
+        expectThrows<IllegalStateException> { operations.securityEventNotification(requestMetadata, request) }
     }
 }
