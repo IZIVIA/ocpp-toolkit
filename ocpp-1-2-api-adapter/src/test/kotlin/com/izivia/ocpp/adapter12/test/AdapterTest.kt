@@ -10,6 +10,7 @@ import com.izivia.ocpp.api.model.common.MeterValueType
 import com.izivia.ocpp.api.model.common.SampledValueType
 import com.izivia.ocpp.api.model.common.enumeration.AuthorizationStatusEnumType
 import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
+import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
 import com.izivia.ocpp.api.model.common.enumeration.ReadingContextEnumType
 import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.firmwarestatusnotification.enumeration.FirmwareStatusEnumType
@@ -328,6 +329,109 @@ class AdapterTest {
         assertUnsupported { adapter.securityEventNotification(meta, mockk()) }
         assertUnsupported { adapter.signCertificate(meta, mockk()) }
         assertUnsupported { adapter.reportChargingProfiles(meta, mockk()) }
+    }
+
+    @Test
+    fun `meter values without an energy register are not sent`() {
+        val requestMetadata = RequestMetadata("CP001")
+        every { chargePointOperations.meterValues(any(), any()) } returns success(
+            requestMetadata,
+            MeterValuesReqCore(1),
+            MeterValuesRespCore()
+        )
+
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = MeterValuesReqGen(
+            connectorId = 1,
+            evseId = 1,
+            meterValue = listOf(
+                MeterValueType(
+                    listOf(SampledValueType(230.0, measurand = MeasurandEnumType.Voltage)),
+                    timestamp
+                )
+            ),
+            transactionId = null
+        )
+        val response = adapter.meterValues(requestMetadata, request)
+
+        expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
+        verify(exactly = 0) { chargePointOperations.meterValues(any(), any()) }
+    }
+
+    @Test
+    fun `meter values with several energy registers are not sent`() {
+        val requestMetadata = RequestMetadata("CP001")
+        every { chargePointOperations.meterValues(any(), any()) } returns success(
+            requestMetadata,
+            MeterValuesReqCore(1),
+            MeterValuesRespCore()
+        )
+
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = MeterValuesReqGen(
+            connectorId = 1,
+            evseId = 1,
+            meterValue = listOf(
+                MeterValueType(listOf(SampledValueType(10.0), SampledValueType(20.0)), timestamp)
+            ),
+            transactionId = null
+        )
+        val response = adapter.meterValues(requestMetadata, request)
+
+        expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
+        verify(exactly = 0) { chargePointOperations.meterValues(any(), any()) }
+    }
+
+    @Test
+    fun `meter values transport failures are not reported as not sent`() {
+        val requestMetadata = RequestMetadata("CP001")
+        every { chargePointOperations.meterValues(any(), any()) } throws IllegalStateException("not connected")
+
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = MeterValuesReqGen(
+            connectorId = 1,
+            evseId = 1,
+            meterValue = listOf(MeterValueType(listOf(SampledValueType(10.0)), timestamp)),
+            transactionId = null
+        )
+
+        assertThrows(IllegalStateException::class.java) { adapter.meterValues(requestMetadata, request) }
+    }
+
+    @Test
+    fun `stopping a transaction releases its id mapping`() {
+        val requestMetadata = RequestMetadata("CP001")
+        every { chargePointOperations.startTransaction(any(), any()) } returns success(
+            requestMetadata,
+            StartTransactionReqCore(1, "Tag1", 10, timestamp),
+            StartTransactionRespCore(IdTagInfo(status = AuthorizationStatus.Accepted), 123)
+        )
+        every { chargePointOperations.stopTransaction(any(), any()) } returns success(
+            requestMetadata,
+            StopTransactionReqCore(123, "Tag1", timestamp, 20),
+            StopTransactionRespCore(IdTagInfo(status = AuthorizationStatus.Accepted))
+        )
+
+        val transactionIds = RealTransactionRepository()
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, transactionIds)
+        adapter.transactionEvent(requestMetadata, transactionEvent(TransactionEventEnumType.Started, 10.0))
+        expectThat(transactionIds.getTransactionIdsByLocalId("T1").csmsId).isEqualTo(123)
+
+        adapter.transactionEvent(requestMetadata, transactionEvent(TransactionEventEnumType.Ended, 20.0))
+
+        assertThrows(IllegalStateException::class.java) { transactionIds.getTransactionIdsByLocalId("T1") }
+    }
+
+    @Test
+    fun `transaction event updated without a charging state is not sent`() {
+        val requestMetadata = RequestMetadata("CP001")
+
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        val request = transactionEvent(TransactionEventEnumType.Updated, 10.0)
+        val response = adapter.transactionEvent(requestMetadata, request)
+
+        expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
+        verify(exactly = 0) { chargePointOperations.statusNotification(any(), any()) }
     }
 
     private fun transactionEvent(eventType: TransactionEventEnumType, meterValue: Double) =

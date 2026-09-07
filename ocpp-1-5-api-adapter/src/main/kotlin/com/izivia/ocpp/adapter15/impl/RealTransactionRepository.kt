@@ -6,8 +6,10 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * In-memory, non-persistent [TransactionRepository]: the local-id/csms-id mappings are lost on restart.
- * A StopTransaction/MeterValues whose StartTransaction was not recorded (e.g. after a restart) will fail
- * the local-id lookup. Inject a persistent [TransactionRepository] if durability across restarts is required.
+ * A StopTransaction whose StartTransaction was not recorded (e.g. after a restart) fails the local-id
+ * lookup; the same case on MeterValues is degraded to a not-sent request instead. Entries are dropped
+ * when the transaction stops, so the map does not grow with the process lifetime.
+ * Inject a persistent [TransactionRepository] if durability across restarts is required.
  */
 class RealTransactionRepository : TransactionRepository {
     private val hashMap: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
@@ -24,5 +26,9 @@ class RealTransactionRepository : TransactionRepository {
     override fun getLocalIdByTransactionId(transactionId: Int): Ocpp15TransactionIds? {
         val localId = hashMap.toList().find { it.second == transactionId }?.first
         return localId?.let { Ocpp15TransactionIds(it, transactionId) }
+    }
+
+    override fun deleteTransactionIds(localId: String) {
+        hashMap.remove(localId)
     }
 }

@@ -11,7 +11,7 @@ import com.izivia.ocpp.api.model.metervalues.MeterValuesResp as MeterValuesRespG
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class MeterValuesMapper {
 
-    @Throws(IllegalStateException::class)
+    @Throws(IllegalArgumentException::class)
     fun genToCoreReq(meterValuesReq: MeterValuesReqGen): MeterValuesReq {
         val connectorId: Int = meterValuesReq.connectorId ?: meterValuesReq.evseId
         val meterValue = meterValuesReq.meterValue

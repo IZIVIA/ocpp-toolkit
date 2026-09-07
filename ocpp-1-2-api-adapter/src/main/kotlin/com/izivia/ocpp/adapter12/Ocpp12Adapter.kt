@@ -106,18 +106,25 @@ class Ocpp12Adapter(
     override fun meterValues(
         meta: RequestMetadata,
         request: MeterValuesReq
-    ): OperationExecution<MeterValuesReq, MeterValuesResp> = try {
+    ): OperationExecution<MeterValuesReq, MeterValuesResp> {
         val mapper: MeterValuesMapper = Mappers.getMapper(MeterValuesMapper::class.java)
-        val transactionId = request.transactionId
-            ?.let { transactionIds.getTransactionIdsByLocalId(it) }
-            ?.csmsId
-        val response = request
-            .copy(transactionId = transactionId?.toString())
-            .let { operations.meterValues(meta, mapper.genToCoreReq(it)) }
-        OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
-    } catch (e: IllegalStateException) {
-        logger.warn(e.message)
-        OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+        // Only the transaction-id lookup and the mapping are guarded: those are the two ways the
+        // request itself can turn out to be unusable. The send stays outside so that a transport
+        // failure keeps surfacing as an error instead of being reported as an ignored request.
+        val coreRequest = try {
+            val transactionId = request.transactionId
+                ?.let { transactionIds.getTransactionIdsByLocalId(it) }
+                ?.csmsId
+            mapper.genToCoreReq(request.copy(transactionId = transactionId?.toString()))
+        } catch (e: IllegalArgumentException) {
+            logger.warn(e.message)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+        } catch (e: IllegalStateException) {
+            logger.warn(e.message)
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+        }
+        val response = operations.meterValues(meta, coreRequest)
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
     }
 
     override fun dataTransfer(
@@ -140,6 +147,17 @@ class Ocpp12Adapter(
         meta: RequestMetadata,
         request: TransactionEventReq
     ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        // chargingState is optional in the generic (2.0-shaped) model, but an OCPP 1.2 StatusNotification
+        // carries nothing else: without it there is no status to report, so skip the notification rather
+        // than fail the whole transaction event.
+        if (request.transactionInfo.chargingState == null) {
+            logger.warn("TransactionEvent without a chargingState has no OCPP 1.2 equivalent, status notification ignored")
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.NOT_SEND),
+                request,
+                TransactionEventResp()
+            )
+        }
         val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
         val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, mapper.coreToGenRespTransac(response.response))
@@ -169,6 +187,9 @@ class Ocpp12Adapter(
         val transactionId =
             transactionIds.getTransactionIdsByLocalId(request.transactionInfo.transactionId).csmsId
         val response = operations.stopTransaction(meta, mapper.genToCoreReq(request, transactionId))
+        // The transaction is over: release its id mapping so the repository does not keep one entry
+        // per transaction for the lifetime of the process.
+        transactionIds.deleteTransactionIds(request.transactionInfo.transactionId)
         val executionMetadata = updateStatusEvent(meta, request, response.executionMeta)
         return OperationExecution(executionMetadata, request, mapper.coreToGenResp(response.response))
     }
