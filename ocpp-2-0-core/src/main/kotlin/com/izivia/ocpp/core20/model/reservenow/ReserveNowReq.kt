@@ -2,7 +2,7 @@ package com.izivia.ocpp.core20.model.reservenow
 
 import com.izivia.ocpp.core20.model.common.IdTokenType
 import com.izivia.ocpp.core20.model.reservenow.enumeration.ConnectorEnumType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ReserveNowReq(
     val id: Int,

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 import com.fasterxml.jackson.module.kotlin.KotlinFeature
 import com.fasterxml.jackson.module.kotlin.kotlinModule
-import com.izivia.ocpp.utils.KotlinxInstantModule
+import com.izivia.ocpp.utils.KotlinInstantModule
 import javax.xml.stream.XMLInputFactory
 
 // enable(MapperFeature) on a built mapper is deprecated in Jackson 2.x. The official
@@ -33,7 +33,7 @@ class OcppSoapMapper : ObjectMapper(
                 configure(KotlinFeature.NullIsSameAsDefault, true)
             }
         )
-        .registerModule(KotlinxInstantModule())
+        .registerModule(KotlinInstantModule())
         .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         .setDefaultPropertyInclusion(Include.NON_EMPTY)
         .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)

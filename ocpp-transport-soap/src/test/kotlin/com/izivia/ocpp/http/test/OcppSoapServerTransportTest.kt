@@ -9,7 +9,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.receiveMessage
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.HttpHandler
 import org.http4k.core.Method

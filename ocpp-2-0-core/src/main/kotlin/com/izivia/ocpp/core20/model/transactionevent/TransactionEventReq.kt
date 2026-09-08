@@ -6,7 +6,7 @@ import com.izivia.ocpp.core20.model.common.MeterValueType
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.TransactionEventEnumType
 import com.izivia.ocpp.core20.model.transactionevent.enumeration.TriggerReasonEnumType
 import com.izivia.ocpp.utils.HasActionTimestamp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class TransactionEventReq(
     val eventType: TransactionEventEnumType,

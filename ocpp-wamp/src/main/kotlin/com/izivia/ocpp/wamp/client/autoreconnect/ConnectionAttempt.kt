@@ -1,6 +1,6 @@
 package com.izivia.ocpp.wamp.client.autoreconnect
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ScheduledFuture
 import kotlin.time.Duration

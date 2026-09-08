@@ -2,7 +2,7 @@ package com.izivia.ocpp.api.model.notifyevchargingschedule
 
 import com.izivia.ocpp.api.model.Request
 import com.izivia.ocpp.api.model.common.ChargingScheduleType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class NotifyEVChargingScheduleReq(
     val timeBase: Instant,

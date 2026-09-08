@@ -46,7 +46,7 @@ import com.izivia.ocpp.utils.ErrorDetailCode
 import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.utils.TypeConvertEnum
 import com.izivia.ocpp.utils.fault.Fault
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.api.expectThrows

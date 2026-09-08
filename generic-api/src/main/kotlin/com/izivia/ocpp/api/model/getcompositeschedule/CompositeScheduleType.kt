@@ -2,7 +2,7 @@ package com.izivia.ocpp.api.model.getcompositeschedule
 
 import com.izivia.ocpp.api.model.common.enumeration.ChargingRateUnitEnumType
 import com.izivia.ocpp.api.model.common.ChargingSchedulePeriodType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class CompositeScheduleType(
     val evseId: Int,

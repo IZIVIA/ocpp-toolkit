@@ -1,6 +1,6 @@
 package com.izivia.ocpp.operation.information
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ExecutionMetadata(
     val reqMeta: RequestMetadata,

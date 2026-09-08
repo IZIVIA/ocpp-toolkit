@@ -13,7 +13,7 @@ import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

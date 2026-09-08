@@ -10,7 +10,7 @@ import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

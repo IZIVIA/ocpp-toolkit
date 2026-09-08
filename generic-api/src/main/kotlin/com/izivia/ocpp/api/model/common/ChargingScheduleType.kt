@@ -2,7 +2,7 @@ package com.izivia.ocpp.api.model.common
 
 import com.izivia.ocpp.api.model.common.enumeration.ChargingRateUnitEnumType
 import com.izivia.ocpp.api.model.remotestart.SalesTariffType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ChargingScheduleType(
     val id: Int? = null,

@@ -1,7 +1,7 @@
 package com.izivia.ocpp.core16.model.signedupdatefirmware
 
 import com.izivia.ocpp.core16.model.Request
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class SignedUpdateFirmwareReq(
     val firmware: FirmwareType,

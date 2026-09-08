@@ -202,8 +202,8 @@ import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.core20.model.updatefirmware.enumeration.UpdateFirmwareStatusEnumType
 import com.izivia.ocpp.json.JsonMessage
 import com.izivia.ocpp.json.JsonMessageType
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isA

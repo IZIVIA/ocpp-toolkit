@@ -13,7 +13,7 @@ import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageMetaHeaders
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import kotlinx.coroutines.*
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import okhttp3.*
 import org.http4k.core.Uri
 import org.slf4j.LoggerFactory

@@ -41,7 +41,7 @@ import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
 import io.mockk.every
 import io.mockk.mockk
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat

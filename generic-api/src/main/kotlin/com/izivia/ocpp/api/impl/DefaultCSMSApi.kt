@@ -54,7 +54,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import kotlinx.datetime.Clock.System.now
+import kotlin.time.Clock.System.now
 
 class DefaultCSMSApi(private val csmsApiCallbacks: CSMSApiCallbacks) : CSMSApi {
 

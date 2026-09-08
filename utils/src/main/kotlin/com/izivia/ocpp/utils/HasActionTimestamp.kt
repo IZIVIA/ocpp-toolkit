@@ -1,6 +1,6 @@
 package com.izivia.ocpp.utils
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 /**
  * Interface implemented by OCPP request containing a timestamp field in its payload.

@@ -58,7 +58,8 @@ class ApiFactory {
                     ocppVersion,
                     ocppId,
                     target,
-                    headers
+                    headers,
+                    newMessageId
                 )
 
                 SOAP -> createClientTransportSoap(
@@ -76,9 +77,10 @@ class ApiFactory {
             ocppVersion: OcppVersionTransport,
             ocppId: String,
             target: String,
-            headers: RequestHeaders = emptyList()
+            headers: RequestHeaders = emptyList(),
+            newMessageId: () -> String
         ): ClientTransport =
-            WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target, headers)
+            WebsocketClient(ocppId, OcppVersion.valueOf(ocppVersion.name), target, headers, newMessageId)
 
         private fun createClientTransportSoap(
             path: String,
@@ -118,7 +120,8 @@ class ApiFactory {
             settings: Settings,
             ocppId: String,
             csApi: CSApi,
-            headers: RequestHeaders = emptyList()
+            headers: RequestHeaders = emptyList(),
+            newMessageId: () -> String = { UUID.randomUUID().toString() }
         ): CSMSApi {
             val transport: ClientTransport = createClientTransport(
                 settings.clientPath,
@@ -127,7 +130,8 @@ class ApiFactory {
                 ocppId,
                 settings.ocppVersion,
                 settings.target,
-                headers
+                headers,
+                newMessageId
             )
             return when (settings.ocppVersion) {
                 OcppVersionTransport.OCPP_1_5 -> throw NotImplementedError("Ocpp 1.5 api adapted not yet implemented")

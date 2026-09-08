@@ -2,7 +2,7 @@ package com.izivia.ocpp.core20.model.bootnotification
 
 import com.izivia.ocpp.core20.model.bootnotification.enumeration.RegistrationStatusEnumType
 import com.izivia.ocpp.core20.model.common.StatusInfoType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class BootNotificationResp(
     val currentTime: Instant,

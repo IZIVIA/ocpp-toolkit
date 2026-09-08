@@ -1,7 +1,7 @@
 package com.izivia.ocpp.api.model.notifyreport
 
 import com.izivia.ocpp.api.model.Request
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class NotifyReportReq(
     val requestId: Int,

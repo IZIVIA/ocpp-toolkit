@@ -90,7 +90,7 @@ import com.izivia.ocpp.core16.model.unlockconnector.enumeration.UnlockStatus
 import com.izivia.ocpp.core16.model.signedupdatefirmware.SignedUpdateFirmwareReq
 import com.izivia.ocpp.core16.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.soap.*
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import java.math.BigDecimal
 
 internal object Ocpp16SoapMapperIn : ObjectMapper(

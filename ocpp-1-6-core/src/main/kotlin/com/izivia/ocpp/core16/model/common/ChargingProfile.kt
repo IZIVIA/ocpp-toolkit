@@ -3,7 +3,7 @@ package com.izivia.ocpp.core16.model.common
 import com.izivia.ocpp.core16.model.common.enumeration.ChargingProfilePurposeType
 import com.izivia.ocpp.core16.model.remotestart.enumeration.ChargingProfileKindType
 import com.izivia.ocpp.core16.model.remotestart.enumeration.RecurrencyKindType
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class ChargingProfile(
     val chargingProfileId: Int,

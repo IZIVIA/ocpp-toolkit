@@ -2,7 +2,7 @@ package com.izivia.ocpp.core16.model.starttransaction
 
 import com.izivia.ocpp.core16.model.Request
 import com.izivia.ocpp.utils.HasActionTimestamp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class StartTransactionReq(
     val connectorId: Int,

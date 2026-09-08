@@ -1,6 +1,6 @@
 package com.izivia.ocpp.core20.model.common
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class MeterValueType(
     val sampledValue: List<SampledValueType>,

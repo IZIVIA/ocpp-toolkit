@@ -1,6 +1,6 @@
 package com.izivia.ocpp.core15.model.common
 
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class MeterValue(
     val timestamp: Instant,

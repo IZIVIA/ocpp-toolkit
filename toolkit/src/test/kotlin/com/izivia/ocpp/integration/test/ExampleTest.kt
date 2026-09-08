@@ -21,7 +21,7 @@ import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp16ConnectionToCSMS
 import com.izivia.ocpp.integration.ApiFactory.Companion.ocpp20ConnectionToCSMS
 import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.operation.information.RequestMetadata
-import kotlinx.datetime.Clock.System.now
+import kotlin.time.Clock.System.now
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import java.lang.Thread.sleep

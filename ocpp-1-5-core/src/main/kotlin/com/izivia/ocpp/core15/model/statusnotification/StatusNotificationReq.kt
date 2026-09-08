@@ -4,7 +4,7 @@ import com.izivia.ocpp.core15.model.Request
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.utils.HasActionTimestamp
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class StatusNotificationReq(
     val connectorId: Int,

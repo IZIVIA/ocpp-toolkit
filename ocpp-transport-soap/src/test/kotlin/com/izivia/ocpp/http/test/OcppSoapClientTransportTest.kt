@@ -8,7 +8,7 @@ import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.http4k.client.JavaHttpClient
 import org.http4k.core.Method
 import org.http4k.core.Request

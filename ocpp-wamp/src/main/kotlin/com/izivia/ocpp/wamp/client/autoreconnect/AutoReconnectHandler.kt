@@ -1,8 +1,8 @@
 package com.izivia.ocpp.wamp.client.autoreconnect
 
 import com.izivia.ocpp.wamp.client.ConnectionListener
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.slf4j.LoggerFactory
 import java.util.*
 import java.util.concurrent.Executors

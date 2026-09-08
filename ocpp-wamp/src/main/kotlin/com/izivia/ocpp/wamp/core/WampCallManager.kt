@@ -1,8 +1,8 @@
 package com.izivia.ocpp.wamp.core
 
 import com.izivia.ocpp.wamp.messages.WampMessage
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import org.slf4j.Logger
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
