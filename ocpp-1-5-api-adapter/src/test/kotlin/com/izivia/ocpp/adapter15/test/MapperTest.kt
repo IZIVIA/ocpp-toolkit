@@ -11,6 +11,7 @@ import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumType
+import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeCore
@@ -95,6 +96,18 @@ class MapperTest {
         // A code that exists in 1.5 is preserved.
         expectThat(mapper.convertErrorCode(ChargePointErrorCode.GroundFailure))
             .isEqualTo(ChargePointErrorCodeCore.GroundFailure)
+    }
+
+    @Test
+    fun `a transaction ended with the EV still connected keeps the connector occupied`() {
+        val mapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+
+        // OCPP 1.5 has no Finishing: the cable is still plugged in, so the connector is not free.
+        val status = mapper.convertChargingState(
+            mapper.createChargingStateWrapper(ChargingStateEnumType.EVConnected, TransactionEventEnumType.Ended)
+        )
+
+        expectThat(status).isEqualTo(ChargePointStatus.Occupied)
     }
 
     @Test

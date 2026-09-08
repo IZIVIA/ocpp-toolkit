@@ -422,6 +422,25 @@ class AdapterTest {
         }
     }
 
+    @Test
+    fun `meter values are sent even when the transaction is unknown to the repository`() {
+        val requestMetadata = RequestMetadata("CP001")
+        every { chargePointOperations.meterValues(any(), any()) } returns success(
+            requestMetadata,
+            MeterValuesReqCore(1),
+            MeterValuesRespCore()
+        )
+
+        val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
+        // The OCPP 1.2 MeterValues message carries no transactionId, so an unknown local id -- after a
+        // restart, or for a transaction started out of band -- must not cost the reading.
+        val request = meterValuesRequest(SampledValueType(10.0)).copy(transactionId = "unknown")
+        val response = adapter.meterValues(requestMetadata, request)
+
+        expectThat(response.executionMeta.status).isEqualTo(RequestStatus.SUCCESS)
+        verify(exactly = 1) { chargePointOperations.meterValues(any(), any()) }
+    }
+
     private fun meterValuesRequest(vararg sampledValues: SampledValueType) = MeterValuesReqGen(
         connectorId = 1,
         evseId = 1,

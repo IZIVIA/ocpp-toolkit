@@ -71,10 +71,9 @@ abstract class StatusNotificationMapper {
     @Named("convertChargingState")
     fun convertChargingState(wrapper: ChargingStateWrapper): ChargePointStatus =
         when (wrapper.chargingState) {
-            ChargingStateEnumType.EVConnected -> when (wrapper.type) {
-                TransactionEventEnumType.Ended -> ChargePointStatus.Available
-                else -> ChargePointStatus.Occupied
-            }
+            // OCPP 1.5 has no Finishing: with the EV still connected the connector is not reusable,
+            // so it stays Occupied. Available comes with the Idle that follows unplugging.
+            ChargingStateEnumType.EVConnected -> ChargePointStatus.Occupied
 
             ChargingStateEnumType.Charging,
             ChargingStateEnumType.SuspendedEV,

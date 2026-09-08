@@ -109,17 +109,13 @@ class Ocpp12Adapter(
         request: MeterValuesReq
     ): OperationExecution<MeterValuesReq, MeterValuesResp> {
         val mapper: MeterValuesMapper = Mappers.getMapper(MeterValuesMapper::class.java)
-        // Only the transaction-id lookup and the mapping are guarded: those are the two ways the
-        // request itself can turn out to be unusable. The send stays outside so that a transport
-        // failure keeps surfacing as an error instead of being reported as an ignored request.
+        // Only the mapping is guarded, since that is the one way the request can turn out to be
+        // unusable: the OCPP 1.2 MeterValues message carries no transactionId, so there is nothing to
+        // resolve. The send stays outside so that a transport failure keeps surfacing as an error
+        // instead of being reported as an ignored request.
         val coreRequest = try {
-            val transactionId = request.transactionId
-                ?.let { transactionIds.getTransactionIdsByLocalId(it) }
-                ?.csmsId
-            mapper.genToCoreReq(request.copy(transactionId = transactionId?.toString()))
+            mapper.genToCoreReq(request)
         } catch (e: IllegalArgumentException) {
-            return meterValuesNotSent(meta, request, e)
-        } catch (e: IllegalStateException) {
             return meterValuesNotSent(meta, request, e)
         }
         val response = operations.meterValues(meta, coreRequest)

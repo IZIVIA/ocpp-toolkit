@@ -2,6 +2,7 @@ package com.izivia.ocpp.adapter12.test
 
 import com.izivia.ocpp.adapter12.Ocpp12Adapter
 import com.izivia.ocpp.adapter12.impl.RealTransactionRepository
+import com.izivia.ocpp.adapter12.mapper.BootNotificationMapper
 import com.izivia.ocpp.adapter12.mapper.CommonMapper
 import com.izivia.ocpp.adapter12.mapper.MeterValuesMapper
 import com.izivia.ocpp.adapter12.mapper.RemoteStartTransactionMapper
@@ -15,7 +16,11 @@ import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
+import com.izivia.ocpp.api.model.bootnotification.enumeration.RegistrationStatusEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumType
+import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
+import com.izivia.ocpp.core12.model.bootnotification.BootNotificationResp as BootNotificationRespCore
+import com.izivia.ocpp.core12.model.bootnotification.enumeration.RegistrationStatus as RegistrationStatusCore
 import com.izivia.ocpp.core12.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core12.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core12.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeCore
@@ -84,6 +89,48 @@ class MapperTest {
             val status = mapper.convertChargingState(mapper.createChargingStateWrapper(state, null))
             expectThat(status).isEqualTo(ChargePointStatus.Occupied)
         }
+    }
+
+    @Test
+    fun `a boot notification rejected without a current time stays usable`() {
+        val mapper = Mappers.getMapper(BootNotificationMapper::class.java)
+
+        // OCPP 1.2 declares currentTime and heartbeatInterval with minOccurs="0": a bare Rejected
+        // response is legal, and is the common shape of a refusal.
+        val response = mapper.coreToGenResp(BootNotificationRespCore(status = RegistrationStatusCore.Rejected))
+
+        expectThat(response) {
+            get { status }.isEqualTo(RegistrationStatusEnumType.Rejected)
+            get { interval }.isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun `an accepted boot notification keeps the values sent by the central system`() {
+        val mapper = Mappers.getMapper(BootNotificationMapper::class.java)
+        val currentTime = Instant.parse("2026-01-01T00:00:00Z")
+
+        val response = mapper.coreToGenResp(
+            BootNotificationRespCore(currentTime, 300, RegistrationStatusCore.Accepted)
+        )
+
+        expectThat(response) {
+            get { status }.isEqualTo(RegistrationStatusEnumType.Accepted)
+            get { this.currentTime }.isEqualTo(currentTime)
+            get { interval }.isEqualTo(300)
+        }
+    }
+
+    @Test
+    fun `a transaction ended with the EV still connected keeps the connector occupied`() {
+        val mapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+
+        // OCPP 1.2 has no Finishing: the cable is still plugged in, so the connector is not free.
+        val status = mapper.convertChargingState(
+            mapper.createChargingStateWrapper(ChargingStateEnumType.EVConnected, TransactionEventEnumType.Ended)
+        )
+
+        expectThat(status).isEqualTo(ChargePointStatus.Occupied)
     }
 
     @Test
