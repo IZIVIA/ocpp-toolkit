@@ -627,6 +627,164 @@ class MapperTest {
     }
 
     @Test
+    fun securityMapperPreservesWhitepaperStatuses() {
+        expectThat(
+            SecurityMapper.genToCoreReq(
+                LogStatusNotificationReq(
+                    status = UploadLogStatusEnumType.AcceptedCanceled,
+                    requestId = 1
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.logstatusnotification.enumeration.UpdateLogStatusEnumType.UploadFailure
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp(
+                    status = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType.NotFound
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType.NotFound
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.certificateSigned.CertificateSignedResp(
+                    com.izivia.ocpp.api.model.certificateSigned.enumeration.CertificateSignedStatusEnumType.Rejected
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.certificatesigned.enumeration.CertificateSignedStatusEnumType.Rejected
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                com.izivia.ocpp.api.model.installcertificate.InstallCertificateResp(
+                    com.izivia.ocpp.api.model.installcertificate.enumeration.InstallCertificateStatusEnumType.Failed
+                )
+            )
+        ).and {
+            get { status }.isEqualTo(
+                com.izivia.ocpp.core16.model.installcertificate.enumeration.CertificateStatusEnumType.Failed
+            )
+        }
+
+        expectThat(
+            SecurityMapper.genToCoreResp(
+                TriggerMessageResp(TriggerMessageStatusEnumType.NotImplemented)
+            )
+        ).and {
+            get { status }.isEqualTo(TriggerMessageStatus.NotImplemented)
+        }
+    }
+
+    @Test
+    fun securityMapperMapsSecurityEventNotification() {
+        val request = SecurityMapper.genToCoreReq(
+            com.izivia.ocpp.api.model.securityeventnotification.SecurityEventNotificationReq(
+                type = "InvalidTLSCipherSuite",
+                timestamp = Instant.parse("2022-02-15T00:00:00Z"),
+                techInfo = "techInfo"
+            )
+        )
+
+        expectThat(request)
+            .and { get { type }.isEqualTo("InvalidTLSCipherSuite") }
+            .and { get { timestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00Z")) }
+            .and { get { techInfo }.isEqualTo("techInfo") }
+    }
+
+    @Test
+    fun securityMapperDropsSignCertificateType() {
+        val request = SecurityMapper.genToCoreReq(
+            com.izivia.ocpp.api.model.signcertificate.SignCertificateReq(
+                csr = "csr",
+                certificateType = com.izivia.ocpp.api.model.common.enumeration
+                    .CertificateSigningUseEnumType.V2GCertificate
+            )
+        )
+
+        // OCPP 1.6 SignCertificate.req has no certificateType field: it can only be dropped.
+        expectThat(request.csr).isEqualTo("csr")
+
+        expectThat(
+            SecurityMapper.coreToGenResp(
+                com.izivia.ocpp.core16.model.signcertificate.SignCertificateResp(
+                    com.izivia.ocpp.core16.model.common.enumeration.GenericStatusEnumType.Rejected
+                )
+            ).status
+        ).isEqualTo(
+            com.izivia.ocpp.api.model.common.enumeration.GenericStatusEnumType.Rejected
+        )
+    }
+
+    @Test
+    fun securityMapperPreservesRequiredSerialNumber() {
+        val request = SecurityMapper.coreToGenReq(
+            com.izivia.ocpp.core16.model.deletecertificate.DeleteCertificateReq(
+                com.izivia.ocpp.core16.model.deletecertificate.CertificateHashDataType(
+                    hashAlgorithm = com.izivia.ocpp.core16.model.deletecertificate.enumeration.HashAlgorithmEnumType.SHA256,
+                    issuerNameHash = "issuer",
+                    issuerKeyHash = "key",
+                    serialNumber = "serial"
+                )
+            )
+        )
+
+        expectThat(request)
+            .and { get { certificateHashData.serialNumber }.isEqualTo("serial") }
+    }
+
+    @Test
+    fun securityMapperMapsExtendedTriggerMessage() {
+        val request = SecurityMapper.coreToGenReq(
+            com.izivia.ocpp.core16.model.extendedtriggermessage.ExtendedTriggerMessageReq(
+                requestedMessage =
+                    com.izivia.ocpp.core16.model.extendedtriggermessage.enumeration.ExtendedMessageTriggerEnumType
+                        .SignChargePointCertificate,
+                connectorId = 2
+            )
+        )
+
+        expectThat(request)
+            .and { get { requestedMessage }.isEqualTo(MessageTriggerEnumType.SignChargingStationCertificate) }
+            .and { get { evse }.isEqualTo(EVSEType(2, 2)) }
+    }
+
+    @Test
+    fun securityMapperMapsMultipleInstalledCertificates() {
+        val response = SecurityMapper.genToCoreResp(
+            com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsResp(
+                status = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                    .GetInstalledCertificateStatusEnumType.Accepted,
+                certificateHashDataChain = listOf(
+                    com.izivia.ocpp.api.model.getinstalledcertificateids.CertificateHashDataChainType(
+                        certificateType = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                            .GetCertificateIdUseEnumType.CSMSRootCertificate,
+                        certificateHashData = CertificateHashDataType(HashAlgorithmEnumType.SHA256, "issuer-1", "key-1", "serial-1")
+                    ),
+                    com.izivia.ocpp.api.model.getinstalledcertificateids.CertificateHashDataChainType(
+                        certificateType = com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration
+                            .GetCertificateIdUseEnumType.ManufacturerRootCertificate,
+                        certificateHashData = CertificateHashDataType(HashAlgorithmEnumType.SHA384, "issuer-2", "key-2", "serial-2")
+                    )
+                )
+            )
+        )
+
+        expectThat(response.certificateHashData!!.map { it.serialNumber })
+            .isEqualTo(listOf("serial-1", "serial-2"))
+    }
+
+    @Test
     fun getDiagnosticsMapper() {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
         val resp = mapper.genToCoreResp(
@@ -699,4 +857,3 @@ class StatusNotificationReqArgumentsProvider : ArgumentsProvider {
         Arguments.of(TransactionEventEnumType.Ended, ChargingStateEnumType.EVConnected, ChargePointStatus.Finishing)
     )
 }
-

@@ -24,6 +24,8 @@ import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
 import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
 import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+import com.izivia.ocpp.security16.SecurityCSMSOperations as SecurityCSMSOperations16
+import com.izivia.ocpp.security16.SecurityChargePointOperations as SecurityChargePointOperations16
 
 
 class CSMS(
@@ -41,20 +43,29 @@ class CSMS(
             .groupBy({ it.first }, { it.second })
             .mapValues { (_, servers) -> servers.toSet() }
 
-    private val csApi: Map<CsApiType, CSCallbacks> = csmsApis.associate { csmsApi ->
+    private val csApi: Map<CsApiType, CSCallbacks> = csmsApis.flatMap { csmsApi ->
+        fun transportsFor(version: OcppVersion): Set<ServerTransport> =
+            serverByVersion[version] ?: error("No transport found for csmsApi ${csmsApi::class.simpleName}")
+
+        val entries = mutableListOf<Pair<CsApiType, CSCallbacks>>()
         when (csmsApi) {
-            is ChargePointOperations16 -> serverByVersion[OCPP_1_6]?.let { transports16 ->
-                CsApiType.OcppCsApiType(OCPP_1_6) to RealCSMSOperations16(transports16, fn, csmsApi)
-            }
-            is ChargePointOperations15 -> serverByVersion[OCPP_1_5]?.let { transports15 ->
-                CsApiType.OcppCsApiType(OCPP_1_5) to RealCSMSOperations15(transports15, fn, csmsApi)
-            }
-            is ChargePointOperations20 -> serverByVersion[OCPP_2_0]?.let { transports20 ->
-                CsApiType.OcppCsApiType(OCPP_2_0) to RealCSMSOperations20(transports20, fn, csmsApi)
-            }
-            else -> error("Unknown csms callbacks")
-        } ?: error("No transport found for csmsApi ${csmsApi::class.simpleName}")
-    }
+            is ChargePointOperations16 ->
+                entries += CsApiType.OcppCsApiType(OCPP_1_6) to RealCSMSOperations16(transportsFor(OCPP_1_6), fn, csmsApi)
+            is ChargePointOperations15 ->
+                entries += CsApiType.OcppCsApiType(OCPP_1_5) to RealCSMSOperations15(transportsFor(OCPP_1_5), fn, csmsApi)
+            is ChargePointOperations20 ->
+                entries += CsApiType.OcppCsApiType(OCPP_2_0) to RealCSMSOperations20(transportsFor(OCPP_2_0), fn, csmsApi)
+        }
+        // Security is an independent facet: a single callback object may implement both a core
+        // ChargePointOperations and SecurityChargePointOperations, so register it separately
+        // instead of letting the core when-branch above shadow (and silently drop) it.
+        if (csmsApi is SecurityChargePointOperations16) {
+            entries += CsApiType.OcppSecurityCsApiType(OCPP_1_6) to
+                SecurityCSMSOperations16.newSecurityCSMSOperations(transportsFor(OCPP_1_6), fn, csmsApi)
+        }
+        if (entries.isEmpty()) error("Unknown csms callbacks: ${csmsApi::class.simpleName}")
+        entries
+    }.toMap()
 
     private val servers = transports
         .map { t -> t.value.first to Pair(t.key, t.value.second) }
@@ -112,6 +123,10 @@ class CSMS(
     fun getCSApi16(): CSMSOperations16 =
         csApi[CsApiType.OcppCsApiType(OCPP_1_6)] as CSMSOperations16? ?: throw IllegalStateException("No 1.6 api is available")
 
+    fun getSecurityCSApi16(): SecurityCSMSOperations16 =
+        csApi[CsApiType.OcppSecurityCsApiType(OCPP_1_6)] as SecurityCSMSOperations16?
+            ?: throw IllegalStateException("No 1.6 security api is available")
+
     fun getCSApi20(): CSMSOperations20 =
         csApi[CsApiType.OcppCsApiType(OCPP_2_0)] as CSMSOperations20? ?: throw IllegalStateException("No 2.0.1 api is available")
 
@@ -120,4 +135,5 @@ class CSMS(
 sealed class CsApiType {
     class GenericCsApiType: CsApiType()
     data class OcppCsApiType(val ocppVersion:OcppVersion): CsApiType()
+    data class OcppSecurityCsApiType(val ocppVersion: OcppVersion): CsApiType()
 }

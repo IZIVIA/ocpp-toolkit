@@ -135,7 +135,13 @@ class ApiFactory {
             )
             return when (settings.ocppVersion) {
                 OcppVersionTransport.OCPP_1_5 -> throw NotImplementedError("Ocpp 1.5 api adapted not yet implemented")
-                OcppVersionTransport.OCPP_1_6 -> Ocpp16Adapter(ocppId, transport, csApi, RealTransactionRepository())
+                OcppVersionTransport.OCPP_1_6 -> Ocpp16Adapter(
+                    ocppId,
+                    transport,
+                    csApi,
+                    RealTransactionRepository(),
+                    settings.ocpp16SecurityExtensions
+                )
                 OcppVersionTransport.OCPP_2_0 -> Ocpp20Adapter(ocppId, transport, csApi)
             }
         }

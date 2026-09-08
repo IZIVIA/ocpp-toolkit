@@ -10,5 +10,6 @@ data class DeleteCertificateReq(
 data class CertificateHashDataType(
     val hashAlgorithm: HashAlgorithmEnumType,
     val issuerNameHash: String,
-    val issuerKeyHash: String
+    val issuerKeyHash: String,
+    val serialNumber: String
 )

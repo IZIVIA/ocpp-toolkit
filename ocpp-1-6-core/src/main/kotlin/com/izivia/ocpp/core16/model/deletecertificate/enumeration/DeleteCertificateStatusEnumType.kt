@@ -1,4 +1,4 @@
-package com.izivia.ocpp.core16.model.certificatesigned.enumeration
+package com.izivia.ocpp.core16.model.deletecertificate.enumeration
 
 enum class DeleteCertificateStatusEnumType(val value: String) {
     Accepted("Accepted"),
@@ -6,4 +6,3 @@ enum class DeleteCertificateStatusEnumType(val value: String) {
     Failed("Failed"),
     NotFound("NotFound")
 }
-

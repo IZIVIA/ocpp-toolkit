@@ -23,6 +23,7 @@ dependencies {
     api(project(":ocpp-1-5-soap"))
     api(project(":ocpp-1-6-api-adapter"))
     api(project(":ocpp-1-6-core"))
+    api(project(":ocpp-1-6-security"))
     api(project(":ocpp-1-6-api"))
     api(project(":ocpp-1-6-soap"))
     api(project(":ocpp-2-0-api"))

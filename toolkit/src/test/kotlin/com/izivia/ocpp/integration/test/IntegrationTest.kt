@@ -194,6 +194,7 @@ class IntegrationTest {
     private fun newMessageId(): String = fixedMessageId
 
     private lateinit var ocppWampClient: OkHttpOcppWampClient
+
     private val csApi: CSApi = object : CSApi {
 
         override fun start() = throw NotImplementedError("ChargePoint can't start a server")
@@ -1226,13 +1227,19 @@ class IntegrationTest {
     }
 
     @Test
-    fun `logStatusNotification 1-6 request`() {
-        every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
+    fun `logStatusNotification 1-6 request sends LogStatusNotification when the security extensions are on`() {
+        val sent = slot<WampMessage>()
+        every { ocppWampClient.sendBlocking(capture(sent)) } returns WampMessage.CallResult(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
             payload = "{}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = Settings(
+            OcppVersion.OCPP_1_6,
+            TransportEnum.WEBSOCKET,
+            target = "",
+            ocpp16SecurityExtensions = true
+        )
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1244,6 +1251,32 @@ class IntegrationTest {
         val response = csmsApi.logStatusNotification(requestMetadata, request)
         expectThat(response)
             .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+        expectThat(sent.captured.action).isEqualTo("LogStatusNotification")
+    }
+
+    @Test
+    fun `logStatusNotification 1-6 request sends DiagnosticsStatusNotification by default`() {
+        val sent = slot<WampMessage>()
+        every { ocppWampClient.sendBlocking(capture(sent)) } returns WampMessage.CallResult(
+            msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
+            payload = "{}"
+        )
+
+        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        // A requestId is present even for the core flow: GetDiagnosticsMapper synthesises one when it
+        // adapts GetDiagnostics onto the generic GetLog, so it cannot select the action.
+        val request = LogStatusNotificationReq(
+            status = UploadLogStatusEnumType.Uploaded,
+            requestId = 1
+        )
+        val response = csmsApi.logStatusNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+        expectThat(sent.captured.action).isEqualTo("DiagnosticsStatusNotification")
     }
 
     @Test
@@ -1536,6 +1569,28 @@ class IntegrationTest {
             payload = "{}"
         )
 
+        val settings = Settings(
+            OcppVersion.OCPP_1_6,
+            TransportEnum.WEBSOCKET,
+            target = "",
+            ocpp16SecurityExtensions = true
+        )
+        val ocppId = "chargePoint2"
+        val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
+
+        val requestMetadata = RequestMetadata(ocppId)
+        val request = SecurityEventNotificationReq(
+            type = "type",
+            timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
+            techInfo = "techInfo"
+        )
+        val response = csmsApi.securityEventNotification(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+    }
+
+    @Test
+    fun `securityEventNotification 1-6 request is rejected when the security extensions are off`() {
         val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
@@ -1546,7 +1601,9 @@ class IntegrationTest {
             timestamp = Instant.parse("2022-02-15T00:00:00.000Z"),
             techInfo = "techInfo"
         )
+        // A plain 1.6 CSMS would answer NotImplemented: fail before putting it on the wire.
         expectThrows<IllegalStateException> { csmsApi.securityEventNotification(requestMetadata, request) }
+        verify(exactly = 0) { ocppWampClient.sendBlocking(any()) }
     }
 
     @Test
@@ -1575,10 +1632,15 @@ class IntegrationTest {
     fun `signCertificate 1-6 request`() {
         every { ocppWampClient.sendBlocking(any()) } returns WampMessage.CallResult(
             msgId = "a727d144-82bb-497a-a0c7-4ef2295910d4",
-            payload = "{}"
+            payload = "{\"status\": \"Accepted\"}"
         )
 
-        val settings = Settings(OcppVersion.OCPP_1_6, TransportEnum.WEBSOCKET, target = "")
+        val settings = Settings(
+            OcppVersion.OCPP_1_6,
+            TransportEnum.WEBSOCKET,
+            target = "",
+            ocpp16SecurityExtensions = true
+        )
         val ocppId = "chargePoint2"
         val csmsApi = ApiFactory.getCSMSApi(settings, ocppId, csApi, newMessageId = ::newMessageId)
 
@@ -1587,7 +1649,10 @@ class IntegrationTest {
             csr = "csr",
             certificateType = CertificateSigningUseEnumType.V2GCertificate
         )
-        expectThrows<IllegalStateException> { csmsApi.signCertificate(requestMetadata, request) }
+        val response = csmsApi.signCertificate(requestMetadata, request)
+        expectThat(response)
+            .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+            .and { get { this.response.status }.isEqualTo(GenericStatusEnumType.Accepted) }
     }
 
     @Test

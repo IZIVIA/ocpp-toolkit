@@ -7,5 +7,5 @@ import com.izivia.ocpp.core16.model.getinstalledcertificateids.enumeration.GetIn
 
 data class GetInstalledCertificateIdsResp(
     val status: GetInstalledCertificateStatusEnumType,
-    val certificateHashDataType: List<CertificateHashDataType>?
+    val certificateHashData: List<CertificateHashDataType>?
 ) : Response
