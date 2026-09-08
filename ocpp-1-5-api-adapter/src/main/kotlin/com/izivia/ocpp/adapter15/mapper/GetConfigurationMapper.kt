@@ -36,17 +36,9 @@ abstract class GetConfigurationMapper {
             }
             when (it.attributeStatus) {
                 GetVariableStatusEnumType.Accepted -> {
-                    if (it.readonly != null) {
-                        knownKeys.add(
-                            KeyValue(
-                                it.variable.name + instance,
-                                it.readonly!!,
-                                it.attributeValue
-                            )
-                        )
-                    } else {
-                        throw IllegalArgumentException("Readonly attribute is required for every GetVariableResultType in OCPP 1.5")
-                    }
+                    val readonly = it.readonly
+                        ?: throw IllegalArgumentException("Readonly attribute is required for every GetVariableResultType in OCPP 1.5")
+                    knownKeys.add(KeyValue(it.variable.name + instance, readonly, it.attributeValue))
                 }
                 else -> {
                     unknownKeys.add(
