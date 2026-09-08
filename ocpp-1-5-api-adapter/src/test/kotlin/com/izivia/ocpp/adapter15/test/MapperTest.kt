@@ -14,7 +14,7 @@ import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumT
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeCore
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat

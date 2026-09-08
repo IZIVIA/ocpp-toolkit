@@ -54,8 +54,7 @@ import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.ClientTransport
-import kotlinx.datetime.DateTimeUnit
-import kotlinx.datetime.plus
+import kotlin.time.Duration.Companion.milliseconds
 import org.mapstruct.factory.Mappers
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
@@ -174,7 +173,7 @@ class Ocpp12Adapter(
         if (request.transactionInfo.chargingState != null) {
             // Add 1ms to the timestamp so that the statusNotification request timestamp
             // is the latest one compare to the previous request timestamp
-            val updatedRequest = request.copy(timestamp = request.timestamp.plus(1, DateTimeUnit.MILLISECOND))
+            val updatedRequest = request.copy(timestamp = request.timestamp + 1.milliseconds)
             val updateResponse = updateTransactionEvent(meta, updatedRequest)
             executionMetadata = executionMetadata.combine(updateResponse.executionMeta)
         }

@@ -39,7 +39,7 @@ import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.transport.receiveMessage
 import com.izivia.ocpp.transport.sendMessage
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class RealCSMSOperations(
     private val servers: Set<ServerTransport>,

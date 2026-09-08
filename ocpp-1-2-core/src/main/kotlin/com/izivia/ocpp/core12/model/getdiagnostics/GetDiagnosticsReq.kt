@@ -1,7 +1,7 @@
 package com.izivia.ocpp.core12.model.getdiagnostics
 
 import com.izivia.ocpp.core12.model.Request
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class GetDiagnosticsReq(
     val location: String,

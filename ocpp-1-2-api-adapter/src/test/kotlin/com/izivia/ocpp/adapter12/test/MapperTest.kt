@@ -22,7 +22,7 @@ import com.izivia.ocpp.core12.model.statusnotification.enumeration.ChargePointEr
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.ClientTransport
 import io.mockk.mockk
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers

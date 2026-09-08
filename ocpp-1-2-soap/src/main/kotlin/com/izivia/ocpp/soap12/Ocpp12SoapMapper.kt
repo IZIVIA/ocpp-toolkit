@@ -56,7 +56,7 @@ import com.izivia.ocpp.soap.FaultSubCodeMixin
 import com.izivia.ocpp.soap.OcppSoapMapper
 import com.izivia.ocpp.soap.SoapFault
 import com.izivia.ocpp.soap.SoapFaultMixin
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 internal object Ocpp12SoapMapperIn : ObjectMapper(
     OcppSoapMapper()

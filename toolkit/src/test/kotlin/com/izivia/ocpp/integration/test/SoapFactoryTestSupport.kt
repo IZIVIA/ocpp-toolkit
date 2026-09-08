@@ -8,7 +8,7 @@ import com.izivia.ocpp.soap.OcppSoapParser
 import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.transport.OcppVersion
 import io.mockk.mockk
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.http4k.core.Method
 import org.http4k.core.Response
 import org.http4k.core.Status

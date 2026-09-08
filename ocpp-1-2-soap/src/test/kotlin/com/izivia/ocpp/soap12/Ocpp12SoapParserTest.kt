@@ -11,7 +11,7 @@ import com.izivia.ocpp.soap.RequestSoapMessage
 import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.soap.SoapFault
 import com.izivia.ocpp.soap.parseRequestFromSoap
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.contains

@@ -23,7 +23,7 @@ import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 
 class DefaultCSMSOperations(
     private val ocppCSCallbacks: OcppCSCallbacks
