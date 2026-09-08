@@ -61,13 +61,16 @@ abstract class CommonMapper {
         private val logger = LoggerFactory.getLogger(CommonMapper::class.java)
 
         /**
-         * OCPP 1.5 spells a few units differently from the generic (2.0-shaped) model, which uses the
-         * SI symbols. Aliased explicitly so that e.g. an ampere reading is not relabelled as Wh.
+         * Units by their OCPP 1.5 wire value. OCPP 1.5 spells a few of them differently from the
+         * generic (2.0-shaped) model, which uses the SI symbols, so those are aliased explicitly:
+         * an ampere reading must not be relabelled as Wh.
          */
-        private val unitAliases = mapOf(
-            "A" to UnitOfMeasure.Amp,
-            "V" to UnitOfMeasure.Volt
-        )
+        private val unitsByWireValue: Map<String, UnitOfMeasure> =
+            UnitOfMeasure.entries.associateBy { it.value } +
+                mapOf("A" to UnitOfMeasure.Amp, "V" to UnitOfMeasure.Volt)
+
+        private fun absentFromOcpp15(kind: String, value: Enum<*>): Nothing =
+            throw IllegalArgumentException("INVALID REQUEST : $kind.${value.name} doesn't exists in OCPP 1.5")
 
         private fun convertReadingContext(value: ReadingContextEnumType?): ReadingContext =
             when (value) {
@@ -83,7 +86,7 @@ abstract class CommonMapper {
                 // so reject rather than mislabel the reading.
                 ReadingContextEnumType.Trigger,
                 ReadingContextEnumType.Other ->
-                    throw IllegalArgumentException("INVALID REQUEST : ReadingContext.${value.name} doesn't exists in OCPP 1.5")
+                    absentFromOcpp15("ReadingContext", value)
             }
 
         private fun convertLocation(value: LocationEnumType?): Location =
@@ -97,7 +100,7 @@ abstract class CommonMapper {
                 // has no equivalent, and mapping it to Outlet would misreport where it was taken.
                 LocationEnumType.Cable,
                 LocationEnumType.EV ->
-                    throw IllegalArgumentException("INVALID REQUEST : Location.${value.name} doesn't exists in OCPP 1.5")
+                    absentFromOcpp15("Location", value)
             }
 
         @Throws(IllegalArgumentException::class)
@@ -133,16 +136,15 @@ abstract class CommonMapper {
                 MeasurandEnumType.Frequency,
                 MeasurandEnumType.SoC,
                 MeasurandEnumType.RPM ->
-                    throw IllegalArgumentException("INVALID REQUEST : Measurand.${value.name} doesn't exists in OCPP 1.5")
+                    absentFromOcpp15("Measurand", value)
             }
 
         private fun convertUnit(value: UnitOfMeasureGen?): UnitOfMeasure {
             val unit = value?.unit ?: return UnitOfMeasure.Wh
-            return enumValues<UnitOfMeasure>().firstOrNull { it.value == unit }
-                ?: unitAliases[unit]
-                ?: UnitOfMeasure.Wh.also {
-                    logger.warn("UnitOfMeasure $unit has no OCPP 1.5 equivalent, defaulted to Wh")
-                }
+            return unitsByWireValue[unit] ?: run {
+                logger.warn("UnitOfMeasure $unit has no OCPP 1.5 equivalent, defaulted to Wh")
+                UnitOfMeasure.Wh
+            }
         }
 
         private fun convertFormat(value: SignedMeterValueType?): ValueFormat =

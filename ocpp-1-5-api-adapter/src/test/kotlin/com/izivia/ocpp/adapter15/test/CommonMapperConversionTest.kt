@@ -13,7 +13,9 @@ import com.izivia.ocpp.core15.model.common.enumeration.UnitOfMeasure as UnitOfMe
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
+import strikt.assertions.contains
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
 
 /**
  * Guards the generic -> OCPP 1.5 narrowing of every sampled-value enum: no conversion may fail with an
@@ -54,7 +56,7 @@ class CommonMapperConversionTest {
             val sampledValue = SampledValueType(10.0, context = context)
             if (context in readingContextsAbsentFrom15) {
                 val error = assertThrows<IllegalArgumentException> { convert(sampledValue) }
-                expectThat(error.message.orEmpty().contains("doesn't exists in OCPP 1.5")).isEqualTo(true)
+                expectThat(error.message).isNotNull().contains("doesn't exists in OCPP 1.5")
             } else {
                 expectThat(convert(sampledValue).context).isEqualTo(ReadingContext.valueOf(context.name))
             }
@@ -67,7 +69,7 @@ class CommonMapperConversionTest {
             val sampledValue = SampledValueType(10.0, location = location)
             if (location in locationsAbsentFrom15) {
                 val error = assertThrows<IllegalArgumentException> { convert(sampledValue) }
-                expectThat(error.message.orEmpty().contains("doesn't exists in OCPP 1.5")).isEqualTo(true)
+                expectThat(error.message).isNotNull().contains("doesn't exists in OCPP 1.5")
             } else {
                 expectThat(convert(sampledValue).location).isEqualTo(Location.valueOf(location.name))
             }
@@ -80,7 +82,7 @@ class CommonMapperConversionTest {
             val sampledValue = SampledValueType(10.0, measurand = measurand)
             if (measurand in measurandsAbsentFrom15) {
                 val error = assertThrows<IllegalArgumentException> { convert(sampledValue) }
-                expectThat(error.message.orEmpty().contains("doesn't exists in OCPP 1.5")).isEqualTo(true)
+                expectThat(error.message).isNotNull().contains("doesn't exists in OCPP 1.5")
             } else {
                 expectThat(convert(sampledValue).measurand).isEqualTo(Measurand.valueOf(measurand.name))
             }

@@ -118,14 +118,21 @@ class Ocpp12Adapter(
                 ?.csmsId
             mapper.genToCoreReq(request.copy(transactionId = transactionId?.toString()))
         } catch (e: IllegalArgumentException) {
-            logger.warn(e.message)
-            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+            return meterValuesNotSent(meta, request, e)
         } catch (e: IllegalStateException) {
-            logger.warn(e.message)
-            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+            return meterValuesNotSent(meta, request, e)
         }
         val response = operations.meterValues(meta, coreRequest)
         return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    private fun meterValuesNotSent(
+        meta: RequestMetadata,
+        request: MeterValuesReq,
+        cause: Exception
+    ): OperationExecution<MeterValuesReq, MeterValuesResp> {
+        logger.warn(cause.message)
+        return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
     }
 
     override fun dataTransfer(
@@ -151,6 +158,9 @@ class Ocpp12Adapter(
         // chargingState is optional in the generic (2.0-shaped) model, but an OCPP 1.2 StatusNotification
         // carries nothing else: without it there is no status to report, so skip the notification rather
         // than fail the whole transaction event.
+        // This guards the direct Updated path only. updateStatusEvent applies the same condition before
+        // calling in, on purpose: it must skip silently rather than combine a NOT_SEND into the
+        // start/stop metadata. Keep both.
         if (request.transactionInfo.chargingState == null) {
             logger.warn("TransactionEvent without a chargingState has no OCPP 1.2 equivalent, status notification ignored")
             return OperationExecution(
@@ -316,8 +326,9 @@ class Ocpp12Adapter(
     override fun logStatusNotification(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
-    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
         throw IllegalStateException("logStatusNotification can't be call in OCPP 1.2")
+    }
 
     override fun diagnosticsStatusNotification(
         meta: RequestMetadata,

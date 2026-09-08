@@ -24,7 +24,7 @@ class RealTransactionRepository : TransactionRepository {
     }
 
     override fun getLocalIdByTransactionId(transactionId: Int): Ocpp15TransactionIds? {
-        val localId = hashMap.toList().find { it.second == transactionId }?.first
+        val localId = hashMap.entries.firstOrNull { it.value == transactionId }?.key
         return localId?.let { Ocpp15TransactionIds(it, transactionId) }
     }
 

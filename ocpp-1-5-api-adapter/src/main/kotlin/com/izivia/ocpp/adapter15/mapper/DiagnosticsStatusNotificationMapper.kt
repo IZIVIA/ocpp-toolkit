@@ -15,16 +15,18 @@ import org.mapstruct.ReportingPolicy
 abstract class DiagnosticsStatusNotificationMapper {
 
     /**
-     * Transient states with no OCPP 1.5 equivalent; kept in sync with the throw branch of convertDiagnosticsStatus.
-     */
-    private val unsupportedStatuses = setOf(DiagnosticsStatusEnumType.Idle, DiagnosticsStatusEnumType.Uploading)
-
-    /**
      * OCPP 1.5 only models terminal diagnostics states; transient states are filtered out by the adapter
-     * (logged and not forwarded).
+     * (logged and not forwarded). Exhaustive, so a status added to the generic model has to be classified
+     * here instead of silently counting as supported and then failing in convertDiagnosticsStatus.
      */
     fun isSupported(status: DiagnosticsStatusEnumType): Boolean =
-        status !in unsupportedStatuses
+        when (status) {
+            DiagnosticsStatusEnumType.Uploaded,
+            DiagnosticsStatusEnumType.UploadFailed -> true
+
+            DiagnosticsStatusEnumType.Idle,
+            DiagnosticsStatusEnumType.Uploading -> false
+        }
 
     @Named("convertDiagnosticsStatus")
     fun convertDiagnosticsStatus(status: DiagnosticsStatusEnumType): DiagnosticsStatus =

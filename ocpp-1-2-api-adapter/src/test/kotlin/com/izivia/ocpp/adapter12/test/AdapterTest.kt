@@ -152,12 +152,7 @@ class AdapterTest {
         )
 
         val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = MeterValuesReqGen(
-            connectorId = 1,
-            evseId = 1,
-            meterValue = listOf(MeterValueType(listOf(SampledValueType(10.0)), timestamp)),
-            transactionId = null
-        )
+        val request = meterValuesRequest(SampledValueType(10.0))
         val response = adapter.meterValues(requestMetadata, request)
 
         expectThat(response) {
@@ -349,24 +344,8 @@ class AdapterTest {
     @Test
     fun `meter values without an energy register are not sent`() {
         val requestMetadata = RequestMetadata("CP001")
-        every { chargePointOperations.meterValues(any(), any()) } returns success(
-            requestMetadata,
-            MeterValuesReqCore(1),
-            MeterValuesRespCore()
-        )
-
         val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = MeterValuesReqGen(
-            connectorId = 1,
-            evseId = 1,
-            meterValue = listOf(
-                MeterValueType(
-                    listOf(SampledValueType(230.0, measurand = MeasurandEnumType.Voltage)),
-                    timestamp
-                )
-            ),
-            transactionId = null
-        )
+        val request = meterValuesRequest(SampledValueType(230.0, measurand = MeasurandEnumType.Voltage))
         val response = adapter.meterValues(requestMetadata, request)
 
         expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
@@ -376,21 +355,8 @@ class AdapterTest {
     @Test
     fun `meter values with several energy registers are not sent`() {
         val requestMetadata = RequestMetadata("CP001")
-        every { chargePointOperations.meterValues(any(), any()) } returns success(
-            requestMetadata,
-            MeterValuesReqCore(1),
-            MeterValuesRespCore()
-        )
-
         val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = MeterValuesReqGen(
-            connectorId = 1,
-            evseId = 1,
-            meterValue = listOf(
-                MeterValueType(listOf(SampledValueType(10.0), SampledValueType(20.0)), timestamp)
-            ),
-            transactionId = null
-        )
+        val request = meterValuesRequest(SampledValueType(10.0), SampledValueType(20.0))
         val response = adapter.meterValues(requestMetadata, request)
 
         expectThat(response.executionMeta.status).isEqualTo(RequestStatus.NOT_SEND)
@@ -403,12 +369,7 @@ class AdapterTest {
         every { chargePointOperations.meterValues(any(), any()) } throws IllegalStateException("not connected")
 
         val adapter = Ocpp12Adapter("CP001", transport, csApi, RealTransactionRepository())
-        val request = MeterValuesReqGen(
-            connectorId = 1,
-            evseId = 1,
-            meterValue = listOf(MeterValueType(listOf(SampledValueType(10.0)), timestamp)),
-            transactionId = null
-        )
+        val request = meterValuesRequest(SampledValueType(10.0))
 
         assertThrows(IllegalStateException::class.java) { adapter.meterValues(requestMetadata, request) }
     }
@@ -460,6 +421,13 @@ class AdapterTest {
             )
         }
     }
+
+    private fun meterValuesRequest(vararg sampledValues: SampledValueType) = MeterValuesReqGen(
+        connectorId = 1,
+        evseId = 1,
+        meterValue = listOf(MeterValueType(sampledValues.toList(), timestamp)),
+        transactionId = null
+    )
 
     private fun transactionEvent(eventType: TransactionEventEnumType, meterValue: Double) =
         TransactionEventReq(

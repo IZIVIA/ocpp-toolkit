@@ -11,8 +11,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
-import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 
 class CSMSApiDispatchTest {
@@ -66,13 +66,11 @@ class CSMSApiDispatchTest {
     fun `the diagnostics status notification callback is optional`() {
         val csmsApi = DefaultCSMSApi(object : CSMSApiCallbacks {})
 
-        expectThat(
-            runCatching {
-                csmsApi.diagnosticsStatusNotification(
-                    meta,
-                    DiagnosticsStatusNotificationReq(DiagnosticsStatusEnumType.Idle)
-                )
-            }.exceptionOrNull()
-        ).isA<NotImplementedError>()
+        assertThrows<NotImplementedError> {
+            csmsApi.diagnosticsStatusNotification(
+                meta,
+                DiagnosticsStatusNotificationReq(DiagnosticsStatusEnumType.Idle)
+            )
+        }
     }
 }

@@ -135,6 +135,7 @@ import com.izivia.ocpp.core16.model.common.IdTagInfo
 import com.izivia.ocpp.core16.model.common.enumeration.AuthorizationStatus
 import com.izivia.ocpp.core16.model.datatransfer.enumeration.DataTransferStatus
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp as LogStatusNotificationRespCore
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import com.izivia.ocpp.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -934,7 +935,7 @@ class AdapterTest {
         every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
         every {
             transport.sendMessageClass<Any, Any>(any(), "LogStatusNotification", any())
-        } returns com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp()
+        } returns LogStatusNotificationRespCore()
 
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = LogStatusNotificationReq(
@@ -972,7 +973,7 @@ class AdapterTest {
                 "LogStatusNotification",
                 any()
             )
-        } returns com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp()
+        } returns LogStatusNotificationRespCore()
 
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = LogStatusNotificationReq(
@@ -992,10 +993,8 @@ class AdapterTest {
         val requestMetadata = RequestMetadata("")
         every { chargePointOperations.diagnosticsStatusNotification(any(), any()) } returns OperationExecution(
             ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq(
-                com.izivia.ocpp.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus.Uploaded
-            ),
-            com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp()
+            DiagnosticsStatusNotificationReq(DiagnosticsStatus.Uploaded),
+            DiagnosticsStatusNotificationResp()
         )
 
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())

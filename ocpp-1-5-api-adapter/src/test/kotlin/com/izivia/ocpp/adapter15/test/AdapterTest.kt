@@ -372,12 +372,6 @@ class AdapterTest {
     @Test
     fun `meter values with a measurand absent from OCPP 1_5 are not sent`() {
         val requestMetadata = RequestMetadata("CP001")
-        every { chargePointOperations.meterValues(any(), any()) } returns success(
-            requestMetadata,
-            MeterValuesReqCore(1),
-            MeterValuesRespCore()
-        )
-
         val adapter = Ocpp15Adapter("CP001", transport, csApi, RealTransactionRepository())
         val request = MeterValuesReqGen(
             connectorId = 1,
