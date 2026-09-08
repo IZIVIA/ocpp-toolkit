@@ -546,8 +546,8 @@ class AdapterTest {
     }
 
     @Test
-    fun `registers security receive handlers on construction`() {
-        Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+    fun `registers security receive handlers when the whitepaper is enabled`() {
+        Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
 
         verify { transport.receiveMessageClass<Any, Any>(any(), "CertificateSigned", any()) }
         verify { transport.receiveMessageClass<Any, Any>(any(), "DeleteCertificate", any()) }
@@ -556,6 +556,16 @@ class AdapterTest {
         verify { transport.receiveMessageClass<Any, Any>(any(), "GetLog", any()) }
         verify { transport.receiveMessageClass<Any, Any>(any(), "InstallCertificate", any()) }
         verify { transport.receiveMessageClass<Any, Any>(any(), "SignedUpdateFirmware", any()) }
+    }
+
+    @Test
+    fun `registers no security receive handler when the whitepaper is disabled`() {
+        // A charge point that did not opt in must not answer whitepaper actions at all. Registering
+        // the handlers anyway would let a CSMS drive SignedUpdateFirmware onto CSApi#updateFirmware
+        // on an application that only ever agreed to speak core 1.6.
+        Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+
+        verify(exactly = 0) { transport.receiveMessageClass<Any, Any>(any(), any(), any()) }
     }
 
     @Test

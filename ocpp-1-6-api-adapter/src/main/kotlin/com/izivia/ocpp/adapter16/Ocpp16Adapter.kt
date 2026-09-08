@@ -70,7 +70,8 @@ import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
  * @param securityExtensions whether the charge point speaks the OCPP 1.6-J Security Whitepaper.
  * Off by default, so a plain 1.6 charge point keeps emitting core actions only. When off, the
  * operations that exist solely in the whitepaper are rejected instead of being put on the wire,
- * where a plain 1.6 CSMS would answer `NotImplemented`.
+ * where a plain 1.6 CSMS would answer `NotImplemented`, and the inbound whitepaper actions are
+ * left unregistered so the CSMS gets the same `NotImplemented` in the other direction.
  */
 class Ocpp16Adapter(
     chargingStationId: String,
@@ -86,15 +87,23 @@ class Ocpp16Adapter(
 
     private val operations: ChargePointOperations = ChargePointOperations
         .newChargePointOperations(chargingStationId, transport, Ocpp16CSApiAdapter(csApi, transactionIds))
-    private val securityOperations: SecurityChargePointOperations =
-        SecurityChargePointOperations
-        .newSecurityChargePointOperations(chargingStationId, transport, Ocpp16SecurityCSApiAdapter(csApi))
 
-    private fun checkSecurityExtensions(action: String) {
-        check(securityExtensions) {
+    // Only built when the whitepaper is enabled: constructing it registers the inbound whitepaper
+    // handlers on the transport, so a charge point that did not opt in must not have them at all.
+    // Otherwise a CSMS could drive CertificateSigned, InstallCertificate or SignedUpdateFirmware
+    // into an application that only ever agreed to speak core 1.6.
+    private val securityOperations: SecurityChargePointOperations? =
+        if (securityExtensions) {
+            SecurityChargePointOperations
+                .newSecurityChargePointOperations(chargingStationId, transport, Ocpp16SecurityCSApiAdapter(csApi))
+        } else {
+            null
+        }
+
+    private fun securityOperations(action: String): SecurityChargePointOperations =
+        checkNotNull(securityOperations) {
             "$action requires the OCPP 1.6 security whitepaper, which is disabled on this charge point"
         }
-    }
 
     override fun connect() {
         transport.connect()
@@ -319,7 +328,11 @@ class Ocpp16Adapter(
         // property: requestId cannot arbitrate, since it is absent from a whitepaper notification
         // triggered while idle and synthesised by GetDiagnosticsMapper for the core flow.
         if (securityExtensions) {
-            val response = securityOperations.logStatusNotification(meta, SecurityMapper.genToCoreReq(request))
+            val response =
+                securityOperations("LogStatusNotification").logStatusNotification(
+                    meta,
+                    SecurityMapper.genToCoreReq(request)
+                )
             OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
         } else {
             val mapper: DiagnosticsStatusNotificationMapper =
@@ -353,8 +366,8 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
-        checkSecurityExtensions("SecurityEventNotification")
-        val response = securityOperations.securityEventNotification(meta, SecurityMapper.genToCoreReq(request))
+        val response = securityOperations("SecurityEventNotification")
+            .securityEventNotification(meta, SecurityMapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
 
@@ -362,8 +375,8 @@ class Ocpp16Adapter(
         meta: RequestMetadata,
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> {
-        checkSecurityExtensions("SignCertificate")
-        val response = securityOperations.signCertificate(meta, SecurityMapper.genToCoreReq(request))
+        val response = securityOperations("SignCertificate")
+            .signCertificate(meta, SecurityMapper.genToCoreReq(request))
         return OperationExecution(response.executionMeta, request, SecurityMapper.coreToGenResp(response.response))
     }
 
