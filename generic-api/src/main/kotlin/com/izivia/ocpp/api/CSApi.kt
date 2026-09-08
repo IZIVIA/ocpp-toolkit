@@ -127,6 +127,13 @@ interface CSApi {
      * In OCPP 1.6 both the core `UpdateFirmware` and the security whitepaper `SignedUpdateFirmware`
      * are routed here. A signed update carries `req.firmware.signingCertificate` and
      * `req.firmware.signature`; both are null for an unsigned one.
+     *
+     * The toolkit performs **no** cryptographic verification: it neither validates
+     * `signingCertificate` against a trust anchor nor checks `signature` over the downloaded
+     * firmware. Implementations MUST do both before installing anything when those fields are
+     * present, and MUST decide on their own policy for an unsigned update — accepting one
+     * unconditionally defeats the point of the whitepaper, since the request comes from whatever
+     * CSMS the charge point happens to be connected to.
      */
     fun updateFirmware(meta: RequestMetadata, req: UpdateFirmwareReq): OperationExecution<UpdateFirmwareReq, UpdateFirmwareResp>
 
