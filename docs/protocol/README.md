@@ -5,23 +5,24 @@ from the official JSON schemas the repo already vendors, but not *quickly*: they
 JSON files, one per direction per action, with no indication of who initiates an action and no way
 to compare versions.
 
-Two scripts make both halves of the specification grep-able. Run them in this order:
-
-```bash
-# 1. the normative PDFs -> page-cited text (needs your own licensed copy + ghostscript)
-OCA_DOCS=~/Documents/OCA python3 docs/protocol/extract-specs.py
-
-# 2. the vendored JSON schemas -> field reference, citing the sections extracted in step 1
-python3 docs/protocol/generate.py
-```
-
-Step 2 works on its own; without step 1 it simply omits the spec citations. Then:
+**The reference is committed — you do not need to generate anything.** Just grep:
 
 ```bash
 grep -rn 'idTag`' docs/protocol/           # which actions carry idTag, in which version
 grep -n 'transactionEvent.req' docs/protocol/OCPP-2.0.1.md
 grep -n 'meterValues' docs/protocol/ACTIONS.md    # does 1.5 have it? who initiates it?
-grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/   # the normative prose
+```
+
+Regenerating is only needed after changing an `Actions` enum or the schema resources:
+
+```bash
+python3 docs/protocol/generate.py                                  # refresh the reference
+
+# optional: also re-extract the OCA PDFs, which refreshes the spec citations and
+# produces the full normative text locally for prose greps. Needs your own licensed
+# copy of the documents plus ghostscript; the extracted text is not committed.
+OCA_DOCS=~/Documents/OCA python3 docs/protocol/extract-specs.py
+grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/     # after extraction
 ```
 
 Each field is one line keyed by its dotted JSON path, carrying everything needed to act on it:
@@ -38,9 +39,9 @@ Each field is one line keyed by its dotted JSON path, carrying everything needed
 | `OCPP-1.5.md` | 24 actions |
 | `OCPP-1.6.md` | 39 actions, including the Security Whitepaper extension |
 | `OCPP-2.0.1.md` | 64 actions |
-| `spec/<version>/*.txt` | extracted specification text, one line per source line, with `[[<slug> pdf-page N]]` markers |
-| `spec/INDEX.md` | every document and every heading, mapped to its PDF page |
-| `spec/sections.json` | the same, machine-readable; `generate.py` reads it to cite sections |
+| `spec/INDEX.md` | every document and every heading, mapped to its PDF page — committed |
+| `spec/sections.json` | the same, machine-readable; `generate.py` reads it to cite sections — committed |
+| `spec/<version>/*.txt` | the extracted specification text itself — **not committed**, see [SPECS.md](SPECS.md#licensing); run `extract-specs.py` to produce it locally |
 | [SPECS.md](SPECS.md) | where the documents are, **which edition the vendored schemas match**, the verified divergences, and the licensing |
 
 Extraction covers 18 documents and about 1,090 pages across the three versions — the specifications,
@@ -87,9 +88,9 @@ will tell you whether the two still agree.
 
 ## Requirements
 
-`extract-specs.py` needs **ghostscript** (`brew install ghostscript`) and your own copy of the OCA
-PDFs. `generate.py` needs nothing beyond Python 3. Neither writes anything outside
-`docs/protocol/`, and all of their output is gitignored — see [SPECS.md](SPECS.md#licensing).
+Nothing, to read it. To regenerate: `generate.py` needs only Python 3; `extract-specs.py` also needs
+**ghostscript** (`brew install ghostscript`) and your own copy of the OCA PDFs. Neither writes
+anything outside `docs/protocol/`.
 
 ## What it deliberately does not cover
 

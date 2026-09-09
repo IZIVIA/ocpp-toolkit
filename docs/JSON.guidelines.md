@@ -7,7 +7,8 @@ the shared parsing/validation machinery in `ocpp-json` to a version's `core` mod
 official OCPP JSON schemas used to validate every payload on the wire.
 
 Those schemas are the machine-readable protocol contract. To read them by field rather than by
-file, generate the reference in [protocol/](protocol/README.md) and grep it.
+file, grep the reference in [protocol/](protocol/README.md) — it is committed, and cites the
+matching section and page of the OCA specification for every action.
 
 Instances: `ocpp-1-5-json`, `ocpp-1-6-json`, `ocpp-2-0-json` — one per supported OCPP version.
 OCPP-J is the only wire format for 2.0.1 (there is no `ocpp-2-0-soap`).

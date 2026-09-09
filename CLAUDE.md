@@ -35,10 +35,14 @@ on the `toolkit` module, which aggregates everything else.
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — release process and Maven Central publishing
 
 ### Protocol reference
-- [docs/protocol/](docs/protocol/README.md) — grep-able per-version field/action reference generated
-  from the vendored OCPP JSON schemas; run `python3 docs/protocol/generate.py` once to produce it
-- [docs/protocol/SPECS.md](docs/protocol/SPECS.md) — where the normative OCPP documents are, and
-  which edition the vendored schemas actually correspond to
+- [docs/protocol/ACTIONS.md](docs/protocol/ACTIONS.md) — every OCPP action × version, with direction
+- [docs/protocol/](docs/protocol/README.md) — per-version field reference: every field of every
+  action, with type, constraints, enum values, the Kotlin class, and the section and page of the
+  normative OCA document. Committed — grep it, no generation step
+- [docs/protocol/spec/INDEX.md](docs/protocol/spec/INDEX.md) — every heading of every OCA
+  specification document mapped to its PDF page
+- [docs/protocol/SPECS.md](docs/protocol/SPECS.md) — which edition the vendored schemas match, the
+  verified divergences from OCA's schemas, and the licensing
 
 ### Layer guidelines
 Conventions shared across each family of repeated modules:

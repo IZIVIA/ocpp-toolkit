@@ -4,8 +4,7 @@ build
 .DS_Store
 __pycache__/
 
-# Generated protocol reference and extracted OCA specification text.
-# Derivatives of CC BY-ND / OCA-licensed material: kept local. See docs/protocol/SPECS.md
-docs/protocol/OCPP-*.md
-docs/protocol/ACTIONS.md
-docs/protocol/spec/
+# Extracted OCA specification text: verbatim copies of the specification
+# documents, kept local. The reference and index built from them ARE committed.
+# See docs/protocol/SPECS.md#licensing
+docs/protocol/spec/*/

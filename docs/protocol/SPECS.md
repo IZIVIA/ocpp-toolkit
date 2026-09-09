@@ -106,15 +106,18 @@ them in `ocpp-1-6-json/src/main/resources/` and `ocpp-2-0-json/src/main/resource
 The **specification PDFs** are OCA copyright and are obtained by each developer under OCA's own
 terms. Neither the PDFs nor text extracted from them may be redistributed here.
 
-*NoDerivatives* is the operative clause for both. It permits redistributing the material as it
-stands, but not distributing a transformed version. Everything this directory produces — the
-extracted spec text and the schema reference, which reproduces OCA's field descriptions verbatim —
-is a transformation. That is why the two scripts are committed and their output is not: each
-developer generates a local copy from material they are licensed to hold, and nothing derived is
-redistributed.
+*NoDerivatives* is the operative clause for the schemas: it permits redistributing them as they
+stand, but not distributing a transformed version. The committed reference **is** such a
+transformation — it restructures the schemas and reproduces OCA's field descriptions verbatim.
+Publishing it here is a deliberate IZIVIA decision, taken so that developers and tooling can grep
+the protocol without a generation step.
 
-If IZIVIA obtains permission from OCA to publish a derived reference, the `docs/protocol/` entries
-in `.gitignore` are the only thing that needs removing.
+What is deliberately **not** committed is `spec/<version>/*.txt`: the extracted text of the
+specification PDFs. Those files are close to verbatim copies of eighteen complete OCA documents
+(~2.7 MB, ~44,000 lines), and this repository is public. Publishing the *citations* to those
+documents — which is what `spec/INDEX.md` and `spec/sections.json` are — is a different thing from
+republishing the documents. Run `extract-specs.py` to produce the text locally from your own
+licensed copy.
 
 Note also that the two `ClearVariableMonitoring` edits above mean the repository is already
 distributing modified copies of two CC BY-ND schemas. Fixing the field names resolves both the
