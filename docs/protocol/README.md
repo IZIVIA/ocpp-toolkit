@@ -1,34 +1,31 @@
 # Protocol reference — the grep-able source of truth
 
-The question "what fields does this action actually carry, in this OCPP version?" is answerable
-from the official JSON schemas the repo already vendors, but not *quickly*: they are 252 separate
-JSON files, one per direction per action, with no indication of who initiates an action and no way
-to compare versions.
-
-**The reference is committed — you do not need to generate anything.** Just grep:
+What fields does this action carry, in this OCPP version, and where does the specification say so?
+This directory answers that with a grep, for all three supported versions and all 127 registered
+actions.
 
 ```bash
-grep -rn 'idTag`' docs/protocol/           # which actions carry idTag, in which version
+grep -rn 'idTag`' docs/protocol/                  # which actions carry idTag, in which version
 grep -n 'transactionEvent.req' docs/protocol/OCPP-2.0.1.md
 grep -n 'meterValues' docs/protocol/ACTIONS.md    # does 1.5 have it? who initiates it?
+grep -n 'Authorization Cache' docs/protocol/spec/INDEX.md   # where is it specified?
 ```
 
-Regenerating is only needed after changing an `Actions` enum or the schema resources:
-
-```bash
-python3 docs/protocol/generate.py                                  # refresh the reference
-
-# optional: also re-extract the OCA PDFs, which refreshes the spec citations and
-# produces the full normative text locally for prose greps. Needs your own licensed
-# copy of the documents plus ghostscript; the extracted text is not committed.
-OCA_DOCS=~/Documents/OCA python3 docs/protocol/extract-specs.py
-grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/     # after extraction
-```
-
-Each field is one line keyed by its dotted JSON path, carrying everything needed to act on it:
+Each field is one line, keyed by its dotted JSON path, carrying everything needed to act on it:
 
 ```
 - `authorize.resp.idTagInfo.status` — string, required, enum: Accepted | Blocked | Expired | Invalid | ConcurrentTx
+```
+
+and each action names its direction, its `Actions` entry, the `.kt` files implementing it, and the
+section and page of the normative OCA document:
+
+```
+## authorize
+- direction: **Charging Station -> CSMS** (`OcppInitiator.CHARGING_STATION`)
+- registry entry: `Actions.AUTHORIZE`
+- Kotlin `AuthorizeReq`: ocpp-1-6-core/.../authorize/AuthorizeReq.kt
+- spec: `ocpp-1.6-edition-2` §4.1 Authorize — pdf-page 37
 ```
 
 ## Files
@@ -39,61 +36,68 @@ Each field is one line keyed by its dotted JSON path, carrying everything needed
 | `OCPP-1.5.md` | 24 actions |
 | `OCPP-1.6.md` | 39 actions, including the Security Whitepaper extension |
 | `OCPP-2.0.1.md` | 64 actions |
-| `spec/INDEX.md` | every document and every heading, mapped to its PDF page — committed |
-| `spec/sections.json` | the same, machine-readable; `generate.py` reads it to cite sections — committed |
-| `spec/<version>/*.txt` | the extracted specification text itself — **not committed**, see [SPECS.md](SPECS.md#licensing); run `extract-specs.py` to produce it locally |
-| [SPECS.md](SPECS.md) | where the documents are, **which edition the vendored schemas match**, the verified divergences, and the licensing |
+| `spec/INDEX.md` | table of contents of all 18 OCA documents, every heading mapped to its PDF page |
+| `spec/sections.json` | the same, machine-readable |
+| [SPECS.md](SPECS.md) | which edition the vendored schemas match, the verified divergences from OCA's schemas, and the licensing |
 
-Extraction covers 18 documents and about 1,090 pages across the three versions — the specifications,
-the OCPP-J and OCPP-S bindings, the 1.6 Security Whitepaper, and every errata sheet and changelog.
-
-Generated files are not committed — see [Licensing](SPECS.md#licensing). Generate them once and
-they stay until the schemas change. They are deliberately long and repetitive: they are a grep
-target, not prose, so the module-doc length conventions in `docs/` do not apply to them.
-
-## What it is generated from
+## What it is derived from
 
 In order of authority:
 
-1. The official OCPP JSON schemas in `ocpp-<version>-json/src/main/resources/` — field names,
+1. **The official OCPP JSON schemas** in `ocpp-<version>-json/src/main/resources/` — field names,
    types, `required`, `maxLength`/`format`/range constraints, enum value sets, and (for 2.0.1)
    OCA's own field descriptions.
-2. Each version's `Actions` enum — the wire action name and its `OcppInitiator`, i.e. the
-   direction. An action absent from that enum is unreachable over the wire regardless of its model,
-   so the reference lists exactly what the registry admits.
-3. The Kotlin model classes — every action links to the `.kt` file for its `Req` and `Resp`, so a
-   grep hit leads straight to the code that implements it.
+2. **Each version's `Actions` enum** — the wire action name and its `OcppInitiator`, i.e. the
+   direction. An action absent from that registry is unreachable over the wire regardless of its
+   model, so this reference lists exactly what the registry admits.
+3. **The Kotlin model classes** — so a grep hit leads straight to the code that implements it.
+4. **The OCA specification PDFs** — the section and page for each action, plus any errata or
+   changelog page that names it. The documents are OCA copyright and are not in this repository;
+   OCA distributes them at <https://www.openchargealliance.org/downloads/>. Page numbers are PDF
+   page positions, not the printed numbers in the footer.
 
-That last point is the reason to prefer this over reading the schemas directly: it ties the wire
-contract, the dispatch registry and the implementation together in one line-addressable place.
+The errata cross-reference is the part that repays attention: OCPP 1.6 errata v4.0 §3.19 turns
+*"a Charge Point **MAY** send a StatusNotification.req"* into *"**SHALL** send"*. No schema will
+ever tell you that.
 
-## It also reports what does not line up
+## Mismatches it records
 
-Each version file ends with a coverage section that compares the registry against the shipped
-schema files. Three checks, all of which have found something real in this repo:
+Three checks were run across the registry, the shipped schemas and OCA's own schema distributions.
+All three found something, and all three are still open — see
+[SPECS.md](SPECS.md) and [../JSON.guidelines.md](../JSON.guidelines.md):
 
-- **Actions with no schema file.** These do not degrade to "unvalidated" — they *throw*.
-  `OcppJsonValidator` hands the missing resource to `JsonSchemaFactory.getSchema(null)`, which
-  raises `IllegalArgumentException: argument "in" is null` (verified against
-  json-schema-validator 1.5.9). `get15118EVCertificate` in 2.0.1 is registered in `Actions` with
-  model classes but ships no schema, so it fails on the first payload unless the parser was built
-  with `enableValidation = false`.
-- **Schema files no action resolves to.** Dead weight in the jar, and usually a naming mismatch —
-  the failure mode `docs/JSON.guidelines.md` warns about.
-- **Declared draft vs. validated draft.** All 22 OCPP 1.6 Security Whitepaper schemas declare
-  draft-06, but `Ocpp16JsonParser` validates every 1.6 payload as `V4`.
+- **`get15118EVCertificate` (2.0.1) has no schema file**, so it throws at validation time rather
+  than going unchecked. The two files exist in OCA's `part3` zip.
+- **Two 2.0.1 schemas were edited to match this codebase's Kotlin models**, changing wire field
+  names: `ClearVariableMonitoringRequest.id` → `ids` and
+  `ClearVariableMonitoringResponse.clearMonitoringResult` → `clearMonitoringResults`.
+- **All 22 OCPP 1.6 Security Whitepaper schemas declare draft-06** while `Ocpp16JsonParser`
+  validates every 1.6 payload as `V4`.
 
-Re-run the generator after touching an `Actions` enum or the schema resources and those sections
-will tell you whether the two still agree.
+## Keeping it current
 
-## Requirements
+These files are maintained by hand. They are long and repetitive because they are a grep target,
+not prose, so the length conventions that apply to the rest of `docs/` do not apply here.
 
-Nothing, to read it. To regenerate: `generate.py` needs only Python 3; `extract-specs.py` also needs
-**ghostscript** (`brew install ghostscript`) and your own copy of the OCA PDFs. Neither writes
-anything outside `docs/protocol/`.
+When you change the protocol surface, update this directory in the same commit:
+
+| Change | Update |
+|---|---|
+| add an action to an `Actions` enum | its version file **and** `ACTIONS.md`, and add both schema files |
+| add or change a field in a schema | the field lines for that action |
+| add a new OCPP version | a new `OCPP-<v>.md`, a column in `ACTIONS.md`, and its documents in `spec/INDEX.md` |
+| refresh the vendored schemas to a newer OCA edition | the affected field lines, and the edition table in [SPECS.md](SPECS.md) |
+
+The scripts that first produced these files are in this branch's history if a bulk regeneration is
+ever needed again: `git log --diff-filter=D -- docs/protocol/generate.py`.
 
 ## What it deliberately does not cover
 
-SOAP wire format: no WSDL or XSD is vendored, so the OCPP-S contract's source of truth is the code
-plus the OCPP-S specification text (which *is* extracted — `spec/1.6/ocpp-s-1.6-specification.txt`).
-Its conventions are documented in [../SOAP.guidelines.md](../SOAP.guidelines.md).
+**Normative prose.** Ordering, state machines, what a status value obliges a CSMS to do, error-code
+selection, feature profiles, retry timing — those live in the specification documents. This
+reference cites the section and page; it does not reproduce the text. See
+[SPECS.md](SPECS.md#what-the-schemas-cannot-tell-you).
+
+**SOAP wire format.** No WSDL or XSD is vendored, so the OCPP-S contract's source of truth is the
+code plus the OCPP-S specification document. Its conventions are documented in
+[../SOAP.guidelines.md](../SOAP.guidelines.md).

@@ -1,6 +1,6 @@
 # Action support matrix
 
-**Generated — do not edit.** Run `python3 docs/protocol/generate.py` to refresh.
+**Derived from each version's `Actions` registry.** Maintained by hand.
 
 Which OCPP action exists in which version, and who initiates it. Grep an action name here first to see whether the version you target has it at all.
 

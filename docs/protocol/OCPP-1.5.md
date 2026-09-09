@@ -1,6 +1,8 @@
 # OCPP 1.5 — protocol reference
 
-**Generated — do not edit.** Run `python3 docs/protocol/generate.py` to refresh.
+**Derived from the official OCPP JSON schemas, the version's `Actions` registry and the OCA
+specification documents.** Maintained by hand: an action added to `Actions` or a schema change
+belongs in this file in the same commit.
 
 Derived from the official OCPP JSON schemas in `ocpp-1-5-json/src/main/resources/` and the action registry in `ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/common/enumeration/Actions.kt`. For the normative prose, see [SPECS.md](SPECS.md).
 
@@ -14,12 +16,14 @@ grep -n 'idTag' docs/protocol/OCPP-1.5.md
 
 ## Specification documents
 
-Each action below cites the section and PDF page of the normative document. The extracted text is grep-able too:
+Each action below cites the section and PDF page of the normative document. Page numbers are
+PDF page positions in these documents, which OCA distributes at
+<https://www.openchargealliance.org/downloads/>:
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 1.5 Specification | spec | 81 | `docs/protocol/spec/1.5/ocpp-1.5-specification.txt` |
-| OCPP 1.5 — a functional description | spec | 7 | `docs/protocol/spec/1.5/ocpp-1.5-functional-description.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 1.5 Specification | spec | 81 |
+| OCPP 1.5 — a functional description | spec | 7 |
 
 ## Actions at a glance
 
@@ -56,9 +60,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.AUTHORIZE`
 - Kotlin `AuthorizeReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/authorize/AuthorizeReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/authorize/AuthorizeReq.kt)
 - Kotlin `AuthorizeResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/authorize/AuthorizeResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/authorize/AuthorizeResp.kt)
-- spec: `ocpp-1.5-specification` §4.1 Authorize — pdf-page 18 (`grep -n 'pdf-page 18]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.1 Authorize.req — pdf-page 41 (`grep -n 'pdf-page 41]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.2 Authorize.conf — pdf-page 41 (`grep -n 'pdf-page 41]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.1 Authorize — pdf-page 18
+- spec: `ocpp-1.5-specification` §6.1 Authorize.req — pdf-page 41
+- spec: `ocpp-1.5-specification` §6.2 Authorize.conf — pdf-page 41
 
 ### authorize request
 
@@ -83,9 +87,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.BOOTNOTIFICATION`
 - Kotlin `BootNotificationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/bootnotification/BootNotificationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/bootnotification/BootNotificationReq.kt)
 - Kotlin `BootNotificationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/bootnotification/BootNotificationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/bootnotification/BootNotificationResp.kt)
-- spec: `ocpp-1.5-specification` §4.2 Boot Notification — pdf-page 19 (`grep -n 'pdf-page 19]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.3 BootNotification.req — pdf-page 41 (`grep -n 'pdf-page 41]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.4 BootNotification.conf — pdf-page 42 (`grep -n 'pdf-page 42]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.2 Boot Notification — pdf-page 19
+- spec: `ocpp-1.5-specification` §6.3 BootNotification.req — pdf-page 41
+- spec: `ocpp-1.5-specification` §6.4 BootNotification.conf — pdf-page 42
 
 ### bootNotification request
 
@@ -117,10 +121,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CANCELRESERVATION`
 - Kotlin `CancelReservationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/cancelreservation/CancelReservationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/cancelreservation/CancelReservationReq.kt)
 - Kotlin `CancelReservationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/cancelreservation/CancelReservationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/cancelreservation/CancelReservationResp.kt)
-- spec: `ocpp-1.5-specification` §5.1 Cancel Reservation — pdf-page 27 (`grep -n 'pdf-page 27]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.5 CancelReservation.req — pdf-page 43 (`grep -n 'pdf-page 43]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.6 CancelReservation.conf — pdf-page 43 (`grep -n 'pdf-page 43]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §7.5 CancelReservationStatus — pdf-page 63 (`grep -n 'pdf-page 63]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.1 Cancel Reservation — pdf-page 27
+- spec: `ocpp-1.5-specification` §6.5 CancelReservation.req — pdf-page 43
+- spec: `ocpp-1.5-specification` §6.6 CancelReservation.conf — pdf-page 43
+- spec: `ocpp-1.5-specification` §7.5 CancelReservationStatus — pdf-page 63
 
 ### cancelReservation request
 
@@ -142,9 +146,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CHANGEAVAILABILITY`
 - Kotlin `ChangeAvailabilityReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeavailability/ChangeAvailabilityReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeavailability/ChangeAvailabilityReq.kt)
 - Kotlin `ChangeAvailabilityResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeavailability/ChangeAvailabilityResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeavailability/ChangeAvailabilityResp.kt)
-- spec: `ocpp-1.5-specification` §5.2 Change Availability — pdf-page 28 (`grep -n 'pdf-page 28]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.7 ChangeAvailability.req — pdf-page 43 (`grep -n 'pdf-page 43]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.8 ChangeAvailability.conf — pdf-page 44 (`grep -n 'pdf-page 44]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.2 Change Availability — pdf-page 28
+- spec: `ocpp-1.5-specification` §6.7 ChangeAvailability.req — pdf-page 43
+- spec: `ocpp-1.5-specification` §6.8 ChangeAvailability.conf — pdf-page 44
 
 ### changeAvailability request
 
@@ -167,9 +171,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CHANGECONFIGURATION`
 - Kotlin `ChangeConfigurationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeconfiguration/ChangeConfigurationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeconfiguration/ChangeConfigurationReq.kt)
 - Kotlin `ChangeConfigurationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeconfiguration/ChangeConfigurationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/changeconfiguration/ChangeConfigurationResp.kt)
-- spec: `ocpp-1.5-specification` §5.3 Change Configuration — pdf-page 29 (`grep -n 'pdf-page 29]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.9 ChangeConfiguration.req — pdf-page 44 (`grep -n 'pdf-page 44]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.10 ChangeConfiguration.conf — pdf-page 47 (`grep -n 'pdf-page 47]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.3 Change Configuration — pdf-page 29
+- spec: `ocpp-1.5-specification` §6.9 ChangeConfiguration.req — pdf-page 44
+- spec: `ocpp-1.5-specification` §6.10 ChangeConfiguration.conf — pdf-page 47
 
 ### changeConfiguration request
 
@@ -192,10 +196,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARCACHE`
 - Kotlin `ClearCacheReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/clearcache/ClearCacheReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/clearcache/ClearCacheReq.kt)
 - Kotlin `ClearCacheResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/clearcache/ClearCacheResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/clearcache/ClearCacheResp.kt)
-- spec: `ocpp-1.5-specification` §5.4 Clear Cache — pdf-page 30 (`grep -n 'pdf-page 30]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.11 ClearCache.req — pdf-page 47 (`grep -n 'pdf-page 47]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.12 ClearCache.conf — pdf-page 47 (`grep -n 'pdf-page 47]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §7.12 ClearCacheStatus — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.4 Clear Cache — pdf-page 30
+- spec: `ocpp-1.5-specification` §6.11 ClearCache.req — pdf-page 47
+- spec: `ocpp-1.5-specification` §6.12 ClearCache.conf — pdf-page 47
+- spec: `ocpp-1.5-specification` §7.12 ClearCacheStatus — pdf-page 66
 
 ### clearCache request
 
@@ -217,11 +221,11 @@ _No fields: empty payload._
 - registry entry: `Actions.DATATRANSFER`
 - Kotlin `DataTransferReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/datatransfer/DataTransferReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/datatransfer/DataTransferReq.kt)
 - Kotlin `DataTransferResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/datatransfer/DataTransferResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/datatransfer/DataTransferResp.kt)
-- spec: `ocpp-1.5-specification` §4.3 Data Transfer — pdf-page 20 (`grep -n 'pdf-page 20]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §5.5 Data Transfer — pdf-page 31 (`grep -n 'pdf-page 31]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.13 DataTransfer.req — pdf-page 47 (`grep -n 'pdf-page 47]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.14 DataTransfer.conf — pdf-page 48 (`grep -n 'pdf-page 48]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §7.14 DataTransferStatus — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.3 Data Transfer — pdf-page 20
+- spec: `ocpp-1.5-specification` §5.5 Data Transfer — pdf-page 31
+- spec: `ocpp-1.5-specification` §6.13 DataTransfer.req — pdf-page 47
+- spec: `ocpp-1.5-specification` §6.14 DataTransfer.conf — pdf-page 48
+- spec: `ocpp-1.5-specification` §7.14 DataTransferStatus — pdf-page 66
 
 ### dataTransfer request
 
@@ -246,9 +250,9 @@ _No fields: empty payload._
 - registry entry: `Actions.DIAGNOSTICSSTATUSNOTIFICATION`
 - Kotlin `DiagnosticsStatusNotificationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationReq.kt)
 - Kotlin `DiagnosticsStatusNotificationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationResp.kt)
-- spec: `ocpp-1.5-specification` §4.4 Diagnostics Status Notification — pdf-page 21 (`grep -n 'pdf-page 21]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.15 DiagnosticsStatusNotification.req — pdf-page 48 (`grep -n 'pdf-page 48]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.16 DiagnosticsStatusNotification.conf — pdf-page 48 (`grep -n 'pdf-page 48]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.4 Diagnostics Status Notification — pdf-page 21
+- spec: `ocpp-1.5-specification` §6.15 DiagnosticsStatusNotification.req — pdf-page 48
+- spec: `ocpp-1.5-specification` §6.16 DiagnosticsStatusNotification.conf — pdf-page 48
 
 ### diagnosticsStatusNotification request
 
@@ -270,9 +274,9 @@ _No fields: empty payload._
 - registry entry: `Actions.FIRMWARESTATUSNOTIFICATION`
 - Kotlin `FirmwareStatusNotificationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt)
 - Kotlin `FirmwareStatusNotificationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt)
-- spec: `ocpp-1.5-specification` §4.5 Firmware Status Notification — pdf-page 21 (`grep -n 'pdf-page 21]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.17 FirmwareStatusNotification.req — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.18 FirmwareStatusNotification.conf — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.5 Firmware Status Notification — pdf-page 21
+- spec: `ocpp-1.5-specification` §6.17 FirmwareStatusNotification.req — pdf-page 49
+- spec: `ocpp-1.5-specification` §6.18 FirmwareStatusNotification.conf — pdf-page 49
 
 ### firmwareStatusNotification request
 
@@ -294,9 +298,9 @@ _No fields: empty payload._
 - registry entry: `Actions.GETCONFIGURATION`
 - Kotlin `GetConfigurationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getconfiguration/GetConfigurationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getconfiguration/GetConfigurationReq.kt)
 - Kotlin `GetConfigurationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getconfiguration/GetConfigurationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getconfiguration/GetConfigurationResp.kt)
-- spec: `ocpp-1.5-specification` §5.6 Get Configuration — pdf-page 31 (`grep -n 'pdf-page 31]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.19 GetConfiguration.req — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.20 GetConfiguration.conf — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.6 Get Configuration — pdf-page 31
+- spec: `ocpp-1.5-specification` §6.19 GetConfiguration.req — pdf-page 49
+- spec: `ocpp-1.5-specification` §6.20 GetConfiguration.conf — pdf-page 49
 
 ### getConfiguration request
 
@@ -324,9 +328,9 @@ _No fields: empty payload._
 - registry entry: `Actions.GETDIAGNOSTICS`
 - Kotlin `GetDiagnosticsReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getdiagnostics/GetDiagnosticsReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getdiagnostics/GetDiagnosticsReq.kt)
 - Kotlin `GetDiagnosticsResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getdiagnostics/GetDiagnosticsResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getdiagnostics/GetDiagnosticsResp.kt)
-- spec: `ocpp-1.5-specification` §5.7 Get Diagnostics — pdf-page 32 (`grep -n 'pdf-page 32]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.21 GetDiagnostics.req — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.22 GetDiagnostics.conf — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.7 Get Diagnostics — pdf-page 32
+- spec: `ocpp-1.5-specification` §6.21 GetDiagnostics.req — pdf-page 50
+- spec: `ocpp-1.5-specification` §6.22 GetDiagnostics.conf — pdf-page 50
 
 ### getDiagnostics request
 
@@ -352,9 +356,9 @@ _No fields: empty payload._
 - registry entry: `Actions.GETLOCALLISTVERSION`
 - Kotlin `GetLocalListVersionReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getlocallistversion/GetLocalListVersionReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getlocallistversion/GetLocalListVersionReq.kt)
 - Kotlin `GetLocalListVersionResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getlocallistversion/GetLocalListVersionResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/getlocallistversion/GetLocalListVersionResp.kt)
-- spec: `ocpp-1.5-specification` §5.8 Get Local List Version — pdf-page 33 (`grep -n 'pdf-page 33]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.23 GetLocalListVersion.req — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.24 GetLocalListVersion.conf — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.8 Get Local List Version — pdf-page 33
+- spec: `ocpp-1.5-specification` §6.23 GetLocalListVersion.req — pdf-page 51
+- spec: `ocpp-1.5-specification` §6.24 GetLocalListVersion.conf — pdf-page 51
 
 ### getLocalListVersion request
 
@@ -376,9 +380,9 @@ _No fields: empty payload._
 - registry entry: `Actions.HEARTBEAT`
 - Kotlin `HeartbeatReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/heartbeat/HeartbeatReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/heartbeat/HeartbeatReq.kt)
 - Kotlin `HeartbeatResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/heartbeat/HeartbeatResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/heartbeat/HeartbeatResp.kt)
-- spec: `ocpp-1.5-specification` §4.6 Heartbeat — pdf-page 22 (`grep -n 'pdf-page 22]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.25 Heartbeat.req — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.26 Heartbeat.conf — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.6 Heartbeat — pdf-page 22
+- spec: `ocpp-1.5-specification` §6.25 Heartbeat.req — pdf-page 51
+- spec: `ocpp-1.5-specification` §6.26 Heartbeat.conf — pdf-page 51
 
 ### heartbeat request
 
@@ -400,9 +404,9 @@ _No fields: empty payload._
 - registry entry: `Actions.METERVALUES`
 - Kotlin `MeterValuesReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/metervalues/MeterValuesReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/metervalues/MeterValuesReq.kt)
 - Kotlin `MeterValuesResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/metervalues/MeterValuesResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/metervalues/MeterValuesResp.kt)
-- spec: `ocpp-1.5-specification` §4.7 Meter Values — pdf-page 23 (`grep -n 'pdf-page 23]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.27 MeterValues.req — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.28 MeterValues.conf — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.7 Meter Values — pdf-page 23
+- spec: `ocpp-1.5-specification` §6.27 MeterValues.req — pdf-page 52
+- spec: `ocpp-1.5-specification` §6.28 MeterValues.conf — pdf-page 52
 
 ### meterValues request
 
@@ -434,9 +438,9 @@ _No fields: empty payload._
 - registry entry: `Actions.REMOTESTARTTRANSACTION`
 - Kotlin `RemoteStartTransactionReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestart/RemoteStartTransactionReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestart/RemoteStartTransactionReq.kt)
 - Kotlin `RemoteStartTransactionResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestart/RemoteStartTransactionResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestart/RemoteStartTransactionResp.kt)
-- spec: `ocpp-1.5-specification` §5.9 Remote Start Transaction — pdf-page 34 (`grep -n 'pdf-page 34]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.29 RemoteStartTransaction.req — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.30 RemoteStartTransaction.conf — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.9 Remote Start Transaction — pdf-page 34
+- spec: `ocpp-1.5-specification` §6.29 RemoteStartTransaction.req — pdf-page 52
+- spec: `ocpp-1.5-specification` §6.30 RemoteStartTransaction.conf — pdf-page 53
 
 ### remoteStartTransaction request
 
@@ -459,9 +463,9 @@ _No fields: empty payload._
 - registry entry: `Actions.REMOTESTOPTRANSACTION`
 - Kotlin `RemoteStopTransactionReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestop/RemoteStopTransactionReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestop/RemoteStopTransactionReq.kt)
 - Kotlin `RemoteStopTransactionResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestop/RemoteStopTransactionResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/remotestop/RemoteStopTransactionResp.kt)
-- spec: `ocpp-1.5-specification` §5.10 Remote Stop Transaction — pdf-page 35 (`grep -n 'pdf-page 35]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.31 RemoteStopTransaction.req — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.32 RemoteStopTransaction.conf — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.10 Remote Stop Transaction — pdf-page 35
+- spec: `ocpp-1.5-specification` §6.31 RemoteStopTransaction.req — pdf-page 53
+- spec: `ocpp-1.5-specification` §6.32 RemoteStopTransaction.conf — pdf-page 53
 
 ### remoteStopTransaction request
 
@@ -483,9 +487,9 @@ _No fields: empty payload._
 - registry entry: `Actions.RESERVENOW`
 - Kotlin `ReserveNowReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reservenow/ReserveNowReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reservenow/ReserveNowReq.kt)
 - Kotlin `ReserveNowResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reservenow/ReserveNowResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reservenow/ReserveNowResp.kt)
-- spec: `ocpp-1.5-specification` §5.11 Reserve Now — pdf-page 35 (`grep -n 'pdf-page 35]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.33 ReserveNow.req — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.34 ReserveNow.conf — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.11 Reserve Now — pdf-page 35
+- spec: `ocpp-1.5-specification` §6.33 ReserveNow.req — pdf-page 54
+- spec: `ocpp-1.5-specification` §6.34 ReserveNow.conf — pdf-page 54
 
 ### reserveNow request
 
@@ -511,11 +515,11 @@ _No fields: empty payload._
 - registry entry: `Actions.RESET`
 - Kotlin `ResetReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reset/ResetReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reset/ResetReq.kt)
 - Kotlin `ResetResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reset/ResetResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/reset/ResetResp.kt)
-- spec: `ocpp-1.5-specification` §5.12 Reset — pdf-page 37 (`grep -n 'pdf-page 37]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.35 Reset.req — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.36 Reset.conf — pdf-page 55 (`grep -n 'pdf-page 55]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §7.33 ResetStatus — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §7.34 ResetType — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.12 Reset — pdf-page 37
+- spec: `ocpp-1.5-specification` §6.35 Reset.req — pdf-page 54
+- spec: `ocpp-1.5-specification` §6.36 Reset.conf — pdf-page 55
+- spec: `ocpp-1.5-specification` §7.33 ResetStatus — pdf-page 74
+- spec: `ocpp-1.5-specification` §7.34 ResetType — pdf-page 74
 
 ### reset request
 
@@ -537,9 +541,9 @@ _No fields: empty payload._
 - registry entry: `Actions.SENDLOCALLIST`
 - Kotlin `SendLocalListReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/sendlocallist/SendLocalListReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/sendlocallist/SendLocalListReq.kt)
 - Kotlin `SendLocalListResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/sendlocallist/SendLocalListResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/sendlocallist/SendLocalListResp.kt)
-- spec: `ocpp-1.5-specification` §5.13 Send Local List — pdf-page 38 (`grep -n 'pdf-page 38]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.37 SendLocalList.req — pdf-page 55 (`grep -n 'pdf-page 55]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.38 SendLocalList.conf — pdf-page 56 (`grep -n 'pdf-page 56]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.13 Send Local List — pdf-page 38
+- spec: `ocpp-1.5-specification` §6.37 SendLocalList.req — pdf-page 55
+- spec: `ocpp-1.5-specification` §6.38 SendLocalList.conf — pdf-page 56
 
 ### sendLocalList request
 
@@ -569,9 +573,9 @@ _No fields: empty payload._
 - registry entry: `Actions.STARTTRANSACTION`
 - Kotlin `StartTransactionReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/starttransaction/StartTransactionReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/starttransaction/StartTransactionReq.kt)
 - Kotlin `StartTransactionResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/starttransaction/StartTransactionResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/starttransaction/StartTransactionResp.kt)
-- spec: `ocpp-1.5-specification` §4.8 Start Transaction — pdf-page 24 (`grep -n 'pdf-page 24]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.39 StartTransaction.req — pdf-page 56 (`grep -n 'pdf-page 56]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.40 StartTransaction.conf — pdf-page 57 (`grep -n 'pdf-page 57]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.8 Start Transaction — pdf-page 24
+- spec: `ocpp-1.5-specification` §6.39 StartTransaction.req — pdf-page 56
+- spec: `ocpp-1.5-specification` §6.40 StartTransaction.conf — pdf-page 57
 
 ### startTransaction request
 
@@ -601,9 +605,9 @@ _No fields: empty payload._
 - registry entry: `Actions.STATUSNOTIFICATION`
 - Kotlin `StatusNotificationReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/statusnotification/StatusNotificationReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/statusnotification/StatusNotificationReq.kt)
 - Kotlin `StatusNotificationResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/statusnotification/StatusNotificationResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/statusnotification/StatusNotificationResp.kt)
-- spec: `ocpp-1.5-specification` §4.9 Status Notification — pdf-page 25 (`grep -n 'pdf-page 25]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.41 StatusNotification.req — pdf-page 57 (`grep -n 'pdf-page 57]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.42 StatusNotification.conf — pdf-page 58 (`grep -n 'pdf-page 58]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.9 Status Notification — pdf-page 25
+- spec: `ocpp-1.5-specification` §6.41 StatusNotification.req — pdf-page 57
+- spec: `ocpp-1.5-specification` §6.42 StatusNotification.conf — pdf-page 58
 
 ### statusNotification request
 
@@ -631,9 +635,9 @@ _No fields: empty payload._
 - registry entry: `Actions.STOPTRANSACTION`
 - Kotlin `StopTransactionReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/stoptransaction/StopTransactionReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/stoptransaction/StopTransactionReq.kt)
 - Kotlin `StopTransactionResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/stoptransaction/StopTransactionResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/stoptransaction/StopTransactionResp.kt)
-- spec: `ocpp-1.5-specification` §4.10 Stop Transaction — pdf-page 26 (`grep -n 'pdf-page 26]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.43 StopTransaction.req — pdf-page 58 (`grep -n 'pdf-page 58]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.44 StopTransaction.conf — pdf-page 59 (`grep -n 'pdf-page 59]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §4.10 Stop Transaction — pdf-page 26
+- spec: `ocpp-1.5-specification` §6.43 StopTransaction.req — pdf-page 58
+- spec: `ocpp-1.5-specification` §6.44 StopTransaction.conf — pdf-page 59
 
 ### stopTransaction request
 
@@ -671,9 +675,9 @@ _No fields: empty payload._
 - registry entry: `Actions.UNLOCKCONNECTOR`
 - Kotlin `UnlockConnectorReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/unlockconnector/UnlockConnectorReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/unlockconnector/UnlockConnectorReq.kt)
 - Kotlin `UnlockConnectorResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/unlockconnector/UnlockConnectorResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/unlockconnector/UnlockConnectorResp.kt)
-- spec: `ocpp-1.5-specification` §5.14 Unlock Connector — pdf-page 39 (`grep -n 'pdf-page 39]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.45 UnlockConnector.req — pdf-page 60 (`grep -n 'pdf-page 60]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.46 UnlockConnector.conf — pdf-page 60 (`grep -n 'pdf-page 60]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.14 Unlock Connector — pdf-page 39
+- spec: `ocpp-1.5-specification` §6.45 UnlockConnector.req — pdf-page 60
+- spec: `ocpp-1.5-specification` §6.46 UnlockConnector.conf — pdf-page 60
 
 ### unlockConnector request
 
@@ -695,9 +699,9 @@ _No fields: empty payload._
 - registry entry: `Actions.UPDATEFIRMWARE`
 - Kotlin `UpdateFirmwareReq`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/updatefirmware/UpdateFirmwareReq.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/updatefirmware/UpdateFirmwareReq.kt)
 - Kotlin `UpdateFirmwareResp`: [`ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/updatefirmware/UpdateFirmwareResp.kt`](../../ocpp-1-5-core/src/main/kotlin/com/izivia/ocpp/core15/model/updatefirmware/UpdateFirmwareResp.kt)
-- spec: `ocpp-1.5-specification` §5.15 Update Firmware — pdf-page 40 (`grep -n 'pdf-page 40]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.47 UpdateFirmware.req — pdf-page 60 (`grep -n 'pdf-page 60]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
-- spec: `ocpp-1.5-specification` §6.48 UpdateFirmware.conf — pdf-page 61 (`grep -n 'pdf-page 61]]' docs/protocol/spec/1.5/ocpp-1.5-specification.txt`)
+- spec: `ocpp-1.5-specification` §5.15 Update Firmware — pdf-page 40
+- spec: `ocpp-1.5-specification` §6.47 UpdateFirmware.req — pdf-page 60
+- spec: `ocpp-1.5-specification` §6.48 UpdateFirmware.conf — pdf-page 61
 
 ### updateFirmware request
 

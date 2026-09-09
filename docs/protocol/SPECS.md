@@ -7,28 +7,28 @@ Two sources of truth sit behind this toolkit, and they answer different question
 | The official **JSON schemas** | payload shape: field names, types, cardinality, value sets | vendored in `ocpp-<v>-json/src/main/resources/` |
 | The official **specification PDFs** | everything else: SHALL/SHOULD requirements, sequences, the meaning of a status, error handling, feature profiles, timing | **not** in this repository — your own licensed copy |
 
-`extract-specs.py` turns the PDFs into page-cited text so the second half is grep-able too, and
-`generate.py` then cites the exact section and PDF page on every action. See
-[README.md](README.md) for the workflow.
+The reference in this directory covers the first row in full, and cites the second row by section
+and page — see [README.md](README.md).
 
 ## Getting the documents
 
 OCA publishes them at <https://www.openchargealliance.org/downloads/>. Download is free but gated
 behind accepting OCA's terms, which is why nothing from them is committed here — see
-[Licensing](#licensing). Point the extractor at wherever you keep them:
+[Licensing](#licensing). [spec/INDEX.md](spec/INDEX.md) is the table of contents of the eighteen
+documents the citations refer to, so you can tell which ones you need.
 
-```bash
-OCA_DOCS=~/Documents/OCA python3 docs/protocol/extract-specs.py
-# more than one folder:
-OCA_DOCS=~/Documents/OCA:~/other/Normes python3 docs/protocol/extract-specs.py
-```
+The documents behind the citations are:
 
-Documents are located by filename pattern anywhere under those roots, so it does not matter how
-the downloads were unpacked or renamed. Anything not found is listed at the end of the run.
+- **1.5** — Specification; *a functional description*
+- **1.6** — edition 2 (FINAL, 2017-09-28); Security Whitepaper edition 2; OCPP-J and OCPP-S
+  bindings; errata sheets for all three
+- **2.0.1** — Parts 0, 1, 2 (specification), Part 2 appendices, Part 4 (OCPP-J); Part 2 errata
+  v1.0; the 2.0 → 2.0.1 changelog and the superseded 2.0 errata
 
-As currently published by OCA, note that **two of these are newer than what the vendored schemas
-correspond to**: *OCPP 1.6 Security Whitepaper Edition 4* and *OCPP 2.0.1 Edition 4 (all files)*
-with *Errata 2026-06* and *Part 2 appendices v1.5*.
+As currently published by OCA, **two of these are newer than what the vendored schemas correspond
+to**: *OCPP 1.6 Security Whitepaper Edition 4* and *OCPP 2.0.1 Edition 4 (all files)* with
+*Errata 2026-06* and *Part 2 appendices v1.5*. Page citations here follow the editions listed
+above, so verify against whatever edition you actually hold.
 
 ## Which edition the vendored schemas correspond to
 
@@ -82,8 +82,8 @@ whole fix.
 
 ## What the schemas cannot tell you
 
-Reach for the specification text — grep `docs/protocol/spec/` after extraction — when the question
-is:
+Open the specification document — [spec/INDEX.md](spec/INDEX.md) tells you which one and which
+page — when the question is:
 
 - **Ordering and state.** Which action must precede which, what a station may send before
   `BootNotification` is accepted, transaction lifecycle, status-transition tables.
@@ -95,7 +95,7 @@ is:
 - **Timing and retries.** Heartbeat intervals, retry back-off, message timeouts.
 - **Corrections.** The errata sheets change normative wording. OCPP 1.6 errata v4.0 §3.19, for
   instance, turns "a Charge Point **MAY** send a StatusNotification.req" into "**SHALL** send".
-  A `grep` of the errata text is the only practical way to notice that.
+  Each action in the reference lists the errata pages that name it, so you know when to go look.
 
 ## Licensing
 
@@ -112,12 +112,10 @@ transformation — it restructures the schemas and reproduces OCA's field descri
 Publishing it here is a deliberate IZIVIA decision, taken so that developers and tooling can grep
 the protocol without a generation step.
 
-What is deliberately **not** committed is `spec/<version>/*.txt`: the extracted text of the
-specification PDFs. Those files are close to verbatim copies of eighteen complete OCA documents
-(~2.7 MB, ~44,000 lines), and this repository is public. Publishing the *citations* to those
-documents — which is what `spec/INDEX.md` and `spec/sections.json` are — is a different thing from
-republishing the documents. Run `extract-specs.py` to produce the text locally from your own
-licensed copy.
+The **specification text itself is deliberately not here.** Publishing the *citations* to a
+document — which is what [spec/INDEX.md](spec/INDEX.md) and `spec/sections.json` are — is a
+different thing from republishing the document, and this repository is public. Read the normative
+wording in your own copy of the PDF, at the page the reference cites.
 
 Note also that the two `ClearVariableMonitoring` edits above mean the repository is already
 distributing modified copies of two CC BY-ND schemas. Fixing the field names resolves both the

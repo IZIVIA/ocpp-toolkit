@@ -1,20 +1,25 @@
 # Specification index
 
-**Generated — do not edit.** Run `python3 docs/protocol/extract-specs.py` to refresh.
+**Table of contents of the OCA specification documents**, with every heading mapped to its PDF
+page, so a section can be cited and found without opening each document to hunt for it. The
+documents themselves are OCA copyright and are not in this repository — OCA distributes them at
+<https://www.openchargealliance.org/downloads/>.
 
-Extracted text of the OCA specification PDFs, with every heading mapped to its PDF page. Grep the `.txt` files for normative wording; the page markers (`[[<slug> pdf-page N]]`) tell you where to open the real document.
+Grep for a topic to find where it is specified:
 
 ```bash
-grep -n 'SHALL' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt | head
-grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/
+grep -n 'Authorization Cache' docs/protocol/spec/INDEX.md
+grep -n 'Smart Charging' docs/protocol/spec/INDEX.md
 ```
+
+Page numbers are PDF page positions, not the printed page numbers in the document footer.
 
 ## OCPP 1.5
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 1.5 Specification | spec | 81 | `docs/protocol/spec/1.5/ocpp-1.5-specification.txt` |
-| OCPP 1.5 — a functional description | spec | 7 | `docs/protocol/spec/1.5/ocpp-1.5-functional-description.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 1.5 Specification | spec | 81 |
+| OCPP 1.5 — a functional description | spec | 7 |
 
 ### OCPP 1.5 Specification — contents
 
@@ -166,15 +171,15 @@ grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/
 
 ## OCPP 1.6
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 1.6 edition 2 (FINAL, 2017-09-28) | spec | 116 | `docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt` |
-| OCPP 1.6 Security Whitepaper | spec | 67 | `docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt` |
-| OCPP-J 1.6 (JSON over WebSocket) | transport | 22 | `docs/protocol/spec/1.6/ocpp-j-1.6-specification.txt` |
-| OCPP-S 1.6 (SOAP) | transport | 14 | `docs/protocol/spec/1.6/ocpp-s-1.6-specification.txt` |
-| OCPP 1.6 errata sheet | errata | 46 | `docs/protocol/spec/1.6/ocpp-1.6-errata.txt` |
-| OCPP-J 1.6 errata sheet | errata | 13 | `docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt` |
-| OCPP-S 1.6 errata sheet | errata | 4 | `docs/protocol/spec/1.6/ocpp-s-1.6-errata.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 1.6 edition 2 (FINAL, 2017-09-28) | spec | 116 |
+| OCPP 1.6 Security Whitepaper | spec | 67 |
+| OCPP-J 1.6 (JSON over WebSocket) | transport | 22 |
+| OCPP-S 1.6 (SOAP) | transport | 14 |
+| OCPP 1.6 errata sheet | errata | 46 |
+| OCPP-J 1.6 errata sheet | errata | 13 |
+| OCPP-S 1.6 errata sheet | errata | 4 |
 
 ### OCPP 1.6 edition 2 (FINAL, 2017-09-28) — contents
 
@@ -710,18 +715,18 @@ grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/
 
 ## OCPP 2.0.1
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 2.0.1 Part 0 — Introduction | spec | 15 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part0-introduction.txt` |
-| OCPP 2.0.1 Part 1 — Architecture & Topology | spec | 27 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part1-architecture.txt` |
-| OCPP 2.0.1 Part 2 — Specification (use cases & requirements) | spec | 459 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt` |
-| OCPP 2.0.1 Part 2 — Appendices | spec | 38 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-appendices.txt` |
-| OCPP 2.0.1 Part 4 — OCPP-J | transport | 27 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part4-ocpp-j.txt` |
-| OCPP 2.0.1 Part 2 errata | errata | 75 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt` |
-| Changelog OCPP 2.0 -> 2.0.1 | changelog | 21 | `docs/protocol/spec/2.0.1/changelog-2.0-to-2.0.1.txt` |
-| OCPP 2.0 Part 1 errata (superseded by 2.0.1) | errata | 5 | `docs/protocol/spec/2.0.1/ocpp-2.0-part1-errata.txt` |
-| OCPP 2.0 Part 2 errata (superseded by 2.0.1) | errata | 119 | `docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt` |
-| OCPP 2.0 Part 4 errata (superseded by 2.0.1) | errata | 6 | `docs/protocol/spec/2.0.1/ocpp-2.0-part4-errata.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 2.0.1 Part 0 — Introduction | spec | 15 |
+| OCPP 2.0.1 Part 1 — Architecture & Topology | spec | 27 |
+| OCPP 2.0.1 Part 2 — Specification (use cases & requirements) | spec | 459 |
+| OCPP 2.0.1 Part 2 — Appendices | spec | 38 |
+| OCPP 2.0.1 Part 4 — OCPP-J | transport | 27 |
+| OCPP 2.0.1 Part 2 errata | errata | 75 |
+| Changelog OCPP 2.0 -> 2.0.1 | changelog | 21 |
+| OCPP 2.0 Part 1 errata (superseded by 2.0.1) | errata | 5 |
+| OCPP 2.0 Part 2 errata (superseded by 2.0.1) | errata | 119 |
+| OCPP 2.0 Part 4 errata (superseded by 2.0.1) | errata | 6 |
 
 ### OCPP 2.0.1 Part 0 — Introduction — contents
 

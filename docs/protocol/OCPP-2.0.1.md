@@ -1,6 +1,8 @@
 # OCPP 2.0.1 — protocol reference
 
-**Generated — do not edit.** Run `python3 docs/protocol/generate.py` to refresh.
+**Derived from the official OCPP JSON schemas, the version's `Actions` registry and the OCA
+specification documents.** Maintained by hand: an action added to `Actions` or a schema change
+belongs in this file in the same commit.
 
 Derived from the official OCPP JSON schemas in `ocpp-2-0-json/src/main/resources/` and the action registry in `ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/common/enumeration/Actions.kt`. For the normative prose, see [SPECS.md](SPECS.md).
 
@@ -14,20 +16,22 @@ grep -n 'idTag' docs/protocol/OCPP-2.0.1.md
 
 ## Specification documents
 
-Each action below cites the section and PDF page of the normative document. The extracted text is grep-able too:
+Each action below cites the section and PDF page of the normative document. Page numbers are
+PDF page positions in these documents, which OCA distributes at
+<https://www.openchargealliance.org/downloads/>:
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 2.0.1 Part 0 — Introduction | spec | 15 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part0-introduction.txt` |
-| OCPP 2.0.1 Part 1 — Architecture & Topology | spec | 27 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part1-architecture.txt` |
-| OCPP 2.0.1 Part 2 — Specification (use cases & requirements) | spec | 459 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt` |
-| OCPP 2.0.1 Part 2 — Appendices | spec | 38 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-appendices.txt` |
-| OCPP 2.0.1 Part 4 — OCPP-J | transport | 27 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part4-ocpp-j.txt` |
-| OCPP 2.0.1 Part 2 errata | errata | 75 | `docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt` |
-| Changelog OCPP 2.0 -> 2.0.1 | changelog | 21 | `docs/protocol/spec/2.0.1/changelog-2.0-to-2.0.1.txt` |
-| OCPP 2.0 Part 1 errata (superseded by 2.0.1) | errata | 5 | `docs/protocol/spec/2.0.1/ocpp-2.0-part1-errata.txt` |
-| OCPP 2.0 Part 2 errata (superseded by 2.0.1) | errata | 119 | `docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt` |
-| OCPP 2.0 Part 4 errata (superseded by 2.0.1) | errata | 6 | `docs/protocol/spec/2.0.1/ocpp-2.0-part4-errata.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 2.0.1 Part 0 — Introduction | spec | 15 |
+| OCPP 2.0.1 Part 1 — Architecture & Topology | spec | 27 |
+| OCPP 2.0.1 Part 2 — Specification (use cases & requirements) | spec | 459 |
+| OCPP 2.0.1 Part 2 — Appendices | spec | 38 |
+| OCPP 2.0.1 Part 4 — OCPP-J | transport | 27 |
+| OCPP 2.0.1 Part 2 errata | errata | 75 |
+| Changelog OCPP 2.0 -> 2.0.1 | changelog | 21 |
+| OCPP 2.0 Part 1 errata (superseded by 2.0.1) | errata | 5 |
+| OCPP 2.0 Part 2 errata (superseded by 2.0.1) | errata | 119 |
+| OCPP 2.0 Part 4 errata (superseded by 2.0.1) | errata | 6 |
 
 ## Actions at a glance
 
@@ -104,10 +108,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.AUTHORIZE`
 - Kotlin `AuthorizeReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/authorize/AuthorizeReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/authorize/AuthorizeReq.kt)
 - Kotlin `AuthorizeResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/authorize/AuthorizeResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/authorize/AuthorizeResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.1 Authorize — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.1.1 AuthorizeRequest — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.1.2 AuthorizeResponse — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 18 (`grep -n 'Authorize' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.1 Authorize — pdf-page 348
+- spec: `ocpp-2.0.1-part2-specification` §1.1.1 AuthorizeRequest — pdf-page 348
+- spec: `ocpp-2.0.1-part2-specification` §1.1.2 AuthorizeResponse — pdf-page 348
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 18
 
 ### authorize request
 
@@ -185,11 +189,11 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.BOOTNOTIFICATION`
 - Kotlin `BootNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/bootnotification/BootNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/bootnotification/BootNotificationReq.kt)
 - Kotlin `BootNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/bootnotification/BootNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/bootnotification/BootNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.2 BootNotification — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.2.1 BootNotificationRequest — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.2.2 BootNotificationResponse — pdf-page 348 (`grep -n 'pdf-page 348]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 10, 11, 69 (`grep -n 'BootNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 14, 22, 48, 99, 109 (`grep -n 'BootNotification' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.2 BootNotification — pdf-page 348
+- spec: `ocpp-2.0.1-part2-specification` §1.2.1 BootNotificationRequest — pdf-page 348
+- spec: `ocpp-2.0.1-part2-specification` §1.2.2 BootNotificationResponse — pdf-page 348
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 10, 11, 69
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 14, 22, 48, 99, 109
 
 ### bootNotification request
 
@@ -239,10 +243,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CANCELRESERVATION`
 - Kotlin `CancelReservationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cancelreservation/CancelReservationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cancelreservation/CancelReservationReq.kt)
 - Kotlin `CancelReservationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cancelreservation/CancelReservationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cancelreservation/CancelReservationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §H02 Cancel Reservation — pdf-page 209 (`grep -n 'pdf-page 209]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.3 CancelReservation — pdf-page 349 (`grep -n 'pdf-page 349]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.3.1 CancelReservationRequest — pdf-page 349 (`grep -n 'pdf-page 349]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.3.2 CancelReservationResponse — pdf-page 349 (`grep -n 'pdf-page 349]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §H02 Cancel Reservation — pdf-page 209
+- spec: `ocpp-2.0.1-part2-specification` §1.3 CancelReservation — pdf-page 349
+- spec: `ocpp-2.0.1-part2-specification` §1.3.1 CancelReservationRequest — pdf-page 349
+- spec: `ocpp-2.0.1-part2-specification` §1.3.2 CancelReservationResponse — pdf-page 349
 
 ### cancelReservation request
 
@@ -277,9 +281,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CERTIFICATESIGNED`
 - Kotlin `CertificateSignedReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/certificateSigned/CertificateSignedReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/certificateSigned/CertificateSignedReq.kt)
 - Kotlin `CertificateSignedResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/certificateSigned/CertificateSignedResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/certificateSigned/CertificateSignedResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.4 CertificateSigned — pdf-page 349 (`grep -n 'pdf-page 349]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.4.1 CertificateSignedRequest — pdf-page 349 (`grep -n 'pdf-page 349]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.4.2 CertificateSignedResponse — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.4 CertificateSigned — pdf-page 349
+- spec: `ocpp-2.0.1-part2-specification` §1.4.1 CertificateSignedRequest — pdf-page 349
+- spec: `ocpp-2.0.1-part2-specification` §1.4.2 CertificateSignedResponse — pdf-page 350
 
 ### certificateSigned request
 
@@ -316,10 +320,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CHANGEAVAILABILITY`
 - Kotlin `ChangeAvailabilityReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/changeavailability/ChangeAvailabilityReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/changeavailability/ChangeAvailabilityReq.kt)
 - Kotlin `ChangeAvailabilityResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/changeavailability/ChangeAvailabilityResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/changeavailability/ChangeAvailabilityResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.5 ChangeAvailability — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.5.1 ChangeAvailabilityRequest — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.5.2 ChangeAvailabilityResponse — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 49 (`grep -n 'ChangeAvailability' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.5 ChangeAvailability — pdf-page 350
+- spec: `ocpp-2.0.1-part2-specification` §1.5.1 ChangeAvailabilityRequest — pdf-page 350
+- spec: `ocpp-2.0.1-part2-specification` §1.5.2 ChangeAvailabilityResponse — pdf-page 350
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 49
 
 ### changeAvailability request
 
@@ -360,9 +364,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARCACHE`
 - Kotlin `ClearCacheReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearcache/ClearCacheReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearcache/ClearCacheReq.kt)
 - Kotlin `ClearCacheResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearcache/ClearCacheResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearcache/ClearCacheResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.6 ClearCache — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.6.1 ClearCacheRequest — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.6.2 ClearCacheResponse — pdf-page 350 (`grep -n 'pdf-page 350]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.6 ClearCache — pdf-page 350
+- spec: `ocpp-2.0.1-part2-specification` §1.6.1 ClearCacheRequest — pdf-page 350
+- spec: `ocpp-2.0.1-part2-specification` §1.6.2 ClearCacheResponse — pdf-page 350
 
 ### clearCache request
 
@@ -396,13 +400,13 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARCHARGINGPROFILE`
 - Kotlin `ClearChargingProfileReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearchargingprofile/ClearChargingProfileReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearchargingprofile/ClearChargingProfileReq.kt)
 - Kotlin `ClearChargingProfileResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearchargingprofile/ClearChargingProfileResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearchargingprofile/ClearChargingProfileResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §K10 Clear Charging Profile — pdf-page 261 (`grep -n 'pdf-page 261]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.7 ClearChargingProfile — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.7.1 ClearChargingProfileRequest — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.7.2 ClearChargingProfileResponse — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §2.14 ClearChargingProfileType — pdf-page 384 (`grep -n 'pdf-page 384]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 38 (`grep -n 'ClearChargingProfile' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 91 (`grep -n 'ClearChargingProfile' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §K10 Clear Charging Profile — pdf-page 261
+- spec: `ocpp-2.0.1-part2-specification` §1.7 ClearChargingProfile — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §1.7.1 ClearChargingProfileRequest — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §1.7.2 ClearChargingProfileResponse — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §2.14 ClearChargingProfileType — pdf-page 384
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 38
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 91
 
 ### clearChargingProfile request
 
@@ -444,9 +448,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARDISPLAYMESSAGE`
 - Kotlin `ClearDisplayMessageReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cleardisplaymessage/ClearDisplayMessageReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cleardisplaymessage/ClearDisplayMessageReq.kt)
 - Kotlin `ClearDisplayMessageResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cleardisplaymessage/ClearDisplayMessageResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/cleardisplaymessage/ClearDisplayMessageResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.8 ClearDisplayMessage — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.8.1 ClearDisplayMessageRequest — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.8.2 ClearDisplayMessageResponse — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.8 ClearDisplayMessage — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §1.8.1 ClearDisplayMessageRequest — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §1.8.2 ClearDisplayMessageResponse — pdf-page 351
 
 ### clearDisplayMessage request
 
@@ -481,10 +485,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARVARIABLEMONITORING`
 - Kotlin `ClearVariableMonitoringReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearvariablemonitoring/ClearVariableMonitoringReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearvariablemonitoring/ClearVariableMonitoringReq.kt)
 - Kotlin `ClearVariableMonitoringResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearvariablemonitoring/ClearVariableMonitoringResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearvariablemonitoring/ClearVariableMonitoringResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.10 ClearVariableMonitoring — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.10.1 ClearVariableMonitoringRequest — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.10.2 ClearVariableMonitoringResponse — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 72 (`grep -n 'ClearVariableMonitoring' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.10 ClearVariableMonitoring — pdf-page 352
+- spec: `ocpp-2.0.1-part2-specification` §1.10.1 ClearVariableMonitoringRequest — pdf-page 352
+- spec: `ocpp-2.0.1-part2-specification` §1.10.2 ClearVariableMonitoringResponse — pdf-page 352
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 72
 
 ### clearVariableMonitoring request
 
@@ -524,9 +528,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEAREDCHARGINGLIMIT`
 - Kotlin `ClearedChargingLimitReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearedcharginglimit/ClearedChargingLimitReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearedcharginglimit/ClearedChargingLimitReq.kt)
 - Kotlin `ClearedChargingLimitResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearedcharginglimit/ClearedChargingLimitResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/clearedcharginglimit/ClearedChargingLimitResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.9 ClearedChargingLimit — pdf-page 351 (`grep -n 'pdf-page 351]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.9.1 ClearedChargingLimitRequest — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.9.2 ClearedChargingLimitResponse — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.9 ClearedChargingLimit — pdf-page 351
+- spec: `ocpp-2.0.1-part2-specification` §1.9.1 ClearedChargingLimitRequest — pdf-page 352
+- spec: `ocpp-2.0.1-part2-specification` §1.9.2 ClearedChargingLimitResponse — pdf-page 352
 
 ### clearedChargingLimit request
 
@@ -556,9 +560,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.COSTUPDATED`
 - Kotlin `CostUpdatedReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/costupdated/CostUpdatedReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/costupdated/CostUpdatedReq.kt)
 - Kotlin `CostUpdatedResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/costupdated/CostUpdatedResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/costupdated/CostUpdatedResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.11 CostUpdated — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.11.1 CostUpdatedRequest — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.11.2 CostUpdatedResponse — pdf-page 352 (`grep -n 'pdf-page 352]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.11 CostUpdated — pdf-page 352
+- spec: `ocpp-2.0.1-part2-specification` §1.11.1 CostUpdatedRequest — pdf-page 352
+- spec: `ocpp-2.0.1-part2-specification` §1.11.2 CostUpdatedResponse — pdf-page 352
 
 ### costUpdated request
 
@@ -584,11 +588,11 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CUSTOMERINFORMATION`
 - Kotlin `CustomerInformationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/customerinformation/CustomerInformationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/customerinformation/CustomerInformationReq.kt)
 - Kotlin `CustomerInformationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/customerinformation/CustomerInformationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/customerinformation/CustomerInformationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §2.4 Customer Information — pdf-page 325 (`grep -n 'pdf-page 325]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.12 CustomerInformation — pdf-page 353 (`grep -n 'pdf-page 353]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.12.1 CustomerInformationRequest — pdf-page 353 (`grep -n 'pdf-page 353]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.12.2 CustomerInformationResponse — pdf-page 353 (`grep -n 'pdf-page 353]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'CustomerInformation' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §2.4 Customer Information — pdf-page 325
+- spec: `ocpp-2.0.1-part2-specification` §1.12 CustomerInformation — pdf-page 353
+- spec: `ocpp-2.0.1-part2-specification` §1.12.1 CustomerInformationRequest — pdf-page 353
+- spec: `ocpp-2.0.1-part2-specification` §1.12.2 CustomerInformationResponse — pdf-page 353
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### customerInformation request
 
@@ -645,12 +649,12 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.DATATRANSFER`
 - Kotlin `DataTransferReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/datatransfer/DataTransferReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/datatransfer/DataTransferReq.kt)
 - Kotlin `DataTransferResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/datatransfer/DataTransferResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/datatransfer/DataTransferResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.13 DataTransfer — pdf-page 353 (`grep -n 'pdf-page 353]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.13.1 DataTransferRequest — pdf-page 353 (`grep -n 'pdf-page 353]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.13.2 DataTransferResponse — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- changelog mentions: `changelog-2.0-to-2.0.1` pdf-page 2, 17 (`grep -n 'DataTransfer' docs/protocol/spec/2.0.1/changelog-2.0-to-2.0.1.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 88, 117, 118 (`grep -n 'DataTransfer' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part4-errata` pdf-page 6 (`grep -n 'DataTransfer' docs/protocol/spec/2.0.1/ocpp-2.0-part4-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.13 DataTransfer — pdf-page 353
+- spec: `ocpp-2.0.1-part2-specification` §1.13.1 DataTransferRequest — pdf-page 353
+- spec: `ocpp-2.0.1-part2-specification` §1.13.2 DataTransferResponse — pdf-page 354
+- changelog mentions: `changelog-2.0-to-2.0.1` pdf-page 2, 17
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 88, 117, 118
+- errata mentions: `ocpp-2.0-part4-errata` pdf-page 6
 
 ### dataTransfer request
 
@@ -688,10 +692,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.DELETECERTIFICATE`
 - Kotlin `DeleteCertificateReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/deletecertificate/DeleteCertificateReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/deletecertificate/DeleteCertificateReq.kt)
 - Kotlin `DeleteCertificateResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/deletecertificate/DeleteCertificateResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/deletecertificate/DeleteCertificateResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.14 DeleteCertificate — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.14.1 DeleteCertificateRequest — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.14.2 DeleteCertificateResponse — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 77 (`grep -n 'DeleteCertificate' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.14 DeleteCertificate — pdf-page 354
+- spec: `ocpp-2.0.1-part2-specification` §1.14.1 DeleteCertificateRequest — pdf-page 354
+- spec: `ocpp-2.0.1-part2-specification` §1.14.2 DeleteCertificateResponse — pdf-page 354
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 77
 
 ### deleteCertificate request
 
@@ -733,11 +737,11 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.FIRMWARESTATUSNOTIFICATION`
 - Kotlin `FirmwareStatusNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt)
 - Kotlin `FirmwareStatusNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.15 FirmwareStatusNotification — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.15.1 FirmwareStatusNotificationRequest — pdf-page 354 (`grep -n 'pdf-page 354]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.15.2 FirmwareStatusNotificationResponse — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'FirmwareStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 72, 92, 93 (`grep -n 'FirmwareStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.15 FirmwareStatusNotification — pdf-page 354
+- spec: `ocpp-2.0.1-part2-specification` §1.15.1 FirmwareStatusNotificationRequest — pdf-page 354
+- spec: `ocpp-2.0.1-part2-specification` §1.15.2 FirmwareStatusNotificationResponse — pdf-page 355
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 72, 92, 93
 
 ### firmwareStatusNotification request
 
@@ -767,10 +771,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.GET15118EVCERTIFICATE`
 - Kotlin `Get15118EVCertificateReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/get15118evcertificate/Get15118EVCertificateReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/get15118evcertificate/Get15118EVCertificateReq.kt)
 - Kotlin `Get15118EVCertificateResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/get15118evcertificate/Get15118EVCertificateResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/get15118evcertificate/Get15118EVCertificateResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.16 Get15118EVCertificate — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.16.1 Get15118EVCertificateRequest — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.16.2 Get15118EVCertificateResponse — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 75, 76 (`grep -n 'Get15118EVCertificate' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.16 Get15118EVCertificate — pdf-page 355
+- spec: `ocpp-2.0.1-part2-specification` §1.16.1 Get15118EVCertificateRequest — pdf-page 355
+- spec: `ocpp-2.0.1-part2-specification` §1.16.2 Get15118EVCertificateResponse — pdf-page 355
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 75, 76
 
 ### get15118EVCertificate request
 
@@ -786,12 +790,12 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETBASEREPORT`
 - Kotlin `GetBaseReportReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getbasereport/GetBaseReportReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getbasereport/GetBaseReportReq.kt)
 - Kotlin `GetBaseReportResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getbasereport/GetBaseReportResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getbasereport/GetBaseReportResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §B07 Get Base Report — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.17 GetBaseReport — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.17.1 GetBaseReportRequest — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.17.2 GetBaseReportResponse — pdf-page 355 (`grep -n 'pdf-page 355]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'GetBaseReport' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 118 (`grep -n 'GetBaseReport' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §B07 Get Base Report — pdf-page 66
+- spec: `ocpp-2.0.1-part2-specification` §1.17 GetBaseReport — pdf-page 355
+- spec: `ocpp-2.0.1-part2-specification` §1.17.1 GetBaseReportRequest — pdf-page 355
+- spec: `ocpp-2.0.1-part2-specification` §1.17.2 GetBaseReportResponse — pdf-page 355
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 118
 
 ### getBaseReport request
 
@@ -828,11 +832,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETCERTIFICATESTATUS`
 - Kotlin `GetCertificateStatusReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcertificatestatus/GetCertificateStatusReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcertificatestatus/GetCertificateStatusReq.kt)
 - Kotlin `GetCertificateStatusResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcertificatestatus/GetCertificateStatusResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcertificatestatus/GetCertificateStatusResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.18 GetCertificateStatus — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.18.1 GetCertificateStatusRequest — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.18.2 GetCertificateStatusResponse — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §3.37 GetCertificateStatusEnumType — pdf-page 412 (`grep -n 'pdf-page 412]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 103 (`grep -n 'GetCertificateStatus' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.18 GetCertificateStatus — pdf-page 356
+- spec: `ocpp-2.0.1-part2-specification` §1.18.1 GetCertificateStatusRequest — pdf-page 356
+- spec: `ocpp-2.0.1-part2-specification` §1.18.2 GetCertificateStatusResponse — pdf-page 356
+- spec: `ocpp-2.0.1-part2-specification` §3.37 GetCertificateStatusEnumType — pdf-page 412
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 103
 
 ### getCertificateStatus request
 
@@ -876,11 +880,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETCHARGINGPROFILES`
 - Kotlin `GetChargingProfilesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getchargingprofiles/GetChargingProfilesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getchargingprofiles/GetChargingProfilesReq.kt)
 - Kotlin `GetChargingProfilesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getchargingprofiles/GetChargingProfilesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getchargingprofiles/GetChargingProfilesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §K09 Get Charging Profiles — pdf-page 260 (`grep -n 'pdf-page 260]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.19 GetChargingProfiles — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.19.1 GetChargingProfilesRequest — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.19.2 GetChargingProfilesResponse — pdf-page 356 (`grep -n 'pdf-page 356]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 7, 36 (`grep -n 'GetChargingProfiles' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §K09 Get Charging Profiles — pdf-page 260
+- spec: `ocpp-2.0.1-part2-specification` §1.19 GetChargingProfiles — pdf-page 356
+- spec: `ocpp-2.0.1-part2-specification` §1.19.1 GetChargingProfilesRequest — pdf-page 356
+- spec: `ocpp-2.0.1-part2-specification` §1.19.2 GetChargingProfilesResponse — pdf-page 356
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 7, 36
 
 ### getChargingProfiles request
 
@@ -927,11 +931,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETCOMPOSITESCHEDULE`
 - Kotlin `GetCompositeScheduleReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcompositeschedule/GetCompositeScheduleReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcompositeschedule/GetCompositeScheduleReq.kt)
 - Kotlin `GetCompositeScheduleResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcompositeschedule/GetCompositeScheduleResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getcompositeschedule/GetCompositeScheduleResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §K08 Get Composite Schedule — pdf-page 258 (`grep -n 'pdf-page 258]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.20 GetCompositeSchedule — pdf-page 357 (`grep -n 'pdf-page 357]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.20.1 GetCompositeScheduleRequest — pdf-page 357 (`grep -n 'pdf-page 357]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.20.2 GetCompositeScheduleResponse — pdf-page 357 (`grep -n 'pdf-page 357]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 62 (`grep -n 'GetCompositeSchedule' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §K08 Get Composite Schedule — pdf-page 258
+- spec: `ocpp-2.0.1-part2-specification` §1.20 GetCompositeSchedule — pdf-page 357
+- spec: `ocpp-2.0.1-part2-specification` §1.20.1 GetCompositeScheduleRequest — pdf-page 357
+- spec: `ocpp-2.0.1-part2-specification` §1.20.2 GetCompositeScheduleResponse — pdf-page 357
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 62
 
 ### getCompositeSchedule request
 
@@ -984,10 +988,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETDISPLAYMESSAGES`
 - Kotlin `GetDisplayMessagesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getdisplaymessages/GetDisplayMessagesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getdisplaymessages/GetDisplayMessagesReq.kt)
 - Kotlin `GetDisplayMessagesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getdisplaymessages/GetDisplayMessagesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getdisplaymessages/GetDisplayMessagesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.21 GetDisplayMessages — pdf-page 357 (`grep -n 'pdf-page 357]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.21.1 GetDisplayMessagesRequest — pdf-page 357 (`grep -n 'pdf-page 357]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.21.2 GetDisplayMessagesResponse — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'GetDisplayMessages' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.21 GetDisplayMessages — pdf-page 357
+- spec: `ocpp-2.0.1-part2-specification` §1.21.1 GetDisplayMessagesRequest — pdf-page 357
+- spec: `ocpp-2.0.1-part2-specification` §1.21.2 GetDisplayMessagesResponse — pdf-page 358
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### getDisplayMessages request
 
@@ -1028,10 +1032,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETINSTALLEDCERTIFICATEIDS`
 - Kotlin `GetInstalledCertificateIdsReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getinstalledcertificateids/GetInstalledCertificateIdsReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getinstalledcertificateids/GetInstalledCertificateIdsReq.kt)
 - Kotlin `GetInstalledCertificateIdsResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getinstalledcertificateids/GetInstalledCertificateIdsResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getinstalledcertificateids/GetInstalledCertificateIdsResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.22 GetInstalledCertificateIds — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.22.1 GetInstalledCertificateIdsRequest — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.22.2 GetInstalledCertificateIdsResponse — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 14, 16 (`grep -n 'GetInstalledCertificateIds' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.22 GetInstalledCertificateIds — pdf-page 358
+- spec: `ocpp-2.0.1-part2-specification` §1.22.1 GetInstalledCertificateIdsRequest — pdf-page 358
+- spec: `ocpp-2.0.1-part2-specification` §1.22.2 GetInstalledCertificateIdsResponse — pdf-page 358
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 14, 16
 
 ### getInstalledCertificateIds request
 
@@ -1088,10 +1092,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETLOCALLISTVERSION`
 - Kotlin `GetLocalListVersionReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlocallistversion/GetLocalListVersionReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlocallistversion/GetLocalListVersionReq.kt)
 - Kotlin `GetLocalListVersionResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlocallistversion/GetLocalListVersionResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlocallistversion/GetLocalListVersionResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §D02 Get Local List Version — pdf-page 123 (`grep -n 'pdf-page 123]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.23 GetLocalListVersion — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.23.1 GetLocalListVersionRequest — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.23.2 GetLocalListVersionResponse — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §D02 Get Local List Version — pdf-page 123
+- spec: `ocpp-2.0.1-part2-specification` §1.23 GetLocalListVersion — pdf-page 358
+- spec: `ocpp-2.0.1-part2-specification` §1.23.1 GetLocalListVersionRequest — pdf-page 358
+- spec: `ocpp-2.0.1-part2-specification` §1.23.2 GetLocalListVersionResponse — pdf-page 358
 
 ### getLocalListVersion request
 
@@ -1116,10 +1120,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETLOG`
 - Kotlin `GetLogReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlog/GetLogReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlog/GetLogReq.kt)
 - Kotlin `GetLogResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlog/GetLogResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getlog/GetLogResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.24 GetLog — pdf-page 358 (`grep -n 'pdf-page 358]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.24.1 GetLogRequest — pdf-page 359 (`grep -n 'pdf-page 359]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.24.2 GetLogResponse — pdf-page 359 (`grep -n 'pdf-page 359]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'GetLog' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.24 GetLog — pdf-page 358
+- spec: `ocpp-2.0.1-part2-specification` §1.24.1 GetLogRequest — pdf-page 359
+- spec: `ocpp-2.0.1-part2-specification` §1.24.2 GetLogResponse — pdf-page 359
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### getLog request
 
@@ -1165,12 +1169,12 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETMONITORINGREPORT`
 - Kotlin `GetMonitoringReportReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getmonitoringreport/GetMonitoringReportReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getmonitoringreport/GetMonitoringReportReq.kt)
 - Kotlin `GetMonitoringReportResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getmonitoringreport/GetMonitoringReportResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getmonitoringreport/GetMonitoringReportResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §N02 Get Monitoring report — pdf-page 314 (`grep -n 'pdf-page 314]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.25 GetMonitoringReport — pdf-page 359 (`grep -n 'pdf-page 359]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.25.1 GetMonitoringReportRequest — pdf-page 359 (`grep -n 'pdf-page 359]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.25.2 GetMonitoringReportResponse — pdf-page 359 (`grep -n 'pdf-page 359]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'GetMonitoringReport' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 99 (`grep -n 'GetMonitoringReport' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §N02 Get Monitoring report — pdf-page 314
+- spec: `ocpp-2.0.1-part2-specification` §1.25 GetMonitoringReport — pdf-page 359
+- spec: `ocpp-2.0.1-part2-specification` §1.25.1 GetMonitoringReportRequest — pdf-page 359
+- spec: `ocpp-2.0.1-part2-specification` §1.25.2 GetMonitoringReportResponse — pdf-page 359
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 99
 
 ### getMonitoringReport request
 
@@ -1226,11 +1230,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETREPORT`
 - Kotlin `GetReportReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getreport/GetReportReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getreport/GetReportReq.kt)
 - Kotlin `GetReportResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getreport/GetReportResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getreport/GetReportResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.26 GetReport — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.26.1 GetReportRequest — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.26.2 GetReportResponse — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7, 70 (`grep -n 'GetReport' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 99 (`grep -n 'GetReport' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.26 GetReport — pdf-page 360
+- spec: `ocpp-2.0.1-part2-specification` §1.26.1 GetReportRequest — pdf-page 360
+- spec: `ocpp-2.0.1-part2-specification` §1.26.2 GetReportResponse — pdf-page 360
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7, 70
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 99
 
 ### getReport request
 
@@ -1286,9 +1290,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETTRANSACTIONSTATUS`
 - Kotlin `GetTransactionStatusReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/gettransactionstatus/GetTransactionStatusReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/gettransactionstatus/GetTransactionStatusReq.kt)
 - Kotlin `GetTransactionStatusResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/gettransactionstatus/GetTransactionStatusResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/gettransactionstatus/GetTransactionStatusResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.27 GetTransactionStatus — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.27.1 GetTransactionStatusRequest — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.27.2 GetTransactionStatusResponse — pdf-page 360 (`grep -n 'pdf-page 360]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.27 GetTransactionStatus — pdf-page 360
+- spec: `ocpp-2.0.1-part2-specification` §1.27.1 GetTransactionStatusRequest — pdf-page 360
+- spec: `ocpp-2.0.1-part2-specification` §1.27.2 GetTransactionStatusResponse — pdf-page 360
 
 ### getTransactionStatus request
 
@@ -1315,11 +1319,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.GETVARIABLES`
 - Kotlin `GetVariablesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getvariables/GetVariablesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getvariables/GetVariablesReq.kt)
 - Kotlin `GetVariablesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getvariables/GetVariablesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/getvariables/GetVariablesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §B06 Get Variables — pdf-page 64 (`grep -n 'pdf-page 64]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.28 GetVariables — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.28.1 GetVariablesRequest — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.28.2 GetVariablesResponse — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 14, 70 (`grep -n 'GetVariables' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §B06 Get Variables — pdf-page 64
+- spec: `ocpp-2.0.1-part2-specification` §1.28 GetVariables — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.28.1 GetVariablesRequest — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.28.2 GetVariablesResponse — pdf-page 361
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 14, 70
 
 ### getVariables request
 
@@ -1393,11 +1397,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.HEARTBEAT`
 - Kotlin `HeartbeatReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/heartbeat/HeartbeatReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/heartbeat/HeartbeatReq.kt)
 - Kotlin `HeartbeatResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/heartbeat/HeartbeatResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/heartbeat/HeartbeatResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §G02 Heartbeat — pdf-page 195 (`grep -n 'pdf-page 195]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.29 Heartbeat — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.29.1 HeartbeatRequest — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.29.2 HeartbeatResponse — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §2.1.5 HeartbeatInterval — pdf-page 431 (`grep -n 'pdf-page 431]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §G02 Heartbeat — pdf-page 195
+- spec: `ocpp-2.0.1-part2-specification` §1.29 Heartbeat — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.29.1 HeartbeatRequest — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.29.2 HeartbeatResponse — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §2.1.5 HeartbeatInterval — pdf-page 431
 
 ### heartbeat request
 
@@ -1422,9 +1426,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.INSTALLCERTIFICATE`
 - Kotlin `InstallCertificateReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/installcertificate/InstallCertificateReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/installcertificate/InstallCertificateReq.kt)
 - Kotlin `InstallCertificateResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/installcertificate/InstallCertificateResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/installcertificate/InstallCertificateResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.30 InstallCertificate — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.30.1 InstallCertificateRequest — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.30.2 InstallCertificateResponse — pdf-page 361 (`grep -n 'pdf-page 361]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.30 InstallCertificate — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.30.1 InstallCertificateRequest — pdf-page 361
+- spec: `ocpp-2.0.1-part2-specification` §1.30.2 InstallCertificateResponse — pdf-page 361
 
 ### installCertificate request
 
@@ -1461,11 +1465,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.LOGSTATUSNOTIFICATION`
 - Kotlin `LogStatusNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/logstatusnotification/LogStatusNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/logstatusnotification/LogStatusNotificationReq.kt)
 - Kotlin `LogStatusNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/logstatusnotification/LogStatusNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/logstatusnotification/LogStatusNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.31 LogStatusNotification — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.31.1 LogStatusNotificationRequest — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.31.2 LogStatusNotificationResponse — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'LogStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 95 (`grep -n 'LogStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.31 LogStatusNotification — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.31.1 LogStatusNotificationRequest — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.31.2 LogStatusNotificationResponse — pdf-page 362
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 95
 
 ### logStatusNotification request
 
@@ -1495,11 +1499,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.METERVALUES`
 - Kotlin `MeterValuesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/metervalues/MeterValuesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/metervalues/MeterValuesReq.kt)
 - Kotlin `MeterValuesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/metervalues/MeterValuesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/metervalues/MeterValuesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §3.1 MeterValues — pdf-page 227 (`grep -n 'pdf-page 227]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.32 MeterValues — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.32.1 MeterValuesRequest — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.32.2 MeterValuesResponse — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 54, 60 (`grep -n 'MeterValues' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §3.1 MeterValues — pdf-page 227
+- spec: `ocpp-2.0.1-part2-specification` §1.32 MeterValues — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.32.1 MeterValuesRequest — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.32.2 MeterValuesResponse — pdf-page 362
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 54, 60
 
 ### meterValues request
 
@@ -1555,10 +1559,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYCHARGINGLIMIT`
 - Kotlin `NotifyChargingLimitReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycharginglimit/NotifyChargingLimitReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycharginglimit/NotifyChargingLimitReq.kt)
 - Kotlin `NotifyChargingLimitResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycharginglimit/NotifyChargingLimitResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycharginglimit/NotifyChargingLimitResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §3 NotifyChargingLimitRequest — pdf-page 242 (`grep -n 'pdf-page 242]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.33 NotifyChargingLimit — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.33.1 NotifyChargingLimitRequest — pdf-page 362 (`grep -n 'pdf-page 362]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.33.2 NotifyChargingLimitResponse — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §3 NotifyChargingLimitRequest — pdf-page 242
+- spec: `ocpp-2.0.1-part2-specification` §1.33 NotifyChargingLimit — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.33.1 NotifyChargingLimitRequest — pdf-page 362
+- spec: `ocpp-2.0.1-part2-specification` §1.33.2 NotifyChargingLimitResponse — pdf-page 363
 
 ### notifyChargingLimit request
 
@@ -1634,10 +1638,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYCUSTOMERINFORMATION`
 - Kotlin `NotifyCustomerInformationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycustomerinformation/NotifyCustomerInformationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycustomerinformation/NotifyCustomerInformationReq.kt)
 - Kotlin `NotifyCustomerInformationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycustomerinformation/NotifyCustomerInformationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifycustomerinformation/NotifyCustomerInformationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.34 NotifyCustomerInformation — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.34.1 NotifyCustomerInformationRequest — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.34.2 NotifyCustomerInformationResponse — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'NotifyCustomerInformation' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.34 NotifyCustomerInformation — pdf-page 363
+- spec: `ocpp-2.0.1-part2-specification` §1.34.1 NotifyCustomerInformationRequest — pdf-page 363
+- spec: `ocpp-2.0.1-part2-specification` §1.34.2 NotifyCustomerInformationResponse — pdf-page 363
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### notifyCustomerInformation request
 
@@ -1666,9 +1670,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYDISPLAYMESSAGES`
 - Kotlin `NotifyDisplayMessagesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifydisplaymessages/NotifyDisplayMessagesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifydisplaymessages/NotifyDisplayMessagesReq.kt)
 - Kotlin `NotifyDisplayMessagesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifydisplaymessages/NotifyDisplayMessagesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifydisplaymessages/NotifyDisplayMessagesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.35 NotifyDisplayMessages — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.35.1 NotifyDisplayMessagesRequest — pdf-page 363 (`grep -n 'pdf-page 363]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.35.2 NotifyDisplayMessagesResponse — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.35 NotifyDisplayMessages — pdf-page 363
+- spec: `ocpp-2.0.1-part2-specification` §1.35.1 NotifyDisplayMessagesRequest — pdf-page 363
+- spec: `ocpp-2.0.1-part2-specification` §1.35.2 NotifyDisplayMessagesResponse — pdf-page 364
 
 ### notifyDisplayMessages request
 
@@ -1725,11 +1729,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYEVCHARGINGNEEDS`
 - Kotlin `NotifyEVChargingNeedsReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingneeds/NotifyEVChargingNeedsReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingneeds/NotifyEVChargingNeedsReq.kt)
 - Kotlin `NotifyEVChargingNeedsResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingneeds/NotifyEVChargingNeedsResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingneeds/NotifyEVChargingNeedsResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.36 NotifyEVChargingNeeds — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.36.1 NotifyEVChargingNeedsRequest — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.36.2 NotifyEVChargingNeedsResponse — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 39, 41, 42 (`grep -n 'NotifyEVChargingNeeds' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 63 (`grep -n 'NotifyEVChargingNeeds' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.36 NotifyEVChargingNeeds — pdf-page 364
+- spec: `ocpp-2.0.1-part2-specification` §1.36.1 NotifyEVChargingNeedsRequest — pdf-page 364
+- spec: `ocpp-2.0.1-part2-specification` §1.36.2 NotifyEVChargingNeedsResponse — pdf-page 364
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 39, 41, 42
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 63
 
 ### notifyEVChargingNeeds request
 
@@ -1789,11 +1793,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYEVCHARGINGSCHEDULE`
 - Kotlin `NotifyEVChargingScheduleReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingschedule/NotifyEVChargingScheduleReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingschedule/NotifyEVChargingScheduleReq.kt)
 - Kotlin `NotifyEVChargingScheduleResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingschedule/NotifyEVChargingScheduleResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevchargingschedule/NotifyEVChargingScheduleResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §2 NotifyEVChargingScheduleRequest — pdf-page 242 (`grep -n 'pdf-page 242]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.37 NotifyEVChargingSchedule — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.37.1 NotifyEVChargingScheduleRequest — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.37.2 NotifyEVChargingScheduleResponse — pdf-page 364 (`grep -n 'pdf-page 364]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 40 (`grep -n 'NotifyEVChargingSchedule' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §2 NotifyEVChargingScheduleRequest — pdf-page 242
+- spec: `ocpp-2.0.1-part2-specification` §1.37 NotifyEVChargingSchedule — pdf-page 364
+- spec: `ocpp-2.0.1-part2-specification` §1.37.1 NotifyEVChargingScheduleRequest — pdf-page 364
+- spec: `ocpp-2.0.1-part2-specification` §1.37.2 NotifyEVChargingScheduleResponse — pdf-page 364
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 40
 
 ### notifyEVChargingSchedule request
 
@@ -1871,10 +1875,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYEVENT`
 - Kotlin `NotifyEventReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevent/NotifyEventReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevent/NotifyEventReq.kt)
 - Kotlin `NotifyEventResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevent/NotifyEventResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyevent/NotifyEventResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.38 NotifyEvent — pdf-page 365 (`grep -n 'pdf-page 365]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.38.1 NotifyEventRequest — pdf-page 365 (`grep -n 'pdf-page 365]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.38.2 NotifyEventResponse — pdf-page 365 (`grep -n 'pdf-page 365]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 2, 19 (`grep -n 'NotifyEvent' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.38 NotifyEvent — pdf-page 365
+- spec: `ocpp-2.0.1-part2-specification` §1.38.1 NotifyEventRequest — pdf-page 365
+- spec: `ocpp-2.0.1-part2-specification` §1.38.2 NotifyEventResponse — pdf-page 365
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 2, 19
 
 ### notifyEvent request
 
@@ -1935,10 +1939,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYMONITORINGREPORT`
 - Kotlin `NotifyMonitoringReportReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifymonitoringreport/NotifyMonitoringReportReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifymonitoringreport/NotifyMonitoringReportReq.kt)
 - Kotlin `NotifyMonitoringReportResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifymonitoringreport/NotifyMonitoringReportResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifymonitoringreport/NotifyMonitoringReportResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.39 NotifyMonitoringReport — pdf-page 365 (`grep -n 'pdf-page 365]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.39.1 NotifyMonitoringReportRequest — pdf-page 365 (`grep -n 'pdf-page 365]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.39.2 NotifyMonitoringReportResponse — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'NotifyMonitoringReport' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.39 NotifyMonitoringReport — pdf-page 365
+- spec: `ocpp-2.0.1-part2-specification` §1.39.1 NotifyMonitoringReportRequest — pdf-page 365
+- spec: `ocpp-2.0.1-part2-specification` §1.39.2 NotifyMonitoringReportResponse — pdf-page 366
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### notifyMonitoringReport request
 
@@ -1996,10 +2000,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.NOTIFYREPORT`
 - Kotlin `NotifyReportReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyreport/NotifyReportReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyreport/NotifyReportReq.kt)
 - Kotlin `NotifyReportResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyreport/NotifyReportResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/notifyreport/NotifyReportResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.40 NotifyReport — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.40.1 NotifyReportRequest — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.40.2 NotifyReportResponse — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'NotifyReport' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.40 NotifyReport — pdf-page 366
+- spec: `ocpp-2.0.1-part2-specification` §1.40.1 NotifyReportRequest — pdf-page 366
+- spec: `ocpp-2.0.1-part2-specification` §1.40.2 NotifyReportResponse — pdf-page 366
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### notifyReport request
 
@@ -2068,10 +2072,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.PUBLISHFIRMWARE`
 - Kotlin `PublishFirmwareReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmware/PublishFirmwareReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmware/PublishFirmwareReq.kt)
 - Kotlin `PublishFirmwareResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmware/PublishFirmwareResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmware/PublishFirmwareResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.41 PublishFirmware — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.41.1 PublishFirmwareRequest — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.41.2 PublishFirmwareResponse — pdf-page 366 (`grep -n 'pdf-page 366]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'PublishFirmware' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.41 PublishFirmware — pdf-page 366
+- spec: `ocpp-2.0.1-part2-specification` §1.41.1 PublishFirmwareRequest — pdf-page 366
+- spec: `ocpp-2.0.1-part2-specification` §1.41.2 PublishFirmwareResponse — pdf-page 366
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
 
 ### publishFirmware request
 
@@ -2110,11 +2114,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.PUBLISHFIRMWARESTATUSNOTIFICATION`
 - Kotlin `PublishFirmwareStatusNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmwarestatusnotification/PublishFirmwareStatusNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmwarestatusnotification/PublishFirmwareStatusNotificationReq.kt)
 - Kotlin `PublishFirmwareStatusNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmwarestatusnotification/PublishFirmwareStatusNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/publishfirmwarestatusnotification/PublishFirmwareStatusNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.42 PublishFirmwareStatusNotification — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.42.1 PublishFirmwareStatusNotificationRequest — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.42.2 PublishFirmwareStatusNotificationResponse — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'PublishFirmwareStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 73, 93, 102 (`grep -n 'PublishFirmwareStatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.42 PublishFirmwareStatusNotification — pdf-page 367
+- spec: `ocpp-2.0.1-part2-specification` §1.42.1 PublishFirmwareStatusNotificationRequest — pdf-page 367
+- spec: `ocpp-2.0.1-part2-specification` §1.42.2 PublishFirmwareStatusNotificationResponse — pdf-page 367
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 73, 93, 102
 
 ### publishFirmwareStatusNotification request
 
@@ -2146,10 +2150,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.REPORTCHARGINGPROFILES`
 - Kotlin `ReportChargingProfilesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reportchargingprofiles/ReportChargingProfilesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reportchargingprofiles/ReportChargingProfilesReq.kt)
 - Kotlin `ReportChargingProfilesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reportchargingprofiles/ReportChargingProfilesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reportchargingprofiles/ReportChargingProfilesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.43 ReportChargingProfiles — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.43.1 ReportChargingProfilesRequest — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.43.2 ReportChargingProfilesResponse — pdf-page 367 (`grep -n 'pdf-page 367]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7, 35 (`grep -n 'ReportChargingProfiles' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.43 ReportChargingProfiles — pdf-page 367
+- spec: `ocpp-2.0.1-part2-specification` §1.43.1 ReportChargingProfilesRequest — pdf-page 367
+- spec: `ocpp-2.0.1-part2-specification` §1.43.2 ReportChargingProfilesResponse — pdf-page 367
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7, 35
 
 ### reportChargingProfiles request
 
@@ -2236,11 +2240,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.REQUESTSTARTTRANSACTION`
 - Kotlin `RequestStartTransactionReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestart/RequestStartTransactionReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestart/RequestStartTransactionReq.kt)
 - Kotlin `RequestStartTransactionResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestart/RequestStartTransactionResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestart/RequestStartTransactionResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.44 RequestStartTransaction — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.44.1 RequestStartTransactionRequest — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.44.2 RequestStartTransactionResponse — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 16, 25, 26 (`grep -n 'RequestStartTransaction' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 96 (`grep -n 'RequestStartTransaction' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.44 RequestStartTransaction — pdf-page 368
+- spec: `ocpp-2.0.1-part2-specification` §1.44.1 RequestStartTransactionRequest — pdf-page 368
+- spec: `ocpp-2.0.1-part2-specification` §1.44.2 RequestStartTransactionResponse — pdf-page 368
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 16, 25, 26
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 96
 
 ### requestStartTransaction request
 
@@ -2353,9 +2357,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.REQUESTSTOPTRANSACTION`
 - Kotlin `RequestStopTransactionReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestop/RequestStopTransactionReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestop/RequestStopTransactionReq.kt)
 - Kotlin `RequestStopTransactionResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestop/RequestStopTransactionResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/remotestop/RequestStopTransactionResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.45 RequestStopTransaction — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.45.1 RequestStopTransactionRequest — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.45.2 RequestStopTransactionResponse — pdf-page 368 (`grep -n 'pdf-page 368]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.45 RequestStopTransaction — pdf-page 368
+- spec: `ocpp-2.0.1-part2-specification` §1.45.1 RequestStopTransactionRequest — pdf-page 368
+- spec: `ocpp-2.0.1-part2-specification` §1.45.2 RequestStopTransactionResponse — pdf-page 368
 
 ### requestStopTransaction request
 
@@ -2390,10 +2394,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.RESERVATIONSTATUSUPDATE`
 - Kotlin `ReservationStatusUpdateReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservationstatusupdate/ReservationStatusUpdateReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservationstatusupdate/ReservationStatusUpdateReq.kt)
 - Kotlin `ReservationStatusUpdateResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservationstatusupdate/ReservationStatusUpdateResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservationstatusupdate/ReservationStatusUpdateResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.46 ReservationStatusUpdate — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.46.1 ReservationStatusUpdateRequest — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.46.2 ReservationStatusUpdateResponse — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 51 (`grep -n 'ReservationStatusUpdate' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.46 ReservationStatusUpdate — pdf-page 369
+- spec: `ocpp-2.0.1-part2-specification` §1.46.1 ReservationStatusUpdateRequest — pdf-page 369
+- spec: `ocpp-2.0.1-part2-specification` §1.46.2 ReservationStatusUpdateResponse — pdf-page 369
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 51
 
 ### reservationStatusUpdate request
 
@@ -2423,10 +2427,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.RESERVENOW`
 - Kotlin `ReserveNowReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservenow/ReserveNowReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservenow/ReserveNowReq.kt)
 - Kotlin `ReserveNowResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservenow/ReserveNowResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reservenow/ReserveNowResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.47 ReserveNow — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.47.1 ReserveNowRequest — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.47.2 ReserveNowResponse — pdf-page 369 (`grep -n 'pdf-page 369]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 96 (`grep -n 'ReserveNow' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.47 ReserveNow — pdf-page 369
+- spec: `ocpp-2.0.1-part2-specification` §1.47.1 ReserveNowRequest — pdf-page 369
+- spec: `ocpp-2.0.1-part2-specification` §1.47.2 ReserveNowResponse — pdf-page 369
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 96
 
 ### reserveNow request
 
@@ -2486,13 +2490,13 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.RESET`
 - Kotlin `ResetReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reset/ResetReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reset/ResetReq.kt)
 - Kotlin `ResetResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reset/ResetResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/reset/ResetResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.48 Reset — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.48.1 ResetRequest — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.48.2 ResetResponse — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §3.74 ResetEnumType — pdf-page 423 (`grep -n 'pdf-page 423]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §2.1.14 ResetRetries — pdf-page 433 (`grep -n 'pdf-page 433]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- changelog mentions: `changelog-2.0-to-2.0.1` pdf-page 8 (`grep -n 'Reset' docs/protocol/spec/2.0.1/changelog-2.0-to-2.0.1.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 28, 29, 30, 110 (`grep -n 'Reset' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.48 Reset — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.48.1 ResetRequest — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.48.2 ResetResponse — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §3.74 ResetEnumType — pdf-page 423
+- spec: `ocpp-2.0.1-part2-specification` §2.1.14 ResetRetries — pdf-page 433
+- changelog mentions: `changelog-2.0-to-2.0.1` pdf-page 8
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 28, 29, 30, 110
 
 ### reset request
 
@@ -2529,11 +2533,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SECURITYEVENTNOTIFICATION`
 - Kotlin `SecurityEventNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/securityeventnotification/SecurityEventNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/securityeventnotification/SecurityEventNotificationReq.kt)
 - Kotlin `SecurityEventNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/securityeventnotification/SecurityEventNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/securityeventnotification/SecurityEventNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §A04 Security Event Notification — pdf-page 48 (`grep -n 'pdf-page 48]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.49 SecurityEventNotification — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.49.1 SecurityEventNotificationRequest — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.49.2 SecurityEventNotificationResponse — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 54 (`grep -n 'SecurityEventNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §A04 Security Event Notification — pdf-page 48
+- spec: `ocpp-2.0.1-part2-specification` §1.49 SecurityEventNotification — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.49.1 SecurityEventNotificationRequest — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.49.2 SecurityEventNotificationResponse — pdf-page 370
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 54
 
 ### securityEventNotification request
 
@@ -2560,11 +2564,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SENDLOCALLIST`
 - Kotlin `SendLocalListReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/sendlocallist/SendLocalListReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/sendlocallist/SendLocalListReq.kt)
 - Kotlin `SendLocalListResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/sendlocallist/SendLocalListResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/sendlocallist/SendLocalListResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.50 SendLocalList — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.50.1 SendLocalListRequest — pdf-page 370 (`grep -n 'pdf-page 370]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.50.2 SendLocalListResponse — pdf-page 371 (`grep -n 'pdf-page 371]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 71 (`grep -n 'SendLocalList' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 114 (`grep -n 'SendLocalList' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.50 SendLocalList — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.50.1 SendLocalListRequest — pdf-page 370
+- spec: `ocpp-2.0.1-part2-specification` §1.50.2 SendLocalListResponse — pdf-page 371
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 71
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 114
 
 ### sendLocalList request
 
@@ -2643,12 +2647,12 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETCHARGINGPROFILE`
 - Kotlin `SetChargingProfileReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setchargingprofile/SetChargingProfileReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setchargingprofile/SetChargingProfileReq.kt)
 - Kotlin `SetChargingProfileResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setchargingprofile/SetChargingProfileResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setchargingprofile/SetChargingProfileResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §K01 SetChargingProfile — pdf-page 243 (`grep -n 'pdf-page 243]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.51 SetChargingProfile — pdf-page 371 (`grep -n 'pdf-page 371]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.51.1 SetChargingProfileRequest — pdf-page 371 (`grep -n 'pdf-page 371]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.51.2 SetChargingProfileResponse — pdf-page 371 (`grep -n 'pdf-page 371]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 35, 41 (`grep -n 'SetChargingProfile' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 57, 58, 59, 71 (`grep -n 'SetChargingProfile' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §K01 SetChargingProfile — pdf-page 243
+- spec: `ocpp-2.0.1-part2-specification` §1.51 SetChargingProfile — pdf-page 371
+- spec: `ocpp-2.0.1-part2-specification` §1.51.1 SetChargingProfileRequest — pdf-page 371
+- spec: `ocpp-2.0.1-part2-specification` §1.51.2 SetChargingProfileResponse — pdf-page 371
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 35, 41
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 57, 58, 59, 71
 
 ### setChargingProfile request
 
@@ -2738,10 +2742,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETDISPLAYMESSAGE`
 - Kotlin `SetDisplayMessageReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setdisplaymessage/SetDisplayMessageReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setdisplaymessage/SetDisplayMessageReq.kt)
 - Kotlin `SetDisplayMessageResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setdisplaymessage/SetDisplayMessageResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setdisplaymessage/SetDisplayMessageResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §O01 Set DisplayMessage — pdf-page 331 (`grep -n 'pdf-page 331]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.52 SetDisplayMessage — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.52.1 SetDisplayMessageRequest — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.52.2 SetDisplayMessageResponse — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §O01 Set DisplayMessage — pdf-page 331
+- spec: `ocpp-2.0.1-part2-specification` §1.52 SetDisplayMessage — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.52.1 SetDisplayMessageRequest — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.52.2 SetDisplayMessageResponse — pdf-page 372
 
 ### setDisplayMessage request
 
@@ -2803,11 +2807,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETMONITORINGBASE`
 - Kotlin `SetMonitoringBaseReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringbase/SetMonitoringBaseReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringbase/SetMonitoringBaseReq.kt)
 - Kotlin `SetMonitoringBaseResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringbase/SetMonitoringBaseResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringbase/SetMonitoringBaseResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §N03 Set Monitoring Base — pdf-page 315 (`grep -n 'pdf-page 315]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.53 SetMonitoringBase — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.53.1 SetMonitoringBaseRequest — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.53.2 SetMonitoringBaseResponse — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 108, 109 (`grep -n 'SetMonitoringBase' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §N03 Set Monitoring Base — pdf-page 315
+- spec: `ocpp-2.0.1-part2-specification` §1.53 SetMonitoringBase — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.53.1 SetMonitoringBaseRequest — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.53.2 SetMonitoringBaseResponse — pdf-page 372
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 108, 109
 
 ### setMonitoringBase request
 
@@ -2843,11 +2847,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETMONITORINGLEVEL`
 - Kotlin `SetMonitoringLevelReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringlevel/SetMonitoringLevelReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringlevel/SetMonitoringLevelReq.kt)
 - Kotlin `SetMonitoringLevelResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringlevel/SetMonitoringLevelResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setmonitoringlevel/SetMonitoringLevelResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §N05 Set Monitoring Level — pdf-page 319 (`grep -n 'pdf-page 319]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.54 SetMonitoringLevel — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.54.1 SetMonitoringLevelRequest — pdf-page 372 (`grep -n 'pdf-page 372]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.54.2 SetMonitoringLevelResponse — pdf-page 373 (`grep -n 'pdf-page 373]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec **(errata)**: `ocpp-2.0-part2-errata` §N05 Set Monitoring Level) — pdf-page 86 (`grep -n 'pdf-page 86]]' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §N05 Set Monitoring Level — pdf-page 319
+- spec: `ocpp-2.0.1-part2-specification` §1.54 SetMonitoringLevel — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.54.1 SetMonitoringLevelRequest — pdf-page 372
+- spec: `ocpp-2.0.1-part2-specification` §1.54.2 SetMonitoringLevelResponse — pdf-page 373
+- spec **(errata)**: `ocpp-2.0-part2-errata` §N05 Set Monitoring Level) — pdf-page 86
 
 ### setMonitoringLevel request
 
@@ -2882,9 +2886,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETNETWORKPROFILE`
 - Kotlin `SetNetworkProfileReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setnetworkprofile/SetNetworkProfileReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setnetworkprofile/SetNetworkProfileReq.kt)
 - Kotlin `SetNetworkProfileResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setnetworkprofile/SetNetworkProfileResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setnetworkprofile/SetNetworkProfileResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.55 SetNetworkProfile — pdf-page 373 (`grep -n 'pdf-page 373]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.55.1 SetNetworkProfileRequest — pdf-page 373 (`grep -n 'pdf-page 373]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.55.2 SetNetworkProfileResponse — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.55 SetNetworkProfile — pdf-page 373
+- spec: `ocpp-2.0.1-part2-specification` §1.55.1 SetNetworkProfileRequest — pdf-page 373
+- spec: `ocpp-2.0.1-part2-specification` §1.55.2 SetNetworkProfileResponse — pdf-page 374
 
 ### setNetworkProfile request
 
@@ -2952,11 +2956,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETVARIABLEMONITORING`
 - Kotlin `SetVariableMonitoringReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariablemonitoring/SetVariableMonitoringReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariablemonitoring/SetVariableMonitoringReq.kt)
 - Kotlin `SetVariableMonitoringResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariablemonitoring/SetVariableMonitoringResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariablemonitoring/SetVariableMonitoringResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §N04 Set Variable Monitoring — pdf-page 316 (`grep -n 'pdf-page 316]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.56 SetVariableMonitoring — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.56.1 SetVariableMonitoringRequest — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.56.2 SetVariableMonitoringResponse — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 72 (`grep -n 'SetVariableMonitoring' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §N04 Set Variable Monitoring — pdf-page 316
+- spec: `ocpp-2.0.1-part2-specification` §1.56 SetVariableMonitoring — pdf-page 374
+- spec: `ocpp-2.0.1-part2-specification` §1.56.1 SetVariableMonitoringRequest — pdf-page 374
+- spec: `ocpp-2.0.1-part2-specification` §1.56.2 SetVariableMonitoringResponse — pdf-page 374
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 72
 
 ### setVariableMonitoring request
 
@@ -3035,11 +3039,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SETVARIABLES`
 - Kotlin `SetVariablesReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariables/SetVariablesReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariables/SetVariablesReq.kt)
 - Kotlin `SetVariablesResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariables/SetVariablesResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/setvariables/SetVariablesResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §B05 Set Variables — pdf-page 62 (`grep -n 'pdf-page 62]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.57 SetVariables — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.57.1 SetVariablesRequest — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.57.2 SetVariablesResponse — pdf-page 374 (`grep -n 'pdf-page 374]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 14, 70 (`grep -n 'SetVariables' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §B05 Set Variables — pdf-page 62
+- spec: `ocpp-2.0.1-part2-specification` §1.57 SetVariables — pdf-page 374
+- spec: `ocpp-2.0.1-part2-specification` §1.57.1 SetVariablesRequest — pdf-page 374
+- spec: `ocpp-2.0.1-part2-specification` §1.57.2 SetVariablesResponse — pdf-page 374
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 14, 70
 
 ### setVariables request
 
@@ -3113,10 +3117,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.SIGNCERTIFICATE`
 - Kotlin `SignCertificateReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/signcertificate/SignCertificateReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/signcertificate/SignCertificateReq.kt)
 - Kotlin `SignCertificateResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/signcertificate/SignCertificateResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/signcertificate/SignCertificateResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.58 SignCertificate — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.58.1 SignCertificateRequest — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.58.2 SignCertificateResponse — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 108 (`grep -n 'SignCertificate' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.58 SignCertificate — pdf-page 375
+- spec: `ocpp-2.0.1-part2-specification` §1.58.1 SignCertificateRequest — pdf-page 375
+- spec: `ocpp-2.0.1-part2-specification` §1.58.2 SignCertificateResponse — pdf-page 375
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 108
 
 ### signCertificate request
 
@@ -3153,12 +3157,12 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.STATUSNOTIFICATION`
 - Kotlin `StatusNotificationReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/statusnotification/StatusNotificationReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/statusnotification/StatusNotificationReq.kt)
 - Kotlin `StatusNotificationResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/statusnotification/StatusNotificationResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/statusnotification/StatusNotificationResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §G01 Status Notification — pdf-page 194 (`grep -n 'pdf-page 194]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.59 StatusNotification — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.59.1 StatusNotificationRequest — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.59.2 StatusNotificationResponse — pdf-page 375 (`grep -n 'pdf-page 375]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 16, 26, 28, 69 (`grep -n 'StatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 118 (`grep -n 'StatusNotification' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §G01 Status Notification — pdf-page 194
+- spec: `ocpp-2.0.1-part2-specification` §1.59 StatusNotification — pdf-page 375
+- spec: `ocpp-2.0.1-part2-specification` §1.59.1 StatusNotificationRequest — pdf-page 375
+- spec: `ocpp-2.0.1-part2-specification` §1.59.2 StatusNotificationResponse — pdf-page 375
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 16, 26, 28, 69
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 118
 
 ### statusNotification request
 
@@ -3190,14 +3194,14 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.TRANSACTIONEVENT`
 - Kotlin `TransactionEventReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/transactionevent/TransactionEventReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/transactionevent/TransactionEventReq.kt)
 - Kotlin `TransactionEventResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/transactionevent/TransactionEventResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/transactionevent/TransactionEventResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1 TransactionEventRequest — pdf-page 136 (`grep -n 'pdf-page 136]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §4 TransactionEventRequest — pdf-page 242 (`grep -n 'pdf-page 242]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.60 TransactionEvent — pdf-page 376 (`grep -n 'pdf-page 376]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.60.1 TransactionEventRequest — pdf-page 376 (`grep -n 'pdf-page 376]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.60.2 TransactionEventResponse — pdf-page 376 (`grep -n 'pdf-page 376]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §3.80 TransactionEventEnumType — pdf-page 424 (`grep -n 'pdf-page 424]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 17, 19, 26, 28, 31, 72 (`grep -n 'TransactionEvent' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 66 (`grep -n 'TransactionEvent' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1 TransactionEventRequest — pdf-page 136
+- spec: `ocpp-2.0.1-part2-specification` §4 TransactionEventRequest — pdf-page 242
+- spec: `ocpp-2.0.1-part2-specification` §1.60 TransactionEvent — pdf-page 376
+- spec: `ocpp-2.0.1-part2-specification` §1.60.1 TransactionEventRequest — pdf-page 376
+- spec: `ocpp-2.0.1-part2-specification` §1.60.2 TransactionEventResponse — pdf-page 376
+- spec: `ocpp-2.0.1-part2-specification` §3.80 TransactionEventEnumType — pdf-page 424
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 3, 17, 19, 26, 28, 31, 72
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 66
 
 ### transactionEvent request
 
@@ -3324,12 +3328,12 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.TRIGGERMESSAGE`
 - Kotlin `TriggerMessageReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/triggermessage/TriggerMessageReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/triggermessage/TriggerMessageReq.kt)
 - Kotlin `TriggerMessageResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/triggermessage/TriggerMessageResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/triggermessage/TriggerMessageResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §F06 Trigger Message — pdf-page 189 (`grep -n 'pdf-page 189]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.61 TriggerMessage — pdf-page 377 (`grep -n 'pdf-page 377]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.61.1 TriggerMessageRequest — pdf-page 377 (`grep -n 'pdf-page 377]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.61.2 TriggerMessageResponse — pdf-page 377 (`grep -n 'pdf-page 377]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'TriggerMessage' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 48 (`grep -n 'TriggerMessage' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §F06 Trigger Message — pdf-page 189
+- spec: `ocpp-2.0.1-part2-specification` §1.61 TriggerMessage — pdf-page 377
+- spec: `ocpp-2.0.1-part2-specification` §1.61.1 TriggerMessageRequest — pdf-page 377
+- spec: `ocpp-2.0.1-part2-specification` §1.61.2 TriggerMessageResponse — pdf-page 377
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 48
 
 ### triggerMessage request
 
@@ -3370,10 +3374,10 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.UNLOCKCONNECTOR`
 - Kotlin `UnlockConnectorReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unlockconnector/UnlockConnectorReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unlockconnector/UnlockConnectorReq.kt)
 - Kotlin `UnlockConnectorResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unlockconnector/UnlockConnectorResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unlockconnector/UnlockConnectorResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §2.2 Unlock Connector — pdf-page 187 (`grep -n 'pdf-page 187]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.62 UnlockConnector — pdf-page 377 (`grep -n 'pdf-page 377]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.62.1 UnlockConnectorRequest — pdf-page 377 (`grep -n 'pdf-page 377]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.62.2 UnlockConnectorResponse — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §2.2 Unlock Connector — pdf-page 187
+- spec: `ocpp-2.0.1-part2-specification` §1.62 UnlockConnector — pdf-page 377
+- spec: `ocpp-2.0.1-part2-specification` §1.62.1 UnlockConnectorRequest — pdf-page 377
+- spec: `ocpp-2.0.1-part2-specification` §1.62.2 UnlockConnectorResponse — pdf-page 378
 
 ### unlockConnector request
 
@@ -3409,9 +3413,9 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.UNPUBLISHFIRMWARE`
 - Kotlin `UnpublishFirmwareReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unpublishfirmware/UnpublishFirmwareReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unpublishfirmware/UnpublishFirmwareReq.kt)
 - Kotlin `UnpublishFirmwareResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unpublishfirmware/UnpublishFirmwareResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/unpublishfirmware/UnpublishFirmwareResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.63 UnpublishFirmware — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.63.1 UnpublishFirmwareRequest — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.63.2 UnpublishFirmwareResponse — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.63 UnpublishFirmware — pdf-page 378
+- spec: `ocpp-2.0.1-part2-specification` §1.63.1 UnpublishFirmwareRequest — pdf-page 378
+- spec: `ocpp-2.0.1-part2-specification` §1.63.2 UnpublishFirmwareResponse — pdf-page 378
 
 ### unpublishFirmware request
 
@@ -3441,11 +3445,11 @@ No schema file `Get15118EVCertificateResponse.json` — payloads of this directi
 - registry entry: `Actions.UPDATEFIRMWARE`
 - Kotlin `UpdateFirmwareReq`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/updatefirmware/UpdateFirmwareReq.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/updatefirmware/UpdateFirmwareReq.kt)
 - Kotlin `UpdateFirmwareResp`: [`ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/updatefirmware/UpdateFirmwareResp.kt`](../../ocpp-2-0-core/src/main/kotlin/com/izivia/ocpp/core20/model/updatefirmware/UpdateFirmwareResp.kt)
-- spec: `ocpp-2.0.1-part2-specification` §1.64 UpdateFirmware — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.64.1 UpdateFirmwareRequest — pdf-page 378 (`grep -n 'pdf-page 378]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- spec: `ocpp-2.0.1-part2-specification` §1.64.2 UpdateFirmwareResponse — pdf-page 379 (`grep -n 'pdf-page 379]]' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.txt`)
-- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7 (`grep -n 'UpdateFirmware' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.txt`)
-- errata mentions: `ocpp-2.0-part2-errata` pdf-page 74 (`grep -n 'UpdateFirmware' docs/protocol/spec/2.0.1/ocpp-2.0-part2-errata.txt`)
+- spec: `ocpp-2.0.1-part2-specification` §1.64 UpdateFirmware — pdf-page 378
+- spec: `ocpp-2.0.1-part2-specification` §1.64.1 UpdateFirmwareRequest — pdf-page 378
+- spec: `ocpp-2.0.1-part2-specification` §1.64.2 UpdateFirmwareResponse — pdf-page 379
+- errata mentions: `ocpp-2.0.1-part2-errata` pdf-page 7
+- errata mentions: `ocpp-2.0-part2-errata` pdf-page 74
 
 ### updateFirmware request
 

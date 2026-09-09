@@ -1,6 +1,8 @@
 # OCPP 1.6 — protocol reference
 
-**Generated — do not edit.** Run `python3 docs/protocol/generate.py` to refresh.
+**Derived from the official OCPP JSON schemas, the version's `Actions` registry and the OCA
+specification documents.** Maintained by hand: an action added to `Actions` or a schema change
+belongs in this file in the same commit.
 
 Derived from the official OCPP JSON schemas in `ocpp-1-6-json/src/main/resources/` and the action registry in `ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/common/enumeration/Actions.kt`. For the normative prose, see [SPECS.md](SPECS.md).
 
@@ -14,17 +16,19 @@ grep -n 'idTag' docs/protocol/OCPP-1.6.md
 
 ## Specification documents
 
-Each action below cites the section and PDF page of the normative document. The extracted text is grep-able too:
+Each action below cites the section and PDF page of the normative document. Page numbers are
+PDF page positions in these documents, which OCA distributes at
+<https://www.openchargealliance.org/downloads/>:
 
-| document | role | pages | extracted text |
-|---|---|--:|---|
-| OCPP 1.6 edition 2 (FINAL, 2017-09-28) | spec | 116 | `docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt` |
-| OCPP 1.6 Security Whitepaper | spec | 67 | `docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt` |
-| OCPP-J 1.6 (JSON over WebSocket) | transport | 22 | `docs/protocol/spec/1.6/ocpp-j-1.6-specification.txt` |
-| OCPP-S 1.6 (SOAP) | transport | 14 | `docs/protocol/spec/1.6/ocpp-s-1.6-specification.txt` |
-| OCPP 1.6 errata sheet | errata | 46 | `docs/protocol/spec/1.6/ocpp-1.6-errata.txt` |
-| OCPP-J 1.6 errata sheet | errata | 13 | `docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt` |
-| OCPP-S 1.6 errata sheet | errata | 4 | `docs/protocol/spec/1.6/ocpp-s-1.6-errata.txt` |
+| document | role | pages |
+|---|---|--:|
+| OCPP 1.6 edition 2 (FINAL, 2017-09-28) | spec | 116 |
+| OCPP 1.6 Security Whitepaper | spec | 67 |
+| OCPP-J 1.6 (JSON over WebSocket) | transport | 22 |
+| OCPP-S 1.6 (SOAP) | transport | 14 |
+| OCPP 1.6 errata sheet | errata | 46 |
+| OCPP-J 1.6 errata sheet | errata | 13 |
+| OCPP-S 1.6 errata sheet | errata | 4 |
 
 ## Actions at a glance
 
@@ -76,10 +80,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.AUTHORIZE`
 - Kotlin `AuthorizeReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/authorize/AuthorizeReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/authorize/AuthorizeReq.kt)
 - Kotlin `AuthorizeResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/authorize/AuthorizeResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/authorize/AuthorizeResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.1 Authorize — pdf-page 37 (`grep -n 'pdf-page 37]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.1 Authorize.req — pdf-page 65 (`grep -n 'pdf-page 65]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.2 Authorize.conf — pdf-page 65 (`grep -n 'pdf-page 65]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 28, 42, 43 (`grep -n 'Authorize' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.1 Authorize — pdf-page 37
+- spec: `ocpp-1.6-edition-2` §6.1 Authorize.req — pdf-page 65
+- spec: `ocpp-1.6-edition-2` §6.2 Authorize.conf — pdf-page 65
+- errata mentions: `ocpp-1.6-errata` pdf-page 28, 42, 43
 
 ### authorize request
 
@@ -104,12 +108,12 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.BOOTNOTIFICATION`
 - Kotlin `BootNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/bootnotification/BootNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/bootnotification/BootNotificationReq.kt)
 - Kotlin `BootNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/bootnotification/BootNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/bootnotification/BootNotificationResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.2 Boot Notification — pdf-page 37 (`grep -n 'pdf-page 37]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.3 BootNotification.req — pdf-page 65 (`grep -n 'pdf-page 65]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.4 BootNotification.conf — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-s-1.6-specification` §7.1 BootNotification — pdf-page 13 (`grep -n 'pdf-page 13]]' docs/protocol/spec/1.6/ocpp-s-1.6-specification.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 6, 12, 16, 17, 20, 33, 41 (`grep -n 'BootNotification' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
-- errata mentions: `ocpp-j-1.6-errata` pdf-page 10, 11, 12 (`grep -n 'BootNotification' docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.2 Boot Notification — pdf-page 37
+- spec: `ocpp-1.6-edition-2` §6.3 BootNotification.req — pdf-page 65
+- spec: `ocpp-1.6-edition-2` §6.4 BootNotification.conf — pdf-page 66
+- spec: `ocpp-s-1.6-specification` §7.1 BootNotification — pdf-page 13
+- errata mentions: `ocpp-1.6-errata` pdf-page 6, 12, 16, 17, 20, 33, 41
+- errata mentions: `ocpp-j-1.6-errata` pdf-page 10, 11, 12
 
 ### bootNotification request
 
@@ -141,10 +145,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CANCELRESERVATION`
 - Kotlin `CancelReservationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/cancelreservation/CancelReservationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/cancelreservation/CancelReservationReq.kt)
 - Kotlin `CancelReservationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/cancelreservation/CancelReservationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/cancelreservation/CancelReservationResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.1 Cancel Reservation — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.5 CancelReservation.req — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.6 CancelReservation.conf — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.5 CancelReservationStatus — pdf-page 81 (`grep -n 'pdf-page 81]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
+- spec: `ocpp-1.6-edition-2` §5.1 Cancel Reservation — pdf-page 50
+- spec: `ocpp-1.6-edition-2` §6.5 CancelReservation.req — pdf-page 66
+- spec: `ocpp-1.6-edition-2` §6.6 CancelReservation.conf — pdf-page 66
+- spec: `ocpp-1.6-edition-2` §7.5 CancelReservationStatus — pdf-page 81
 
 ### cancelReservation request
 
@@ -166,8 +170,8 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CERTIFICATESIGNED`
 - Kotlin `CertificateSignedReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/certificatesigned/CertificateSignedReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/certificatesigned/CertificateSignedReq.kt)
 - Kotlin `CertificateSignedResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/certificatesigned/CertificateSignedResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/certificatesigned/CertificateSignedResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.1 CertificateSigned.req — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.2 CertificateSigned.conf — pdf-page 49 (`grep -n 'pdf-page 49]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.1 CertificateSigned.req — pdf-page 49
+- spec: `ocpp-1.6-security-whitepaper` §5.2 CertificateSigned.conf — pdf-page 49
 
 ### certificateSigned request
 
@@ -193,9 +197,9 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CHANGEAVAILABILITY`
 - Kotlin `ChangeAvailabilityReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeavailability/ChangeAvailabilityReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeavailability/ChangeAvailabilityReq.kt)
 - Kotlin `ChangeAvailabilityResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeavailability/ChangeAvailabilityResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeavailability/ChangeAvailabilityResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.2 Change Availability — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.7 ChangeAvailability.req — pdf-page 66 (`grep -n 'pdf-page 66]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.8 ChangeAvailability.conf — pdf-page 67 (`grep -n 'pdf-page 67]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
+- spec: `ocpp-1.6-edition-2` §5.2 Change Availability — pdf-page 50
+- spec: `ocpp-1.6-edition-2` §6.7 ChangeAvailability.req — pdf-page 66
+- spec: `ocpp-1.6-edition-2` §6.8 ChangeAvailability.conf — pdf-page 67
 
 ### changeAvailability request
 
@@ -218,10 +222,10 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CHANGECONFIGURATION`
 - Kotlin `ChangeConfigurationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeconfiguration/ChangeConfigurationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeconfiguration/ChangeConfigurationReq.kt)
 - Kotlin `ChangeConfigurationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeconfiguration/ChangeConfigurationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/changeconfiguration/ChangeConfigurationResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.3 Change Configuration — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.9 ChangeConfiguration.req — pdf-page 67 (`grep -n 'pdf-page 67]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.10 ChangeConfiguration.conf — pdf-page 67 (`grep -n 'pdf-page 67]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 9, 46 (`grep -n 'ChangeConfiguration' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.3 Change Configuration — pdf-page 50
+- spec: `ocpp-1.6-edition-2` §6.9 ChangeConfiguration.req — pdf-page 67
+- spec: `ocpp-1.6-edition-2` §6.10 ChangeConfiguration.conf — pdf-page 67
+- errata mentions: `ocpp-1.6-errata` pdf-page 9, 46
 
 ### changeConfiguration request
 
@@ -244,11 +248,11 @@ Each action below cites the section and PDF page of the normative document. The 
 - registry entry: `Actions.CLEARCACHE`
 - Kotlin `ClearCacheReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearcache/ClearCacheReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearcache/ClearCacheReq.kt)
 - Kotlin `ClearCacheResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearcache/ClearCacheResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearcache/ClearCacheResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.4 Clear Cache — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.11 ClearCache.req — pdf-page 67 (`grep -n 'pdf-page 67]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.12 ClearCache.conf — pdf-page 68 (`grep -n 'pdf-page 68]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.20 ClearCacheStatus — pdf-page 87 (`grep -n 'pdf-page 87]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 12, 42 (`grep -n 'ClearCache' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.4 Clear Cache — pdf-page 51
+- spec: `ocpp-1.6-edition-2` §6.11 ClearCache.req — pdf-page 67
+- spec: `ocpp-1.6-edition-2` §6.12 ClearCache.conf — pdf-page 68
+- spec: `ocpp-1.6-edition-2` §7.20 ClearCacheStatus — pdf-page 87
+- errata mentions: `ocpp-1.6-errata` pdf-page 12, 42
 
 ### clearCache request
 
@@ -270,11 +274,11 @@ _No fields: empty payload._
 - registry entry: `Actions.CLEARCHARGINGPROFILE`
 - Kotlin `ClearChargingProfileReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearchargingprofile/ClearChargingProfileReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearchargingprofile/ClearChargingProfileReq.kt)
 - Kotlin `ClearChargingProfileResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearchargingprofile/ClearChargingProfileResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/clearchargingprofile/ClearChargingProfileResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.5 Clear Charging Profile — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.13 ClearChargingProfile.req — pdf-page 68 (`grep -n 'pdf-page 68]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.14 ClearChargingProfile.conf — pdf-page 68 (`grep -n 'pdf-page 68]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.21 ClearChargingProfileStatus — pdf-page 88 (`grep -n 'pdf-page 88]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 13, 42 (`grep -n 'ClearChargingProfile' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.5 Clear Charging Profile — pdf-page 52
+- spec: `ocpp-1.6-edition-2` §6.13 ClearChargingProfile.req — pdf-page 68
+- spec: `ocpp-1.6-edition-2` §6.14 ClearChargingProfile.conf — pdf-page 68
+- spec: `ocpp-1.6-edition-2` §7.21 ClearChargingProfileStatus — pdf-page 88
+- errata mentions: `ocpp-1.6-errata` pdf-page 13, 42
 
 ### clearChargingProfile request
 
@@ -299,11 +303,11 @@ _No fields: empty payload._
 - registry entry: `Actions.DATATRANSFER`
 - Kotlin `DataTransferReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/datatransfer/DataTransferReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/datatransfer/DataTransferReq.kt)
 - Kotlin `DataTransferResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/datatransfer/DataTransferResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/datatransfer/DataTransferResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.3 Data Transfer — pdf-page 39 (`grep -n 'pdf-page 39]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §5.6 Data Transfer — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.15 DataTransfer.req — pdf-page 68 (`grep -n 'pdf-page 68]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.16 DataTransfer.conf — pdf-page 69 (`grep -n 'pdf-page 69]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.23 DataTransferStatus — pdf-page 88 (`grep -n 'pdf-page 88]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
+- spec: `ocpp-1.6-edition-2` §4.3 Data Transfer — pdf-page 39
+- spec: `ocpp-1.6-edition-2` §5.6 Data Transfer — pdf-page 52
+- spec: `ocpp-1.6-edition-2` §6.15 DataTransfer.req — pdf-page 68
+- spec: `ocpp-1.6-edition-2` §6.16 DataTransfer.conf — pdf-page 69
+- spec: `ocpp-1.6-edition-2` §7.23 DataTransferStatus — pdf-page 88
 
 ### dataTransfer request
 
@@ -328,8 +332,8 @@ _No fields: empty payload._
 - registry entry: `Actions.DELETECERTIFICATE`
 - Kotlin `DeleteCertificateReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/deletecertificate/DeleteCertificateReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/deletecertificate/DeleteCertificateReq.kt)
 - Kotlin `DeleteCertificateResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/deletecertificate/DeleteCertificateResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/deletecertificate/DeleteCertificateResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.3 DeleteCertificate.req — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.4 DeleteCertificate.conf — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.3 DeleteCertificate.req — pdf-page 50
+- spec: `ocpp-1.6-security-whitepaper` §5.4 DeleteCertificate.conf — pdf-page 50
 
 ### deleteCertificate request
 
@@ -360,10 +364,10 @@ _No fields: empty payload._
 - registry entry: `Actions.DIAGNOSTICSSTATUSNOTIFICATION`
 - Kotlin `DiagnosticsStatusNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationReq.kt)
 - Kotlin `DiagnosticsStatusNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/diagnosticsstatusnotification/DiagnosticsStatusNotificationResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.4 Diagnostics Status Notification — pdf-page 39 (`grep -n 'pdf-page 39]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.17 DiagnosticsStatusNotification.req — pdf-page 69 (`grep -n 'pdf-page 69]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.18 DiagnosticsStatusNotification.conf — pdf-page 69 (`grep -n 'pdf-page 69]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 14, 15 (`grep -n 'DiagnosticsStatusNotification' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.4 Diagnostics Status Notification — pdf-page 39
+- spec: `ocpp-1.6-edition-2` §6.17 DiagnosticsStatusNotification.req — pdf-page 69
+- spec: `ocpp-1.6-edition-2` §6.18 DiagnosticsStatusNotification.conf — pdf-page 69
+- errata mentions: `ocpp-1.6-errata` pdf-page 14, 15
 
 ### diagnosticsStatusNotification request
 
@@ -385,8 +389,8 @@ _No fields: empty payload._
 - registry entry: `Actions.EXTENDEDTRIGGERMESSAGE`
 - Kotlin `ExtendedTriggerMessageReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/extendedtriggermessage/ExtendedTriggerMessageReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/extendedtriggermessage/ExtendedTriggerMessageReq.kt)
 - Kotlin `ExtendedTriggerMessageResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/extendedtriggermessage/ExtendedTriggerMessageResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/extendedtriggermessage/ExtendedTriggerMessageResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.5 ExtendedTriggerMessage.req — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.6 ExtendedTriggerMessage.conf — pdf-page 50 (`grep -n 'pdf-page 50]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.5 ExtendedTriggerMessage.req — pdf-page 50
+- spec: `ocpp-1.6-security-whitepaper` §5.6 ExtendedTriggerMessage.conf — pdf-page 50
 
 ### extendedTriggerMessage request
 
@@ -414,10 +418,10 @@ _No fields: empty payload._
 - registry entry: `Actions.FIRMWARESTATUSNOTIFICATION`
 - Kotlin `FirmwareStatusNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/firmwarestatusnotification/FirmwareStatusNotificationReq.kt)
 - Kotlin `FirmwareStatusNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/firmwarestatusnotification/FirmwareStatusNotificationResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.5 Firmware Status Notification — pdf-page 39 (`grep -n 'pdf-page 39]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.19 FirmwareStatusNotification.req — pdf-page 69 (`grep -n 'pdf-page 69]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.20 FirmwareStatusNotification.conf — pdf-page 70 (`grep -n 'pdf-page 70]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 6, 19, 20 (`grep -n 'FirmwareStatusNotification' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.5 Firmware Status Notification — pdf-page 39
+- spec: `ocpp-1.6-edition-2` §6.19 FirmwareStatusNotification.req — pdf-page 69
+- spec: `ocpp-1.6-edition-2` §6.20 FirmwareStatusNotification.conf — pdf-page 70
+- errata mentions: `ocpp-1.6-errata` pdf-page 6, 19, 20
 
 ### firmwareStatusNotification request
 
@@ -439,11 +443,11 @@ _No fields: empty payload._
 - registry entry: `Actions.GETCOMPOSITESCHEDULE`
 - Kotlin `GetCompositeScheduleReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getcompositeschedule/GetCompositeScheduleReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getcompositeschedule/GetCompositeScheduleReq.kt)
 - Kotlin `GetCompositeScheduleResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getcompositeschedule/GetCompositeScheduleResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getcompositeschedule/GetCompositeScheduleResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.7 Get Composite Schedule — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.21 GetCompositeSchedule.req — pdf-page 70 (`grep -n 'pdf-page 70]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.22 GetCompositeSchedule.conf — pdf-page 70 (`grep -n 'pdf-page 70]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.26 GetCompositeScheduleStatus — pdf-page 89 (`grep -n 'pdf-page 89]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 13, 14, 21, 23, 36, 44 (`grep -n 'GetCompositeSchedule' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.7 Get Composite Schedule — pdf-page 52
+- spec: `ocpp-1.6-edition-2` §6.21 GetCompositeSchedule.req — pdf-page 70
+- spec: `ocpp-1.6-edition-2` §6.22 GetCompositeSchedule.conf — pdf-page 70
+- spec: `ocpp-1.6-edition-2` §7.26 GetCompositeScheduleStatus — pdf-page 89
+- errata mentions: `ocpp-1.6-errata` pdf-page 13, 14, 21, 23, 36, 44
 
 ### getCompositeSchedule request
 
@@ -478,11 +482,11 @@ _No fields: empty payload._
 - registry entry: `Actions.GETCONFIGURATION`
 - Kotlin `GetConfigurationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getconfiguration/GetConfigurationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getconfiguration/GetConfigurationReq.kt)
 - Kotlin `GetConfigurationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getconfiguration/GetConfigurationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getconfiguration/GetConfigurationResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.8 Get Configuration — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.23 GetConfiguration.req — pdf-page 70 (`grep -n 'pdf-page 70]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.24 GetConfiguration.conf — pdf-page 71 (`grep -n 'pdf-page 71]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §9.1.9 GetConfigurationMaxKeys — pdf-page 104 (`grep -n 'pdf-page 104]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 43 (`grep -n 'GetConfiguration' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.8 Get Configuration — pdf-page 53
+- spec: `ocpp-1.6-edition-2` §6.23 GetConfiguration.req — pdf-page 70
+- spec: `ocpp-1.6-edition-2` §6.24 GetConfiguration.conf — pdf-page 71
+- spec: `ocpp-1.6-edition-2` §9.1.9 GetConfigurationMaxKeys — pdf-page 104
+- errata mentions: `ocpp-1.6-errata` pdf-page 43
 
 ### getConfiguration request
 
@@ -510,10 +514,10 @@ _No fields: empty payload._
 - registry entry: `Actions.GETDIAGNOSTICS`
 - Kotlin `GetDiagnosticsReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getdiagnostics/GetDiagnosticsReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getdiagnostics/GetDiagnosticsReq.kt)
 - Kotlin `GetDiagnosticsResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getdiagnostics/GetDiagnosticsResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getdiagnostics/GetDiagnosticsResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.9 Get Diagnostics — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.25 GetDiagnostics.req — pdf-page 71 (`grep -n 'pdf-page 71]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.26 GetDiagnostics.conf — pdf-page 71 (`grep -n 'pdf-page 71]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 14, 15 (`grep -n 'GetDiagnostics' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.9 Get Diagnostics — pdf-page 53
+- spec: `ocpp-1.6-edition-2` §6.25 GetDiagnostics.req — pdf-page 71
+- spec: `ocpp-1.6-edition-2` §6.26 GetDiagnostics.conf — pdf-page 71
+- errata mentions: `ocpp-1.6-errata` pdf-page 14, 15
 
 ### getDiagnostics request
 
@@ -539,8 +543,8 @@ _No fields: empty payload._
 - registry entry: `Actions.GETINSTALLEDCERTIFICATEIDS`
 - Kotlin `GetInstalledCertificateIdsReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getinstalledcertificateids/GetInstalledCertificateIdsReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getinstalledcertificateids/GetInstalledCertificateIdsReq.kt)
 - Kotlin `GetInstalledCertificateIdsResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getinstalledcertificateids/GetInstalledCertificateIdsResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getinstalledcertificateids/GetInstalledCertificateIdsResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.7 GetInstalledCertificateIds.req — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.8 GetInstalledCertificateIds.conf — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.7 GetInstalledCertificateIds.req — pdf-page 51
+- spec: `ocpp-1.6-security-whitepaper` §5.8 GetInstalledCertificateIds.conf — pdf-page 51
 
 ### getInstalledCertificateIds request
 
@@ -573,10 +577,10 @@ _No fields: empty payload._
 - registry entry: `Actions.GETLOCALLISTVERSION`
 - Kotlin `GetLocalListVersionReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlocallistversion/GetLocalListVersionReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlocallistversion/GetLocalListVersionReq.kt)
 - Kotlin `GetLocalListVersionResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlocallistversion/GetLocalListVersionResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlocallistversion/GetLocalListVersionResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.10 Get Local List Version — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.27 GetLocalListVersion.req — pdf-page 71 (`grep -n 'pdf-page 71]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.28 GetLocalListVersion.conf — pdf-page 72 (`grep -n 'pdf-page 72]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 21, 22 (`grep -n 'GetLocalListVersion' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.10 Get Local List Version — pdf-page 54
+- spec: `ocpp-1.6-edition-2` §6.27 GetLocalListVersion.req — pdf-page 71
+- spec: `ocpp-1.6-edition-2` §6.28 GetLocalListVersion.conf — pdf-page 72
+- errata mentions: `ocpp-1.6-errata` pdf-page 21, 22
 
 ### getLocalListVersion request
 
@@ -598,8 +602,8 @@ _No fields: empty payload._
 - registry entry: `Actions.GETLOG`
 - Kotlin `GetLogReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlog/GetLogReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlog/GetLogReq.kt)
 - Kotlin `GetLogResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlog/GetLogResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/getlog/GetLogResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.9 GetLog.req — pdf-page 51 (`grep -n 'pdf-page 51]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.10 GetLog.conf — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.9 GetLog.req — pdf-page 51
+- spec: `ocpp-1.6-security-whitepaper` §5.10 GetLog.conf — pdf-page 52
 
 ### getLog request
 
@@ -634,10 +638,10 @@ _No fields: empty payload._
 - registry entry: `Actions.HEARTBEAT`
 - Kotlin `HeartbeatReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/heartbeat/HeartbeatReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/heartbeat/HeartbeatReq.kt)
 - Kotlin `HeartbeatResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/heartbeat/HeartbeatResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/heartbeat/HeartbeatResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.6 Heartbeat — pdf-page 40 (`grep -n 'pdf-page 40]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.29 Heartbeat.req — pdf-page 72 (`grep -n 'pdf-page 72]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.30 Heartbeat.conf — pdf-page 72 (`grep -n 'pdf-page 72]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §9.1.10 HeartbeatInterval — pdf-page 104 (`grep -n 'pdf-page 104]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
+- spec: `ocpp-1.6-edition-2` §4.6 Heartbeat — pdf-page 40
+- spec: `ocpp-1.6-edition-2` §6.29 Heartbeat.req — pdf-page 72
+- spec: `ocpp-1.6-edition-2` §6.30 Heartbeat.conf — pdf-page 72
+- spec: `ocpp-1.6-edition-2` §9.1.10 HeartbeatInterval — pdf-page 104
 
 ### heartbeat request
 
@@ -659,8 +663,8 @@ _No fields: empty payload._
 - registry entry: `Actions.INSTALLCERTIFICATE`
 - Kotlin `InstallCertificateReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/installcertificate/InstallCertificateReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/installcertificate/InstallCertificateReq.kt)
 - Kotlin `InstallCertificateResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/installcertificate/InstallCertificateResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/installcertificate/InstallCertificateResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.11 InstallCertificate.req — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.12 InstallCertificate.conf — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.11 InstallCertificate.req — pdf-page 52
+- spec: `ocpp-1.6-security-whitepaper` §5.12 InstallCertificate.conf — pdf-page 52
 
 ### installCertificate request
 
@@ -688,8 +692,8 @@ _No fields: empty payload._
 - registry entry: `Actions.LOGSTATUSNOTIFICATION`
 - Kotlin `LogStatusNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/logstatusnotification/LogStatusNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/logstatusnotification/LogStatusNotificationReq.kt)
 - Kotlin `LogStatusNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/logstatusnotification/LogStatusNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/logstatusnotification/LogStatusNotificationResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.13 LogStatusNotification.req — pdf-page 52 (`grep -n 'pdf-page 52]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.14 LogStatusNotification.conf — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.13 LogStatusNotification.req — pdf-page 52
+- spec: `ocpp-1.6-security-whitepaper` §5.14 LogStatusNotification.conf — pdf-page 53
 
 ### logStatusNotification request
 
@@ -716,11 +720,11 @@ _No fields: empty payload._
 - registry entry: `Actions.METERVALUES`
 - Kotlin `MeterValuesReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/metervalues/MeterValuesReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/metervalues/MeterValuesReq.kt)
 - Kotlin `MeterValuesResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/metervalues/MeterValuesResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/metervalues/MeterValuesResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.7 Meter Values — pdf-page 40 (`grep -n 'pdf-page 40]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.31 MeterValues.req — pdf-page 72 (`grep -n 'pdf-page 72]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.32 MeterValues.conf — pdf-page 72 (`grep -n 'pdf-page 72]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 4, 6, 7, 8, 9, 10, 19, 41, 45 (`grep -n 'MeterValues' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
-- errata mentions: `ocpp-j-1.6-errata` pdf-page 3 (`grep -n 'MeterValues' docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.7 Meter Values — pdf-page 40
+- spec: `ocpp-1.6-edition-2` §6.31 MeterValues.req — pdf-page 72
+- spec: `ocpp-1.6-edition-2` §6.32 MeterValues.conf — pdf-page 72
+- errata mentions: `ocpp-1.6-errata` pdf-page 4, 6, 7, 8, 9, 10, 19, 41, 45
+- errata mentions: `ocpp-j-1.6-errata` pdf-page 3
 
 ### meterValues request
 
@@ -753,10 +757,10 @@ _No fields: empty payload._
 - registry entry: `Actions.REMOTESTARTTRANSACTION`
 - Kotlin `RemoteStartTransactionReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestart/RemoteStartTransactionReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestart/RemoteStartTransactionReq.kt)
 - Kotlin `RemoteStartTransactionResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestart/RemoteStartTransactionResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestart/RemoteStartTransactionResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.11 Remote Start Transaction — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.33 RemoteStartTransaction.req — pdf-page 73 (`grep -n 'pdf-page 73]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.34 RemoteStartTransaction.conf — pdf-page 73 (`grep -n 'pdf-page 73]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 15, 18, 26 (`grep -n 'RemoteStartTransaction' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.11 Remote Start Transaction — pdf-page 54
+- spec: `ocpp-1.6-edition-2` §6.33 RemoteStartTransaction.req — pdf-page 73
+- spec: `ocpp-1.6-edition-2` §6.34 RemoteStartTransaction.conf — pdf-page 73
+- errata mentions: `ocpp-1.6-errata` pdf-page 15, 18, 26
 
 ### remoteStartTransaction request
 
@@ -797,10 +801,10 @@ _No fields: empty payload._
 - registry entry: `Actions.REMOTESTOPTRANSACTION`
 - Kotlin `RemoteStopTransactionReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestop/RemoteStopTransactionReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestop/RemoteStopTransactionReq.kt)
 - Kotlin `RemoteStopTransactionResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestop/RemoteStopTransactionResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/remotestop/RemoteStopTransactionResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.12 Remote Stop Transaction — pdf-page 55 (`grep -n 'pdf-page 55]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.35 RemoteStopTransaction.req — pdf-page 73 (`grep -n 'pdf-page 73]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.36 RemoteStopTransaction.conf — pdf-page 73 (`grep -n 'pdf-page 73]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 15 (`grep -n 'RemoteStopTransaction' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.12 Remote Stop Transaction — pdf-page 55
+- spec: `ocpp-1.6-edition-2` §6.35 RemoteStopTransaction.req — pdf-page 73
+- spec: `ocpp-1.6-edition-2` §6.36 RemoteStopTransaction.conf — pdf-page 73
+- errata mentions: `ocpp-1.6-errata` pdf-page 15
 
 ### remoteStopTransaction request
 
@@ -822,9 +826,9 @@ _No fields: empty payload._
 - registry entry: `Actions.RESERVENOW`
 - Kotlin `ReserveNowReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reservenow/ReserveNowReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reservenow/ReserveNowReq.kt)
 - Kotlin `ReserveNowResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reservenow/ReserveNowResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reservenow/ReserveNowResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.13 Reserve Now — pdf-page 56 (`grep -n 'pdf-page 56]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.37 ReserveNow.req — pdf-page 73 (`grep -n 'pdf-page 73]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.38 ReserveNow.conf — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
+- spec: `ocpp-1.6-edition-2` §5.13 Reserve Now — pdf-page 56
+- spec: `ocpp-1.6-edition-2` §6.37 ReserveNow.req — pdf-page 73
+- spec: `ocpp-1.6-edition-2` §6.38 ReserveNow.conf — pdf-page 74
 
 ### reserveNow request
 
@@ -850,13 +854,13 @@ _No fields: empty payload._
 - registry entry: `Actions.RESET`
 - Kotlin `ResetReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reset/ResetReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reset/ResetReq.kt)
 - Kotlin `ResetResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reset/ResetResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/reset/ResetResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.14 Reset — pdf-page 57 (`grep -n 'pdf-page 57]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.39 Reset.req — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.40 Reset.conf — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.41 ResetStatus — pdf-page 97 (`grep -n 'pdf-page 97]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.42 ResetType — pdf-page 97 (`grep -n 'pdf-page 97]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §9.1.22 ResetRetries — pdf-page 107 (`grep -n 'pdf-page 107]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 16, 20, 32, 43 (`grep -n 'Reset' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.14 Reset — pdf-page 57
+- spec: `ocpp-1.6-edition-2` §6.39 Reset.req — pdf-page 74
+- spec: `ocpp-1.6-edition-2` §6.40 Reset.conf — pdf-page 74
+- spec: `ocpp-1.6-edition-2` §7.41 ResetStatus — pdf-page 97
+- spec: `ocpp-1.6-edition-2` §7.42 ResetType — pdf-page 97
+- spec: `ocpp-1.6-edition-2` §9.1.22 ResetRetries — pdf-page 107
+- errata mentions: `ocpp-1.6-errata` pdf-page 16, 20, 32, 43
 
 ### reset request
 
@@ -878,9 +882,9 @@ _No fields: empty payload._
 - registry entry: `Actions.SECURITYEVENTNOTIFICATION`
 - Kotlin `SecurityEventNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/securityeventnotification/SecurityEventNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/securityeventnotification/SecurityEventNotificationReq.kt)
 - Kotlin `SecurityEventNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/securityeventnotification/SecurityEventNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/securityeventnotification/SecurityEventNotificationResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §A04 Security Event Notification — pdf-page 37 (`grep -n 'pdf-page 37]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.15 SecurityEventNotification.req — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.16 SecurityEventNotification.conf — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §A04 Security Event Notification — pdf-page 37
+- spec: `ocpp-1.6-security-whitepaper` §5.15 SecurityEventNotification.req — pdf-page 53
+- spec: `ocpp-1.6-security-whitepaper` §5.16 SecurityEventNotification.conf — pdf-page 53
 
 ### securityEventNotification request
 
@@ -904,11 +908,11 @@ _No fields: empty payload._
 - registry entry: `Actions.SENDLOCALLIST`
 - Kotlin `SendLocalListReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/sendlocallist/SendLocalListReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/sendlocallist/SendLocalListReq.kt)
 - Kotlin `SendLocalListResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/sendlocallist/SendLocalListResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/sendlocallist/SendLocalListResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.15 Send Local List — pdf-page 57 (`grep -n 'pdf-page 57]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.41 SendLocalList.req — pdf-page 74 (`grep -n 'pdf-page 74]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.42 SendLocalList.conf — pdf-page 75 (`grep -n 'pdf-page 75]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 21 (`grep -n 'SendLocalList' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
-- errata mentions: `ocpp-j-1.6-errata` pdf-page 3, 11 (`grep -n 'SendLocalList' docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.15 Send Local List — pdf-page 57
+- spec: `ocpp-1.6-edition-2` §6.41 SendLocalList.req — pdf-page 74
+- spec: `ocpp-1.6-edition-2` §6.42 SendLocalList.conf — pdf-page 75
+- errata mentions: `ocpp-1.6-errata` pdf-page 21
+- errata mentions: `ocpp-j-1.6-errata` pdf-page 3, 11
 
 ### sendLocalList request
 
@@ -937,10 +941,10 @@ _No fields: empty payload._
 - registry entry: `Actions.SETCHARGINGPROFILE`
 - Kotlin `SetChargingProfileReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/setchargingprofile/SetChargingProfileReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/setchargingprofile/SetChargingProfileReq.kt)
 - Kotlin `SetChargingProfileResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/setchargingprofile/SetChargingProfileResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/setchargingprofile/SetChargingProfileResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.16 Set Charging Profile — pdf-page 58 (`grep -n 'pdf-page 58]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.43 SetChargingProfile.req — pdf-page 75 (`grep -n 'pdf-page 75]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.44 SetChargingProfile.conf — pdf-page 75 (`grep -n 'pdf-page 75]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 16, 17, 22, 44 (`grep -n 'SetChargingProfile' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.16 Set Charging Profile — pdf-page 58
+- spec: `ocpp-1.6-edition-2` §6.43 SetChargingProfile.req — pdf-page 75
+- spec: `ocpp-1.6-edition-2` §6.44 SetChargingProfile.conf — pdf-page 75
+- errata mentions: `ocpp-1.6-errata` pdf-page 16, 17, 22, 44
 
 ### setChargingProfile request
 
@@ -980,8 +984,8 @@ _No fields: empty payload._
 - registry entry: `Actions.SIGNCERTIFICATE`
 - Kotlin `SignCertificateReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signcertificate/SignCertificateReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signcertificate/SignCertificateReq.kt)
 - Kotlin `SignCertificateResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signcertificate/SignCertificateResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signcertificate/SignCertificateResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.17 SignCertificate.req — pdf-page 53 (`grep -n 'pdf-page 53]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.18 SignCertificate.conf — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.17 SignCertificate.req — pdf-page 53
+- spec: `ocpp-1.6-security-whitepaper` §5.18 SignCertificate.conf — pdf-page 54
 
 ### signCertificate request
 
@@ -1007,8 +1011,8 @@ _No fields: empty payload._
 - registry entry: `Actions.SIGNEDFIRMWARESTATUSNOTIFICATION`
 - Kotlin `SignedFirmwareStatusNotificationReq`: _class file not found_
 - Kotlin `SignedFirmwareStatusNotificationResp`: _class file not found_
-- spec: `ocpp-1.6-security-whitepaper` §5.19 SignedFirmwareStatusNotification.req — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.20 SignedFirmwareStatusNotification.conf — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.19 SignedFirmwareStatusNotification.req — pdf-page 54
+- spec: `ocpp-1.6-security-whitepaper` §5.20 SignedFirmwareStatusNotification.conf — pdf-page 54
 
 ### signedFirmwareStatusNotification request
 
@@ -1035,8 +1039,8 @@ _No fields: empty payload._
 - registry entry: `Actions.SIGNEDUPDATEFIRMWARE`
 - Kotlin `SignedUpdateFirmwareReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signedupdatefirmware/SignedUpdateFirmwareReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signedupdatefirmware/SignedUpdateFirmwareReq.kt)
 - Kotlin `SignedUpdateFirmwareResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signedupdatefirmware/SignedUpdateFirmwareResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/signedupdatefirmware/SignedUpdateFirmwareResp.kt)
-- spec: `ocpp-1.6-security-whitepaper` §5.21 SignedUpdateFirmware.req — pdf-page 54 (`grep -n 'pdf-page 54]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
-- spec: `ocpp-1.6-security-whitepaper` §5.22 SignedUpdateFirmware.conf — pdf-page 55 (`grep -n 'pdf-page 55]]' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.txt`)
+- spec: `ocpp-1.6-security-whitepaper` §5.21 SignedUpdateFirmware.req — pdf-page 54
+- spec: `ocpp-1.6-security-whitepaper` §5.22 SignedUpdateFirmware.conf — pdf-page 55
 
 ### signedUpdateFirmware request
 
@@ -1070,10 +1074,10 @@ _No fields: empty payload._
 - registry entry: `Actions.STARTTRANSACTION`
 - Kotlin `StartTransactionReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/starttransaction/StartTransactionReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/starttransaction/StartTransactionReq.kt)
 - Kotlin `StartTransactionResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/starttransaction/StartTransactionResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/starttransaction/StartTransactionResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.8 Start Transaction — pdf-page 42 (`grep -n 'pdf-page 42]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.45 StartTransaction.req — pdf-page 76 (`grep -n 'pdf-page 76]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.46 StartTransaction.conf — pdf-page 76 (`grep -n 'pdf-page 76]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 4, 10, 11, 22, 25 (`grep -n 'StartTransaction' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.8 Start Transaction — pdf-page 42
+- spec: `ocpp-1.6-edition-2` §6.45 StartTransaction.req — pdf-page 76
+- spec: `ocpp-1.6-edition-2` §6.46 StartTransaction.conf — pdf-page 76
+- errata mentions: `ocpp-1.6-errata` pdf-page 4, 10, 11, 22, 25
 
 ### startTransaction request
 
@@ -1103,10 +1107,10 @@ _No fields: empty payload._
 - registry entry: `Actions.STATUSNOTIFICATION`
 - Kotlin `StatusNotificationReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/statusnotification/StatusNotificationReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/statusnotification/StatusNotificationReq.kt)
 - Kotlin `StatusNotificationResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/statusnotification/StatusNotificationResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/statusnotification/StatusNotificationResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.9 Status Notification — pdf-page 43 (`grep -n 'pdf-page 43]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.47 StatusNotification.req — pdf-page 76 (`grep -n 'pdf-page 76]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.48 StatusNotification.conf — pdf-page 77 (`grep -n 'pdf-page 77]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 11, 12 (`grep -n 'StatusNotification' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.9 Status Notification — pdf-page 43
+- spec: `ocpp-1.6-edition-2` §6.47 StatusNotification.req — pdf-page 76
+- spec: `ocpp-1.6-edition-2` §6.48 StatusNotification.conf — pdf-page 77
+- errata mentions: `ocpp-1.6-errata` pdf-page 11, 12
 
 ### statusNotification request
 
@@ -1134,11 +1138,11 @@ _No fields: empty payload._
 - registry entry: `Actions.STOPTRANSACTION`
 - Kotlin `StopTransactionReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/stoptransaction/StopTransactionReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/stoptransaction/StopTransactionReq.kt)
 - Kotlin `StopTransactionResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/stoptransaction/StopTransactionResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/stoptransaction/StopTransactionResp.kt)
-- spec: `ocpp-1.6-edition-2` §4.10 Stop Transaction — pdf-page 48 (`grep -n 'pdf-page 48]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.49 StopTransaction.req — pdf-page 77 (`grep -n 'pdf-page 77]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.50 StopTransaction.conf — pdf-page 77 (`grep -n 'pdf-page 77]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 7, 8, 9, 16, 33, 35, 36, 41, 45 (`grep -n 'StopTransaction' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
-- errata mentions: `ocpp-j-1.6-errata` pdf-page 3, 9 (`grep -n 'StopTransaction' docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §4.10 Stop Transaction — pdf-page 48
+- spec: `ocpp-1.6-edition-2` §6.49 StopTransaction.req — pdf-page 77
+- spec: `ocpp-1.6-edition-2` §6.50 StopTransaction.conf — pdf-page 77
+- errata mentions: `ocpp-1.6-errata` pdf-page 7, 8, 9, 16, 33, 35, 36, 41, 45
+- errata mentions: `ocpp-j-1.6-errata` pdf-page 3, 9
 
 ### stopTransaction request
 
@@ -1177,11 +1181,11 @@ _No fields: empty payload._
 - registry entry: `Actions.TRIGGERMESSAGE`
 - Kotlin `TriggerMessageReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/triggermessage/TriggerMessageReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/triggermessage/TriggerMessageReq.kt)
 - Kotlin `TriggerMessageResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/triggermessage/TriggerMessageResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/triggermessage/TriggerMessageResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.17 Trigger Message — pdf-page 60 (`grep -n 'pdf-page 60]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.51 TriggerMessage.req — pdf-page 78 (`grep -n 'pdf-page 78]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.52 TriggerMessage.conf — pdf-page 78 (`grep -n 'pdf-page 78]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §7.44 TriggerMessageStatus — pdf-page 98 (`grep -n 'pdf-page 98]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 16, 17, 19 (`grep -n 'TriggerMessage' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.17 Trigger Message — pdf-page 60
+- spec: `ocpp-1.6-edition-2` §6.51 TriggerMessage.req — pdf-page 78
+- spec: `ocpp-1.6-edition-2` §6.52 TriggerMessage.conf — pdf-page 78
+- spec: `ocpp-1.6-edition-2` §7.44 TriggerMessageStatus — pdf-page 98
+- errata mentions: `ocpp-1.6-errata` pdf-page 16, 17, 19
 
 ### triggerMessage request
 
@@ -1204,10 +1208,10 @@ _No fields: empty payload._
 - registry entry: `Actions.UNLOCKCONNECTOR`
 - Kotlin `UnlockConnectorReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/unlockconnector/UnlockConnectorReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/unlockconnector/UnlockConnectorReq.kt)
 - Kotlin `UnlockConnectorResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/unlockconnector/UnlockConnectorResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/unlockconnector/UnlockConnectorResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.18 Unlock Connector — pdf-page 61 (`grep -n 'pdf-page 61]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.53 UnlockConnector.req — pdf-page 78 (`grep -n 'pdf-page 78]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.54 UnlockConnector.conf — pdf-page 78 (`grep -n 'pdf-page 78]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 34 (`grep -n 'UnlockConnector' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.18 Unlock Connector — pdf-page 61
+- spec: `ocpp-1.6-edition-2` §6.53 UnlockConnector.req — pdf-page 78
+- spec: `ocpp-1.6-edition-2` §6.54 UnlockConnector.conf — pdf-page 78
+- errata mentions: `ocpp-1.6-errata` pdf-page 34
 
 ### unlockConnector request
 
@@ -1229,11 +1233,11 @@ _No fields: empty payload._
 - registry entry: `Actions.UPDATEFIRMWARE`
 - Kotlin `UpdateFirmwareReq`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/updatefirmware/UpdateFirmwareReq.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/updatefirmware/UpdateFirmwareReq.kt)
 - Kotlin `UpdateFirmwareResp`: [`ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/updatefirmware/UpdateFirmwareResp.kt`](../../ocpp-1-6-core/src/main/kotlin/com/izivia/ocpp/core16/model/updatefirmware/UpdateFirmwareResp.kt)
-- spec: `ocpp-1.6-edition-2` §5.19 Update Firmware — pdf-page 62 (`grep -n 'pdf-page 62]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.55 UpdateFirmware.req — pdf-page 78 (`grep -n 'pdf-page 78]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- spec: `ocpp-1.6-edition-2` §6.56 UpdateFirmware.conf — pdf-page 79 (`grep -n 'pdf-page 79]]' docs/protocol/spec/1.6/ocpp-1.6-edition-2.txt`)
-- errata mentions: `ocpp-1.6-errata` pdf-page 19, 20, 24, 41, 42 (`grep -n 'UpdateFirmware' docs/protocol/spec/1.6/ocpp-1.6-errata.txt`)
-- errata mentions: `ocpp-j-1.6-errata` pdf-page 7 (`grep -n 'UpdateFirmware' docs/protocol/spec/1.6/ocpp-j-1.6-errata.txt`)
+- spec: `ocpp-1.6-edition-2` §5.19 Update Firmware — pdf-page 62
+- spec: `ocpp-1.6-edition-2` §6.55 UpdateFirmware.req — pdf-page 78
+- spec: `ocpp-1.6-edition-2` §6.56 UpdateFirmware.conf — pdf-page 79
+- errata mentions: `ocpp-1.6-errata` pdf-page 19, 20, 24, 41, 42
+- errata mentions: `ocpp-j-1.6-errata` pdf-page 7
 
 ### updateFirmware request
 

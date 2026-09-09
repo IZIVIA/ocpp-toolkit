@@ -2,9 +2,3 @@ build
 .gradle
 .idea
 .DS_Store
-__pycache__/
-
-# Extracted OCA specification text: verbatim copies of the specification
-# documents, kept local. The reference and index built from them ARE committed.
-# See docs/protocol/SPECS.md#licensing
-docs/protocol/spec/*/

@@ -258,7 +258,7 @@ separately — do not duplicate them here:
   (OCPP-S wire format).
 - [docs/protocol/](protocol/README.md) — the grep-able protocol reference: what fields each action
   carries in each version, who initiates it, and the section and page of the normative OCA document.
-  Committed, so no generation step; `generate.py` refreshes it after an `Actions` or schema change.
+  Maintained by hand — update it in the same commit as an `Actions` or schema change.
 
 Cross-cutting / non-versioned modules:
 
