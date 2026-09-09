@@ -279,10 +279,6 @@ version's `-core`/`-api` modules directly instead of the generic API.
   the callback object must implement the security interface for `CSMS` to register that facet.
   Looking for `getLog` on `CSMSOperations` and concluding it is unimplemented is the easy mistake
   here.
-- **The root README's usage examples are stale.** They reference class names like
-  `Ocpp16ConnectionToCSMS`/`Ocpp20ConnectionToCSMS` that do not exist in the current code; the real
-  entry points are the `ApiFactory.ocpp16ConnectionToCSMS`/`ocpp20ConnectionToCSMS` companion
-  functions on `toolkit`'s `ApiFactory`. See [toolkit/CLAUDE.md](../toolkit/CLAUDE.md).
 - **OCPP 1.5 has no working generic-API path.** `ocpp-1-5-api-adapter` exists as a Gradle module
   and is `api(...)`'d by `toolkit`, but ships no sources, so `ApiFactory.getCSMSApi` throws
   `NotImplementedError` for `OCPP_1_5`. Use the typed 1.5 API (`ocpp-1-5-api` + `ocpp-1-5-core`)

@@ -32,7 +32,7 @@ Aggregator/facade module: exposes `ApiFactory` and `CSMS`, the single entry poin
 Tests under `src/test` split into two groups:
 
 - **Run by default** — `ServerSettingSettingsTest.kt` (per-server `ServerSetting` wiring), `CSMSSecurityWiringTest.kt` (that the 1.6 security facet registers independently of the core one, i.e. the separate-`if` behaviour above), and `utils/KotlinInstantModuleTest.kt`.
-- **Opt-in integration examples** — `ExampleTest.kt`, `ExampleCSApiTest.kt`, `IntegrationTest.kt`, `IntegrationTestCSApi.kt`, `SteveTest.kt`, gated by `@EnabledIfSystemProperty` against a real CSMS (e.g. SteVe). They are not run by default and double as the **trustworthy usage documentation** for this module — prefer them over the root `README.md`, whose OCPP 1.6/2.0 examples reference `Ocpp16ConnectionToCSMS`-style classes that do not exist (the real entry points are the `ApiFactory` companion functions).
+- **Opt-in integration examples** — `ExampleTest.kt`, `ExampleCSApiTest.kt`, `IntegrationTest.kt`, `IntegrationTestCSApi.kt`, `SteveTest.kt`, gated by `@EnabledIfSystemProperty` against a real CSMS (e.g. SteVe). They are not run by default and are the **runnable reference** for this module; the root `README.md` mirrors them, so keep the two in step when a factory signature changes.
 
 ## See Also
 

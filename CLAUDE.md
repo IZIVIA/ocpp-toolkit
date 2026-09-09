@@ -79,9 +79,9 @@ Per-version families:
 - **`OcppVersion` is declared twice** — `com.izivia.ocpp.transport.OcppVersion` (`ocpp-transport`)
   and `com.izivia.ocpp.OcppVersion` (`ocpp-wamp`) — with identical entries and no derivation
   between them. A new protocol version must be added to both.
-- **The root README's OCPP 1.6/2.0 usage examples are stale** — they name connection classes that
-  do not exist. The real entry points are companion functions on `ApiFactory`; the opt-in tests in
-  `toolkit` are the trustworthy usage examples.
+- **`ApiFactory`'s companion functions are the only public entry points.** `ocpp16ConnectionToCSMS`
+  and friends are `companion object` members, not top-level or constructor calls. The opt-in tests
+  in `toolkit` are the runnable reference; the root `README.md` mirrors them.
 
 Start at [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) for setup, or
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) to understand the shape of the system.
