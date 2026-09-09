@@ -19,8 +19,11 @@ abstract class ResetMapper {
     @Named("convertResetStatus")
     fun convertResetStatus(status: ResetStatusEnumType): ResetStatus =
         when (status) {
+            ResetStatusEnumType.Accepted -> ResetStatus.Accepted
+            ResetStatusEnumType.Rejected -> ResetStatus.Rejected
+
+            // OCPP 1.2 has no Scheduled: the reset is acknowledged, so Accepted is the honest downgrade.
             ResetStatusEnumType.Scheduled -> ResetStatus.Accepted
-            else -> ResetStatus.valueOf(status.name)
         }
 
     @Named("convertResetType")

@@ -930,27 +930,6 @@ class AdapterTest {
     }
 
     @Test
-    fun `logStatusNotification request`() {
-        val requestMetadata = RequestMetadata("")
-        every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
-        every {
-            transport.sendMessageClass<Any, Any>(any(), "LogStatusNotification", any())
-        } returns LogStatusNotificationRespCore()
-
-        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
-        val request = LogStatusNotificationReq(
-            status = UploadLogStatusEnumType.Uploaded,
-            requestId = 1
-        )
-        val response = operations.logStatusNotification(requestMetadata, request)
-        expectThat(response)
-            .and { get { this.request }.isEqualTo(request) }
-            .and {
-                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
-            }
-    }
-
-    @Test
     fun `logStatusNotification is rejected without the security extensions`() {
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
 

@@ -29,6 +29,9 @@ import com.izivia.ocpp.transport.ClientTransport
 import io.mockk.mockk
 import kotlin.time.Instant
 import org.junit.jupiter.api.Assertions.assertThrows
+import com.izivia.ocpp.adapter12.mapper.ResetMapper
+import com.izivia.ocpp.api.model.reset.enumeration.ResetStatusEnumType
+import com.izivia.ocpp.core12.model.reset.enumeration.ResetStatus
 import org.junit.jupiter.api.Test
 import org.mapstruct.factory.Mappers
 import strikt.api.expectThat
@@ -176,6 +179,21 @@ class MapperTest {
 
         expectThat(mapper.convertConnectorStatus(ConnectorStatusEnumType.Reserved))
             .isEqualTo(ChargePointStatus.Unavailable)
+    }
+
+    @Test
+    fun `every generic reset status maps to an OCPP 1_2 status`() {
+        val mapper = Mappers.getMapper(ResetMapper::class.java)
+
+        // Scheduled has no OCPP 1.2 equivalent: the reset is acknowledged, so Accepted is the honest
+        // downgrade. Pinned here because nothing else exercises it.
+        mapOf(
+            ResetStatusEnumType.Accepted to ResetStatus.Accepted,
+            ResetStatusEnumType.Rejected to ResetStatus.Rejected,
+            ResetStatusEnumType.Scheduled to ResetStatus.Accepted
+        ).forEach { (generic, expected) ->
+            expectThat(mapper.convertResetStatus(generic)).isEqualTo(expected)
+        }
     }
 
     @Test

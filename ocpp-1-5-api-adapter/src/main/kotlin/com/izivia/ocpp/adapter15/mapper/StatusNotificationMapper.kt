@@ -24,6 +24,12 @@ abstract class StatusNotificationMapper {
 
     data class ChargingStateWrapper(
         val chargingState: ChargingStateEnumType?,
+        /**
+         * Not read by [convertChargingState] in OCPP 1.5: unlike 1.6, which splits EVConnected into
+         * Preparing and Finishing on the event type, 1.x maps it to Occupied whatever the event. The
+         * field is kept so this wrapper stays shaped like the 1.6 one, and so tests can pin the
+         * combination that used to yield Available on Ended.
+         */
         val type: TransactionEventEnumType?
     )
 

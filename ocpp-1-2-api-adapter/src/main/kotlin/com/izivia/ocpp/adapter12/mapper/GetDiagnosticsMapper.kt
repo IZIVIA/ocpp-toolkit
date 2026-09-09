@@ -14,6 +14,12 @@ abstract class GetDiagnosticsMapper {
 
     fun genToCoreResp(getLogResp: GetLogResp?): GetDiagnosticsResp = GetDiagnosticsResp(getLogResp?.filename)
 
+    /**
+     * OCPP 1.2 GetDiagnostics carries no request id, and neither does the DiagnosticsStatusNotification
+     * that answers it, so the id below is synthetic and constant: a unique value would suggest a
+     * correlation the protocol cannot provide. A CSApi implementation must therefore not index
+     * pending log requests by [GetLogReq.requestId] on this flow.
+     */
     fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetLogReq =
         GetLogReq(
             requestId = 1,
