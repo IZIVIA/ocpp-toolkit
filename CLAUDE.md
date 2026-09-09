@@ -39,8 +39,8 @@ on the `toolkit` module, which aggregates everything else.
 - [docs/protocol/](docs/protocol/README.md) — per-version field reference: every field of every
   action, with type, constraints, enum values, the Kotlin class, and the section and page of the
   normative OCA document. Committed — grep it, no generation step
-- [docs/protocol/spec/INDEX.md](docs/protocol/spec/INDEX.md) — every heading of every OCA
-  specification document mapped to its PDF page
+- [docs/protocol/spec/](docs/protocol/spec/README.md) — which OCA document specifies a topic, and
+  on which page: every heading of all 18 documents
 - [docs/protocol/SPECS.md](docs/protocol/SPECS.md) — which edition the vendored schemas match, the
   verified divergences from OCA's schemas, and the licensing
 

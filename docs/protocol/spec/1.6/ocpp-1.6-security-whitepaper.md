@@ -1,0 +1,122 @@
+# OCPP 1.6 Security Whitepaper
+
+Headings of this document mapped to their PDF page. The document itself is
+OCA copyright and not in this repository. **Grep this file, do not read it whole.**
+
+```bash
+grep -n 'Authorization' docs/protocol/spec/1.6/ocpp-1.6-security-whitepaper.md
+```
+- `ocpp-1.6-security-whitepaper pdf-page 3` — **1** Scope
+- `ocpp-1.6-security-whitepaper pdf-page 3` — **1.2** Security Objectives
+- `ocpp-1.6-security-whitepaper pdf-page 4` — **1.3** Design Considerations
+- `ocpp-1.6-security-whitepaper pdf-page 4` — **1.4** OCPP-J Only
+- `ocpp-1.6-security-whitepaper pdf-page 4` — **1.5** General documentation remarks
+- `ocpp-1.6-security-whitepaper pdf-page 4` — **1.6** Conventions
+- `ocpp-1.6-security-whitepaper pdf-page 5` — **1.7** References
+- `ocpp-1.6-security-whitepaper pdf-page 6` — **2** Secure connection setup
+- `ocpp-1.6-security-whitepaper pdf-page 6` — **2.1** Security Profiles
+- `ocpp-1.6-security-whitepaper pdf-page 6` — **2.2** Generic Security Profile requirements
+- `ocpp-1.6-security-whitepaper pdf-page 7` — **1** Name                   Unsecured Transport with Basic Authentication
+- `ocpp-1.6-security-whitepaper pdf-page 8` — **2.3.1** Unsecured Transport with Basic Authentication Profile -
+- `ocpp-1.6-security-whitepaper pdf-page 9` — **1** Name                   TLS with Basic Authentication
+- `ocpp-1.6-security-whitepaper pdf-page 10` — **2.4.1** TLS with Basic Authentication Profile - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 13` — **1** Name                   TLS with Client Side Certificates
+- `ocpp-1.6-security-whitepaper pdf-page 14` — **2.5.1** TLS with Client Side Certificates Profile - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 16` — **2.6** Keys used in OCPP
+- `ocpp-1.6-security-whitepaper pdf-page 17` — **2.6.1** Certificate Properties
+- `ocpp-1.6-security-whitepaper pdf-page 18` — **2.6.2** Certificate Hierarchy
+- `ocpp-1.6-security-whitepaper pdf-page 18` — **2.6.3** Certificate Revocation
+- `ocpp-1.6-security-whitepaper pdf-page 20` — **A01** Update Charge Point Password for HTTP Basic Authentication
+- `ocpp-1.6-security-whitepaper pdf-page 20` — **2** ID                     A01 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 21` — **7** Error handling            n/a
+- `ocpp-1.6-security-whitepaper pdf-page 21` — **8** Remark(s)                 n/a
+- `ocpp-1.6-security-whitepaper pdf-page 22` — **A02** Update Charge Point Certificate by request of Central System
+- `ocpp-1.6-security-whitepaper pdf-page 23` — **2** ID                     A02 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 23` — **2** The Charge Point responds with ExtendedTriggerMessage.conf
+- `ocpp-1.6-security-whitepaper pdf-page 26` — **A03** Update Charge Point Certificate initiated by the Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 26` — **2** ID                     A03 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 28` — **A05** Upgrade Charge Point Security Profile
+- `ocpp-1.6-security-whitepaper pdf-page 29` — **1** Name                   Upgrade Charge Point Security Profile
+- `ocpp-1.6-security-whitepaper pdf-page 29` — **2** ID                     A05 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 30` — **A05** Upgrade Charge Point Security Profile - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 31` — **M03** Retrieve list of available certificates from a Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 31` — **2** ID                     M03 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 31` — **2** The Charge Point responds with a GetInstalledCertificateIds.conf
+- `ocpp-1.6-security-whitepaper pdf-page 31` — **5** Prerequisite(s)        n/a
+- `ocpp-1.6-security-whitepaper pdf-page 32` — **M04** Delete a specific certificate from a Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 32` — **1** Name                      Delete a specific certificate from a Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 32` — **2** ID                        M04 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 33` — **M04** Delete a specific certificate from a Charge Point - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 34` — **M05** Install CA certificate in a Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 34` — **1** Name                  Install CA certificate in a Charge Point
+- `ocpp-1.6-security-whitepaper pdf-page 34` — **2** ID                    M05 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 35` — **M05** Install CA certificate in a Charge Point - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 37` — **3** Security events/logging
+- `ocpp-1.6-security-whitepaper pdf-page 37` — **A04** Security Event Notification
+- `ocpp-1.6-security-whitepaper pdf-page 37` — **1** Name                    Security Event Notification
+- `ocpp-1.6-security-whitepaper pdf-page 37` — **2** ID                      A04 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 38` — **A04** Security Event Notification - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 38` — **N01** Retrieve Log Information
+- `ocpp-1.6-security-whitepaper pdf-page 38` — **1** Name                   Retrieve Log
+- `ocpp-1.6-security-whitepaper pdf-page 38` — **2** ID                     N01 (OCPP 2.0.1)
+- `ocpp-1.6-security-whitepaper pdf-page 39` — **3** The Charge Point sends a LogStatusNotification.req with the status Uploading
+- `ocpp-1.6-security-whitepaper pdf-page 40` — **N01** Retrieve Log Information - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 42` — **4** Secure firmware update
+- `ocpp-1.6-security-whitepaper pdf-page 42` — **L01** Secure Firmware Update
+- `ocpp-1.6-security-whitepaper pdf-page 42` — **1** Name                   Secure Firmware Update
+- `ocpp-1.6-security-whitepaper pdf-page 42` — **2** ID                     L01
+- `ocpp-1.6-security-whitepaper pdf-page 46` — **L01** Secure Firmware Update - Requirements
+- `ocpp-1.6-security-whitepaper pdf-page 49` — **5** Messages
+- `ocpp-1.6-security-whitepaper pdf-page 49` — **5.1** CertificateSigned.req
+- `ocpp-1.6-security-whitepaper pdf-page 49` — **5.2** CertificateSigned.conf
+- `ocpp-1.6-security-whitepaper pdf-page 50` — **5.3** DeleteCertificate.req
+- `ocpp-1.6-security-whitepaper pdf-page 50` — **5.4** DeleteCertificate.conf
+- `ocpp-1.6-security-whitepaper pdf-page 50` — **5.5** ExtendedTriggerMessage.req
+- `ocpp-1.6-security-whitepaper pdf-page 50` — **5.6** ExtendedTriggerMessage.conf
+- `ocpp-1.6-security-whitepaper pdf-page 51` — **5.7** GetInstalledCertificateIds.req
+- `ocpp-1.6-security-whitepaper pdf-page 51` — **5.8** GetInstalledCertificateIds.conf
+- `ocpp-1.6-security-whitepaper pdf-page 51` — **5.9** GetLog.req
+- `ocpp-1.6-security-whitepaper pdf-page 52` — **5.10** GetLog.conf
+- `ocpp-1.6-security-whitepaper pdf-page 52` — **5.11** InstallCertificate.req
+- `ocpp-1.6-security-whitepaper pdf-page 52` — **5.12** InstallCertificate.conf
+- `ocpp-1.6-security-whitepaper pdf-page 52` — **5.13** LogStatusNotification.req
+- `ocpp-1.6-security-whitepaper pdf-page 53` — **5.14** LogStatusNotification.conf
+- `ocpp-1.6-security-whitepaper pdf-page 53` — **5.15** SecurityEventNotification.req
+- `ocpp-1.6-security-whitepaper pdf-page 53` — **5.16** SecurityEventNotification.conf
+- `ocpp-1.6-security-whitepaper pdf-page 53` — **5.17** SignCertificate.req
+- `ocpp-1.6-security-whitepaper pdf-page 54` — **5.18** SignCertificate.conf
+- `ocpp-1.6-security-whitepaper pdf-page 54` — **5.19** SignedFirmwareStatusNotification.req
+- `ocpp-1.6-security-whitepaper pdf-page 54` — **5.20** SignedFirmwareStatusNotification.conf
+- `ocpp-1.6-security-whitepaper pdf-page 54` — **5.21** SignedUpdateFirmware.req
+- `ocpp-1.6-security-whitepaper pdf-page 55` — **5.22** SignedUpdateFirmware.conf
+- `ocpp-1.6-security-whitepaper pdf-page 55` — **6** Datatypes
+- `ocpp-1.6-security-whitepaper pdf-page 55` — **6.1** CertificateHashDataType
+- `ocpp-1.6-security-whitepaper pdf-page 56` — **6.2** CertificateSignedStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 56` — **6.3** CertificateStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 56` — **6.4** CertificateUseEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 57` — **6.5** DeleteCertificateStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 57` — **6.6** FirmwareStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 58` — **6.7** FirmwareType
+- `ocpp-1.6-security-whitepaper pdf-page 58` — **6.8** GenericStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 59` — **6.9** GetInstalledCertificateStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 59` — **6.10** HashAlgorithmEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 59` — **6.11** LogEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 60` — **6.12** LogParametersType
+- `ocpp-1.6-security-whitepaper pdf-page 60` — **6.13** LogStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 60` — **6.14** MessageTriggerEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 61` — **6.15** TriggerMessageStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 61` — **6.16** UpdateFirmwareStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 62` — **6.17** UploadLogStatusEnumType
+- `ocpp-1.6-security-whitepaper pdf-page 62` — **7** Configuration Keys
+- `ocpp-1.6-security-whitepaper pdf-page 62` — **7.1** AdditionalRootCertificateCheck
+- `ocpp-1.6-security-whitepaper pdf-page 63` — **7.2** AuthorizationKey
+- `ocpp-1.6-security-whitepaper pdf-page 63` — **7.3** CertificateSignedMaxChainSize
+- `ocpp-1.6-security-whitepaper pdf-page 63` — **7.4** CertificateStoreMaxLength
+- `ocpp-1.6-security-whitepaper pdf-page 64` — **7.5** CpoName
+- `ocpp-1.6-security-whitepaper pdf-page 64` — **7.6** SecurityProfile
+- `ocpp-1.6-security-whitepaper pdf-page 64` — **8** Security Events
+- `ocpp-1.6-security-whitepaper pdf-page 65` — **9** Changelog
+
+---
+
+[OCPP 1.6 documents](../1.6.md) · [protocol reference](../../1.6/README.md)

@@ -4,11 +4,13 @@ What fields does this action carry, in this OCPP version, and where does the spe
 This directory answers that with a grep, for all three supported versions and all 127 registered
 actions.
 
+**One file per action**, so a lookup costs a few kilobytes rather than the whole protocol:
+
 ```bash
 grep -rn 'idTag`' docs/protocol/                  # which actions carry idTag, in which version
-grep -n 'transactionEvent.req' docs/protocol/OCPP-2.0.1.md
+cat docs/protocol/2.0.1/transactionEvent.md       # one action, in full
 grep -n 'meterValues' docs/protocol/ACTIONS.md    # does 1.5 have it? who initiates it?
-grep -n 'Authorization Cache' docs/protocol/spec/INDEX.md   # where is it specified?
+grep -rn 'Authorization Cache' docs/protocol/spec/   # where is it specified?
 ```
 
 Each field is one line, keyed by its dotted JSON path, carrying everything needed to act on it:
@@ -30,15 +32,24 @@ section and page of the normative OCA document:
 
 ## Files
 
-| File | Contents |
+| Path | Contents |
 |---|---|
-| `ACTIONS.md` | every action × every version, with direction — start here |
-| `OCPP-1.5.md` | 24 actions |
-| `OCPP-1.6.md` | 39 actions, including the Security Whitepaper extension |
-| `OCPP-2.0.1.md` | 64 actions |
-| `spec/INDEX.md` | table of contents of all 18 OCA documents, every heading mapped to its PDF page |
-| `spec/sections.json` | the same, machine-readable |
-| [SPECS.md](SPECS.md) | which edition the vendored schemas match, the verified divergences from OCA's schemas, and the licensing |
+| [`ACTIONS.md`](ACTIONS.md) | every action × every version, with direction — **start here**, ~1k tokens |
+| [`1.5/`](1.5/README.md) | 24 actions, one file each |
+| [`1.6/`](1.6/README.md) | 39 actions, including the Security Whitepaper extension |
+| [`2.0.1/`](2.0.1/README.md) | 64 actions |
+| [`spec/`](spec/README.md) | tables of contents of all 18 OCA documents — which one specifies a topic, and on which page |
+| [`SPECS.md`](SPECS.md) | which edition the vendored schemas match, the verified divergences from OCA's schemas, and the licensing |
+
+Each version directory has a `README.md` indexing its actions, plus the schema-coverage and
+JSON-Schema-draft notes for that version.
+
+### Why one file per action
+
+The reference used to be three files; `OCPP-2.0.1.md` alone was 445 KB, about 113k tokens, which
+made reading it to answer one question wasteful for a person and prohibitive for an agent. Split,
+the median action file is under 5 KB and the largest — `2.0.1/transactionEvent.md` — is 26 KB. Grep
+still spans everything, and the dotted field paths keep each matched line self-identifying.
 
 ## What it is derived from
 
@@ -83,10 +94,10 @@ When you change the protocol surface, update this directory in the same commit:
 
 | Change | Update |
 |---|---|
-| add an action to an `Actions` enum | its version file **and** `ACTIONS.md`, and add both schema files |
-| add or change a field in a schema | the field lines for that action |
-| add a new OCPP version | a new `OCPP-<v>.md`, a column in `ACTIONS.md`, and its documents in `spec/INDEX.md` |
-| refresh the vendored schemas to a newer OCA edition | the affected field lines, and the edition table in [SPECS.md](SPECS.md) |
+| add an action to an `Actions` enum | a new `<version>/<action>.md`, a row in `<version>/README.md` **and** in `ACTIONS.md`, and both schema files |
+| add or change a field in a schema | the field lines in `<version>/<action>.md` |
+| add a new OCPP version | a new `<version>/` directory, a column in `ACTIONS.md`, and its documents under `spec/` |
+| refresh the vendored schemas to a newer OCA edition | the affected action files, and the edition table in [SPECS.md](SPECS.md) |
 
 The scripts that first produced these files are in this branch's history if a bulk regeneration is
 ever needed again: `git log --diff-filter=D -- docs/protocol/generate.py`.

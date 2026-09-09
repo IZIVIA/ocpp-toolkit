@@ -1,0 +1,157 @@
+# OCPP 1.5 Specification
+
+Headings of this document mapped to their PDF page. The document itself is
+OCA copyright and not in this repository. **Grep this file, do not read it whole.**
+
+```bash
+grep -n 'Authorization' docs/protocol/spec/1.5/ocpp-1.5-specification.md
+```
+- `ocpp-1.5-specification pdf-page 9` — **1** Scope
+- `ocpp-1.5-specification pdf-page 10` — **2** Terminology and Conventions
+- `ocpp-1.5-specification pdf-page 10` — **2.1** Conventions
+- `ocpp-1.5-specification pdf-page 10` — **2.2** Definitions
+- `ocpp-1.5-specification pdf-page 10` — **2.3** Abbreviations
+- `ocpp-1.5-specification pdf-page 11` — **2.4** References
+- `ocpp-1.5-specification pdf-page 11` — **27** April 2007. http://www.w3.org/TR/2007/REC-
+- `ocpp-1.5-specification pdf-page 12` — **3** Introduction
+- `ocpp-1.5-specification pdf-page 12` — **3.1** General views of operation
+- `ocpp-1.5-specification pdf-page 15` — **3.2** Off-line behaviour
+- `ocpp-1.5-specification pdf-page 15` — **3.3** Local authorisation list
+- `ocpp-1.5-specification pdf-page 16` — **3.4** Parent id-tag
+- `ocpp-1.5-specification pdf-page 17` — **3.5** Reservations
+- `ocpp-1.5-specification pdf-page 17` — **3.6** Vendor-specific data transfer
+- `ocpp-1.5-specification pdf-page 17` — **3.7** Time zones
+- `ocpp-1.5-specification pdf-page 17` — **3.8** Case sensitivity
+- `ocpp-1.5-specification pdf-page 18` — **4** Operations Initiated by Charge Point
+- `ocpp-1.5-specification pdf-page 18` — **4.1** Authorize
+- `ocpp-1.5-specification pdf-page 19` — **4.2** Boot Notification
+- `ocpp-1.5-specification pdf-page 20` — **4.3** Data Transfer
+- `ocpp-1.5-specification pdf-page 21` — **4.4** Diagnostics Status Notification
+- `ocpp-1.5-specification pdf-page 21` — **4.5** Firmware Status Notification
+- `ocpp-1.5-specification pdf-page 22` — **4.6** Heartbeat
+- `ocpp-1.5-specification pdf-page 23` — **4.7** Meter Values
+- `ocpp-1.5-specification pdf-page 24` — **4.8** Start Transaction
+- `ocpp-1.5-specification pdf-page 25` — **4.9** Status Notification
+- `ocpp-1.5-specification pdf-page 26` — **4.10** Stop Transaction
+- `ocpp-1.5-specification pdf-page 27` — **5** Operations Initiated by Central System
+- `ocpp-1.5-specification pdf-page 27` — **5.1** Cancel Reservation
+- `ocpp-1.5-specification pdf-page 28` — **5.2** Change Availability
+- `ocpp-1.5-specification pdf-page 29` — **5.3** Change Configuration
+- `ocpp-1.5-specification pdf-page 30` — **5.4** Clear Cache
+- `ocpp-1.5-specification pdf-page 31` — **5.5** Data Transfer
+- `ocpp-1.5-specification pdf-page 31` — **5.6** Get Configuration
+- `ocpp-1.5-specification pdf-page 32` — **5.7** Get Diagnostics
+- `ocpp-1.5-specification pdf-page 33` — **5.8** Get Local List Version
+- `ocpp-1.5-specification pdf-page 34` — **5.9** Remote Start Transaction
+- `ocpp-1.5-specification pdf-page 35` — **5.10** Remote Stop Transaction
+- `ocpp-1.5-specification pdf-page 35` — **5.11** Reserve Now
+- `ocpp-1.5-specification pdf-page 37` — **5.12** Reset
+- `ocpp-1.5-specification pdf-page 38` — **5.13** Send Local List
+- `ocpp-1.5-specification pdf-page 39` — **5.14** Unlock Connector
+- `ocpp-1.5-specification pdf-page 40` — **5.15** Update Firmware
+- `ocpp-1.5-specification pdf-page 41` — **6** Messages
+- `ocpp-1.5-specification pdf-page 41` — **6.1** Authorize.req
+- `ocpp-1.5-specification pdf-page 41` — **6.2** Authorize.conf
+- `ocpp-1.5-specification pdf-page 41` — **6.3** BootNotification.req
+- `ocpp-1.5-specification pdf-page 42` — **6.4** BootNotification.conf
+- `ocpp-1.5-specification pdf-page 43` — **6.5** CancelReservation.req
+- `ocpp-1.5-specification pdf-page 43` — **6.6** CancelReservation.conf
+- `ocpp-1.5-specification pdf-page 43` — **6.7** ChangeAvailability.req
+- `ocpp-1.5-specification pdf-page 44` — **6.8** ChangeAvailability.conf
+- `ocpp-1.5-specification pdf-page 44` — **6.9** ChangeConfiguration.req
+- `ocpp-1.5-specification pdf-page 45` — **6.9.1** Standard Configuration Key Names & Values
+- `ocpp-1.5-specification pdf-page 47` — **6.10** ChangeConfiguration.conf
+- `ocpp-1.5-specification pdf-page 47` — **6.11** ClearCache.req
+- `ocpp-1.5-specification pdf-page 47` — **6.12** ClearCache.conf
+- `ocpp-1.5-specification pdf-page 47` — **6.13** DataTransfer.req
+- `ocpp-1.5-specification pdf-page 48` — **6.14** DataTransfer.conf
+- `ocpp-1.5-specification pdf-page 48` — **6.15** DiagnosticsStatusNotification.req
+- `ocpp-1.5-specification pdf-page 48` — **6.16** DiagnosticsStatusNotification.conf
+- `ocpp-1.5-specification pdf-page 49` — **6.17** FirmwareStatusNotification.req
+- `ocpp-1.5-specification pdf-page 49` — **6.18** FirmwareStatusNotification.conf
+- `ocpp-1.5-specification pdf-page 49` — **6.19** GetConfiguration.req
+- `ocpp-1.5-specification pdf-page 49` — **6.20** GetConfiguration.conf
+- `ocpp-1.5-specification pdf-page 50` — **6.21** GetDiagnostics.req
+- `ocpp-1.5-specification pdf-page 50` — **6.22** GetDiagnostics.conf
+- `ocpp-1.5-specification pdf-page 51` — **6.23** GetLocalListVersion.req
+- `ocpp-1.5-specification pdf-page 51` — **6.24** GetLocalListVersion.conf
+- `ocpp-1.5-specification pdf-page 51` — **6.25** Heartbeat.req
+- `ocpp-1.5-specification pdf-page 51` — **6.26** Heartbeat.conf
+- `ocpp-1.5-specification pdf-page 52` — **6.27** MeterValues.req
+- `ocpp-1.5-specification pdf-page 52` — **6.28** MeterValues.conf
+- `ocpp-1.5-specification pdf-page 52` — **6.29** RemoteStartTransaction.req
+- `ocpp-1.5-specification pdf-page 53` — **6.30** RemoteStartTransaction.conf
+- `ocpp-1.5-specification pdf-page 53` — **6.31** RemoteStopTransaction.req
+- `ocpp-1.5-specification pdf-page 53` — **6.32** RemoteStopTransaction.conf
+- `ocpp-1.5-specification pdf-page 54` — **6.33** ReserveNow.req
+- `ocpp-1.5-specification pdf-page 54` — **6.34** ReserveNow.conf
+- `ocpp-1.5-specification pdf-page 54` — **6.35** Reset.req
+- `ocpp-1.5-specification pdf-page 55` — **6.36** Reset.conf
+- `ocpp-1.5-specification pdf-page 55` — **6.37** SendLocalList.req
+- `ocpp-1.5-specification pdf-page 56` — **6.38** SendLocalList.conf
+- `ocpp-1.5-specification pdf-page 56` — **6.39** StartTransaction.req
+- `ocpp-1.5-specification pdf-page 57` — **6.40** StartTransaction.conf
+- `ocpp-1.5-specification pdf-page 57` — **6.41** StatusNotification.req
+- `ocpp-1.5-specification pdf-page 58` — **6.42** StatusNotification.conf
+- `ocpp-1.5-specification pdf-page 58` — **6.43** StopTransaction.req
+- `ocpp-1.5-specification pdf-page 59` — **6.44** StopTransaction.conf
+- `ocpp-1.5-specification pdf-page 60` — **6.45** UnlockConnector.req
+- `ocpp-1.5-specification pdf-page 60` — **6.46** UnlockConnector.conf
+- `ocpp-1.5-specification pdf-page 60` — **6.47** UpdateFirmware.req
+- `ocpp-1.5-specification pdf-page 61` — **6.48** UpdateFirmware.conf
+- `ocpp-1.5-specification pdf-page 62` — **7** Types
+- `ocpp-1.5-specification pdf-page 62` — **7.1** AuthorisationData
+- `ocpp-1.5-specification pdf-page 62` — **7.2** AuthorizationStatus
+- `ocpp-1.5-specification pdf-page 62` — **7.3** AvailabilityStatus
+- `ocpp-1.5-specification pdf-page 63` — **7.4** AvailabilityType
+- `ocpp-1.5-specification pdf-page 63` — **7.5** CancelReservationStatus
+- `ocpp-1.5-specification pdf-page 63` — **7.6** ChargeBoxSerialNumber
+- `ocpp-1.5-specification pdf-page 64` — **7.7** ChargePointErrorCode
+- `ocpp-1.5-specification pdf-page 64` — **7.8** ChargePointModel
+- `ocpp-1.5-specification pdf-page 65` — **7.9** ChargePointSerialNumber
+- `ocpp-1.5-specification pdf-page 65` — **7.10** ChargePointStatus
+- `ocpp-1.5-specification pdf-page 66` — **7.11** ChargePointVendor
+- `ocpp-1.5-specification pdf-page 66` — **7.12** ClearCacheStatus
+- `ocpp-1.5-specification pdf-page 66` — **7.13** ConfigurationStatus
+- `ocpp-1.5-specification pdf-page 66` — **7.14** DataTransferStatus
+- `ocpp-1.5-specification pdf-page 67` — **7.15** DiagnosticsStatus
+- `ocpp-1.5-specification pdf-page 67` — **7.16** FirmwareStatus
+- `ocpp-1.5-specification pdf-page 68` — **7.17** FirmwareVersion
+- `ocpp-1.5-specification pdf-page 68` — **7.18** Iccid
+- `ocpp-1.5-specification pdf-page 68` — **7.19** IdTagInfo
+- `ocpp-1.5-specification pdf-page 68` — **7.20** IdToken
+- `ocpp-1.5-specification pdf-page 69` — **7.21** Imsi
+- `ocpp-1.5-specification pdf-page 69` — **7.22** KeyValue
+- `ocpp-1.5-specification pdf-page 69` — **7.23** Location
+- `ocpp-1.5-specification pdf-page 70` — **7.24** Measurand
+- `ocpp-1.5-specification pdf-page 71` — **7.25** MeterSerialNumber
+- `ocpp-1.5-specification pdf-page 71` — **7.26** MeterType
+- `ocpp-1.5-specification pdf-page 71` — **7.27** MeterValue
+- `ocpp-1.5-specification pdf-page 72` — **7.28** ReadingContext
+- `ocpp-1.5-specification pdf-page 73` — **7.29** NameString
+- `ocpp-1.5-specification pdf-page 73` — **7.30** RegistrationStatus
+- `ocpp-1.5-specification pdf-page 73` — **7.31** RemoteStartStopStatus
+- `ocpp-1.5-specification pdf-page 74` — **7.32** ReservationStatus
+- `ocpp-1.5-specification pdf-page 74` — **7.33** ResetStatus
+- `ocpp-1.5-specification pdf-page 74` — **7.34** ResetType
+- `ocpp-1.5-specification pdf-page 75` — **7.35** SerialNumberString
+- `ocpp-1.5-specification pdf-page 75` — **7.36** TransactionData
+- `ocpp-1.5-specification pdf-page 75` — **7.37** UnitOfMeasure
+- `ocpp-1.5-specification pdf-page 76` — **7.38** UnlockStatus
+- `ocpp-1.5-specification pdf-page 76` — **7.39** UpdateStatus
+- `ocpp-1.5-specification pdf-page 77` — **7.40** UpdateType
+- `ocpp-1.5-specification pdf-page 77` — **7.41** ValueFormat
+- `ocpp-1.5-specification pdf-page 77` — **7.42** VersionString
+- `ocpp-1.5-specification pdf-page 78` — **8** Binding to Transport Protocol
+- `ocpp-1.5-specification pdf-page 78` — **8.1** Charge Box Identity
+- `ocpp-1.5-specification pdf-page 78` — **8.2** Fault Response
+- `ocpp-1.5-specification pdf-page 79` — **8.3** Mobile Networks
+- `ocpp-1.5-specification pdf-page 80` — **8.4** Download Firmware
+- `ocpp-1.5-specification pdf-page 81` — **8.5** Upload Diagnostics
+- `ocpp-1.5-specification pdf-page 81` — **8.6** Compression
+- `ocpp-1.5-specification pdf-page 81` — **8.7** Security
+- `ocpp-1.5-specification pdf-page 81` — **8.8** WSDL
+
+---
+
+[OCPP 1.5 documents](../1.5.md) · [protocol reference](../../1.5/README.md)

@@ -14,7 +14,7 @@ and page — see [README.md](README.md).
 
 OCA publishes them at <https://www.openchargealliance.org/downloads/>. Download is free but gated
 behind accepting OCA's terms, which is why nothing from them is committed here — see
-[Licensing](#licensing). [spec/INDEX.md](spec/INDEX.md) is the table of contents of the eighteen
+[Licensing](#licensing). [spec/](spec/README.md) is the table of contents of the eighteen
 documents the citations refer to, so you can tell which ones you need.
 
 The documents behind the citations are:
@@ -82,7 +82,7 @@ whole fix.
 
 ## What the schemas cannot tell you
 
-Open the specification document — [spec/INDEX.md](spec/INDEX.md) tells you which one and which
+Open the specification document — [spec/](spec/README.md) tells you which one and which
 page — when the question is:
 
 - **Ordering and state.** Which action must precede which, what a station may send before
@@ -113,7 +113,7 @@ Publishing it here is a deliberate IZIVIA decision, taken so that developers and
 the protocol without a generation step.
 
 The **specification text itself is deliberately not here.** Publishing the *citations* to a
-document — which is what [spec/INDEX.md](spec/INDEX.md) and `spec/sections.json` are — is a
+document — which is what [spec/](spec/README.md) and the per-document tables of contents are — is a
 different thing from republishing the document, and this repository is public. Read the normative
 wording in your own copy of the PDF, at the page the reference cites.
 
