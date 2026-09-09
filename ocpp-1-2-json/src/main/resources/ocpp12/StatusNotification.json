@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StatusNotificationRequest",
+    "type": "object",
+    "properties": {
+        "connectorId": {
+            "type": "integer"
+        },
+        "status": {
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "Available",
+                "Occupied",
+                "Faulted",
+                "Unavailable"
+            ]
+        },
+        "errorCode": {
+            "type": "string",
+            "additionalProperties": false,
+            "enum": [
+                "ConnectorLockFailure",
+                "HighTemperature",
+                "Mode3Error",
+                "NoError",
+                "PowerMeterFailure",
+                "PowerSwitchFailure",
+                "ReaderFailure",
+                "ResetFailure"
+            ]
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "connectorId",
+        "status",
+        "errorCode"
+    ]
+}

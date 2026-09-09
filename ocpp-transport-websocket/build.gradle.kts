@@ -16,9 +16,11 @@ dependencies {
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
     implementation(project(":ocpp-1-5-core"))
+    implementation(project(":ocpp-1-2-core"))
     implementation(project(":ocpp-2-0-json"))
     implementation(project(":ocpp-1-6-json"))
     implementation(project(":ocpp-1-5-json"))
+    implementation(project(":ocpp-1-2-json"))
 }
 
 java {

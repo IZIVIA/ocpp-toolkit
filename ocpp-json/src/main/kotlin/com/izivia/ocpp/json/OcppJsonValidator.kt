@@ -9,8 +9,16 @@ import com.networknt.schema.ValidationMessage
 import java.io.InputStream
 import java.util.Locale
 
-class OcppJsonValidator(
-    private val specVersion: SpecVersion.VersionFlag
+/**
+ * Loads and caches the JSON schemas of a single OCPP version.
+ *
+ * Schemas are resolved as classpath resources by action name. Since every version module ships its
+ * own schemas under the same names, [schemaFolder] lets a module namespace them; the default keeps
+ * them at the resources root.
+ */
+class OcppJsonValidator @JvmOverloads constructor(
+    private val specVersion: SpecVersion.VersionFlag,
+    private val schemaFolder: String = ""
 ) {
     private val jsonSchemas = mutableMapOf<String, JsonSchema>()
 
@@ -20,7 +28,8 @@ class OcppJsonValidator(
     private val config: SchemaValidatorsConfig =
         SchemaValidatorsConfig.builder().locale(Locale.ENGLISH).build()
 
-    private fun getJsonSchema(file: String): JsonSchema {
+    private fun getJsonSchema(action: String): JsonSchema {
+        val file = if (schemaFolder.isEmpty()) "$action.json" else "$schemaFolder/$action.json"
         val factory: JsonSchemaFactory = JsonSchemaFactory.getInstance(specVersion)
         val input: InputStream? = Thread.currentThread().contextClassLoader.getResourceAsStream(file)
         return factory.getSchema(input, config)
@@ -32,7 +41,7 @@ class OcppJsonValidator(
      */
     fun isValidObject(action: String, payload: JsonNode): List<ValidationMessage> =
         // Info :  loading JsonSchema is not thread safe. Can affect performance during the first instanciation
-        (jsonSchemas[action] ?: getJsonSchema("$action.json").also { jsonSchemas[action] = it })
+        (jsonSchemas[action] ?: getJsonSchema(action).also { jsonSchemas[action] = it })
             .validate(payload)
             .toList()
 }

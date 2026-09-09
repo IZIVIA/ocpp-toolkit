@@ -1,0 +1,27 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StopTransactionRequest",
+    "type": "object",
+    "properties": {
+        "transactionId": {
+            "type": "integer"
+        },
+        "idTag": {
+            "type": "string",
+            "maxLength": 15
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "meterStop": {
+            "type": "integer"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "transactionId",
+        "timestamp",
+        "meterStop"
+    ]
+}

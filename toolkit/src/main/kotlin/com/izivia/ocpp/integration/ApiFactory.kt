@@ -115,11 +115,7 @@ class ApiFactory {
             newMessageId: () -> String,
             settings: OcppWampServerSettings,
             listeners: EventsListeners = EventsListeners()
-        ): ServerTransport {
-            // Fail fast with an actionable message rather than on the valueOf inside WebsocketServer.
-            ocppVersion.forEach { getWampVersion(it) }
-            return WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
-        }
+        ): ServerTransport = WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
 
         private fun createServerTransportSoap(
             path: String,
@@ -282,19 +278,20 @@ class ApiFactory {
 }
 
 /**
- * Maps a transport version onto the WAMP subprotocol enum, mirroring [getSoapParser]. Exhaustive so a
- * version without a WebSocket binding reports what is wrong instead of failing on a `No enum constant`.
+ * Maps a transport version onto the WAMP subprotocol enum, mirroring [getSoapParser]. Exhaustive so
+ * that a transport version added without a WebSocket counterpart fails to compile here, rather than
+ * on the `valueOf` by name that `WebsocketServer` performs.
  */
 private fun getWampVersion(version: OcppVersionTransport): OcppVersion = when (version) {
+    OcppVersionTransport.OCPP_2_0 -> OcppVersion.OCPP_2_0
     OcppVersionTransport.OCPP_1_6 -> OcppVersion.OCPP_1_6
     OcppVersionTransport.OCPP_1_5 -> OcppVersion.OCPP_1_5
-    OcppVersionTransport.OCPP_2_0 -> OcppVersion.OCPP_2_0
-    OcppVersionTransport.OCPP_1_2 -> throw IllegalArgumentException("OCPP 1.2 has no WebSocket transport")
+    OcppVersionTransport.OCPP_1_2 -> OcppVersion.OCPP_1_2
 }
 
 private fun getSoapParser(version: OcppVersionTransport) = when (version) {
+    OcppVersionTransport.OCPP_2_0 -> throw IllegalArgumentException("OCPP 2.0 has no SOAP transport")
     OcppVersionTransport.OCPP_1_6 -> Ocpp16SoapParser()
     OcppVersionTransport.OCPP_1_5 -> Ocpp15SoapParser()
     OcppVersionTransport.OCPP_1_2 -> Ocpp12SoapParser()
-    OcppVersionTransport.OCPP_2_0 -> throw IllegalArgumentException("OCPP 2.0 has no SOAP transport")
 }

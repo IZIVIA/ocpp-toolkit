@@ -37,6 +37,7 @@ include(
     "ocpp-1-5-api",
     "ocpp-1-2-api-adapter",
     "ocpp-1-2-core",
+    "ocpp-1-2-json",
     "ocpp-1-2-soap",
     "ocpp-1-2-api",
     "ocpp-transport-soap",

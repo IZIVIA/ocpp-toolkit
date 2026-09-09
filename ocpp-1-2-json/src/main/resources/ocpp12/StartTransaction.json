@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "StartTransactionRequest",
+    "type": "object",
+    "properties": {
+        "connectorId": {
+            "type": "integer"
+        },
+        "idTag": {
+            "type": "string",
+            "maxLength": 15
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "meterStart": {
+            "type": "integer"
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "connectorId",
+        "idTag",
+        "timestamp",
+        "meterStart"
+    ]
+}
