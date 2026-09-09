@@ -268,6 +268,8 @@ import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq as
 import com.izivia.ocpp.api.model.getcertificatestatus.enumeration.GetCertificateStatusEnumType as GetCertificateStatusEnumTypeGen
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq as LogStatusNotificationReqGen
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq as DiagnosticsStatusNotificationReqGen
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType as DiagnosticsStatusEnumTypeGen
 import com.izivia.ocpp.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType as UploadLogStatusEnumTypeGen
 import com.izivia.ocpp.api.model.notifycharginglimit.ChargingLimitType as ChargingLimitTypeGen
 import com.izivia.ocpp.api.model.notifycharginglimit.NotifyChargingLimitReq as NotifyChargingLimitReqGen
@@ -1325,6 +1327,19 @@ class AdapterTest {
             .and {
                 get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
             }
+    }
+
+    @Test
+    fun `diagnosticsStatusNotification is rejected in OCPP 2_0`() {
+        val operations = Ocpp20Adapter("c1", transport, csApi)
+
+        // OCPP 2.0.1 replaced DiagnosticsStatusNotification by LogStatusNotification.
+        expectThrows<IllegalStateException> {
+            operations.diagnosticsStatusNotification(
+                RequestMetadata(""),
+                DiagnosticsStatusNotificationReqGen(DiagnosticsStatusEnumTypeGen.Uploaded)
+            )
+        }
     }
 
     @Test

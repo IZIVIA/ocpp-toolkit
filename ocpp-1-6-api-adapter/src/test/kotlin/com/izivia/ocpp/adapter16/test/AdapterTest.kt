@@ -67,6 +67,8 @@ import com.izivia.ocpp.api.model.getvariables.GetVariablesResp
 import com.izivia.ocpp.api.model.getvariables.enumeration.GetVariableStatusEnumType
 import com.izivia.ocpp.api.model.installcertificate.InstallCertificateReq
 import com.izivia.ocpp.api.model.installcertificate.InstallCertificateResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq as DiagnosticsStatusNotificationReqGen
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatusEnumType
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.enumeration.UploadLogStatusEnumType
 import com.izivia.ocpp.api.model.publishfirmware.PublishFirmwareReq
@@ -133,6 +135,7 @@ import com.izivia.ocpp.core16.model.common.IdTagInfo
 import com.izivia.ocpp.core16.model.common.enumeration.AuthorizationStatus
 import com.izivia.ocpp.core16.model.datatransfer.enumeration.DataTransferStatus
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp as LogStatusNotificationRespCore
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.core16.model.diagnosticsstatusnotification.enumeration.DiagnosticsStatus
 import com.izivia.ocpp.core16.model.firmwarestatusnotification.FirmwareStatusNotificationReq
@@ -163,6 +166,7 @@ import kotlin.time.Clock
 import kotlin.time.Instant
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.isEqualTo
@@ -926,17 +930,31 @@ class AdapterTest {
     }
 
     @Test
-    fun `diagnosticsStatusNotification request`() {
-        val requestMetadata = RequestMetadata("")
-        every { chargePointOperations.diagnosticsStatusNotification(any(), any()) } returns OperationExecution(
-            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
-            DiagnosticsStatusNotificationReq(
-                status = DiagnosticsStatus.Uploaded
-            ),
-            DiagnosticsStatusNotificationResp()
-        )
-
+    fun `logStatusNotification is rejected without the security extensions`() {
         val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+
+        // The core GetDiagnostics flow has its own generic operation now.
+        assertThrows<IllegalStateException> {
+            operations.logStatusNotification(
+                RequestMetadata(""),
+                LogStatusNotificationReq(status = UploadLogStatusEnumType.Uploaded, requestId = 1)
+            )
+        }
+    }
+
+    @Test
+    fun `logStatusNotification request sends LogStatusNotification when the security extensions are on`() {
+        val requestMetadata = RequestMetadata("")
+        every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
+        every {
+            transport.sendMessageClass<Any, Any>(
+                any(),
+                "LogStatusNotification",
+                any()
+            )
+        } returns LogStatusNotificationRespCore()
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
         val request = LogStatusNotificationReq(
             status = UploadLogStatusEnumType.Uploaded,
             requestId = 1
@@ -950,28 +968,23 @@ class AdapterTest {
     }
 
     @Test
-    fun `logStatusNotification request sends LogStatusNotification when the security extensions are on`() {
+    fun `diagnosticsStatusNotification request`() {
         val requestMetadata = RequestMetadata("")
-        every { transport.receiveMessageClass<Any, Any>(any(), any(), any()) } returns Unit
-        every {
-            transport.sendMessageClass<Any, Any>(
-                any(),
-                "LogStatusNotification",
-                any()
-            )
-        } returns com.izivia.ocpp.core16.model.logstatusnotification.LogStatusNotificationResp()
-
-        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository(), securityExtensions = true)
-        val request = LogStatusNotificationReq(
-            status = UploadLogStatusEnumType.Uploaded,
-            requestId = 1
+        every { chargePointOperations.diagnosticsStatusNotification(any(), any()) } returns OperationExecution(
+            ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS, Clock.System.now(), Clock.System.now()),
+            DiagnosticsStatusNotificationReq(DiagnosticsStatus.Uploaded),
+            DiagnosticsStatusNotificationResp()
         )
-        val response = operations.logStatusNotification(requestMetadata, request)
-        expectThat(response)
-            .and { get { this.request }.isEqualTo(request) }
-            .and {
-                get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS)
-            }
+
+        val operations = Ocpp16Adapter("", transport, csApi, RealTransactionRepository())
+        // OCPP 1.6 models every generic diagnostics status, transient ones included.
+        DiagnosticsStatusEnumType.entries.forEach { status ->
+            val request = DiagnosticsStatusNotificationReqGen(status)
+            val response = operations.diagnosticsStatusNotification(requestMetadata, request)
+            expectThat(response)
+                .and { get { this.request }.isEqualTo(request) }
+                .and { get { this.executionMeta.status }.isEqualTo(RequestStatus.SUCCESS) }
+        }
     }
 
     @Test

@@ -9,8 +9,8 @@ For more information about OCPP (Open Charge Point Protocol), see https://www.op
 
 The aim is to support:
 - both the CSMS and the Charging Station sides
-- versions 1.5, 1.6 and 2.0.1 of OCPP
-- WS/JSON (OCPP-J - all versions) and SOAP (OCPP-S ; 1.x versions only) flavor for the transport
+- versions 1.2, 1.5, 1.6 and 2.0.1 of OCPP
+- WS/JSON (OCPP-J ; 1.5 and later) and SOAP (OCPP-S ; 1.x versions only) flavor for the transport
 
 It can be used:
 - to simulate a charging station, eg to test a CSMS
@@ -38,7 +38,7 @@ Inbound timestamp parsing is intentionally more tolerant for OCPP interoperabili
 
 Currently the ChargingStation side of versions 1.6 and 2.0.1 are fully supported in OCPP-J flavor - except the security requirements besides support for http basic auth. This includes all the data structures described by the specification, with json serialisation verified against the json schemas provided in the specification.
 
-Support of CSMS side, OCPP 1.5 and SOAP flavor is planned.
+The CSMS side is available through the `CSMS` entry point, and the SOAP (OCPP-S) flavor is implemented for the 1.x versions. OCPP 1.2 and 1.5 are supported over SOAP, 1.5 also over OCPP-J; OCPP 1.2 has no WebSocket binding, so it is SOAP only. All four versions are reachable through the generic API.
 
 Support for security requirements like SSL and mutual certificates is under discussion, as it can be achieved using a proxy like Envoy.
 

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":ocpp-1-5-core"))
     implementation(project(":ocpp-transport"))
     implementation(project(":operation-information"))
+    implementation(project(":utils"))
     implementation("org.mapstruct:mapstruct:_")
     kapt("org.mapstruct:mapstruct-processor:_")
     runtimeOnly("ch.qos.logback:logback-classic:_")

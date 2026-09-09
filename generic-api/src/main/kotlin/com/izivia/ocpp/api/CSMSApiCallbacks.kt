@@ -14,6 +14,8 @@ import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -86,6 +88,8 @@ interface CSMSApiCallbacks {
     fun notifyEVChargingNeeds(request: NotifyEVChargingNeedsReq): NotifyEVChargingNeedsResp = throw NotImplementedError()
 
     fun logStatusNotification(request: LogStatusNotificationReq): LogStatusNotificationResp = throw NotImplementedError()
+
+    fun diagnosticsStatusNotification(request: DiagnosticsStatusNotificationReq): DiagnosticsStatusNotificationResp = throw NotImplementedError()
 
     fun publishFirmwareStatusNotification(request: PublishFirmwareStatusNotificationReq): PublishFirmwareStatusNotificationResp = throw NotImplementedError()
 

@@ -16,6 +16,8 @@ import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
 import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
 import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
@@ -240,6 +242,16 @@ class DefaultCSMSApi(private val csmsApiCallbacks: CSMSApiCallbacks) : CSMSApi {
             ExecutionMetadata(meta, RequestStatus.SUCCESS, now()),
             request,
             csmsApiCallbacks.logStatusNotification(request)
+        )
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> =
+        OperationExecution(
+            ExecutionMetadata(meta, RequestStatus.SUCCESS, now()),
+            request,
+            csmsApiCallbacks.diagnosticsStatusNotification(request)
         )
 
     override fun publishFirmwareStatusNotification(

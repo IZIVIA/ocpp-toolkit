@@ -1,0 +1,395 @@
+package com.izivia.ocpp.adapter15
+
+import com.izivia.ocpp.adapter15.mapper.*
+import com.izivia.ocpp.api.CSApi
+import com.izivia.ocpp.api.CSMSApi
+import com.izivia.ocpp.api.model.bootnotification.BootNotificationReq
+import com.izivia.ocpp.api.model.bootnotification.BootNotificationResp
+import com.izivia.ocpp.api.model.clearedcharginglimit.ClearedChargingLimitReq
+import com.izivia.ocpp.api.model.clearedcharginglimit.ClearedChargingLimitResp
+import com.izivia.ocpp.api.model.datatransfer.DataTransferReq
+import com.izivia.ocpp.api.model.datatransfer.DataTransferResp
+import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationReq
+import com.izivia.ocpp.api.model.firmwarestatusnotification.FirmwareStatusNotificationResp
+import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusReq
+import com.izivia.ocpp.api.model.getcertificatestatus.GetCertificateStatusResp
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationReq
+import com.izivia.ocpp.api.model.diagnosticsstatusnotification.DiagnosticsStatusNotificationResp
+import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationReq
+import com.izivia.ocpp.api.model.logstatusnotification.LogStatusNotificationResp
+import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
+import com.izivia.ocpp.api.model.metervalues.MeterValuesResp
+import com.izivia.ocpp.api.model.notifycharginglimit.NotifyChargingLimitReq
+import com.izivia.ocpp.api.model.notifycharginglimit.NotifyChargingLimitResp
+import com.izivia.ocpp.api.model.notifycustomerinformation.NotifyCustomerInformationReq
+import com.izivia.ocpp.api.model.notifycustomerinformation.NotifyCustomerInformationResp
+import com.izivia.ocpp.api.model.notifydisplaymessages.NotifyDisplayMessagesReq
+import com.izivia.ocpp.api.model.notifydisplaymessages.NotifyDisplayMessagesResp
+import com.izivia.ocpp.api.model.notifyevchargingneeds.NotifyEVChargingNeedsReq
+import com.izivia.ocpp.api.model.notifyevchargingneeds.NotifyEVChargingNeedsResp
+import com.izivia.ocpp.api.model.notifyevchargingschedule.NotifyEVChargingScheduleReq
+import com.izivia.ocpp.api.model.notifyevchargingschedule.NotifyEVChargingScheduleResp
+import com.izivia.ocpp.api.model.notifyevent.NotifyEventReq
+import com.izivia.ocpp.api.model.notifyevent.NotifyEventResp
+import com.izivia.ocpp.api.model.notifymonitoringreport.NotifyMonitoringReportReq
+import com.izivia.ocpp.api.model.notifymonitoringreport.NotifyMonitoringReportResp
+import com.izivia.ocpp.api.model.notifyreport.NotifyReportReq
+import com.izivia.ocpp.api.model.notifyreport.NotifyReportResp
+import com.izivia.ocpp.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationReq
+import com.izivia.ocpp.api.model.publishfirmwarestatusnotification.PublishFirmwareStatusNotificationResp
+import com.izivia.ocpp.api.model.reportchargingprofiles.ReportChargingProfilesReq
+import com.izivia.ocpp.api.model.reportchargingprofiles.ReportChargingProfilesResp
+import com.izivia.ocpp.api.model.reservationstatusupdate.ReservationStatusUpdateReq
+import com.izivia.ocpp.api.model.reservationstatusupdate.ReservationStatusUpdateResp
+import com.izivia.ocpp.api.model.securityeventnotification.SecurityEventNotificationReq
+import com.izivia.ocpp.api.model.securityeventnotification.SecurityEventNotificationResp
+import com.izivia.ocpp.api.model.signcertificate.SignCertificateReq
+import com.izivia.ocpp.api.model.signcertificate.SignCertificateResp
+import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq
+import com.izivia.ocpp.api.model.statusnotification.StatusNotificationResp
+import com.izivia.ocpp.api.model.transactionevent.TransactionEventReq
+import com.izivia.ocpp.api.model.transactionevent.TransactionEventResp
+import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
+import com.izivia.ocpp.core15.ChargePointOperations
+import com.izivia.ocpp.operation.information.ExecutionMetadata
+import com.izivia.ocpp.operation.information.OperationExecution
+import com.izivia.ocpp.operation.information.RequestMetadata
+import com.izivia.ocpp.operation.information.RequestStatus
+import com.izivia.ocpp.transport.ClientTransport
+import kotlin.time.Duration.Companion.milliseconds
+import org.mapstruct.factory.Mappers
+import org.slf4j.LoggerFactory
+import java.net.ConnectException
+import com.izivia.ocpp.api.model.authorize.AuthorizeReq as AuthorizeReqGen
+import com.izivia.ocpp.api.model.authorize.AuthorizeResp as AuthorizeRespGen
+import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq as HeartbeatReqGen
+import com.izivia.ocpp.api.model.heartbeat.HeartbeatResp as HeartbeatRespGen
+
+class Ocpp15Adapter(
+    chargingStationId: String,
+    private val transport: ClientTransport,
+    csApi: CSApi,
+    private val transactionIds: TransactionRepository
+) : CSMSApi {
+
+    companion object {
+        private val logger = LoggerFactory.getLogger(Ocpp15Adapter::class.java)
+    }
+
+    private val operations: ChargePointOperations = ChargePointOperations
+        .newChargePointOperations(chargingStationId, transport, Ocpp15CSApiAdapter(csApi, transactionIds))
+
+    override fun connect() {
+        transport.connect()
+    }
+
+    override fun close() {
+        transport.close()
+    }
+
+    @Throws(IllegalStateException::class, ConnectException::class)
+    override fun heartbeat(
+        meta: RequestMetadata,
+        request: HeartbeatReqGen
+    ): OperationExecution<HeartbeatReqGen, HeartbeatRespGen> {
+        val mapper: HeartbeatMapper = Mappers.getMapper(HeartbeatMapper::class.java)
+        val response = operations.heartbeat(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun authorize(
+        meta: RequestMetadata,
+        request: AuthorizeReqGen
+    ): OperationExecution<AuthorizeReqGen, AuthorizeRespGen> {
+        val mapper: AuthorizeMapper = Mappers.getMapper(AuthorizeMapper::class.java)
+        val response = operations.authorize(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun meterValues(
+        meta: RequestMetadata,
+        request: MeterValuesReq
+    ): OperationExecution<MeterValuesReq, MeterValuesResp> {
+        val mapper: MeterValuesMapper = Mappers.getMapper(MeterValuesMapper::class.java)
+        // Only the transaction-id lookup and the mapping are guarded: those are the two ways the
+        // request itself can turn out to be unusable. The send stays outside so that a transport
+        // failure keeps surfacing as an error instead of being reported as an ignored request.
+        val coreRequest = try {
+            val transactionId = request.transactionId
+                ?.let { transactionIds.getTransactionIdsByLocalId(it) }
+                ?.csmsId
+            mapper.genToCoreReq(request.copy(transactionId = transactionId?.toString()))
+        } catch (e: IllegalArgumentException) {
+            return meterValuesNotSent(meta, request, e)
+        } catch (e: IllegalStateException) {
+            return meterValuesNotSent(meta, request, e)
+        }
+        val response = operations.meterValues(meta, coreRequest)
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    private fun meterValuesNotSent(
+        meta: RequestMetadata,
+        request: MeterValuesReq,
+        cause: Exception
+    ): OperationExecution<MeterValuesReq, MeterValuesResp> {
+        logger.warn(cause.message)
+        return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, MeterValuesResp())
+    }
+
+    override fun dataTransfer(
+        meta: RequestMetadata,
+        request: DataTransferReq
+    ): OperationExecution<DataTransferReq, DataTransferResp> {
+        val mapper: DataTransferMapper = Mappers.getMapper(DataTransferMapper::class.java)
+        val response = operations.dataTransfer(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun bootNotification(
+        meta: RequestMetadata,
+        request: BootNotificationReq
+    ): OperationExecution<BootNotificationReq, BootNotificationResp> {
+        val mapper: BootNotificationMapper = Mappers.getMapper(BootNotificationMapper::class.java)
+        val response = operations.bootNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    private fun updateTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        // chargingState is optional in the generic (2.0-shaped) model, but an OCPP 1.5 StatusNotification
+        // carries nothing else: without it there is no status to report, so skip the notification rather
+        // than fail the whole transaction event.
+        // This guards the direct Updated path only. updateStatusEvent applies the same condition before
+        // calling in, on purpose: it must skip silently rather than combine a NOT_SEND into the
+        // start/stop metadata. Keep both.
+        if (request.transactionInfo.chargingState == null) {
+            logger.warn("TransactionEvent without a chargingState has no OCPP 1.5 equivalent, status notification ignored")
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.NOT_SEND),
+                request,
+                TransactionEventResp()
+            )
+        }
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenRespTransac(response.response))
+    }
+
+    private fun updateStatusEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq,
+        responseMeta: ExecutionMetadata
+    ): ExecutionMetadata {
+        var executionMetadata = responseMeta
+        if (request.transactionInfo.chargingState != null) {
+            // Add 1ms to the timestamp so that the statusNotification request timestamp
+            // is the latest one compare to the previous request timestamp
+            val updatedRequest = request.copy(timestamp = request.timestamp + 1.milliseconds)
+            val updateResponse = updateTransactionEvent(meta, updatedRequest)
+            executionMetadata = executionMetadata.combine(updateResponse.executionMeta)
+        }
+        return executionMetadata
+    }
+
+    private fun stopTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: StopTransactionMapper = Mappers.getMapper(StopTransactionMapper::class.java)
+        val transactionId =
+            transactionIds.getTransactionIdsByLocalId(request.transactionInfo.transactionId).csmsId
+        val response = operations.stopTransaction(meta, mapper.genToCoreReq(request, transactionId))
+        // The transaction is over: release its id mapping so the repository does not keep one entry
+        // per transaction for the lifetime of the process.
+        transactionIds.deleteTransactionIds(request.transactionInfo.transactionId)
+        val executionMetadata = updateStatusEvent(meta, request, response.executionMeta)
+        return OperationExecution(executionMetadata, request, mapper.coreToGenResp(response.response))
+    }
+
+
+    private fun startTransactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> {
+        val mapper: StartTransactionMapper = Mappers.getMapper(StartTransactionMapper::class.java)
+        val response = operations.startTransaction(meta, mapper.genToCoreReq(request))
+        transactionIds.saveTransactionIds(
+            Ocpp15TransactionIds(
+                request.transactionInfo.transactionId,
+                response.response.transactionId
+            )
+        )
+        val executionMetadata = updateStatusEvent(meta, request, response.executionMeta)
+        return OperationExecution(executionMetadata, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun transactionEvent(
+        meta: RequestMetadata,
+        request: TransactionEventReq
+    ): OperationExecution<TransactionEventReq, TransactionEventResp> =
+        when (request.eventType) {
+            TransactionEventEnumType.Started -> {
+                startTransactionEvent(meta, request)
+            }
+            TransactionEventEnumType.Ended -> {
+                stopTransactionEvent(meta, request)
+            }
+            TransactionEventEnumType.Updated -> {
+                updateTransactionEvent(meta, request)
+            }
+        }
+
+    override fun statusNotification(
+        meta: RequestMetadata,
+        request: StatusNotificationReq
+    ): OperationExecution<StatusNotificationReq, StatusNotificationResp> {
+        val mapper: StatusNotificationMapper = Mappers.getMapper(StatusNotificationMapper::class.java)
+        val response = operations.statusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun notifyReport(
+        meta: RequestMetadata,
+        request: NotifyReportReq
+    ): OperationExecution<NotifyReportReq, NotifyReportResp> {
+        throw IllegalStateException("NotifyReport can't be call in OCPP 1.5")
+    }
+
+    override fun firmwareStatusNotification(
+        meta: RequestMetadata,
+        request: FirmwareStatusNotificationReq
+    ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> {
+        val mapper: FirmwareStatusNotificationMapper = Mappers.getMapper(FirmwareStatusNotificationMapper::class.java)
+        if (!mapper.isSupported(request.status)) {
+            logger.warn("FirmwareStatus ${request.status} has no OCPP 1.5 equivalent, notification ignored")
+            return OperationExecution(ExecutionMetadata(meta, RequestStatus.NOT_SEND), request, FirmwareStatusNotificationResp())
+        }
+        val response = operations.firmwareStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun clearedChargingLimit(
+        meta: RequestMetadata,
+        request: ClearedChargingLimitReq
+    ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> {
+        throw IllegalStateException("clearedChargingLimit can't be call in OCPP 1.5")
+    }
+
+    override fun getCertificateStatus(
+        meta: RequestMetadata,
+        request: GetCertificateStatusReq
+    ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> {
+        throw IllegalStateException("GetCertificateStatus can't be call in OCPP 1.5")
+    }
+
+    override fun notifyCustomerInformation(
+        meta: RequestMetadata,
+        request: NotifyCustomerInformationReq
+    ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> {
+        throw IllegalStateException("notifyCustomerInformation can't be call in OCPP 1.5")
+    }
+
+    override fun notifyEvent(
+        meta: RequestMetadata,
+        request: NotifyEventReq
+    ): OperationExecution<NotifyEventReq, NotifyEventResp> {
+        throw IllegalStateException("NotifyEvent can't be call in OCPP 1.5")
+    }
+
+    override fun notifyEVChargingSchedule(
+        meta: RequestMetadata,
+        request: NotifyEVChargingScheduleReq
+    ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> {
+        throw IllegalStateException("notifyEVChargingSchedule can't be called in OCPP 1.5")
+    }
+
+    override fun notifyChargingLimit(
+        meta: RequestMetadata,
+        request: NotifyChargingLimitReq
+    ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp> {
+        throw IllegalStateException("NotifyChargingLimit can't be call in OCPP 1.5")
+    }
+
+    override fun notifyDisplayMessages(
+        meta: RequestMetadata,
+        request: NotifyDisplayMessagesReq
+    ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> {
+        throw IllegalStateException("notifyDisplayMessages can't be call in OCPP 1.5")
+    }
+
+    override fun notifyEVChargingNeeds(
+        meta: RequestMetadata,
+        request: NotifyEVChargingNeedsReq
+    ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> {
+        throw IllegalStateException("NotifyEVChargingNeeds can't be call in OCPP 1.5")
+    }
+
+    override fun logStatusNotification(
+        meta: RequestMetadata,
+        request: LogStatusNotificationReq
+    ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> {
+        throw IllegalStateException("logStatusNotification can't be call in OCPP 1.5")
+    }
+
+    override fun diagnosticsStatusNotification(
+        meta: RequestMetadata,
+        request: DiagnosticsStatusNotificationReq
+    ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> {
+        val mapper: DiagnosticsStatusNotificationMapper = Mappers.getMapper(DiagnosticsStatusNotificationMapper::class.java)
+        if (!mapper.isSupported(request.status)) {
+            logger.warn("DiagnosticsStatus ${request.status} has no OCPP 1.5 equivalent, notification ignored")
+            return OperationExecution(
+                ExecutionMetadata(meta, RequestStatus.NOT_SEND),
+                request,
+                DiagnosticsStatusNotificationResp()
+            )
+        }
+        val response = operations.diagnosticsStatusNotification(meta, mapper.genToCoreReq(request))
+        return OperationExecution(response.executionMeta, request, mapper.coreToGenResp(response.response))
+    }
+
+    override fun publishFirmwareStatusNotification(
+        meta: RequestMetadata,
+        request: PublishFirmwareStatusNotificationReq
+    ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> {
+        throw IllegalStateException("PublishFirmwareStatusNotification can't be call in OCPP 1.5")
+    }
+
+    override fun notifyMonitoringReport(
+        meta: RequestMetadata,
+        request: NotifyMonitoringReportReq
+    ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> {
+        throw IllegalStateException("NotifyMonitoringReport can't be call in OCPP 1.5")
+    }
+
+    override fun reservationStatusUpdate(
+        meta: RequestMetadata,
+        request: ReservationStatusUpdateReq
+    ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> {
+        throw IllegalStateException("ReservationStatusUpdate can't be call in OCPP 1.5")
+    }
+
+    override fun securityEventNotification(
+        meta: RequestMetadata,
+        request: SecurityEventNotificationReq
+    ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> {
+        throw IllegalStateException("SecurityEventNotification can't be call in OCPP 1.5")
+    }
+
+    override fun signCertificate(
+        meta: RequestMetadata,
+        request: SignCertificateReq
+    ): OperationExecution<SignCertificateReq, SignCertificateResp> {
+        throw IllegalStateException("SignCertificate can't be call in OCPP 1.5")
+    }
+
+    override fun reportChargingProfiles(
+        meta: RequestMetadata,
+        request: ReportChargingProfilesReq
+    ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> {
+        throw IllegalStateException("ReportChargingProfiles can't be call in OCPP 1.5")
+    }
+}

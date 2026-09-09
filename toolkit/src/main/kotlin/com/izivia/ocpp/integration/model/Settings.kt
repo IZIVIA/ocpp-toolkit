@@ -21,7 +21,8 @@ data class Settings(
      * Whether the OCPP 1.6 charge point speaks the OCPP 1.6-J Security Whitepaper.
      * Ignored for the other OCPP versions.
      */
-    val ocpp16SecurityExtensions: Boolean = false
+    val ocpp16SecurityExtensions: Boolean = false,
+    val newMessageId: () -> String = { UUID.randomUUID().toString() },
 )
 
 data class CSMSSettings(

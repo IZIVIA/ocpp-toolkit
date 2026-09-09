@@ -1,0 +1,47 @@
+package com.izivia.ocpp.adapter15.mapper
+
+import com.izivia.ocpp.api.model.common.ComponentType
+import com.izivia.ocpp.api.model.common.VariableType
+import com.izivia.ocpp.api.model.setvariables.SetVariableDataType
+import com.izivia.ocpp.api.model.setvariables.enumeration.SetVariableStatusEnumType
+import com.izivia.ocpp.core15.model.changeconfiguration.ChangeConfigurationReq
+import com.izivia.ocpp.core15.model.changeconfiguration.ChangeConfigurationResp
+import com.izivia.ocpp.core15.model.changeconfiguration.enumeration.ConfigurationStatus
+import org.mapstruct.Mapper
+import org.mapstruct.ReportingPolicy
+import com.izivia.ocpp.api.model.setvariables.SetVariablesReq as SetVariablesReqGen
+import com.izivia.ocpp.api.model.setvariables.SetVariablesResp as SetVariablesRespGen
+
+@Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
+abstract class ChangeConfigurationMapper {
+
+    private fun convertVariableEnum(value: SetVariableStatusEnumType): ConfigurationStatus =
+        when (value) {
+            SetVariableStatusEnumType.Accepted -> ConfigurationStatus.Accepted
+            SetVariableStatusEnumType.Rejected -> ConfigurationStatus.Rejected
+            SetVariableStatusEnumType.UnknownComponent,
+            SetVariableStatusEnumType.UnknownVariable,
+            SetVariableStatusEnumType.NotSupportedAttributeType -> ConfigurationStatus.NotSupported
+            // OCPP 1.5 has no RebootRequired status: the value was accepted, a reboot is needed to apply it.
+            SetVariableStatusEnumType.RebootRequired -> ConfigurationStatus.Accepted
+        }
+
+    fun genToCoreResp(changeConfigResp: SetVariablesRespGen): ChangeConfigurationResp {
+        check(changeConfigResp.setVariableResult.size == 1) {
+            "SetVariables must return exactly 1 SetVariableResultType : ${changeConfigResp.setVariableResult.size} != 1"
+        }
+        return ChangeConfigurationResp(convertVariableEnum(changeConfigResp.setVariableResult[0].attributeStatus))
+    }
+
+
+    fun coreToGenReq(changeConfigReq: ChangeConfigurationReq): SetVariablesReqGen =
+        SetVariablesReqGen(
+            listOf(
+                SetVariableDataType(
+                    attributeValue = changeConfigReq.value,
+                    component = ComponentType(changeConfigReq.key),
+                    variable = VariableType(changeConfigReq.key)
+                )
+            )
+        )
+}

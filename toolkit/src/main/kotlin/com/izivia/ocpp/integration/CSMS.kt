@@ -15,15 +15,18 @@ import org.http4k.routing.websockets
 import org.http4k.core.PolyHandler
 import org.http4k.server.asServer
 import org.slf4j.LoggerFactory
-import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
-import com.izivia.ocpp.core15.impl.RealCSMSOperations as RealCSMSOperations15
-import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
-import com.izivia.ocpp.core15.CSMSOperations as CSMSOperations15
-import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
-import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
 import com.izivia.ocpp.core20.CSMSOperations as CSMSOperations20
 import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
 import com.izivia.ocpp.core20.impl.RealCSMSOperations as RealCSMSOperations20
+import com.izivia.ocpp.core16.CSMSOperations as CSMSOperations16
+import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
+import com.izivia.ocpp.core16.impl.RealCSMSOperations as RealCSMSOperations16
+import com.izivia.ocpp.core15.CSMSOperations as CSMSOperations15
+import com.izivia.ocpp.core15.ChargePointOperations as ChargePointOperations15
+import com.izivia.ocpp.core15.impl.RealCSMSOperations as RealCSMSOperations15
+import com.izivia.ocpp.core12.CSMSOperations as CSMSOperations12
+import com.izivia.ocpp.core12.ChargePointOperations as ChargePointOperations12
+import com.izivia.ocpp.core12.impl.RealCSMSOperations as RealCSMSOperations12
 import com.izivia.ocpp.security16.SecurityCSMSOperations as SecurityCSMSOperations16
 import com.izivia.ocpp.security16.SecurityChargePointOperations as SecurityChargePointOperations16
 
@@ -49,12 +52,14 @@ class CSMS(
 
         val entries = mutableListOf<Pair<CsApiType, CSCallbacks>>()
         when (csmsApi) {
+            is ChargePointOperations20 ->
+                entries += CsApiType.OcppCsApiType(OCPP_2_0) to RealCSMSOperations20(transportsFor(OCPP_2_0), fn, csmsApi)
             is ChargePointOperations16 ->
                 entries += CsApiType.OcppCsApiType(OCPP_1_6) to RealCSMSOperations16(transportsFor(OCPP_1_6), fn, csmsApi)
             is ChargePointOperations15 ->
                 entries += CsApiType.OcppCsApiType(OCPP_1_5) to RealCSMSOperations15(transportsFor(OCPP_1_5), fn, csmsApi)
-            is ChargePointOperations20 ->
-                entries += CsApiType.OcppCsApiType(OCPP_2_0) to RealCSMSOperations20(transportsFor(OCPP_2_0), fn, csmsApi)
+            is ChargePointOperations12 ->
+                entries += CsApiType.OcppCsApiType(OCPP_1_2) to RealCSMSOperations12(transportsFor(OCPP_1_2), fn, csmsApi)
         }
         // Security is an independent facet: a single callback object may implement both a core
         // ChargePointOperations and SecurityChargePointOperations, so register it separately
@@ -117,8 +122,8 @@ class CSMS(
     fun getCSApiGeneric(): CSApi =
         csApi[CsApiType.GenericCsApiType()] as CSApi? ?: throw IllegalStateException("No generic api is available")
 
-    fun getCSApi15(): CSMSOperations15 =
-        csApi[CsApiType.OcppCsApiType(OCPP_1_5)] as CSMSOperations15? ?: throw IllegalStateException("No 1.5 api is available")
+    fun getCSApi20(): CSMSOperations20 =
+        csApi[CsApiType.OcppCsApiType(OCPP_2_0)] as CSMSOperations20? ?: throw IllegalStateException("No 2.0.1 api is available")
 
     fun getCSApi16(): CSMSOperations16 =
         csApi[CsApiType.OcppCsApiType(OCPP_1_6)] as CSMSOperations16? ?: throw IllegalStateException("No 1.6 api is available")
@@ -127,8 +132,11 @@ class CSMS(
         csApi[CsApiType.OcppSecurityCsApiType(OCPP_1_6)] as SecurityCSMSOperations16?
             ?: throw IllegalStateException("No 1.6 security api is available")
 
-    fun getCSApi20(): CSMSOperations20 =
-        csApi[CsApiType.OcppCsApiType(OCPP_2_0)] as CSMSOperations20? ?: throw IllegalStateException("No 2.0.1 api is available")
+    fun getCSApi15(): CSMSOperations15 =
+        csApi[CsApiType.OcppCsApiType(OCPP_1_5)] as CSMSOperations15? ?: throw IllegalStateException("No 1.5 api is available")
+
+    fun getCSApi12(): CSMSOperations12 =
+        csApi[CsApiType.OcppCsApiType(OCPP_1_2)] as CSMSOperations12? ?: throw IllegalStateException("No 1.2 api is available")
 
 }
 
