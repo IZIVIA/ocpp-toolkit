@@ -6,6 +6,9 @@ The `json` layer implements OCPP-J (JSON over WebSocket) for a given protocol ve
 the shared parsing/validation machinery in `ocpp-json` to a version's `core` model, and ships the
 official OCPP JSON schemas used to validate every payload on the wire.
 
+Those schemas are the machine-readable protocol contract. To read them by field rather than by
+file, generate the reference in [protocol/](protocol/README.md) and grep it.
+
 Instances: `ocpp-1-5-json`, `ocpp-1-6-json`, `ocpp-2-0-json` — one per supported OCPP version.
 OCPP-J is the only wire format for 2.0.1 (there is no `ocpp-2-0-soap`).
 
@@ -31,6 +34,13 @@ flowchart LR
   `<Action><Suffix>.json` in `src/main/resources/`. A schema file whose name does not exactly
   match the expected `Actions`-derived name fails validation with a confusing "schema not
   found" error rather than a clear naming complaint — get the file name right.
+- **A registered action with no schema file throws; it does not skip validation.** The lookup
+  reaches `JsonSchemaFactory.getSchema(null)` and raises
+  `IllegalArgumentException: argument "in" is null`, so the action is unusable over OCPP-J rather
+  than merely unchecked. **`get15118EVCertificate` (2.0.1) is in this state today**: it has an
+  `Actions` entry and model classes, but no `Get15118EVCertificateRequest.json` /
+  `Get15118EVCertificateResponse.json`, and no test covers it. Adding an `Actions` entry therefore
+  obliges you to add both schema files in the same change.
 - **Validation is opt-out, not opt-in.** The parser constructor takes
   `enableValidation: Boolean = true`; passing `false` drops the `OcppJsonValidator` entirely via
   `takeIf { enableValidation }`. Useful for talking to a non-conforming peer, at the cost of
@@ -94,7 +104,12 @@ ocpp-<version>-json/
 These are real, deliberate differences between instances — do not "fix" one to match another:
 
 - **JSON Schema draft differs**: 1.5 and 1.6 validate against `SpecVersion.VersionFlag.V4`;
-  2.0.1 validates against `V6`.
+  2.0.1 validates against `V6`. Note that in 1.6 this does **not** match what the files declare:
+  all 22 Security Whitepaper schemas (`GetLog*`, `*Certificate*`, `SignedUpdateFirmware*`,
+  `SecurityEventNotification*`, `LogStatusNotification*`, `ExtendedTriggerMessage*`) declare
+  `draft-06`, while the other 56 declare `draft-04` and the validator is fixed at `V4` for all of
+  them. Keywords whose meaning changed between the drafts are therefore interpreted as draft-04 on
+  schemas written for draft-06.
 - **CALL request schema name differs**: 1.5 names the request schema after the **bare** action
   (e.g. `Authorize.json`, no `Request` suffix); 1.6 and 2.0.1 use `${action}Request.json`. The
   response schema is always `${action}Response.json` in all three.

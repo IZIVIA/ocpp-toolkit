@@ -256,6 +256,10 @@ separately — do not duplicate them here:
   (OCPP-J wire format + `JsonSchemaTest`).
 - [docs/SOAP.guidelines.md](SOAP.guidelines.md) — conventions shared by the `ocpp-*-soap` modules
   (OCPP-S wire format).
+- [docs/protocol/](protocol/README.md) — the generated, grep-able protocol reference: what fields
+  each action carries in each version, and who initiates it. Generate it with
+  `python3 docs/protocol/generate.py`; the output is gitignored on purpose
+  ([why](protocol/SPECS.md#licensing)).
 
 Cross-cutting / non-versioned modules:
 

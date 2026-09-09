@@ -34,6 +34,12 @@ on the `toolkit` module, which aggregates everything else.
 - [docs/SECURITY.md](docs/SECURITY.md) — security scope, and what is explicitly out of it
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) — release process and Maven Central publishing
 
+### Protocol reference
+- [docs/protocol/](docs/protocol/README.md) — grep-able per-version field/action reference generated
+  from the vendored OCPP JSON schemas; run `python3 docs/protocol/generate.py` once to produce it
+- [docs/protocol/SPECS.md](docs/protocol/SPECS.md) — where the normative OCPP documents are, and
+  which edition the vendored schemas actually correspond to
+
 ### Layer guidelines
 Conventions shared across each family of repeated modules:
 - [docs/CORE.guidelines.md](docs/CORE.guidelines.md) — protocol model, operation interfaces, `Actions` registry

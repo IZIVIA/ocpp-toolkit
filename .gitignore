@@ -2,3 +2,8 @@ build
 .gradle
 .idea
 .DS_Store
+__pycache__/
+
+# Generated protocol reference: a CC BY-ND derivative, kept local. See docs/protocol/SPECS.md
+docs/protocol/OCPP-*.md
+docs/protocol/ACTIONS.md
