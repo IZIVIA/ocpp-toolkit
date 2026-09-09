@@ -1,0 +1,245 @@
+# OCPP 1.6 edition 2 (FINAL, 2017-09-28)
+
+Headings of this document mapped to their PDF page. The document itself is
+OCA copyright and not in this repository. **Grep this file, do not read it whole.**
+
+```bash
+grep -n 'Authorization' docs/protocol/spec/1.6/ocpp-1.6-edition-2.md
+```
+- `ocpp-1.6-edition-2 pdf-page 9` — **1** Scope
+- `ocpp-1.6-edition-2 pdf-page 10` — **2** Terminology and Conventions
+- `ocpp-1.6-edition-2 pdf-page 10` — **2.1** Conventions
+- `ocpp-1.6-edition-2 pdf-page 10` — **2.2** Definitions
+- `ocpp-1.6-edition-2 pdf-page 11` — **2.3** Abbreviations
+- `ocpp-1.6-edition-2 pdf-page 12` — **2.4** References
+- `ocpp-1.6-edition-2 pdf-page 13` — **3** Introduction
+- `ocpp-1.6-edition-2 pdf-page 13` — **3.2** Document structure
+- `ocpp-1.6-edition-2 pdf-page 13` — **3.3** Feature Profiles
+- `ocpp-1.6-edition-2 pdf-page 15` — **3.4** General views of operation
+- `ocpp-1.6-edition-2 pdf-page 17` — **3.5** Local Authorization & Offline Behavior
+- `ocpp-1.6-edition-2 pdf-page 18` — **3.5.1** Authorization Cache
+- `ocpp-1.6-edition-2 pdf-page 18` — **3.5.2** Local Authorization List
+- `ocpp-1.6-edition-2 pdf-page 19` — **3.5.3** Relation between Authorization Cache and Local Authorization List
+- `ocpp-1.6-edition-2 pdf-page 19` — **3.5.4** Unknown Offline Authorization
+- `ocpp-1.6-edition-2 pdf-page 20` — **3.6** Transaction in relation to Energy Transfer Period
+- `ocpp-1.6-edition-2 pdf-page 22` — **3.7** Transaction-related messages
+- `ocpp-1.6-edition-2 pdf-page 22` — **3.7.1** Error responses to transaction-related messages
+- `ocpp-1.6-edition-2 pdf-page 23` — **3.8** Connector numbering
+- `ocpp-1.6-edition-2 pdf-page 23` — **3.9** ID Tokens
+- `ocpp-1.6-edition-2 pdf-page 24` — **3.10** Parent idTag
+- `ocpp-1.6-edition-2 pdf-page 24` — **3.11** Reservations
+- `ocpp-1.6-edition-2 pdf-page 24` — **3.12** Vendor-specific data transfer
+- `ocpp-1.6-edition-2 pdf-page 25` — **3.13** Smart Charging
+- `ocpp-1.6-edition-2 pdf-page 25` — **3.13.1** Charging profile purposes
+- `ocpp-1.6-edition-2 pdf-page 26` — **3.13.2** Stacking charging profiles
+- `ocpp-1.6-edition-2 pdf-page 26` — **3.13.3** Combining charging profile purposes
+- `ocpp-1.6-edition-2 pdf-page 27` — **3.13.4** Smart Charging Use Cases
+- `ocpp-1.6-edition-2 pdf-page 27` — **1** EV1
+- `ocpp-1.6-edition-2 pdf-page 31` — **3.13.5** Discovery of Charge Point Capabilities
+- `ocpp-1.6-edition-2 pdf-page 32` — **3.13.6** Offline behavior of smart charging
+- `ocpp-1.6-edition-2 pdf-page 32` — **3.13.7** Example data structure for smart charging
+- `ocpp-1.6-edition-2 pdf-page 34` — **3.14** Time zones
+- `ocpp-1.6-edition-2 pdf-page 34` — **3.15** Time notations
+- `ocpp-1.6-edition-2 pdf-page 34` — **3.16** Metering Data
+- `ocpp-1.6-edition-2 pdf-page 34` — **3.16.1** Charging Session Meter Values
+- `ocpp-1.6-edition-2 pdf-page 35` — **3.16.2** Clock-Aligned Meter Values
+- `ocpp-1.6-edition-2 pdf-page 36` — **3.16.3** Multiple Locations/Phases
+- `ocpp-1.6-edition-2 pdf-page 36` — **3.16.4** Unsupported measurands
+- `ocpp-1.6-edition-2 pdf-page 36` — **3.16.5** No metering data in a Stop Transaction
+- `ocpp-1.6-edition-2 pdf-page 37` — **4** Operations Initiated by Charge Point
+- `ocpp-1.6-edition-2 pdf-page 37` — **4.1** Authorize
+- `ocpp-1.6-edition-2 pdf-page 37` — **4.2** Boot Notification
+- `ocpp-1.6-edition-2 pdf-page 38` — **4.2.1** Transactions before being accepted by a Central System
+- `ocpp-1.6-edition-2 pdf-page 39` — **4.3** Data Transfer
+- `ocpp-1.6-edition-2 pdf-page 39` — **4.4** Diagnostics Status Notification
+- `ocpp-1.6-edition-2 pdf-page 39` — **4.5** Firmware Status Notification
+- `ocpp-1.6-edition-2 pdf-page 40` — **4.6** Heartbeat
+- `ocpp-1.6-edition-2 pdf-page 40` — **4.7** Meter Values
+- `ocpp-1.6-edition-2 pdf-page 42` — **4.8** Start Transaction
+- `ocpp-1.6-edition-2 pdf-page 43` — **4.9** Status Notification
+- `ocpp-1.6-edition-2 pdf-page 48` — **4.10** Stop Transaction
+- `ocpp-1.6-edition-2 pdf-page 50` — **5** Operations Initiated by Central System
+- `ocpp-1.6-edition-2 pdf-page 50` — **5.1** Cancel Reservation
+- `ocpp-1.6-edition-2 pdf-page 50` — **5.2** Change Availability
+- `ocpp-1.6-edition-2 pdf-page 50` — **5.3** Change Configuration
+- `ocpp-1.6-edition-2 pdf-page 51` — **5.4** Clear Cache
+- `ocpp-1.6-edition-2 pdf-page 52` — **5.5** Clear Charging Profile
+- `ocpp-1.6-edition-2 pdf-page 52` — **5.6** Data Transfer
+- `ocpp-1.6-edition-2 pdf-page 52` — **5.7** Get Composite Schedule
+- `ocpp-1.6-edition-2 pdf-page 53` — **5.8** Get Configuration
+- `ocpp-1.6-edition-2 pdf-page 53` — **5.9** Get Diagnostics
+- `ocpp-1.6-edition-2 pdf-page 54` — **5.10** Get Local List Version
+- `ocpp-1.6-edition-2 pdf-page 54` — **5.11** Remote Start Transaction
+- `ocpp-1.6-edition-2 pdf-page 55` — **5.12** Remote Stop Transaction
+- `ocpp-1.6-edition-2 pdf-page 56` — **5.13** Reserve Now
+- `ocpp-1.6-edition-2 pdf-page 57` — **5.14** Reset
+- `ocpp-1.6-edition-2 pdf-page 57` — **5.15** Send Local List
+- `ocpp-1.6-edition-2 pdf-page 58` — **5.16** Set Charging Profile
+- `ocpp-1.6-edition-2 pdf-page 59` — **5.16.1** Setting a charging profile at start of transaction
+- `ocpp-1.6-edition-2 pdf-page 59` — **5.16.2** Setting a charge profile in a RemoteStartTransaction request
+- `ocpp-1.6-edition-2 pdf-page 59` — **5.16.4** Setting a charging profile outside of a transaction
+- `ocpp-1.6-edition-2 pdf-page 60` — **5.17** Trigger Message
+- `ocpp-1.6-edition-2 pdf-page 61` — **5.18** Unlock Connector
+- `ocpp-1.6-edition-2 pdf-page 62` — **5.19** Update Firmware
+- `ocpp-1.6-edition-2 pdf-page 65` — **6** Messages
+- `ocpp-1.6-edition-2 pdf-page 65` — **6.1** Authorize.req
+- `ocpp-1.6-edition-2 pdf-page 65` — **6.2** Authorize.conf
+- `ocpp-1.6-edition-2 pdf-page 65` — **6.3** BootNotification.req
+- `ocpp-1.6-edition-2 pdf-page 66` — **6.4** BootNotification.conf
+- `ocpp-1.6-edition-2 pdf-page 66` — **6.5** CancelReservation.req
+- `ocpp-1.6-edition-2 pdf-page 66` — **6.6** CancelReservation.conf
+- `ocpp-1.6-edition-2 pdf-page 66` — **6.7** ChangeAvailability.req
+- `ocpp-1.6-edition-2 pdf-page 67` — **6.8** ChangeAvailability.conf
+- `ocpp-1.6-edition-2 pdf-page 67` — **6.9** ChangeConfiguration.req
+- `ocpp-1.6-edition-2 pdf-page 67` — **6.10** ChangeConfiguration.conf
+- `ocpp-1.6-edition-2 pdf-page 67` — **6.11** ClearCache.req
+- `ocpp-1.6-edition-2 pdf-page 68` — **6.12** ClearCache.conf
+- `ocpp-1.6-edition-2 pdf-page 68` — **6.13** ClearChargingProfile.req
+- `ocpp-1.6-edition-2 pdf-page 68` — **6.14** ClearChargingProfile.conf
+- `ocpp-1.6-edition-2 pdf-page 68` — **6.15** DataTransfer.req
+- `ocpp-1.6-edition-2 pdf-page 69` — **6.16** DataTransfer.conf
+- `ocpp-1.6-edition-2 pdf-page 69` — **6.17** DiagnosticsStatusNotification.req
+- `ocpp-1.6-edition-2 pdf-page 69` — **6.18** DiagnosticsStatusNotification.conf
+- `ocpp-1.6-edition-2 pdf-page 69` — **6.19** FirmwareStatusNotification.req
+- `ocpp-1.6-edition-2 pdf-page 70` — **6.20** FirmwareStatusNotification.conf
+- `ocpp-1.6-edition-2 pdf-page 70` — **6.21** GetCompositeSchedule.req
+- `ocpp-1.6-edition-2 pdf-page 70` — **6.22** GetCompositeSchedule.conf
+- `ocpp-1.6-edition-2 pdf-page 70` — **6.23** GetConfiguration.req
+- `ocpp-1.6-edition-2 pdf-page 71` — **6.24** GetConfiguration.conf
+- `ocpp-1.6-edition-2 pdf-page 71` — **6.25** GetDiagnostics.req
+- `ocpp-1.6-edition-2 pdf-page 71` — **6.26** GetDiagnostics.conf
+- `ocpp-1.6-edition-2 pdf-page 71` — **6.27** GetLocalListVersion.req
+- `ocpp-1.6-edition-2 pdf-page 72` — **6.28** GetLocalListVersion.conf
+- `ocpp-1.6-edition-2 pdf-page 72` — **6.29** Heartbeat.req
+- `ocpp-1.6-edition-2 pdf-page 72` — **6.30** Heartbeat.conf
+- `ocpp-1.6-edition-2 pdf-page 72` — **6.31** MeterValues.req
+- `ocpp-1.6-edition-2 pdf-page 72` — **6.32** MeterValues.conf
+- `ocpp-1.6-edition-2 pdf-page 73` — **6.33** RemoteStartTransaction.req
+- `ocpp-1.6-edition-2 pdf-page 73` — **6.34** RemoteStartTransaction.conf
+- `ocpp-1.6-edition-2 pdf-page 73` — **6.35** RemoteStopTransaction.req
+- `ocpp-1.6-edition-2 pdf-page 73` — **6.36** RemoteStopTransaction.conf
+- `ocpp-1.6-edition-2 pdf-page 73` — **6.37** ReserveNow.req
+- `ocpp-1.6-edition-2 pdf-page 74` — **6.38** ReserveNow.conf
+- `ocpp-1.6-edition-2 pdf-page 74` — **6.39** Reset.req
+- `ocpp-1.6-edition-2 pdf-page 74` — **6.40** Reset.conf
+- `ocpp-1.6-edition-2 pdf-page 74` — **6.41** SendLocalList.req
+- `ocpp-1.6-edition-2 pdf-page 75` — **6.42** SendLocalList.conf
+- `ocpp-1.6-edition-2 pdf-page 75` — **6.43** SetChargingProfile.req
+- `ocpp-1.6-edition-2 pdf-page 75` — **6.44** SetChargingProfile.conf
+- `ocpp-1.6-edition-2 pdf-page 76` — **6.45** StartTransaction.req
+- `ocpp-1.6-edition-2 pdf-page 76` — **6.46** StartTransaction.conf
+- `ocpp-1.6-edition-2 pdf-page 76` — **6.47** StatusNotification.req
+- `ocpp-1.6-edition-2 pdf-page 77` — **6.48** StatusNotification.conf
+- `ocpp-1.6-edition-2 pdf-page 77` — **6.49** StopTransaction.req
+- `ocpp-1.6-edition-2 pdf-page 77` — **6.50** StopTransaction.conf
+- `ocpp-1.6-edition-2 pdf-page 78` — **6.51** TriggerMessage.req
+- `ocpp-1.6-edition-2 pdf-page 78` — **6.52** TriggerMessage.conf
+- `ocpp-1.6-edition-2 pdf-page 78` — **6.53** UnlockConnector.req
+- `ocpp-1.6-edition-2 pdf-page 78` — **6.54** UnlockConnector.conf
+- `ocpp-1.6-edition-2 pdf-page 78` — **6.55** UpdateFirmware.req
+- `ocpp-1.6-edition-2 pdf-page 79` — **6.56** UpdateFirmware.conf
+- `ocpp-1.6-edition-2 pdf-page 80` — **7** Types
+- `ocpp-1.6-edition-2 pdf-page 80` — **7.1** AuthorizationData
+- `ocpp-1.6-edition-2 pdf-page 80` — **7.2** AuthorizationStatus
+- `ocpp-1.6-edition-2 pdf-page 80` — **7.3** AvailabilityStatus
+- `ocpp-1.6-edition-2 pdf-page 81` — **7.4** AvailabilityType
+- `ocpp-1.6-edition-2 pdf-page 81` — **7.5** CancelReservationStatus
+- `ocpp-1.6-edition-2 pdf-page 81` — **7.6** ChargePointErrorCode
+- `ocpp-1.6-edition-2 pdf-page 82` — **7.7** ChargePointStatus
+- `ocpp-1.6-edition-2 pdf-page 83` — **7.8** ChargingProfile
+- `ocpp-1.6-edition-2 pdf-page 84` — **7.9** ChargingProfileKindType
+- `ocpp-1.6-edition-2 pdf-page 84` — **7.10** ChargingProfilePurposeType
+- `ocpp-1.6-edition-2 pdf-page 85` — **7.11** ChargingProfileStatus
+- `ocpp-1.6-edition-2 pdf-page 85` — **7.12** ChargingRateUnitType
+- `ocpp-1.6-edition-2 pdf-page 85` — **7.13** ChargingSchedule
+- `ocpp-1.6-edition-2 pdf-page 86` — **7.14** ChargingSchedulePeriod
+- `ocpp-1.6-edition-2 pdf-page 86` — **7.15** CiString20Type
+- `ocpp-1.6-edition-2 pdf-page 86` — **7.16** CiString25Type
+- `ocpp-1.6-edition-2 pdf-page 87` — **7.17** CiString50Type
+- `ocpp-1.6-edition-2 pdf-page 87` — **7.18** CiString255Type
+- `ocpp-1.6-edition-2 pdf-page 87` — **7.19** CiString500Type
+- `ocpp-1.6-edition-2 pdf-page 87` — **7.20** ClearCacheStatus
+- `ocpp-1.6-edition-2 pdf-page 88` — **7.21** ClearChargingProfileStatus
+- `ocpp-1.6-edition-2 pdf-page 88` — **7.22** ConfigurationStatus
+- `ocpp-1.6-edition-2 pdf-page 88` — **7.23** DataTransferStatus
+- `ocpp-1.6-edition-2 pdf-page 89` — **7.24** DiagnosticsStatus
+- `ocpp-1.6-edition-2 pdf-page 89` — **7.25** FirmwareStatus
+- `ocpp-1.6-edition-2 pdf-page 89` — **7.26** GetCompositeScheduleStatus
+- `ocpp-1.6-edition-2 pdf-page 90` — **7.27** IdTagInfo
+- `ocpp-1.6-edition-2 pdf-page 90` — **7.28** IdToken
+- `ocpp-1.6-edition-2 pdf-page 90` — **7.29** KeyValue
+- `ocpp-1.6-edition-2 pdf-page 91` — **7.30** Location
+- `ocpp-1.6-edition-2 pdf-page 91` — **7.31** Measurand
+- `ocpp-1.6-edition-2 pdf-page 93` — **7.32** MessageTrigger
+- `ocpp-1.6-edition-2 pdf-page 93` — **7.33** MeterValue
+- `ocpp-1.6-edition-2 pdf-page 94` — **7.34** Phase
+- `ocpp-1.6-edition-2 pdf-page 94` — **7.35** ReadingContext
+- `ocpp-1.6-edition-2 pdf-page 95` — **7.36** Reason
+- `ocpp-1.6-edition-2 pdf-page 95` — **7.37** RecurrencyKindType
+- `ocpp-1.6-edition-2 pdf-page 96` — **7.38** RegistrationStatus
+- `ocpp-1.6-edition-2 pdf-page 96` — **7.39** RemoteStartStopStatus
+- `ocpp-1.6-edition-2 pdf-page 96` — **7.40** ReservationStatus
+- `ocpp-1.6-edition-2 pdf-page 97` — **7.41** ResetStatus
+- `ocpp-1.6-edition-2 pdf-page 97` — **7.42** ResetType
+- `ocpp-1.6-edition-2 pdf-page 97` — **7.43** SampledValue
+- `ocpp-1.6-edition-2 pdf-page 98` — **7.44** TriggerMessageStatus
+- `ocpp-1.6-edition-2 pdf-page 98` — **7.45** UnitOfMeasure
+- `ocpp-1.6-edition-2 pdf-page 99` — **7.46** UnlockStatus
+- `ocpp-1.6-edition-2 pdf-page 99` — **7.47** UpdateStatus
+- `ocpp-1.6-edition-2 pdf-page 100` — **7.48** UpdateType
+- `ocpp-1.6-edition-2 pdf-page 100` — **7.49** ValueFormat
+- `ocpp-1.6-edition-2 pdf-page 101` — **8** Firmware and Diagnostics File Transfer
+- `ocpp-1.6-edition-2 pdf-page 101` — **8.1** Download Firmware
+- `ocpp-1.6-edition-2 pdf-page 101` — **8.2** Upload Diagnostics
+- `ocpp-1.6-edition-2 pdf-page 102` — **9** Standard Configuration Key Names & Values
+- `ocpp-1.6-edition-2 pdf-page 102` — **9.1** Core Profile
+- `ocpp-1.6-edition-2 pdf-page 102` — **9.1.1** AllowOfflineTxForUnknownId
+- `ocpp-1.6-edition-2 pdf-page 102` — **9.1.2** AuthorizationCacheEnabled
+- `ocpp-1.6-edition-2 pdf-page 102` — **9.1.3** AuthorizeRemoteTxRequests
+- `ocpp-1.6-edition-2 pdf-page 103` — **9.1.4** BlinkRepeat
+- `ocpp-1.6-edition-2 pdf-page 103` — **9.1.5** ClockAlignedDataInterval
+- `ocpp-1.6-edition-2 pdf-page 103` — **9.1.6** ConnectionTimeOut
+- `ocpp-1.6-edition-2 pdf-page 104` — **9.1.7** ConnectorPhaseRotation
+- `ocpp-1.6-edition-2 pdf-page 104` — **9.1.8** ConnectorPhaseRotationMaxLength
+- `ocpp-1.6-edition-2 pdf-page 104` — **9.1.9** GetConfigurationMaxKeys
+- `ocpp-1.6-edition-2 pdf-page 104` — **9.1.10** HeartbeatInterval
+- `ocpp-1.6-edition-2 pdf-page 105` — **9.1.11** LightIntensity
+- `ocpp-1.6-edition-2 pdf-page 105` — **9.1.12** LocalAuthorizeOffline
+- `ocpp-1.6-edition-2 pdf-page 105` — **9.1.13** LocalPreAuthorize
+- `ocpp-1.6-edition-2 pdf-page 105` — **9.1.14** MaxEnergyOnInvalidId
+- `ocpp-1.6-edition-2 pdf-page 106` — **9.1.15** MeterValuesAlignedData
+- `ocpp-1.6-edition-2 pdf-page 106` — **9.1.16** MeterValuesAlignedDataMaxLength
+- `ocpp-1.6-edition-2 pdf-page 106` — **9.1.17** MeterValuesSampledData
+- `ocpp-1.6-edition-2 pdf-page 106` — **9.1.18** MeterValuesSampledDataMaxLength
+- `ocpp-1.6-edition-2 pdf-page 107` — **9.1.19** MeterValueSampleInterval
+- `ocpp-1.6-edition-2 pdf-page 107` — **9.1.20** MinimumStatusDuration
+- `ocpp-1.6-edition-2 pdf-page 107` — **9.1.21** NumberOfConnectors
+- `ocpp-1.6-edition-2 pdf-page 107` — **9.1.22** ResetRetries
+- `ocpp-1.6-edition-2 pdf-page 108` — **9.1.23** StopTransactionOnEVSideDisconnect
+- `ocpp-1.6-edition-2 pdf-page 108` — **9.1.24** StopTransactionOnInvalidId
+- `ocpp-1.6-edition-2 pdf-page 108` — **9.1.25** StopTxnAlignedData
+- `ocpp-1.6-edition-2 pdf-page 108` — **9.1.26** StopTxnAlignedDataMaxLength
+- `ocpp-1.6-edition-2 pdf-page 109` — **9.1.27** StopTxnSampledData
+- `ocpp-1.6-edition-2 pdf-page 109` — **9.1.28** StopTxnSampledDataMaxLength
+- `ocpp-1.6-edition-2 pdf-page 109` — **9.1.29** SupportedFeatureProfiles
+- `ocpp-1.6-edition-2 pdf-page 109` — **9.1.30** SupportedFeatureProfilesMaxLength
+- `ocpp-1.6-edition-2 pdf-page 110` — **9.1.31** TransactionMessageAttempts
+- `ocpp-1.6-edition-2 pdf-page 110` — **9.1.32** TransactionMessageRetryInterval
+- `ocpp-1.6-edition-2 pdf-page 110` — **9.1.33** UnlockConnectorOnEVSideDisconnect
+- `ocpp-1.6-edition-2 pdf-page 110` — **9.1.34** WebSocketPingInterval
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.2** Local Auth List Management Profile
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.2.1** LocalAuthListEnabled
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.2.2** LocalAuthListMaxLength
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.2.3** SendLocalListMaxLength
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.3** Reservation Profile
+- `ocpp-1.6-edition-2 pdf-page 111` — **9.3.1** ReserveConnectorZeroSupported
+- `ocpp-1.6-edition-2 pdf-page 112` — **9.4** Smart Charging Profile
+- `ocpp-1.6-edition-2 pdf-page 112` — **9.4.1** ChargeProfileMaxStackLevel
+- `ocpp-1.6-edition-2 pdf-page 112` — **9.4.2** ChargingScheduleAllowedChargingRateUnit
+- `ocpp-1.6-edition-2 pdf-page 112` — **9.4.3** ChargingScheduleMaxPeriods
+- `ocpp-1.6-edition-2 pdf-page 112` — **9.4.4** ConnectorSwitch3to1PhaseSupported
+- `ocpp-1.6-edition-2 pdf-page 113` — **9.4.5** MaxChargingProfilesInstalled
+
+---
+
+[OCPP 1.6 documents](../1.6.md) · [protocol reference](../../1.6/README.md)

@@ -1,0 +1,175 @@
+# OCPP 2.0.1 Part 2 errata
+
+Headings of this document mapped to their PDF page. The document itself is
+OCA copyright and not in this repository. **Grep this file, do not read it whole.**
+
+```bash
+grep -n 'Authorization' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-errata.md
+```
+- `ocpp-2.0.1-part2-errata pdf-page 5` — **1** Disclaimer
+- `ocpp-2.0.1-part2-errata pdf-page 6` — **2** Scope
+- `ocpp-2.0.1-part2-errata pdf-page 6` — **2.1** Terminology and Conventions
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **3** General
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **3.1** Requirements take precedence over text [14]
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **3.2** Error in changelog [381]
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **3.3** Respond to request before sending result messages [397]
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **4** Use case A Security
+- `ocpp-2.0.1-part2-errata pdf-page 7` — **4.2** Page 20 - Type of BasicAuthPassword [489]
+- `ocpp-2.0.1-part2-errata pdf-page 8` — **4.2.1** Page 5 - New primitive datatype passwordString
+- `ocpp-2.0.1-part2-errata pdf-page 8` — **4.3** Page 20 - Note about changed password encoding between OCPP
+- `ocpp-2.0.1-part2-errata pdf-page 9` — **7** Remark(s)                […]
+- `ocpp-2.0.1-part2-errata pdf-page 9` — **4.4** Page 20 - Unnecessary precondition for A00.FR.205 [429]
+- `ocpp-2.0.1-part2-errata pdf-page 9` — **4.5** Page 20 - Implicit requirement for CSMS made explicit [440]
+- `ocpp-2.0.1-part2-errata pdf-page 9` — **4.6** Page 23 - Wrong precondition in requirements [444]
+- `ocpp-2.0.1-part2-errata pdf-page 10` — **4.7** Page 24 - Provision for accepting Charging Station with expired
+- `ocpp-2.0.1-part2-errata pdf-page 11` — **4.8** Page 29 - Recommendations for handling expired manufacturer
+- `ocpp-2.0.1-part2-errata pdf-page 11` — **4.9** Page 31 - Additional requirements for updating a Charging Station
+- `ocpp-2.0.1-part2-errata pdf-page 12` — **4.9.1** Page 427 - New SecurityCtrlr variables
+- `ocpp-2.0.1-part2-errata pdf-page 13` — **4.10** Page 33 - Clarification for reconnection with new certificate [149]
+- `ocpp-2.0.1-part2-errata pdf-page 13` — **4.10.1** Page 33 - A02.FR.08
+- `ocpp-2.0.1-part2-errata pdf-page 13` — **4.10.2** Page 36 - A03.FR.08
+- `ocpp-2.0.1-part2-errata pdf-page 13` — **5** Use case B Provisioning
+- `ocpp-2.0.1-part2-errata pdf-page 13` — **5.1.1** Page 421 - Adding minLimit to HeartbeatInterval configuration variable
+- `ocpp-2.0.1-part2-errata pdf-page 14` — **5.4** Page 56 - Use case B08 Get Custom Report: conflicting
+- `ocpp-2.0.1-part2-errata pdf-page 15` — **5.5** Page 66 - Incomplete preconditions in B12 [442]
+- `ocpp-2.0.1-part2-errata pdf-page 15` — **6** Use case C Authorization
+- `ocpp-2.0.1-part2-errata pdf-page 16` — **6.3** Page 83 - Sequence diagram use case C05 [435]
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **6.4.1** Error in description of use case C05
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **5** The Charging Station accepts the RequestStartTransactionRequest by sending a
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **6.4.2** Remarks use case C05
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **8** Remarks                  […]
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **6.5** Page 94 - Requirement C09.FR.11 is partly incorrect [513]
+- `ocpp-2.0.1-part2-errata pdf-page 17` — **6.6** Page 105 - ChargingState in requirement C15.FR.03 [464]
+- `ocpp-2.0.1-part2-errata pdf-page 18` — **7** Use case E Transactions
+- `ocpp-2.0.1-part2-errata pdf-page 18` — **7.1** Page 115 - Setting for OCPP 1.6 transaction compatibility [516]
+- `ocpp-2.0.1-part2-errata pdf-page 19` — **7.2** Page 116 - Using seqNo in TransactionEventRequest when EVSE is
+- `ocpp-2.0.1-part2-errata pdf-page 19` — **7.3** Page 126 - Requirement E02.FR.05 new note about NotifyEvent
+- `ocpp-2.0.1-part2-errata pdf-page 20` — **7.4** Page 126 - Precondition E02.FR.06 is incomplete [438]
+- `ocpp-2.0.1-part2-errata pdf-page 20` — **7.5** Page 126 - Missing requirement about authorization during
+- `ocpp-2.0.1-part2-errata pdf-page 20` — **7.6** Page 130 - Precondition E03.FR.04 is incomplete [435]
+- `ocpp-2.0.1-part2-errata pdf-page 21` — **7.7** Page 143 - Confusing precondition in E06.FR.06 [506]
+- `ocpp-2.0.1-part2-errata pdf-page 21` — **7.8** Page 143 - Requirements for eventType=Started do not belong in
+- `ocpp-2.0.1-part2-errata pdf-page 21` — **7.8.1** Page 143 - Requirement E06.FR.11 and E06.FR.17
+- `ocpp-2.0.1-part2-errata pdf-page 22` — **7.8.2** Page 145 - Requirement E07.FR.08 and E07.FR.13
+- `ocpp-2.0.1-part2-errata pdf-page 24` — **7.10** Page 162 - Misspelled field name in requirements [452]
+- `ocpp-2.0.1-part2-errata pdf-page 25` — **8** Use case F Remote Control
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **8.2** Page 170 - Requirement missing for remoteStartId [517]
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **8.2.1** Page 358 - Minor change to description of remoteStartId
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **8.3** Page 171 - Sequence diagram error [435]
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **8.3.1** Use case F02 scenario description
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **6** The CSMS sends StatusNotificationResponse to the Charging Station
+- `ocpp-2.0.1-part2-errata pdf-page 26` — **11** The CSMS sends TransactionEventResponse to the Charging Station
+- `ocpp-2.0.1-part2-errata pdf-page 27` — **8.3.2** Use case F02 sequence diagram
+- `ocpp-2.0.1-part2-errata pdf-page 28` — **8.5** Page 180 - Requirement F06.FR.06 description improvement [451]
+- `ocpp-2.0.1-part2-errata pdf-page 28` — **8.6** Page 180 - Note to requirement F06.FR.11 is contradicting
+- `ocpp-2.0.1-part2-errata pdf-page 28` — **8.7** Page 180 - Requirement F06.FR.12: evseId cannot be 0 [450]
+- `ocpp-2.0.1-part2-errata pdf-page 29` — **9** Use case G Availability
+- `ocpp-2.0.1-part2-errata pdf-page 29` — **9.1** Page 188 - Precondition of G03.FR.05 is incomplete [368]
+- `ocpp-2.0.1-part2-errata pdf-page 29` — **10** Use case H Reservation
+- `ocpp-2.0.1-part2-errata pdf-page 29` — **10.1** Page 197 - Merging two requirements [445]
+- `ocpp-2.0.1-part2-errata pdf-page 30` — **11** Use case I Tariff And Cost
+- `ocpp-2.0.1-part2-errata pdf-page 30` — **11.1.1** Page 208 - I02 changed requirements
+- `ocpp-2.0.1-part2-errata pdf-page 31` — **11.1.2** Page 367 - TransactionEventResponse
+- `ocpp-2.0.1-part2-errata pdf-page 31` — **12** Use case J Meter Values
+- `ocpp-2.0.1-part2-errata pdf-page 31` — **12.1** Page 214 - Limit the amount of meter values in
+- `ocpp-2.0.1-part2-errata pdf-page 31` — **12.1.1** Section 2.1
+- `ocpp-2.0.1-part2-errata pdf-page 32` — **12.1.2** Requirements J02
+- `ocpp-2.0.1-part2-errata pdf-page 32` — **2.7.18** SampledDataRegisterValuesWithoutPhases
+- `ocpp-2.0.1-part2-errata pdf-page 33` — **12.3** Page 218 - Missing requirement for dealing with
+- `ocpp-2.0.1-part2-errata pdf-page 33` — **12.4** Page 218 - Wrong placement of
+- `ocpp-2.0.1-part2-errata pdf-page 33` — **12.4.1** Page 218 - Requirement J01.FR.16 belongs to use case J02
+- `ocpp-2.0.1-part2-errata pdf-page 33` — **12.4.2** Page 220 - Requirement J02.FR.15 belongs to use case J01
+- `ocpp-2.0.1-part2-errata pdf-page 33` — **12.5.1** Use case J03 row #7
+- `ocpp-2.0.1-part2-errata pdf-page 34` — **7** Combined scenario        15118
+- `ocpp-2.0.1-part2-errata pdf-page 34` — **12.5.2** Use case J03 row #10
+- `ocpp-2.0.1-part2-errata pdf-page 34` — **12.5.3** Requirement J03.FR.03
+- `ocpp-2.0.1-part2-errata pdf-page 35` — **13** Use case K Smart Charging
+- `ocpp-2.0.1-part2-errata pdf-page 35` — **13.2** Page 234 - Use case K01: SetChargingProfile cannot replace
+- `ocpp-2.0.1-part2-errata pdf-page 35` — **13.3** Page 236 - Use case K01: Missing requirement for startSchedule
+- `ocpp-2.0.1-part2-errata pdf-page 36` — **13.4.1** Page 373 - section 2.10 ChargingProfile
+- `ocpp-2.0.1-part2-errata pdf-page 36` — **13.5** Page 250 - Unclear precondition of K08.FR.06 [462]
+- `ocpp-2.0.1-part2-errata pdf-page 36` — **13.6** Page 251 - Requirements K09 GetChargingProfiles [406]
+- `ocpp-2.0.1-part2-errata pdf-page 37` — **13.6.1** Page 346 - GetChargingProfileRequest
+- `ocpp-2.0.1-part2-errata pdf-page 38` — **13.7** Page 252 - Use case K10 requirements are incomplete [502]
+- `ocpp-2.0.1-part2-errata pdf-page 39` — **13.8** Page 253 - K01.FR.34 refers to ChargingSchedulePeriodType, but
+- `ocpp-2.0.1-part2-errata pdf-page 39` — **13.9** Page 254 - Charging profile id’s for external constraints profiles
+- `ocpp-2.0.1-part2-errata pdf-page 40` — **13.10** Page 259 - section K15: Recommendation for
+- `ocpp-2.0.1-part2-errata pdf-page 40` — **13.10.1** Usecase K15
+- `ocpp-2.0.1-part2-errata pdf-page 40` — **13.10.2** Usecase K16
+- `ocpp-2.0.1-part2-errata pdf-page 41` — **13.10.3** Usecase K17
+- `ocpp-2.0.1-part2-errata pdf-page 41` — **13.11** Page 260 - Use case K15: Improved error handling description
+- `ocpp-2.0.1-part2-errata pdf-page 41` — **13.11.1** Page 260 - Added note to K15.FR.05
+- `ocpp-2.0.1-part2-errata pdf-page 41` — **13.12** Page 260 - Note to requirement K15.FR.07 about composite
+- `ocpp-2.0.1-part2-errata pdf-page 42` — **13.13** Page 261 - Requirement K15.FR.17 has incomplete precondition
+- `ocpp-2.0.1-part2-errata pdf-page 42` — **14** Use case L Firmware Management
+- `ocpp-2.0.1-part2-errata pdf-page 42` — **14.1** Page 273 - Missing requirement if firmware verification fails [455]
+- `ocpp-2.0.1-part2-errata pdf-page 42` — **14.2** Page 274 - Changed note of L01.FR.13 [456]
+- `ocpp-2.0.1-part2-errata pdf-page 43` — **14.3** Page 275 - Requirement for DownloadFailed missing [384]
+- `ocpp-2.0.1-part2-errata pdf-page 43` — **15** Use case M ISO15118 Certificate Management
+- `ocpp-2.0.1-part2-errata pdf-page 43` — **15.1** Page 288 - Improving definition of V2GRootCertificate [283]
+- `ocpp-2.0.1-part2-errata pdf-page 43` — **15.2.1** Page 292 - M01
+- `ocpp-2.0.1-part2-errata pdf-page 43` — **15.2.2** Page 292 - Requirement M01.FR.01
+- `ocpp-2.0.1-part2-errata pdf-page 44` — **15.2.3** Page 293 - M02
+- `ocpp-2.0.1-part2-errata pdf-page 44` — **15.2.4** Page 294 - Requirement M02.FR.01
+- `ocpp-2.0.1-part2-errata pdf-page 44` — **15.3** Page 294 - Some occurences of typeOfCertificate instead of
+- `ocpp-2.0.1-part2-errata pdf-page 45` — **15.5** Page 296 - Requirement M04.FR.06 misses status code [471]
+- `ocpp-2.0.1-part2-errata pdf-page 45` — **16** Use case N Diagnostics
+- `ocpp-2.0.1-part2-errata pdf-page 45` — **16.1** Page 303 - Misspelled enumeration in N01.FR.10 [443]
+- `ocpp-2.0.1-part2-errata pdf-page 45` — **16.2** Page 303 - Requirements for GetLogRequest are incomplete [497]
+- `ocpp-2.0.1-part2-errata pdf-page 46` — **16.3** Page 305 - Use case N02 Get Monitoring Report: conflicting
+- `ocpp-2.0.1-part2-errata pdf-page 46` — **16.4** Page 307 - Misspelled type in requirement N04.FR.05 [372]
+- `ocpp-2.0.1-part2-errata pdf-page 47` — **16.5** Page 308 - Requirement N04.FR.10 is too restrictive [358]
+- `ocpp-2.0.1-part2-errata pdf-page 47` — **16.6** Page 308 - Precondition incomplete in N04.FR.11 [373]
+- `ocpp-2.0.1-part2-errata pdf-page 47` — **16.7** Page 308 - Precondition unclear in N04.FR.16 [374]
+- `ocpp-2.0.1-part2-errata pdf-page 48` — **16.8** Page 310 - Error in requirement N06.FR.05 [369]
+- `ocpp-2.0.1-part2-errata pdf-page 48` — **16.9** Page 311 - N07.FR.06 uses variableMonitoringId [477]
+- `ocpp-2.0.1-part2-errata pdf-page 48` — **16.10** Page 312 - Wrong precondition in requirement N07.FR.14 [356]
+- `ocpp-2.0.1-part2-errata pdf-page 49` — **16.11** Page 312 - Added remark to requirements N07.FR.16 and
+- `ocpp-2.0.1-part2-errata pdf-page 49` — **16.12** Page 312 - Moved requirements about periodic monitors from
+- `ocpp-2.0.1-part2-errata pdf-page 50` — **1** N07.FR.20 becomes N08.FR.06
+- `ocpp-2.0.1-part2-errata pdf-page 50` — **2** N07.FR.21 becomes N08.FR.07
+- `ocpp-2.0.1-part2-errata pdf-page 50` — **16.12.1** Page 313 - Requirement N08.FR.01 is replaced by N08.FR.06 and
+- `ocpp-2.0.1-part2-errata pdf-page 50` — **17** Messages
+- `ocpp-2.0.1-part2-errata pdf-page 50` — **17.1** Page 344 - Typographical error in FirmwareNotificationRequest
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **17.2** Page 351 - Remark at InstallCertificateRequest [283]
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **17.3** Page 365 - Wrong description of timestamp in
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **18** Datatypes
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **18.1** Page 380 - Description of MessageInfoType [481]
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **18.2** Page 386 - SetVariablesRequest can have empty string [488]
+- `ocpp-2.0.1-part2-errata pdf-page 51` — **19** Enumerations
+- `ocpp-2.0.1-part2-errata pdf-page 52` — **19.1** Page 400 - Wrong description of EventTriggerEnumType Alerting
+- `ocpp-2.0.1-part2-errata pdf-page 52` — **19.2** Page 404 - LocationEnumType Inlet description [494]
+- `ocpp-2.0.1-part2-errata pdf-page 52` — **19.3** Page 409 - Enumeration value for OCPP 2.0.1 missing [501]
+- `ocpp-2.0.1-part2-errata pdf-page 52` — **20** Referenced Components and Variables
+- `ocpp-2.0.1-part2-errata pdf-page 54` — **20.3** Page 422 - Improved description of OfflineThreshold [487]
+- `ocpp-2.0.1-part2-errata pdf-page 54` — **20.4** Page 426 - Variable
+- `ocpp-2.0.1-part2-errata pdf-page 54` — **20.4.1** TimeAdjustmentReportingThreshold
+- `ocpp-2.0.1-part2-errata pdf-page 54` — **20.5** Page 427 - Variable SecurityCtrlr.BasicAuthPassword [489]
+- `ocpp-2.0.1-part2-errata pdf-page 54` — **20.6** Page 428 - Note with AdditionalRootCertificateCheck variable
+- `ocpp-2.0.1-part2-errata pdf-page 55` — **20.7** Page 429 - Improved description of AuthEnabled [485]
+- `ocpp-2.0.1-part2-errata pdf-page 55` — **20.8** Page 430 - New optional variable DisableRemoteAuthorization
+- `ocpp-2.0.1-part2-errata pdf-page 55` — **20.9** Page 431 - New optional variable DisablePostAuthorize [484]
+- `ocpp-2.0.1-part2-errata pdf-page 56` — **20.10** Page 434 - Better description of TxStartPoint/TxStopPoint [348]
+- `ocpp-2.0.1-part2-errata pdf-page 57` — **2.6.4.1** TxStartPoint values
+- `ocpp-2.0.1-part2-errata pdf-page 58` — **2.6.5.1** TxStopPoint values
+- `ocpp-2.0.1-part2-errata pdf-page 58` — **20.11** Page 435 - Note to SampledDataSignReadings [526]
+- `ocpp-2.0.1-part2-errata pdf-page 58` — **20.12** Page 439 - Note to PublicKeyWithSignedMeterValue [460]
+- `ocpp-2.0.1-part2-errata pdf-page 58` — **20.13** Page 445 - New optional MonitoringCtrlr variables [357]
+- `ocpp-2.0.1-part2-errata pdf-page 59` — **20.14** Page 446 - CustomImplementationEnabled is located in wrong
+- `ocpp-2.0.1-part2-errata pdf-page 59` — **20.15** Page 447 - Reporting new connector types [478]
+- `ocpp-2.0.1-part2-errata pdf-page 60` — **20.16** New variables for ISO15118Ctrlr about protocol version in use
+- `ocpp-2.0.1-part2-errata pdf-page 60` — **20.17** Page 449 - New configuration variables for ISO15118Ctrlr
+- `ocpp-2.0.1-part2-errata pdf-page 60` — **20.17.1** ISO15118CtrlrEvseId [180, 433]
+- `ocpp-2.0.1-part2-errata pdf-page 60` — **20.17.2** ISO15118PnCEnabled
+- `ocpp-2.0.1-part2-errata pdf-page 61` — **20.17.3** ISO15118RequestMeteringReceipt
+- `ocpp-2.0.1-part2-errata pdf-page 61` — **21.1** Page 8 - DefaultMessageTimeout missing for OCPPCommCtrlr
+- `ocpp-2.0.1-part2-errata pdf-page 61` — **21.2** Page 8 - Description of NetworkConfigurationPriority for
+- `ocpp-2.0.1-part2-errata pdf-page 61` — **21.3** Page 9 - BasicAuthPassword of SecurityCtrlr [490]
+- `ocpp-2.0.1-part2-errata pdf-page 62` — **21.4** Page 14 - New component ConnectedEV
+- `ocpp-2.0.1-part2-errata pdf-page 63` — **22** Appendix 5 Reason Codes
+- `ocpp-2.0.1-part2-errata pdf-page 63` — **22.1** MissingDeviceModelInfo [383]
+- `ocpp-2.0.1-part2-errata pdf-page 63` — **23** List of Referenced Components and Typical Variables
+
+---
+
+[OCPP 2.0.1 documents](../2.0.1.md) · [protocol reference](../../2.0.1/README.md)

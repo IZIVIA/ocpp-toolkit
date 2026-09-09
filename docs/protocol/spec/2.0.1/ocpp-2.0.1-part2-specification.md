@@ -1,0 +1,1136 @@
+# OCPP 2.0.1 Part 2 — Specification (use cases & requirements)
+
+Headings of this document mapped to their PDF page. The document itself is
+OCA copyright and not in this repository. **Grep this file, do not read it whole.**
+
+```bash
+grep -n 'Authorization' docs/protocol/spec/2.0.1/ocpp-2.0.1-part2-specification.md
+```
+- `ocpp-2.0.1-part2-specification pdf-page 14` — **1** Scope
+- `ocpp-2.0.1-part2-specification pdf-page 14` — **1.1** OCPP 2.0.1
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2** Conventions, Terminology and Abbreviations
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1** Conventions
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1.1** Normative
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1.2** Requirement Keywords
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1.3** Primitive Datatypes
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1.4** Normal communication
+- `ocpp-2.0.1-part2-specification pdf-page 15` — **2.1.5** Field description
+- `ocpp-2.0.1-part2-specification pdf-page 16` — **2.2** Terminology
+- `ocpp-2.0.1-part2-specification pdf-page 16` — **2.2.1** General Terminology
+- `ocpp-2.0.1-part2-specification pdf-page 18` — **2.2.2** ISO 15118 and OCPP terminology mapping
+- `ocpp-2.0.1-part2-specification pdf-page 18` — **2.3** Abbreviations
+- `ocpp-2.0.1-part2-specification pdf-page 18` — **2.3.1** General Abbreviations
+- `ocpp-2.0.1-part2-specification pdf-page 19` — **2.3.2** ISO 15118 Abbreviations
+- `ocpp-2.0.1-part2-specification pdf-page 20` — **2.4** Actors
+- `ocpp-2.0.1-part2-specification pdf-page 20` — **2.5** References
+- `ocpp-2.0.1-part2-specification pdf-page 20` — **2.5.1** Generic references
+- `ocpp-2.0.1-part2-specification pdf-page 21` — **2.5.2** Security related references
+- `ocpp-2.0.1-part2-specification pdf-page 22` — **2.6** Definition of Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 22` — **2.6.1** Transaction in relation to Energy Transfer Period
+- `ocpp-2.0.1-part2-specification pdf-page 23` — **2.7** ISO 15118 support
+- `ocpp-2.0.1-part2-specification pdf-page 25` — **3** Generic Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 25` — **3.1** Time Format Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 25` — **3.1.1** Displaying local time
+- `ocpp-2.0.1-part2-specification pdf-page 25` — **3.1.1.1** Daylight Saving Time
+- `ocpp-2.0.1-part2-specification pdf-page 26` — **3.2** Message Timeouts
+- `ocpp-2.0.1-part2-specification pdf-page 26` — **3.3** Language support
+- `ocpp-2.0.1-part2-specification pdf-page 28` — **1** OCPP Security
+- `ocpp-2.0.1-part2-specification pdf-page 28` — **1.1** Security Objectives
+- `ocpp-2.0.1-part2-specification pdf-page 28` — **1.2** Design Considerations
+- `ocpp-2.0.1-part2-specification pdf-page 29` — **1.3** Security Profiles
+- `ocpp-2.0.1-part2-specification pdf-page 29` — **1.3.1** Generic Security Profile requirements
+- `ocpp-2.0.1-part2-specification pdf-page 29` — **1** Name                     Unsecured Transport with Basic Authentication
+- `ocpp-2.0.1-part2-specification pdf-page 30` — **7** Remark(s)            n/a
+- `ocpp-2.0.1-part2-specification pdf-page 30` — **1.3.3** Unsecured Transport with Basic Authentication Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 30` — **1** Name                 TLS with Basic Authentication
+- `ocpp-2.0.1-part2-specification pdf-page 31` — **1.3.5** TLS with Basic Authentication Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 33` — **1** Name                    TLS with Client Side Certificates
+- `ocpp-2.0.1-part2-specification pdf-page 34` — **1.3.7** TLS with Client Side Certificates Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 36` — **1.4** Keys used in OCPP
+- `ocpp-2.0.1-part2-specification pdf-page 36` — **1.4.1** Certificate Properties
+- `ocpp-2.0.1-part2-specification pdf-page 37` — **1.4.2** Certificate Hierarchy
+- `ocpp-2.0.1-part2-specification pdf-page 38` — **1.5** Certificate Revocation
+- `ocpp-2.0.1-part2-specification pdf-page 38` — **1.6** Installation
+- `ocpp-2.0.1-part2-specification pdf-page 40` — **2** Use cases & Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 40` — **A01** Update Charging Station Password for HTTP Basic Authentication
+- `ocpp-2.0.1-part2-specification pdf-page 40` — **2** ID                       A01
+- `ocpp-2.0.1-part2-specification pdf-page 40` — **7** Error handling           n/a
+- `ocpp-2.0.1-part2-specification pdf-page 40` — **8** Remark(s)                n/a
+- `ocpp-2.0.1-part2-specification pdf-page 41` — **A02** Update Charging Station Certificate by request of CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 41` — **1** Name                 Update Charging Station Certificate by request of CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 41` — **2** ID                   A02
+- `ocpp-2.0.1-part2-specification pdf-page 42` — **2** The Charging Station responds with TriggerMessageResponse
+- `ocpp-2.0.1-part2-specification pdf-page 43` — **A02** Update Charging Station Certificate by request of CSMS - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 44` — **A03** Update Charging Station Certificate initiated by the Charging
+- `ocpp-2.0.1-part2-specification pdf-page 44` — **2** ID                       A03
+- `ocpp-2.0.1-part2-specification pdf-page 46` — **A03** Update Charging Station Certificate initiated by the Charging Station -
+- `ocpp-2.0.1-part2-specification pdf-page 48` — **A04** Security Event Notification
+- `ocpp-2.0.1-part2-specification pdf-page 48` — **1** Name                     Security Event Notification
+- `ocpp-2.0.1-part2-specification pdf-page 48` — **2** ID                       A04
+- `ocpp-2.0.1-part2-specification pdf-page 48` — **5** Prerequisite(s)          n/a
+- `ocpp-2.0.1-part2-specification pdf-page 48` — **A04** Security Event Notification - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **A05** Upgrade Charging Station Security Profile
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **1** Name                     Upgrade Charging Station Security Profile
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **2** ID                       A05
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **2** The Charging Station responds with a SetVariablesResponse with status Accepted
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **3** The CSMS sends a ResetRequest(OnIdle)
+- `ocpp-2.0.1-part2-specification pdf-page 49` — **A05** Upgrade Charging Station Security Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 52` — **1** Introduction
+- `ocpp-2.0.1-part2-specification pdf-page 52` — **1.1** Transactions before being accepted by a CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 53` — **2.1** Booting a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 53` — **B01** Cold Boot Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 53` — **1** Name                     Cold Boot Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 53` — **2** ID                       B01
+- `ocpp-2.0.1-part2-specification pdf-page 53` — **B03** Cold Boot Charging Station - Rejected
+- `ocpp-2.0.1-part2-specification pdf-page 54` — **B01** Cold Boot Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 56` — **B02** Cold Boot Charging Station - Pending
+- `ocpp-2.0.1-part2-specification pdf-page 56` — **1** Name                     Cold Boot Charging Station - Pending
+- `ocpp-2.0.1-part2-specification pdf-page 56` — **2** ID                       B02
+- `ocpp-2.0.1-part2-specification pdf-page 57` — **B02** Cold Boot Charging Station - Pending - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 59` — **1** Name                     Cold Boot Charging Station - Rejected
+- `ocpp-2.0.1-part2-specification pdf-page 59` — **2** ID                       B03
+- `ocpp-2.0.1-part2-specification pdf-page 59` — **B03** Cold Boot Charging Station - Rejected - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 61` — **B04** Offline Behavior Idle Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 61` — **1** Name                     Offline Behavior Idle Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 61` — **2** ID                       B04
+- `ocpp-2.0.1-part2-specification pdf-page 62` — **B04** Offline Behavior Idle Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 62` — **2.2** Configuring a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 62` — **B05** Set Variables
+- `ocpp-2.0.1-part2-specification pdf-page 62` — **1** Name                     Set Variables
+- `ocpp-2.0.1-part2-specification pdf-page 62` — **2** ID                       B05
+- `ocpp-2.0.1-part2-specification pdf-page 63` — **B05** Set Variables - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 64` — **B06** Get Variables
+- `ocpp-2.0.1-part2-specification pdf-page 64` — **1** Name                     Get Variables
+- `ocpp-2.0.1-part2-specification pdf-page 64` — **2** ID                       B06
+- `ocpp-2.0.1-part2-specification pdf-page 64` — **B06** Get Variables - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 66` — **B07** Get Base Report
+- `ocpp-2.0.1-part2-specification pdf-page 66` — **1** Name                     Get Base Report
+- `ocpp-2.0.1-part2-specification pdf-page 66` — **2** ID                       B07
+- `ocpp-2.0.1-part2-specification pdf-page 66` — **B07** Get Base Report - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 68` — **B08** Get Custom Report
+- `ocpp-2.0.1-part2-specification pdf-page 68` — **1** Name                     Get Custom Report
+- `ocpp-2.0.1-part2-specification pdf-page 68` — **2** ID                       B08
+- `ocpp-2.0.1-part2-specification pdf-page 68` — **B08** Get Custom Report - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 70` — **B09** Setting a new NetworkConnectionProfile
+- `ocpp-2.0.1-part2-specification pdf-page 70` — **2** ID                      B09
+- `ocpp-2.0.1-part2-specification pdf-page 70` — **B09** Setting a new NetworkConnectionProfile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 71` — **B10** Migrate to new CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 71` — **2** ID                      B10
+- `ocpp-2.0.1-part2-specification pdf-page 71` — **8** Error Handling          n/a
+- `ocpp-2.0.1-part2-specification pdf-page 71` — **B10** Migrate to new NetworkConnectionProfile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 72` — **2.3** Resetting a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 72` — **B11** Reset - Without Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 72` — **1** Name                    Reset - Without Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 72` — **2** ID                      B11
+- `ocpp-2.0.1-part2-specification pdf-page 73` — **B11** Reset - Without Ongoing Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 75` — **B12** Reset - With Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 75` — **1** Name                     Reset - With Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 75` — **2** ID                       B12
+- `ocpp-2.0.1-part2-specification pdf-page 76` — **B12** Reset - With Ongoing Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 79` — **1.1** ID Tokens
+- `ocpp-2.0.1-part2-specification pdf-page 79` — **1.1.1** Additional Info
+- `ocpp-2.0.1-part2-specification pdf-page 79` — **1.2** Group ID Tokens
+- `ocpp-2.0.1-part2-specification pdf-page 80` — **1.3** Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 80` — **1.4** Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 80` — **1.5** Unknown Offline Authorization
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **2.1** Authorization options
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C01** EV Driver Authorization using RFID
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **1** Name                     EV Driver Authorization using RFID
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **2** ID                       C01
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C03** Authorization using credit/debit card
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C04** Authorization using PIN-code
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C05** Authorization for CSMS initiated transactions
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C06** Authorization using local id type
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C07** Authorization using Contract Certificates
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C08** Authorization at EVSE using ISO 15118 External Identification Means (EIM)
+- `ocpp-2.0.1-part2-specification pdf-page 82` — **C15** Unknown Offline Authorization
+- `ocpp-2.0.1-part2-specification pdf-page 84` — **C01** EV Driver Authorization using RFID - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 86` — **C02** Authorization using a start button
+- `ocpp-2.0.1-part2-specification pdf-page 86` — **1** Name                     Authorization using a start button
+- `ocpp-2.0.1-part2-specification pdf-page 86` — **2** ID                       C02
+- `ocpp-2.0.1-part2-specification pdf-page 87` — **C02** Authorization using a start button - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 88` — **1** Name                     Authorization using credit card
+- `ocpp-2.0.1-part2-specification pdf-page 88` — **2** ID                       C03
+- `ocpp-2.0.1-part2-specification pdf-page 88` — **8** The Charging Station accepts the RequestStartTransactionRequest by sending a
+- `ocpp-2.0.1-part2-specification pdf-page 88` — **6** Postcondition(s)         Transaction ongoing on Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 89` — **C03** Authorization using credit/debit card - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 91` — **1** Name                     Authorization using PIN-code
+- `ocpp-2.0.1-part2-specification pdf-page 91` — **2** ID                       C04
+- `ocpp-2.0.1-part2-specification pdf-page 91` — **C04** Authorization using PIN-code - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 93` — **1** Name                     Authorization for CSMS initiated transactions
+- `ocpp-2.0.1-part2-specification pdf-page 93` — **2** ID                       C05
+- `ocpp-2.0.1-part2-specification pdf-page 93` — **5** The Charging Station accepts the RequestStartTransactionRequest by sending a
+- `ocpp-2.0.1-part2-specification pdf-page 94` — **C05** Authorization for CSMS initiated transactions Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 95` — **1** Name                     Authorization using local id type
+- `ocpp-2.0.1-part2-specification pdf-page 95` — **2** ID                       C06
+- `ocpp-2.0.1-part2-specification pdf-page 95` — **6** EV driver returns, inserts parking ticket into a payment kiosk
+- `ocpp-2.0.1-part2-specification pdf-page 95` — **7** Pays for parking and charging
+- `ocpp-2.0.1-part2-specification pdf-page 95` — **5** Prerequisites            Integrated parking & charging payment system
+- `ocpp-2.0.1-part2-specification pdf-page 97` — **C06** Authorization using local id type - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 98` — **2.2** ISO 15118 Authorization
+- `ocpp-2.0.1-part2-specification pdf-page 98` — **1** Name                     Authorization using Contract Certificates
+- `ocpp-2.0.1-part2-specification pdf-page 98` — **2** ID                       C07
+- `ocpp-2.0.1-part2-specification pdf-page 99` — **7** Error handling
+- `ocpp-2.0.1-part2-specification pdf-page 99` — **C07** Authorization using Contract Certificates - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 101` — **C08** Authorization at EVSE using ISO 15118 External Identification
+- `ocpp-2.0.1-part2-specification pdf-page 101` — **2** ID                       C08 / 15118-1 D4
+- `ocpp-2.0.1-part2-specification pdf-page 103` — **2.3** GroupId
+- `ocpp-2.0.1-part2-specification pdf-page 103` — **C09** Authorization by GroupId
+- `ocpp-2.0.1-part2-specification pdf-page 103` — **1** Name                                       Authorization by GroupId
+- `ocpp-2.0.1-part2-specification pdf-page 103` — **2** ID                                         C09
+- `ocpp-2.0.1-part2-specification pdf-page 103` — **C09** Authorization by GroupId - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 105` — **2.4** Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 105` — **C10** Store Authorization Data in the Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 105` — **1** Name                     Store Authorization Data in the Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 105` — **2** ID                       C10
+- `ocpp-2.0.1-part2-specification pdf-page 106` — **C10** Store Authorization Data in the Authorization Cache - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 107` — **C11** Clear Authorization Data in Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 107` — **1** Name                     Clear Authorization Data in Authorization Cache
+- `ocpp-2.0.1-part2-specification pdf-page 107` — **2** ID                       C11
+- `ocpp-2.0.1-part2-specification pdf-page 107` — **C11** Clear Authorization Data in Authorization Cache - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 108` — **C12** Start Transaction - Cached Id
+- `ocpp-2.0.1-part2-specification pdf-page 108` — **1** Name                     Start Transaction - Cached Id
+- `ocpp-2.0.1-part2-specification pdf-page 108` — **2** ID                       C12
+- `ocpp-2.0.1-part2-specification pdf-page 108` — **5** Prerequisite(s)          AuthCacheEnabled = true
+- `ocpp-2.0.1-part2-specification pdf-page 109` — **C12** Start Transaction - Cached Id - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 110` — **2.5** Local Authorization list
+- `ocpp-2.0.1-part2-specification pdf-page 110` — **C13** Offline Authorization through Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 110` — **1** Name                   Offline Authorization through Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 110` — **2** ID                     C13
+- `ocpp-2.0.1-part2-specification pdf-page 110` — **5** Prerequisite(s)        Local Authorization List is available
+- `ocpp-2.0.1-part2-specification pdf-page 111` — **C13** Offline Authorization through Local Authorization List - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 111` — **C14** Online Authorization through Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 111` — **1** Name                    Online Authorization through Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 111` — **2** ID                      C14
+- `ocpp-2.0.1-part2-specification pdf-page 112` — **C14** Online Authorization through Local Authorization List - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 113` — **2.6** Offline Authorization
+- `ocpp-2.0.1-part2-specification pdf-page 113` — **C15** Offline Authorization of unknown Id
+- `ocpp-2.0.1-part2-specification pdf-page 113` — **1** Name                     Offline Authorization of unknown Id
+- `ocpp-2.0.1-part2-specification pdf-page 113` — **2** ID                       C15
+- `ocpp-2.0.1-part2-specification pdf-page 114` — **C15** Offline Authorization of unknown Id - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 115` — **2.7** Master Pass
+- `ocpp-2.0.1-part2-specification pdf-page 115` — **C16** Stop Transaction with a Master Pass
+- `ocpp-2.0.1-part2-specification pdf-page 115` — **1** Name                     Stop Transaction with a Master Pass
+- `ocpp-2.0.1-part2-specification pdf-page 115` — **2** ID                       C16
+- `ocpp-2.0.1-part2-specification pdf-page 116` — **5** Prerequisites            Ongoing Transaction(s)
+- `ocpp-2.0.1-part2-specification pdf-page 117` — **C16** Stop Transaction with a Master Pass - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 120` — **D01** Send Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 120` — **1** Name                     Send Local Authorization List
+- `ocpp-2.0.1-part2-specification pdf-page 120` — **2** ID                       D01
+- `ocpp-2.0.1-part2-specification pdf-page 120` — **D01** Send Local Authorization List - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **D02** Get Local List Version
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **1** Name                     Get Local List Version
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **2** ID                       D02
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **2** Upon receipt of the GetLocalListVersionRequest Charging Station responds with a
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **5** Prerequisite(s)
+- `ocpp-2.0.1-part2-specification pdf-page 123` — **D02** Get Local List Version - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 125` — **1.1** Flexible transaction start/stop
+- `ocpp-2.0.1-part2-specification pdf-page 125` — **1.1.1** Readonly or Read/Write
+- `ocpp-2.0.1-part2-specification pdf-page 125` — **1.1.2** OCPP 1.6 Transaction compatibility
+- `ocpp-2.0.1-part2-specification pdf-page 125` — **1.2** TransactionId generation
+- `ocpp-2.0.1-part2-specification pdf-page 126` — **1.3** Delivering transaction-related messages
+- `ocpp-2.0.1-part2-specification pdf-page 126` — **1.3.1** Retrying
+- `ocpp-2.0.1-part2-specification pdf-page 126` — **1.3.2** Sequence numbers
+- `ocpp-2.0.1-part2-specification pdf-page 126` — **1.3.2.1** Sequence number generation
+- `ocpp-2.0.1-part2-specification pdf-page 126` — **1.4** Authorization
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **2.1** OCPP transaction mechanism
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **E01** Start Transaction options
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **1** Name                     Start Transaction options
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **2** ID                       E01
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **5** Actors                   Charging Station, CSMS, EV Driver
+- `ocpp-2.0.1-part2-specification pdf-page 127` — **3** The CSMS responds with a TransactionEventResponse, confirming that the
+- `ocpp-2.0.1-part2-specification pdf-page 128` — **4** The CSMS responds with a TransactionEventResponse, confirming that the
+- `ocpp-2.0.1-part2-specification pdf-page 129` — **5** The CSMS responds with a TransactionEventResponse, confirming that the
+- `ocpp-2.0.1-part2-specification pdf-page 132` — **E01** Start Transaction options - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 133` — **E02** Start Transaction - Cable Plugin First
+- `ocpp-2.0.1-part2-specification pdf-page 133` — **1** Name                     Start Transaction - Cable Plugin First
+- `ocpp-2.0.1-part2-specification pdf-page 133` — **2** ID                       E02
+- `ocpp-2.0.1-part2-specification pdf-page 133` — **9** During the charging process, the Charging Stations continues to send
+- `ocpp-2.0.1-part2-specification pdf-page 134` — **E04** Offline Start Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 134` — **E05** Start Transaction - Id not Accepted
+- `ocpp-2.0.1-part2-specification pdf-page 135` — **E02** Start Transaction - Cable Plugin First - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 136` — **1** TransactionEventRequest
+- `ocpp-2.0.1-part2-specification pdf-page 138` — **E03** Start Transaction - IdToken First
+- `ocpp-2.0.1-part2-specification pdf-page 138` — **1** Name                     Start Transaction - IdToken First
+- `ocpp-2.0.1-part2-specification pdf-page 138` — **2** ID                       E03
+- `ocpp-2.0.1-part2-specification pdf-page 138` — **4** The Charging Station sends StatusNotificationRequest to, and receives
+- `ocpp-2.0.1-part2-specification pdf-page 139` — **E03** Start Transaction - IdToken First - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 141` — **E04** Transaction started while Charging Station is offline
+- `ocpp-2.0.1-part2-specification pdf-page 141` — **1** Name                     Transaction started while Charging Station is offline
+- `ocpp-2.0.1-part2-specification pdf-page 141` — **2** ID                       E04
+- `ocpp-2.0.1-part2-specification pdf-page 141` — **4** The Charging Station starts to send queued messages
+- `ocpp-2.0.1-part2-specification pdf-page 143` — **E04** Transaction started while Charging Station is offline - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 145` — **1** Name                     Start Transaction - Id not Accepted
+- `ocpp-2.0.1-part2-specification pdf-page 145` — **2** ID                       E05
+- `ocpp-2.0.1-part2-specification pdf-page 146` — **E05** Start Transaction - Id not Accepted - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 148` — **E06** Stop Transaction options
+- `ocpp-2.0.1-part2-specification pdf-page 148` — **1** Name                     Stop Transaction options
+- `ocpp-2.0.1-part2-specification pdf-page 148` — **2** ID                       E06
+- `ocpp-2.0.1-part2-specification pdf-page 152` — **E06** Stop Transaction options - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 153` — **E07** Transaction locally stopped by IdToken
+- `ocpp-2.0.1-part2-specification pdf-page 153` — **1** Name                     Transaction locally stopped by IdToken
+- `ocpp-2.0.1-part2-specification pdf-page 153` — **2** ID                       E07
+- `ocpp-2.0.1-part2-specification pdf-page 154` — **8** The Charging Station sends a TransactionEventRequest (eventType = Ended)
+- `ocpp-2.0.1-part2-specification pdf-page 154` — **E07** Offline Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 154` — **E08** When cable disconnected on EV-side: Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 154` — **E09** When cable disconnected on EV-side: Suspend Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 155` — **E07** Transaction locally stopped by IdToken - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 157` — **E08** Transaction stopped while Charging Station is offline
+- `ocpp-2.0.1-part2-specification pdf-page 157` — **1** Name                     Transaction stopped while Charging Station is offline
+- `ocpp-2.0.1-part2-specification pdf-page 157` — **2** ID                       E08
+- `ocpp-2.0.1-part2-specification pdf-page 157` — **6** The Charging Station starts to send queued messages
+- `ocpp-2.0.1-part2-specification pdf-page 158` — **E08** Transaction stopped while Charging Station is offline - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 160` — **E09** When cable disconnected on EV-side: Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 160` — **1** Name                     When cable disconnected on EV-side: Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 160` — **2** ID                       E09
+- `ocpp-2.0.1-part2-specification pdf-page 160` — **5** Prerequisite(s)          Configuration Variable: StopTxOnEVSideDisconnect = true
+- `ocpp-2.0.1-part2-specification pdf-page 161` — **E09** When cable disconnected on EV-side: Stop Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 163` — **E10** When cable disconnected on EV-side: Suspend Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 163` — **1** Name                     When cable disconnected on EV-side: Suspend Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 163` — **2** ID                       E10
+- `ocpp-2.0.1-part2-specification pdf-page 164` — **E10** When cable disconnected on EV-side: Suspend Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 166` — **E11** Connection Loss During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 166` — **1** Name                     Connection Loss During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 166` — **2** ID                       E11
+- `ocpp-2.0.1-part2-specification pdf-page 166` — **E11** Connection Loss During Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 168` — **E12** Inform CSMS of an Offline Occurred Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 168` — **1** Name                     Inform CSMS of an Offline Occurred Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 168` — **2** ID                       E12
+- `ocpp-2.0.1-part2-specification pdf-page 168` — **E12** Inform CSMS of an Offline Occurred Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 170` — **E13** Transaction-related message not accepted by CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 170` — **1** Name                     Transaction-related message not accepted by CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 170` — **2** ID                       E13
+- `ocpp-2.0.1-part2-specification pdf-page 170` — **E13** Transaction-related message not accepted by CSMS - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 171` — **E13** Transaction-related message not accepted by CSMS - Example
+- `ocpp-2.0.1-part2-specification pdf-page 172` — **E14** Check transaction status
+- `ocpp-2.0.1-part2-specification pdf-page 172` — **1** Name                    Check transaction status
+- `ocpp-2.0.1-part2-specification pdf-page 172` — **2** ID                      E14
+- `ocpp-2.0.1-part2-specification pdf-page 172` — **E14** Check transaction status - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 173` — **2.2** Interrupting and Stopping ISO 15118 Charging
+- `ocpp-2.0.1-part2-specification pdf-page 173` — **E15** End of charging process
+- `ocpp-2.0.1-part2-specification pdf-page 173` — **2** ID                    E15
+- `ocpp-2.0.1-part2-specification pdf-page 173` — **5** Actors                EV, EVSE, EV Driver
+- `ocpp-2.0.1-part2-specification pdf-page 173` — **6** The EV driver unplugs the cable from the EV
+- `ocpp-2.0.1-part2-specification pdf-page 174` — **9** Error handling         n/a
+- `ocpp-2.0.1-part2-specification pdf-page 174` — **E15** End of charging process - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 177` — **2.1** Remote Transaction Control
+- `ocpp-2.0.1-part2-specification pdf-page 177` — **F01** Remote Start Transaction - Cable Plugin First
+- `ocpp-2.0.1-part2-specification pdf-page 177` — **1** Name                     Remote Start Transaction - Cable Plugin First
+- `ocpp-2.0.1-part2-specification pdf-page 177` — **2** ID                       F01
+- `ocpp-2.0.1-part2-specification pdf-page 177` — **3** The CSMS responds with a StatusNotificationResponse, confirming that the
+- `ocpp-2.0.1-part2-specification pdf-page 179` — **F01** Remote Start Transaction - Cable Plugin First - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 180` — **F02** Remote Start Transaction - Remote Start First
+- `ocpp-2.0.1-part2-specification pdf-page 180` — **1** Name                    Remote Start Transaction - Remote Start first
+- `ocpp-2.0.1-part2-specification pdf-page 180` — **2** ID                      F02
+- `ocpp-2.0.1-part2-specification pdf-page 181` — **6** The CSMS sends StatusNotificationResponse to the Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 181` — **11** The CSMS sends TransactionEventResponse to the Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 182` — **F02** Remote Start Transaction - Remote Start First - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 182` — **F03** Remote Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 182` — **1** Name                     Remote Stop Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 182` — **2** ID                       F03
+- `ocpp-2.0.1-part2-specification pdf-page 184` — **F03** Remote Stop Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 184` — **F04** Remote Stop ISO 15118 Charging from CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 184` — **1** Name                     Remote Stop ISO 15118 Charging from CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 184` — **2** ID                       F04
+- `ocpp-2.0.1-part2-specification pdf-page 184` — **5** Actors                   EV, EVSE, Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 185` — **10** Remark(s)                n/a
+- `ocpp-2.0.1-part2-specification pdf-page 185` — **F04** Remote Stop ISO 15118 Charging from CSMS - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **2.2** Unlock Connector
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **F05** Remotely Unlock Connector
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **1** Name                    Remotely Unlock Connector
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **2** ID                      F05
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **3** Upon receipt of UnlockConnectorRequest, the Charging Station responds with
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **5** Prerequisite(s)         No ongoing transaction on the specified connector
+- `ocpp-2.0.1-part2-specification pdf-page 187` — **F05** Remotely Unlock Connector - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 189` — **2.3** Remote Trigger
+- `ocpp-2.0.1-part2-specification pdf-page 189` — **F06** Trigger Message
+- `ocpp-2.0.1-part2-specification pdf-page 189` — **1** Name                    Trigger Message
+- `ocpp-2.0.1-part2-specification pdf-page 189` — **2** ID                      F06
+- `ocpp-2.0.1-part2-specification pdf-page 189` — **2** The CSMS has Successfully received a TriggerMessageResponse message with status
+- `ocpp-2.0.1-part2-specification pdf-page 190` — **F06** Trigger Message - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 194` — **G01** Status Notification
+- `ocpp-2.0.1-part2-specification pdf-page 194` — **1** Name                     Status Notification
+- `ocpp-2.0.1-part2-specification pdf-page 194` — **2** ID                       G01
+- `ocpp-2.0.1-part2-specification pdf-page 194` — **G01** Status Notification - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 195` — **G02** Heartbeat
+- `ocpp-2.0.1-part2-specification pdf-page 195` — **1** Name                     Heartbeat
+- `ocpp-2.0.1-part2-specification pdf-page 195` — **2** ID                       G02
+- `ocpp-2.0.1-part2-specification pdf-page 195` — **G02** Heartbeat - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 197` — **G03** Change Availability EVSE/Connector
+- `ocpp-2.0.1-part2-specification pdf-page 197` — **1** Name                     Change Availability EVSE/Connector
+- `ocpp-2.0.1-part2-specification pdf-page 197` — **2** ID                       G03
+- `ocpp-2.0.1-part2-specification pdf-page 197` — **3** Upon receipt of ChangeAvailabilityRequest, the Charging Station responds with
+- `ocpp-2.0.1-part2-specification pdf-page 198` — **G03** Change Availability EVSE - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 199` — **G04** Change Availability Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 199` — **1** Name                     Change Availability Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 199` — **2** ID                       G04
+- `ocpp-2.0.1-part2-specification pdf-page 199` — **2** Upon receipt of a ChangeAvailabilityRequest, the Charging Station responds with
+- `ocpp-2.0.1-part2-specification pdf-page 199` — **G04** Change Availability Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 201` — **G05** Lock Failure
+- `ocpp-2.0.1-part2-specification pdf-page 201` — **1** Name                     Lock Failure
+- `ocpp-2.0.1-part2-specification pdf-page 201` — **2** ID                       G05
+- `ocpp-2.0.1-part2-specification pdf-page 201` — **5** Prerequisite(s)          Charging Cable plugged in (status = Occupied)
+- `ocpp-2.0.1-part2-specification pdf-page 201` — **G05** Lock Failure - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 205` — **H01** Reservation
+- `ocpp-2.0.1-part2-specification pdf-page 205` — **1** Name                     Reservation
+- `ocpp-2.0.1-part2-specification pdf-page 205` — **2** ID                       H01
+- `ocpp-2.0.1-part2-specification pdf-page 205` — **3** Upon receipt of ReserveNowRequest, the Charging Station responds with
+- `ocpp-2.0.1-part2-specification pdf-page 207` — **6** Error handling
+- `ocpp-2.0.1-part2-specification pdf-page 207` — **H01** Reservation - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 209` — **H02** Cancel Reservation
+- `ocpp-2.0.1-part2-specification pdf-page 209` — **1** Name                     Cancel Reservation
+- `ocpp-2.0.1-part2-specification pdf-page 209` — **2** ID                       H02
+- `ocpp-2.0.1-part2-specification pdf-page 209` — **H02** Cancel Reservation - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 210` — **H03** Use a reserved EVSE
+- `ocpp-2.0.1-part2-specification pdf-page 210` — **1** Name                     Use a reserved EVSE
+- `ocpp-2.0.1-part2-specification pdf-page 210` — **2** ID                       H03
+- `ocpp-2.0.1-part2-specification pdf-page 210` — **3** Objective(s)             Use a reserved EVSE
+- `ocpp-2.0.1-part2-specification pdf-page 210` — **6** Postcondition(s)         n/a
+- `ocpp-2.0.1-part2-specification pdf-page 211` — **6** The CSMS responds with an AuthorizeResponse. This response message includes
+- `ocpp-2.0.1-part2-specification pdf-page 212` — **H03** Use a reserved EVSE - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 213` — **H04** Reservation Ended, not used
+- `ocpp-2.0.1-part2-specification pdf-page 213` — **1** Name                    Reservation Ended, not used
+- `ocpp-2.0.1-part2-specification pdf-page 213` — **2** ID                      H04
+- `ocpp-2.0.1-part2-specification pdf-page 213` — **H04** Reservation Ended, not used - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 215` — **1.1** Why no structured tariff information?
+- `ocpp-2.0.1-part2-specification pdf-page 216` — **I01** Show EV Driver-specific Tariff Information
+- `ocpp-2.0.1-part2-specification pdf-page 216` — **1** Name                     Show EV Driver-specific Tariff Information
+- `ocpp-2.0.1-part2-specification pdf-page 216` — **2** ID                       I01
+- `ocpp-2.0.1-part2-specification pdf-page 216` — **5** Prerequisite(s)          The Charging Station supports Tariff Information
+- `ocpp-2.0.1-part2-specification pdf-page 217` — **I01** Show EV Driver-specific Tariff Information - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 217` — **I02** Show EV Driver Running Total Cost During Charging
+- `ocpp-2.0.1-part2-specification pdf-page 217` — **1** Name                    Show EV Driver Running Total Cost During Charging
+- `ocpp-2.0.1-part2-specification pdf-page 217` — **2** ID                      I02
+- `ocpp-2.0.1-part2-specification pdf-page 217` — **I02** Show EV Driver Running Total Cost During Charging - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 218` — **I03** Show EV Driver Final Total Cost After Charging
+- `ocpp-2.0.1-part2-specification pdf-page 218` — **1** Name                    Show EV Driver Final Total Cost After Charging
+- `ocpp-2.0.1-part2-specification pdf-page 218` — **2** ID                      I03
+- `ocpp-2.0.1-part2-specification pdf-page 218` — **2** The Charging Station sends TransactionEventRequest (eventType = Ended)
+- `ocpp-2.0.1-part2-specification pdf-page 219` — **I03** Show EV Driver Final Total Cost After Charging - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 219` — **0.00** Thus omitting totalCost does not imply that the transaction
+- `ocpp-2.0.1-part2-specification pdf-page 219` — **I04** Show Fallback Tariff Information
+- `ocpp-2.0.1-part2-specification pdf-page 219` — **1** Name                    Show Fallback Tariff Information
+- `ocpp-2.0.1-part2-specification pdf-page 219` — **2** ID                      I04
+- `ocpp-2.0.1-part2-specification pdf-page 220` — **I04** Show Fallback Tariff Information - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 220` — **I05** Show Fallback Total Cost Message
+- `ocpp-2.0.1-part2-specification pdf-page 220` — **1** Name                    Show Fallback Total Cost Message
+- `ocpp-2.0.1-part2-specification pdf-page 220` — **2** ID                      I05
+- `ocpp-2.0.1-part2-specification pdf-page 221` — **I05** Show Fallback Total Cost Message - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 221` — **I06** Update Tariff Information During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 221` — **1** Name                     Update Tariff Information During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 221` — **2** ID                       I06
+- `ocpp-2.0.1-part2-specification pdf-page 222` — **I06** Update Tariff Information During Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 225` — **2** Configuration
+- `ocpp-2.0.1-part2-specification pdf-page 225` — **2.1** Transaction Meter Values
+- `ocpp-2.0.1-part2-specification pdf-page 225` — **2.2** Clock-Aligned Meter Values
+- `ocpp-2.0.1-part2-specification pdf-page 226` — **2.3** Multiple Locations/Phases
+- `ocpp-2.0.1-part2-specification pdf-page 226` — **2.4** Signed Meter Values
+- `ocpp-2.0.1-part2-specification pdf-page 227` — **3** Use cases & Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 227` — **3.1** MeterValues
+- `ocpp-2.0.1-part2-specification pdf-page 227` — **J01** Sending Meter Values not related to a transaction
+- `ocpp-2.0.1-part2-specification pdf-page 227` — **1** Name                     Sending Meter Values not related to a transaction
+- `ocpp-2.0.1-part2-specification pdf-page 227` — **2** ID                       J01
+- `ocpp-2.0.1-part2-specification pdf-page 228` — **J01** Sending Meter Values not related to a transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 229` — **J02** Sending transaction related Meter Values
+- `ocpp-2.0.1-part2-specification pdf-page 229` — **1** Name                     Sending transaction related Meter Values
+- `ocpp-2.0.1-part2-specification pdf-page 229` — **2** ID                       J02
+- `ocpp-2.0.1-part2-specification pdf-page 230` — **J02** Sending transaction related Meter Values - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **3.2** ISO 15118 MeterValue signing
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **J03** Charging Loop with metering information exchange
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **1** Name                       Charging Loop with metering information exchange
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **2** ID                         J03
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **6** Actors                     EV, EVSE, Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 231` — **7** Combined scenario          15118
+- `ocpp-2.0.1-part2-specification pdf-page 232` — **J03** Charging Loop with metering information exchange - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 235` — **2** Types of Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 235` — **2.1** Internal Load Balancing
+- `ocpp-2.0.1-part2-specification pdf-page 235` — **1** EV1
+- `ocpp-2.0.1-part2-specification pdf-page 235` — **2.2** Central Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 235` — **2.3** Local Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 236` — **2.4** External Smart Charging Control Signals
+- `ocpp-2.0.1-part2-specification pdf-page 238` — **3** Charging profiles
+- `ocpp-2.0.1-part2-specification pdf-page 238` — **3.1** Introduction
+- `ocpp-2.0.1-part2-specification pdf-page 238` — **3.2** Charging profile purposes
+- `ocpp-2.0.1-part2-specification pdf-page 238` — **3.3** Charging profile recurrency
+- `ocpp-2.0.1-part2-specification pdf-page 239` — **3.4** Stacking charging profiles
+- `ocpp-2.0.1-part2-specification pdf-page 239` — **3.5** Combining Charging Profile Purposes
+- `ocpp-2.0.1-part2-specification pdf-page 240` — **3.6** Example Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 240` — **3.6.1** Example Using Stacked Charging Profiles
+- `ocpp-2.0.1-part2-specification pdf-page 242` — **4** Smart Charging Signals to a Charging Station from Multiple
+- `ocpp-2.0.1-part2-specification pdf-page 242` — **2** NotifyEVChargingScheduleRequest
+- `ocpp-2.0.1-part2-specification pdf-page 242` — **3** NotifyChargingLimitRequest
+- `ocpp-2.0.1-part2-specification pdf-page 242` — **4** TransactionEventRequest
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **5** Use cases & Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **5.1** General Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **K01** SetChargingProfile
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **1** Name                     SetChargingProfile
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **2** ID                       K01
+- `ocpp-2.0.1-part2-specification pdf-page 243` — **K01** SetChargingProfile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 246` — **K02** Central Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 246` — **1** Name                     Central Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 246` — **2** ID                       K02
+- `ocpp-2.0.1-part2-specification pdf-page 246` — **K04** Internal Load Balancing
+- `ocpp-2.0.1-part2-specification pdf-page 248` — **K02** Central Smart Charging - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 249` — **K03** Local Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 249` — **1** Name                     Local Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 249` — **2** ID                       K03
+- `ocpp-2.0.1-part2-specification pdf-page 250` — **K03** Local Smart Charging - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 252` — **1** Name                     Internal Load Balancing
+- `ocpp-2.0.1-part2-specification pdf-page 252` — **2** ID                       K04
+- `ocpp-2.0.1-part2-specification pdf-page 252` — **K04** Internal Load Balancing - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 253` — **K05** Remote Start Transaction with Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 253` — **1** Name                     Remote Start Transaction with Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 253` — **2** ID                       K05
+- `ocpp-2.0.1-part2-specification pdf-page 255` — **K05** Remote Start Transaction with Charging Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 255` — **K06** Offline Behavior Smart Charging During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 255` — **1** Name                    Offline Behavior Smart Charging During Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 255` — **2** ID                      K06
+- `ocpp-2.0.1-part2-specification pdf-page 256` — **K06** Offline Behavior Smart Charging During Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 256` — **K07** Offline Behavior Smart Charging at Start of Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 256` — **2** ID                           K07
+- `ocpp-2.0.1-part2-specification pdf-page 258` — **K07** Offline Behavior Smart Charging at Start of Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 258` — **K08** Get Composite Schedule
+- `ocpp-2.0.1-part2-specification pdf-page 259` — **1** Name                     Get Composite Schedule
+- `ocpp-2.0.1-part2-specification pdf-page 259` — **2** ID                       K08
+- `ocpp-2.0.1-part2-specification pdf-page 260` — **K08** Get Composite Schedule - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 260` — **K09** Get Charging Profiles
+- `ocpp-2.0.1-part2-specification pdf-page 260` — **1** Name                     Get Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 260` — **2** ID                       K09
+- `ocpp-2.0.1-part2-specification pdf-page 260` — **4** The CSMS acknowledges reception of the reports by sending a
+- `ocpp-2.0.1-part2-specification pdf-page 261` — **K09** Get Charging Profiles - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 261` — **K10** Clear Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 261` — **1** Name                       Clear Charging Profile
+- `ocpp-2.0.1-part2-specification pdf-page 261` — **2** ID                         K10
+- `ocpp-2.0.1-part2-specification pdf-page 262` — **K10** Clear Charging Profile - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 262` — **5.2** External Charging Limit based Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 262` — **K11** Set / Update External Charging Limit With Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 262` — **2** ID                       K11
+- `ocpp-2.0.1-part2-specification pdf-page 264` — **K12** Set / Update External Charging Limit Without Ongoing Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 264` — **2** ID                       K12
+- `ocpp-2.0.1-part2-specification pdf-page 265` — **K13** Reset / Release External Charging Limit
+- `ocpp-2.0.1-part2-specification pdf-page 265` — **1** Name                    Reset / Release External Charging Limit
+- `ocpp-2.0.1-part2-specification pdf-page 265` — **2** ID                      K13
+- `ocpp-2.0.1-part2-specification pdf-page 266` — **K13** Reset / Release External Charging Limit - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 267` — **K14** External Charging Limit with Local Controller
+- `ocpp-2.0.1-part2-specification pdf-page 267` — **1** Name                     Handle external charging limit with a local controller
+- `ocpp-2.0.1-part2-specification pdf-page 267` — **2** ID                       K14
+- `ocpp-2.0.1-part2-specification pdf-page 268` — **K14** External Charging Limit with Local Controller - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 269` — **5.3** ISO 15118 based Smart Charging
+- `ocpp-2.0.1-part2-specification pdf-page 269` — **K15** Charging with load leveling based on High Level Communication
+- `ocpp-2.0.1-part2-specification pdf-page 269` — **2** ID                   K15
+- `ocpp-2.0.1-part2-specification pdf-page 272` — **K16** Renegotiation initiated by CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 272` — **2** ID                      K16
+- `ocpp-2.0.1-part2-specification pdf-page 273` — **K16** Renegotiation initiated by CSMS - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 274` — **K17** Renegotiation initiated by EV
+- `ocpp-2.0.1-part2-specification pdf-page 275` — **K17** Renegotiation initiated by EV - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **L01** Secure Firmware Update
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **1** Name                     Secure Firmware Update
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **2** ID                       L01
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **4** If the Firmware successfully downloaded, the Charging Station sends a
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **5** If the verification is successful, the Charging Station sends a
+- `ocpp-2.0.1-part2-specification pdf-page 280` — **6** If the installation is successful, the Charging Station sends a
+- `ocpp-2.0.1-part2-specification pdf-page 283` — **L01** Secure Firmware Update - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 285` — **L02** Non-Secure Firmware Update
+- `ocpp-2.0.1-part2-specification pdf-page 285` — **1** Name                     Non-Secure Firmware Update
+- `ocpp-2.0.1-part2-specification pdf-page 285` — **2** ID                       L02
+- `ocpp-2.0.1-part2-specification pdf-page 288` — **L02** Non-Secure Firmware Update - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 289` — **L03** Publish Firmware file on Local Controller
+- `ocpp-2.0.1-part2-specification pdf-page 289` — **2** ID                       L03
+- `ocpp-2.0.1-part2-specification pdf-page 289` — **2** Upon receipt of PublishFirmwareRequest, the Local Controller responds with
+- `ocpp-2.0.1-part2-specification pdf-page 290` — **L03** Publish Firmware file on Local Controller - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 291` — **L04** Unpublish Firmware file on Local Controller
+- `ocpp-2.0.1-part2-specification pdf-page 291` — **2** ID                        L04
+- `ocpp-2.0.1-part2-specification pdf-page 292` — **L04** Unpublish Firmware file on Local Controller - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 295` — **15118** Communication Setup, OCPP Transaction started (and OCPP status: Occupied)
+- `ocpp-2.0.1-part2-specification pdf-page 295` — **15118** Identification, Authentication
+- `ocpp-2.0.1-part2-specification pdf-page 297` — **2** ISO 15118 Certificates
+- `ocpp-2.0.1-part2-specification pdf-page 297` — **2.1** ISO 15118 Certificate structure
+- `ocpp-2.0.1-part2-specification pdf-page 298` — **1** The authorization status of the EMAID
+- `ocpp-2.0.1-part2-specification pdf-page 298` — **2** The revocation status of each certificate
+- `ocpp-2.0.1-part2-specification pdf-page 298` — **2.2** Using ISO 15118 Certificates in OCPP
+- `ocpp-2.0.1-part2-specification pdf-page 299` — **2.4** Certificate - Use Case mapping
+- `ocpp-2.0.1-part2-specification pdf-page 301` — **3** Use cases from ISO 15118 relevant for OCPP
+- `ocpp-2.0.1-part2-specification pdf-page 302` — **4** Use cases & Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 302` — **M01** Certificate installation EV
+- `ocpp-2.0.1-part2-specification pdf-page 302` — **1** Name                    Certificate Installation
+- `ocpp-2.0.1-part2-specification pdf-page 302` — **2** ID                      M01
+- `ocpp-2.0.1-part2-specification pdf-page 302` — **M01** Certificate installation - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 303` — **M02** Certificate Update EV
+- `ocpp-2.0.1-part2-specification pdf-page 303` — **1** Name                    Certificate Update
+- `ocpp-2.0.1-part2-specification pdf-page 303` — **2** ID                      M02
+- `ocpp-2.0.1-part2-specification pdf-page 303` — **M02** Certificate Update - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 304` — **M03** Retrieve list of available certificates from a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 304` — **2** ID                       M03
+- `ocpp-2.0.1-part2-specification pdf-page 304` — **2** The Charging Station responds with a GetInstalledCertificateIdsResponse
+- `ocpp-2.0.1-part2-specification pdf-page 304` — **6** Postcondition(s)         The CSMS received a list of installed certificates
+- `ocpp-2.0.1-part2-specification pdf-page 305` — **M04** Delete a specific certificate from a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 305` — **1** Name                     Delete a specific certificate from a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 305` — **2** ID                       M04
+- `ocpp-2.0.1-part2-specification pdf-page 305` — **M04** Delete a specific certificate from a Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 306` — **M05** Install CA certificate in a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 306` — **1** Name                    Install CA certificate in a Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 306` — **2** ID                      M05
+- `ocpp-2.0.1-part2-specification pdf-page 307` — **M05** Install CA certificate in a Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 308` — **M06** Get V2G Charging Station Certificate status
+- `ocpp-2.0.1-part2-specification pdf-page 308` — **1** Name                    Get V2G Charging Station Certificate status
+- `ocpp-2.0.1-part2-specification pdf-page 308` — **2** ID                      M06
+- `ocpp-2.0.1-part2-specification pdf-page 309` — **M06** Get V2G Charging Station Certificate status - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 312` — **2.1** Logging
+- `ocpp-2.0.1-part2-specification pdf-page 312` — **N01** Retrieve Log Information
+- `ocpp-2.0.1-part2-specification pdf-page 312` — **1** Name                     Retrieve Log
+- `ocpp-2.0.1-part2-specification pdf-page 312` — **2** ID                       N01
+- `ocpp-2.0.1-part2-specification pdf-page 313` — **N01** Retrieve Log Information - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **2.2** Configure Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **N02** Get Monitoring report
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **1** Name                     Get Monitoring Report
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **2** ID                       N02
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **5** Prerequisite(s)          Charging Station supports Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 314` — **N02** Get Monitoring Report - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 315` — **N03** Set Monitoring Base
+- `ocpp-2.0.1-part2-specification pdf-page 315` — **1** Name                    Set Monitoring Base
+- `ocpp-2.0.1-part2-specification pdf-page 315` — **2** ID                      N03
+- `ocpp-2.0.1-part2-specification pdf-page 316` — **N03** Set Monitoring Base - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 316` — **N04** Set Variable Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 316` — **1** Name                     Set Variable Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 316` — **2** ID                       N04
+- `ocpp-2.0.1-part2-specification pdf-page 317` — **N04** Set Variable Monitoring - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 319` — **N05** Set Monitoring Level
+- `ocpp-2.0.1-part2-specification pdf-page 319` — **1** Name                     Set Monitoring Level
+- `ocpp-2.0.1-part2-specification pdf-page 319` — **2** ID                       N05
+- `ocpp-2.0.1-part2-specification pdf-page 319` — **N05** Set Monitoring Level - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 319` — **N06** Clear / Remove Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 320` — **1** Name                     Clear / Remove Monitoring
+- `ocpp-2.0.1-part2-specification pdf-page 320` — **2** ID                       N06
+- `ocpp-2.0.1-part2-specification pdf-page 320` — **N06** Clear / Remove Monitoring - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 320` — **2.3** Monitoring Events
+- `ocpp-2.0.1-part2-specification pdf-page 320` — **N07** Alert Event
+- `ocpp-2.0.1-part2-specification pdf-page 321` — **1** Name                     Alert Event
+- `ocpp-2.0.1-part2-specification pdf-page 321` — **2** ID                       N07
+- `ocpp-2.0.1-part2-specification pdf-page 321` — **N07** Alert Event - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 323` — **N08** Periodic Event
+- `ocpp-2.0.1-part2-specification pdf-page 323` — **1** Name                     Periodic Event
+- `ocpp-2.0.1-part2-specification pdf-page 323` — **2** ID                       N08
+- `ocpp-2.0.1-part2-specification pdf-page 323` — **N08** Periodic Event - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 325` — **2.4** Customer Information
+- `ocpp-2.0.1-part2-specification pdf-page 325` — **N09** Get Customer Information
+- `ocpp-2.0.1-part2-specification pdf-page 325` — **1** Name                     Get Customer Information
+- `ocpp-2.0.1-part2-specification pdf-page 325` — **2** ID                       N09
+- `ocpp-2.0.1-part2-specification pdf-page 326` — **N09** Get Customer Information - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 326` — **N10** Clear Customer Information
+- `ocpp-2.0.1-part2-specification pdf-page 326` — **1** Name                      Clear Customer Information
+- `ocpp-2.0.1-part2-specification pdf-page 326` — **2** ID                        N10
+- `ocpp-2.0.1-part2-specification pdf-page 327` — **N10** Clear Customer Information - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 331` — **O01** Set DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 331` — **1** Name                    Set DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 331` — **2** ID                      O01
+- `ocpp-2.0.1-part2-specification pdf-page 331` — **O06** Replace DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 331` — **O01** Set DisplayMessage - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 333` — **O02** Set DisplayMessage for Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 333` — **1** Name                    Set DisplayMessage for Transaction
+- `ocpp-2.0.1-part2-specification pdf-page 333` — **2** ID                      O02
+- `ocpp-2.0.1-part2-specification pdf-page 333` — **O06** Replace MessageMessage
+- `ocpp-2.0.1-part2-specification pdf-page 334` — **O02** Set DisplayMessage for Transaction - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 335` — **O03** Get All DisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 335` — **1** Name                    Get All DisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 335` — **2** ID                      O03
+- `ocpp-2.0.1-part2-specification pdf-page 335` — **O03** Get All DisplayMessages - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 337` — **O04** Get Specific DisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 337` — **1** Name                  Get Specific DisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 337` — **2** ID                    O04
+- `ocpp-2.0.1-part2-specification pdf-page 337` — **O04** Get Specific DisplayMessage - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 339` — **O05** Clear a DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 339` — **1** Name                    Clear a DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 339` — **2** ID                      O05
+- `ocpp-2.0.1-part2-specification pdf-page 339` — **O05** Clear a DisplayMessage - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 340` — **1** Name                    Replace DisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 340` — **2** ID                      O06
+- `ocpp-2.0.1-part2-specification pdf-page 340` — **O06** Replace DisplayMessage - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 343` — **P01** Data Transfer to the Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 343` — **1** Name                     Data Transfer to the Charging Station
+- `ocpp-2.0.1-part2-specification pdf-page 343` — **2** ID                       P01
+- `ocpp-2.0.1-part2-specification pdf-page 343` — **P01** Data Transfer to the Charging Station - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 345` — **P02** Data Transfer to the CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 345` — **1** Name                     Data Transfer to the CSMS
+- `ocpp-2.0.1-part2-specification pdf-page 345` — **2** ID                       P02
+- `ocpp-2.0.1-part2-specification pdf-page 345` — **P02** Data Transfer to the CSMS - Requirements
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1** Messages
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.1** Authorize
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.1.1** AuthorizeRequest
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.1.2** AuthorizeResponse
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.2** BootNotification
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.2.1** BootNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 348` — **1.2.2** BootNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 349` — **1.3** CancelReservation
+- `ocpp-2.0.1-part2-specification pdf-page 349` — **1.3.1** CancelReservationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 349` — **1.3.2** CancelReservationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 349` — **1.4** CertificateSigned
+- `ocpp-2.0.1-part2-specification pdf-page 349` — **1.4.1** CertificateSignedRequest
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.4.2** CertificateSignedResponse
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.5** ChangeAvailability
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.5.1** ChangeAvailabilityRequest
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.5.2** ChangeAvailabilityResponse
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.6** ClearCache
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.6.1** ClearCacheRequest
+- `ocpp-2.0.1-part2-specification pdf-page 350` — **1.6.2** ClearCacheResponse
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.7** ClearChargingProfile
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.7.1** ClearChargingProfileRequest
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.7.2** ClearChargingProfileResponse
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.8** ClearDisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.8.1** ClearDisplayMessageRequest
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.8.2** ClearDisplayMessageResponse
+- `ocpp-2.0.1-part2-specification pdf-page 351` — **1.9** ClearedChargingLimit
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.9.1** ClearedChargingLimitRequest
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.9.2** ClearedChargingLimitResponse
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.10** ClearVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.10.1** ClearVariableMonitoringRequest
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.10.2** ClearVariableMonitoringResponse
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.11** CostUpdated
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.11.1** CostUpdatedRequest
+- `ocpp-2.0.1-part2-specification pdf-page 352` — **1.11.2** CostUpdatedResponse
+- `ocpp-2.0.1-part2-specification pdf-page 353` — **1.12** CustomerInformation
+- `ocpp-2.0.1-part2-specification pdf-page 353` — **1.12.1** CustomerInformationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 353` — **1.12.2** CustomerInformationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 353` — **1.13** DataTransfer
+- `ocpp-2.0.1-part2-specification pdf-page 353` — **1.13.1** DataTransferRequest
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.13.2** DataTransferResponse
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.14** DeleteCertificate
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.14.1** DeleteCertificateRequest
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.14.2** DeleteCertificateResponse
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.15** FirmwareStatusNotification
+- `ocpp-2.0.1-part2-specification pdf-page 354` — **1.15.1** FirmwareStatusNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.15.2** FirmwareStatusNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.16** Get15118EVCertificate
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.16.1** Get15118EVCertificateRequest
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.16.2** Get15118EVCertificateResponse
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.17** GetBaseReport
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.17.1** GetBaseReportRequest
+- `ocpp-2.0.1-part2-specification pdf-page 355` — **1.17.2** GetBaseReportResponse
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.18** GetCertificateStatus
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.18.1** GetCertificateStatusRequest
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.18.2** GetCertificateStatusResponse
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **6960** DER encoded (as defined in IETF RFC 6960), and
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.19** GetChargingProfiles
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.19.1** GetChargingProfilesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 356` — **1.19.2** GetChargingProfilesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 357` — **1.20** GetCompositeSchedule
+- `ocpp-2.0.1-part2-specification pdf-page 357` — **1.20.1** GetCompositeScheduleRequest
+- `ocpp-2.0.1-part2-specification pdf-page 357` — **1.20.2** GetCompositeScheduleResponse
+- `ocpp-2.0.1-part2-specification pdf-page 357` — **1.21** GetDisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 357` — **1.21.1** GetDisplayMessagesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.21.2** GetDisplayMessagesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.22** GetInstalledCertificateIds
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.22.1** GetInstalledCertificateIdsRequest
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.22.2** GetInstalledCertificateIdsResponse
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.23** GetLocalListVersion
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.23.1** GetLocalListVersionRequest
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.23.2** GetLocalListVersionResponse
+- `ocpp-2.0.1-part2-specification pdf-page 358` — **1.24** GetLog
+- `ocpp-2.0.1-part2-specification pdf-page 359` — **1.24.1** GetLogRequest
+- `ocpp-2.0.1-part2-specification pdf-page 359` — **1.24.2** GetLogResponse
+- `ocpp-2.0.1-part2-specification pdf-page 359` — **1.25** GetMonitoringReport
+- `ocpp-2.0.1-part2-specification pdf-page 359` — **1.25.1** GetMonitoringReportRequest
+- `ocpp-2.0.1-part2-specification pdf-page 359` — **1.25.2** GetMonitoringReportResponse
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.26** GetReport
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.26.1** GetReportRequest
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.26.2** GetReportResponse
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.27** GetTransactionStatus
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.27.1** GetTransactionStatusRequest
+- `ocpp-2.0.1-part2-specification pdf-page 360` — **1.27.2** GetTransactionStatusResponse
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.28** GetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.28.1** GetVariablesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.28.2** GetVariablesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.29** Heartbeat
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.29.1** HeartbeatRequest
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.29.2** HeartbeatResponse
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.30** InstallCertificate
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.30.1** InstallCertificateRequest
+- `ocpp-2.0.1-part2-specification pdf-page 361` — **1.30.2** InstallCertificateResponse
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.31** LogStatusNotification
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.31.1** LogStatusNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.31.2** LogStatusNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.32** MeterValues
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.32.1** MeterValuesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.32.2** MeterValuesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.33** NotifyChargingLimit
+- `ocpp-2.0.1-part2-specification pdf-page 362` — **1.33.1** NotifyChargingLimitRequest
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.33.2** NotifyChargingLimitResponse
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.34** NotifyCustomerInformation
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.34.1** NotifyCustomerInformationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.34.2** NotifyCustomerInformationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.35** NotifyDisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 363` — **1.35.1** NotifyDisplayMessagesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.35.2** NotifyDisplayMessagesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.36** NotifyEVChargingNeeds
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.36.1** NotifyEVChargingNeedsRequest
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.36.2** NotifyEVChargingNeedsResponse
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.37** NotifyEVChargingSchedule
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.37.1** NotifyEVChargingScheduleRequest
+- `ocpp-2.0.1-part2-specification pdf-page 364` — **1.37.2** NotifyEVChargingScheduleResponse
+- `ocpp-2.0.1-part2-specification pdf-page 365` — **1.38** NotifyEvent
+- `ocpp-2.0.1-part2-specification pdf-page 365` — **1.38.1** NotifyEventRequest
+- `ocpp-2.0.1-part2-specification pdf-page 365` — **1.38.2** NotifyEventResponse
+- `ocpp-2.0.1-part2-specification pdf-page 365` — **1.39** NotifyMonitoringReport
+- `ocpp-2.0.1-part2-specification pdf-page 365` — **1.39.1** NotifyMonitoringReportRequest
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.39.2** NotifyMonitoringReportResponse
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.40** NotifyReport
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.40.1** NotifyReportRequest
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.40.2** NotifyReportResponse
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.41** PublishFirmware
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.41.1** PublishFirmwareRequest
+- `ocpp-2.0.1-part2-specification pdf-page 366` — **1.41.2** PublishFirmwareResponse
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.42** PublishFirmwareStatusNotification
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.42.1** PublishFirmwareStatusNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.42.2** PublishFirmwareStatusNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.43** ReportChargingProfiles
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.43.1** ReportChargingProfilesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 367` — **1.43.2** ReportChargingProfilesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.44** RequestStartTransaction
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.44.1** RequestStartTransactionRequest
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.44.2** RequestStartTransactionResponse
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.45** RequestStopTransaction
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.45.1** RequestStopTransactionRequest
+- `ocpp-2.0.1-part2-specification pdf-page 368` — **1.45.2** RequestStopTransactionResponse
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.46** ReservationStatusUpdate
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.46.1** ReservationStatusUpdateRequest
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.46.2** ReservationStatusUpdateResponse
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.47** ReserveNow
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.47.1** ReserveNowRequest
+- `ocpp-2.0.1-part2-specification pdf-page 369` — **1.47.2** ReserveNowResponse
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.48** Reset
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.48.1** ResetRequest
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.48.2** ResetResponse
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.49** SecurityEventNotification
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.49.1** SecurityEventNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.49.2** SecurityEventNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.50** SendLocalList
+- `ocpp-2.0.1-part2-specification pdf-page 370` — **1.50.1** SendLocalListRequest
+- `ocpp-2.0.1-part2-specification pdf-page 371` — **1.50.2** SendLocalListResponse
+- `ocpp-2.0.1-part2-specification pdf-page 371` — **1.51** SetChargingProfile
+- `ocpp-2.0.1-part2-specification pdf-page 371` — **1.51.1** SetChargingProfileRequest
+- `ocpp-2.0.1-part2-specification pdf-page 371` — **1.51.2** SetChargingProfileResponse
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.52** SetDisplayMessage
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.52.1** SetDisplayMessageRequest
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.52.2** SetDisplayMessageResponse
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.53** SetMonitoringBase
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.53.1** SetMonitoringBaseRequest
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.53.2** SetMonitoringBaseResponse
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.54** SetMonitoringLevel
+- `ocpp-2.0.1-part2-specification pdf-page 372` — **1.54.1** SetMonitoringLevelRequest
+- `ocpp-2.0.1-part2-specification pdf-page 373` — **1.54.2** SetMonitoringLevelResponse
+- `ocpp-2.0.1-part2-specification pdf-page 373` — **1.55** SetNetworkProfile
+- `ocpp-2.0.1-part2-specification pdf-page 373` — **1.55.1** SetNetworkProfileRequest
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.55.2** SetNetworkProfileResponse
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.56** SetVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.56.1** SetVariableMonitoringRequest
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.56.2** SetVariableMonitoringResponse
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.57** SetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.57.1** SetVariablesRequest
+- `ocpp-2.0.1-part2-specification pdf-page 374` — **1.57.2** SetVariablesResponse
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.58** SignCertificate
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.58.1** SignCertificateRequest
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.58.2** SignCertificateResponse
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.59** StatusNotification
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.59.1** StatusNotificationRequest
+- `ocpp-2.0.1-part2-specification pdf-page 375` — **1.59.2** StatusNotificationResponse
+- `ocpp-2.0.1-part2-specification pdf-page 376` — **1.60** TransactionEvent
+- `ocpp-2.0.1-part2-specification pdf-page 376` — **1.60.1** TransactionEventRequest
+- `ocpp-2.0.1-part2-specification pdf-page 376` — **1.60.2** TransactionEventResponse
+- `ocpp-2.0.1-part2-specification pdf-page 377` — **1.61** TriggerMessage
+- `ocpp-2.0.1-part2-specification pdf-page 377` — **1.61.1** TriggerMessageRequest
+- `ocpp-2.0.1-part2-specification pdf-page 377` — **1.61.2** TriggerMessageResponse
+- `ocpp-2.0.1-part2-specification pdf-page 377` — **1.62** UnlockConnector
+- `ocpp-2.0.1-part2-specification pdf-page 377` — **1.62.1** UnlockConnectorRequest
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.62.2** UnlockConnectorResponse
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.63** UnpublishFirmware
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.63.1** UnpublishFirmwareRequest
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.63.2** UnpublishFirmwareResponse
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.64** UpdateFirmware
+- `ocpp-2.0.1-part2-specification pdf-page 378` — **1.64.1** UpdateFirmwareRequest
+- `ocpp-2.0.1-part2-specification pdf-page 379` — **1.64.2** UpdateFirmwareResponse
+- `ocpp-2.0.1-part2-specification pdf-page 380` — **2** Datatypes
+- `ocpp-2.0.1-part2-specification pdf-page 380` — **2.1** ACChargingParametersType
+- `ocpp-2.0.1-part2-specification pdf-page 380` — **2.2** AdditionalInfoType
+- `ocpp-2.0.1-part2-specification pdf-page 380` — **2.3** APNType
+- `ocpp-2.0.1-part2-specification pdf-page 381` — **2.4** AuthorizationData
+- `ocpp-2.0.1-part2-specification pdf-page 381` — **2.5** CertificateHashDataChainType
+- `ocpp-2.0.1-part2-specification pdf-page 381` — **2.6** CertificateHashDataType
+- `ocpp-2.0.1-part2-specification pdf-page 381` — **2.7** ChargingLimitType
+- `ocpp-2.0.1-part2-specification pdf-page 382` — **2.8** ChargingNeedsType
+- `ocpp-2.0.1-part2-specification pdf-page 382` — **2.9** ChargingProfileCriterionType
+- `ocpp-2.0.1-part2-specification pdf-page 382` — **2.10** ChargingProfileType
+- `ocpp-2.0.1-part2-specification pdf-page 383` — **2.11** ChargingSchedulePeriodType
+- `ocpp-2.0.1-part2-specification pdf-page 383` — **2.12** ChargingScheduleType
+- `ocpp-2.0.1-part2-specification pdf-page 384` — **2.13** ChargingStationType
+- `ocpp-2.0.1-part2-specification pdf-page 384` — **2.14** ClearChargingProfileType
+- `ocpp-2.0.1-part2-specification pdf-page 385` — **2.15** ClearMonitoringResultType
+- `ocpp-2.0.1-part2-specification pdf-page 385` — **2.16** ComponentType
+- `ocpp-2.0.1-part2-specification pdf-page 385` — **2.17** ComponentVariableType
+- `ocpp-2.0.1-part2-specification pdf-page 385` — **2.18** CompositeScheduleType
+- `ocpp-2.0.1-part2-specification pdf-page 386` — **2.19** ConsumptionCostType
+- `ocpp-2.0.1-part2-specification pdf-page 386` — **2.20** CostType
+- `ocpp-2.0.1-part2-specification pdf-page 386` — **2.21** DCChargingParametersType
+- `ocpp-2.0.1-part2-specification pdf-page 387` — **2.22** EventDataType
+- `ocpp-2.0.1-part2-specification pdf-page 387` — **2.23** EVSEType
+- `ocpp-2.0.1-part2-specification pdf-page 388` — **2.24** FirmwareType
+- `ocpp-2.0.1-part2-specification pdf-page 388` — **2.25** GetVariableDataType
+- `ocpp-2.0.1-part2-specification pdf-page 388` — **2.26** GetVariableResultType
+- `ocpp-2.0.1-part2-specification pdf-page 389` — **2.27** IdTokenInfoType
+- `ocpp-2.0.1-part2-specification pdf-page 389` — **2.28** IdTokenType
+- `ocpp-2.0.1-part2-specification pdf-page 390` — **2.29** LogParametersType
+- `ocpp-2.0.1-part2-specification pdf-page 390` — **2.30** MessageContentType
+- `ocpp-2.0.1-part2-specification pdf-page 390` — **2.31** MessageInfoType
+- `ocpp-2.0.1-part2-specification pdf-page 391` — **2.32** MeterValueType
+- `ocpp-2.0.1-part2-specification pdf-page 391` — **2.33** ModemType
+- `ocpp-2.0.1-part2-specification pdf-page 391` — **2.34** MonitoringDataType
+- `ocpp-2.0.1-part2-specification pdf-page 391` — **2.35** NetworkConnectionProfileType
+- `ocpp-2.0.1-part2-specification pdf-page 392` — **2.36** OCSPRequestDataType
+- `ocpp-2.0.1-part2-specification pdf-page 392` — **2.37** RelativeTimeIntervalType
+- `ocpp-2.0.1-part2-specification pdf-page 392` — **2.38** ReportDataType
+- `ocpp-2.0.1-part2-specification pdf-page 393` — **2.39** SalesTariffEntryType
+- `ocpp-2.0.1-part2-specification pdf-page 393` — **2.40** SalesTariffType
+- `ocpp-2.0.1-part2-specification pdf-page 393` — **2.41** SampledValueType
+- `ocpp-2.0.1-part2-specification pdf-page 394` — **2.42** SetMonitoringDataType
+- `ocpp-2.0.1-part2-specification pdf-page 395` — **2.43** SetMonitoringResultType
+- `ocpp-2.0.1-part2-specification pdf-page 396` — **2.44** SetVariableDataType
+- `ocpp-2.0.1-part2-specification pdf-page 397` — **2.45** SetVariableResultType
+- `ocpp-2.0.1-part2-specification pdf-page 397` — **2.46** SignedMeterValueType
+- `ocpp-2.0.1-part2-specification pdf-page 397` — **2.47** StatusInfoType
+- `ocpp-2.0.1-part2-specification pdf-page 398` — **2.48** TransactionType
+- `ocpp-2.0.1-part2-specification pdf-page 398` — **2.49** UnitOfMeasureType
+- `ocpp-2.0.1-part2-specification pdf-page 398` — **2.50** VariableAttributeType
+- `ocpp-2.0.1-part2-specification pdf-page 399` — **2.51** VariableCharacteristicsType
+- `ocpp-2.0.1-part2-specification pdf-page 399` — **2.52** VariableMonitoringType
+- `ocpp-2.0.1-part2-specification pdf-page 400` — **2.53** VariableType
+- `ocpp-2.0.1-part2-specification pdf-page 401` — **2.54** VPNType
+- `ocpp-2.0.1-part2-specification pdf-page 402` — **3** Enumerations
+- `ocpp-2.0.1-part2-specification pdf-page 402` — **3.1** APNAuthenticationEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 402` — **3.2** AttributeEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 402` — **3.3** AuthorizationStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 402` — **3.4** AuthorizeCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 403` — **3.5** BootReasonEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 403` — **3.6** CancelReservationStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 403` — **3.7** CertificateActionEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 404` — **3.8** CertificateSignedStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 404` — **3.9** CertificateSigningUseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 404` — **3.10** ChangeAvailabilityStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 404` — **3.11** ChargingLimitSourceEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 405` — **3.12** ChargingProfileKindEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 405` — **3.13** ChargingProfilePurposeEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 405` — **3.14** ChargingProfileStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 405` — **3.15** ChargingRateUnitEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 406` — **3.16** ChargingStateEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 406` — **3.17** ClearCacheStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 406` — **3.18** ClearChargingProfileStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 406` — **3.19** ClearMessageStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 407` — **3.20** ClearMonitoringStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 407` — **3.21** ComponentCriterionEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 407` — **3.22** ConnectorEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 408` — **3.23** ConnectorStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 408` — **3.24** CostKindEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 408` — **3.25** CustomerInformationStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 409` — **3.26** DataEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 409` — **3.27** DataTransferStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 409` — **3.28** DeleteCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 409` — **3.29** DisplayMessageStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 410` — **3.30** EnergyTransferModeEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 410` — **3.31** EventNotificationEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 410` — **3.32** EventTriggerEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 411` — **3.33** FirmwareStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 411` — **3.34** GenericDeviceModelStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 411` — **3.35** GenericStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 412` — **3.36** GetCertificateIdUseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 412` — **3.37** GetCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 412` — **3.38** GetChargingProfileStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 412` — **3.39** GetDisplayMessagesStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 412` — **3.40** GetInstalledCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 413` — **3.41** GetVariableStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 413` — **3.42** HashAlgorithmEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 413` — **3.43** IdTokenEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 413` — **3.44** InstallCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 414` — **3.45** InstallCertificateUseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 414` — **3.46** Iso15118EVCertificateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 414` — **3.47** LocationEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 414` — **3.48** LogEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 415` — **3.49** LogStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 415` — **3.50** MeasurandEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 416` — **3.51** MessageFormatEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 416` — **3.52** MessagePriorityEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 417` — **3.53** MessageStateEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 417` — **3.54** MessageTriggerEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 417` — **3.55** MonitorEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 418` — **3.56** MonitoringBaseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 418` — **3.57** MonitoringCriterionEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 418` — **3.58** MutabilityEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 418` — **3.59** NotifyEVChargingNeedsStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 419` — **3.60** OCPPInterfaceEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 419` — **3.61** OCPPTransportEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 419` — **3.62** OCPPVersionEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 419` — **3.63** OperationalStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 420` — **3.64** PhaseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 420` — **3.65** PublishFirmwareStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 420` — **3.66** ReadingContextEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 421` — **3.67** ReasonEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 421` — **3.68** RecurrencyKindEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 421` — **3.69** RegistrationStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 422` — **3.70** ReportBaseEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 422` — **3.71** RequestStartStopStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 422` — **3.72** ReservationUpdateStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 423` — **3.73** ReserveNowStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 423` — **3.74** ResetEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 423` — **3.75** ResetStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 423` — **3.76** SendLocalListStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 424` — **3.77** SetMonitoringStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 424` — **3.78** SetNetworkProfileStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 424` — **3.79** SetVariableStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 424` — **3.80** TransactionEventEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 425` — **3.81** TriggerMessageStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 425` — **3.82** TriggerReasonEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 426` — **3.83** UnlockStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 426` — **3.84** UnpublishFirmwareStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 426` — **3.85** UpdateEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 426` — **3.86** UpdateFirmwareStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 427` — **3.87** UploadLogStatusEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 427` — **3.88** VPNEnumType
+- `ocpp-2.0.1-part2-specification pdf-page 429` — **1** Controller Components
+- `ocpp-2.0.1-part2-specification pdf-page 430` — **2** Referenced Components and Variables
+- `ocpp-2.0.1-part2-specification pdf-page 430` — **2.1** General
+- `ocpp-2.0.1-part2-specification pdf-page 430` — **2.1.1** ActiveNetworkProfile
+- `ocpp-2.0.1-part2-specification pdf-page 430` — **2.1.2** AllowNewSessionsPendingFirmwareUpdate
+- `ocpp-2.0.1-part2-specification pdf-page 430` — **2.1.3** DefaultMessageTimeout
+- `ocpp-2.0.1-part2-specification pdf-page 431` — **2.1.4** FileTransferProtocols
+- `ocpp-2.0.1-part2-specification pdf-page 431` — **2.1.5** HeartbeatInterval
+- `ocpp-2.0.1-part2-specification pdf-page 431` — **2.1.6** NetworkConfigurationPriority
+- `ocpp-2.0.1-part2-specification pdf-page 431` — **2.1.7** NetworkProfileConnectionAttempts
+- `ocpp-2.0.1-part2-specification pdf-page 432` — **2.1.8** OfflineThreshold
+- `ocpp-2.0.1-part2-specification pdf-page 432` — **2.1.9** QueueAllMessages
+- `ocpp-2.0.1-part2-specification pdf-page 432` — **2.1.10** MessageAttemptsTransactionEvent
+- `ocpp-2.0.1-part2-specification pdf-page 432` — **2.1.11** MessageAttemptIntervalTransactionEvent
+- `ocpp-2.0.1-part2-specification pdf-page 433` — **2.1.12** UnlockOnEVSideDisconnect
+- `ocpp-2.0.1-part2-specification pdf-page 433` — **2.1.13** WebSocketPingInterval
+- `ocpp-2.0.1-part2-specification pdf-page 433` — **2.1.14** ResetRetries
+- `ocpp-2.0.1-part2-specification pdf-page 433` — **2.1.15** ItemsPerMessageGetReport
+- `ocpp-2.0.1-part2-specification pdf-page 433` — **2.1.16** ItemsPerMessageGetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 434` — **2.1.17** BytesPerMessageGetReport
+- `ocpp-2.0.1-part2-specification pdf-page 434` — **2.1.18** BytesPerMessageGetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 434` — **2.1.19** ConfigurationValueSize
+- `ocpp-2.0.1-part2-specification pdf-page 434` — **2.1.20** ReportingValueSize
+- `ocpp-2.0.1-part2-specification pdf-page 434` — **2.1.21** ItemsPerMessageSetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 435` — **2.1.22** BytesPerMessageSetVariables
+- `ocpp-2.0.1-part2-specification pdf-page 435` — **2.1.23** DateTime
+- `ocpp-2.0.1-part2-specification pdf-page 435` — **2.1.24** NtpSource
+- `ocpp-2.0.1-part2-specification pdf-page 435` — **2.1.25** NtpServerUri
+- `ocpp-2.0.1-part2-specification pdf-page 436` — **2.1.26** TimeOffset
+- `ocpp-2.0.1-part2-specification pdf-page 436` — **2.1.27** NextTimeOffsetTransitionDateTime
+- `ocpp-2.0.1-part2-specification pdf-page 436` — **2.1.28** TimeOffsetNextTransition
+- `ocpp-2.0.1-part2-specification pdf-page 436` — **2.1.29** TimeSource
+- `ocpp-2.0.1-part2-specification pdf-page 437` — **2.1.30** TimeZone
+- `ocpp-2.0.1-part2-specification pdf-page 437` — **2.2** Security related
+- `ocpp-2.0.1-part2-specification pdf-page 437` — **2.2.1** BasicAuthPassword
+- `ocpp-2.0.1-part2-specification pdf-page 437` — **2.2.2** Identity
+- `ocpp-2.0.1-part2-specification pdf-page 438` — **2.2.3** OrganizationName
+- `ocpp-2.0.1-part2-specification pdf-page 438` — **2.2.4** CertificateEntries
+- `ocpp-2.0.1-part2-specification pdf-page 438` — **2.2.5** SecurityProfile
+- `ocpp-2.0.1-part2-specification pdf-page 438` — **2.2.6** AdditionalRootCertificateCheck
+- `ocpp-2.0.1-part2-specification pdf-page 439` — **2.2.7** MaxCertificateChainSize
+- `ocpp-2.0.1-part2-specification pdf-page 439` — **2.3** Authorization related
+- `ocpp-2.0.1-part2-specification pdf-page 439` — **2.3.1** AuthEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 439` — **2.3.2** AdditionalInfoItemsPerMessage
+- `ocpp-2.0.1-part2-specification pdf-page 439` — **2.3.3** OfflineTxForUnknownIdEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 440` — **2.3.4** AuthorizeRemoteStart
+- `ocpp-2.0.1-part2-specification pdf-page 440` — **2.3.5** LocalAuthorizeOffline
+- `ocpp-2.0.1-part2-specification pdf-page 440` — **2.3.6** LocalPreAuthorize
+- `ocpp-2.0.1-part2-specification pdf-page 440` — **2.3.7** MasterPassGroupId
+- `ocpp-2.0.1-part2-specification pdf-page 440` — **2.4** Authorization Cache related
+- `ocpp-2.0.1-part2-specification pdf-page 441` — **2.4.1** AuthCacheEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 441` — **2.4.2** AuthCacheAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 441` — **2.4.3** AuthCacheLifeTime
+- `ocpp-2.0.1-part2-specification pdf-page 441` — **2.4.4** AuthCacheStorage
+- `ocpp-2.0.1-part2-specification pdf-page 441` — **2.4.5** AuthCachePolicy
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5** Local Authorization List Management related
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5.1** LocalAuthListEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5.2** LocalAuthListEntries
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5.3** LocalAuthListAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5.4** ItemsPerMessageSendLocalList
+- `ocpp-2.0.1-part2-specification pdf-page 442` — **2.5.5** BytesPerMessageSendLocalList
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.5.6** LocalAuthListStorage
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.6** Transaction related
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.6.1** EVConnectionTimeOut
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.6.2** StopTxOnEVSideDisconnect
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.6.3** TxBeforeAcceptedEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 443` — **2.6.4** TxStartPoint
+- `ocpp-2.0.1-part2-specification pdf-page 444` — **2.6.4.1** TxStartStopPoint values
+- `ocpp-2.0.1-part2-specification pdf-page 444` — **2.6.5** TxStopPoint
+- `ocpp-2.0.1-part2-specification pdf-page 444` — **2.6.6** MaxEnergyOnInvalidId
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.6.7** StopTxOnInvalidId
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.7** Metering related
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.7.1** SampledDataEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.7.2** SampledDataAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.7.3** SampledDataSignReadings
+- `ocpp-2.0.1-part2-specification pdf-page 445` — **2.7.4** SampledDataTxEndedMeasurands
+- `ocpp-2.0.1-part2-specification pdf-page 446` — **2.7.5** SampledDataTxEndedInterval
+- `ocpp-2.0.1-part2-specification pdf-page 446` — **2.7.6** SampledDataTxStartedMeasurands
+- `ocpp-2.0.1-part2-specification pdf-page 446` — **2.7.7** SampledDataTxUpdatedMeasurands
+- `ocpp-2.0.1-part2-specification pdf-page 447` — **2.7.8** SampledDataTxUpdatedInterval
+- `ocpp-2.0.1-part2-specification pdf-page 447` — **2.7.9** AlignedDataEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 447` — **2.7.10** AlignedDataAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 447` — **2.7.11** AlignedDataMeasurands
+- `ocpp-2.0.1-part2-specification pdf-page 448` — **2.7.12** AlignedDataInterval
+- `ocpp-2.0.1-part2-specification pdf-page 448` — **2.7.13** AlignedDataSendDuringIdle
+- `ocpp-2.0.1-part2-specification pdf-page 448` — **2.7.14** AlignedDataSignReadings
+- `ocpp-2.0.1-part2-specification pdf-page 448` — **2.7.15** AlignedDataTxEndedMeasurands
+- `ocpp-2.0.1-part2-specification pdf-page 449` — **2.7.16** AlignedDataTxEndedInterval
+- `ocpp-2.0.1-part2-specification pdf-page 449` — **2.7.17** PublicKeyWithSignedMeterValue
+- `ocpp-2.0.1-part2-specification pdf-page 449` — **2.8** Reservation related
+- `ocpp-2.0.1-part2-specification pdf-page 449` — **2.8.1** ReservationEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 449` — **2.8.2** ReservationAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.8.3** ReservationNonEvseSpecific
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.9** Smart Charging related
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.9.1** SmartChargingEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.9.2** SmartChargingAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.9.3** ACPhaseSwitchingSupported
+- `ocpp-2.0.1-part2-specification pdf-page 450` — **2.9.4** ChargingProfileMaxStackLevel
+- `ocpp-2.0.1-part2-specification pdf-page 451` — **2.9.5** ChargingScheduleChargingRateUnit
+- `ocpp-2.0.1-part2-specification pdf-page 451` — **2.9.6** PeriodsPerSchedule
+- `ocpp-2.0.1-part2-specification pdf-page 451` — **2.9.7** ExternalControlSignalsEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 451` — **2.9.8** NotifyChargingLimitWithSchedules
+- `ocpp-2.0.1-part2-specification pdf-page 451` — **2.9.9** Phases3to1
+- `ocpp-2.0.1-part2-specification pdf-page 452` — **2.9.10** ChargingProfileEntries
+- `ocpp-2.0.1-part2-specification pdf-page 452` — **2.9.11** LimitChangeSignificance
+- `ocpp-2.0.1-part2-specification pdf-page 452` — **2.10** Tariff & Cost related
+- `ocpp-2.0.1-part2-specification pdf-page 452` — **2.10.1** TariffEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 452` — **2.10.2** TariffAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 453` — **2.10.3** TariffFallbackMessage
+- `ocpp-2.0.1-part2-specification pdf-page 453` — **2.10.4** CostEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 453` — **2.10.5** CostAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 453` — **2.10.6** TotalCostFallbackMessage
+- `ocpp-2.0.1-part2-specification pdf-page 453` — **2.10.7** Currency
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11** Diagnostics related
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11.1** MonitoringEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11.2** MonitoringAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11.3** ItemsPerMessageClearVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11.4** ItemsPerMessageSetVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 454` — **2.11.5** BytesPerMessageClearVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 455` — **2.11.6** BytesPerMessageSetVariableMonitoring
+- `ocpp-2.0.1-part2-specification pdf-page 455` — **2.11.7** OfflineMonitoringEventQueuingSeverity
+- `ocpp-2.0.1-part2-specification pdf-page 455` — **2.12** Display Message related
+- `ocpp-2.0.1-part2-specification pdf-page 455` — **2.12.1** DisplayMessageEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 455` — **2.12.2** DisplayMessageAvailable
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.12.3** NumberOfDisplayMessages
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.12.4** DisplayMessageSupportedFormats
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.12.5** DisplayMessageSupportedPriorities
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.12.6** CustomImplementationEnabled
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.13** Charging Infrastructure related
+- `ocpp-2.0.1-part2-specification pdf-page 456` — **2.13.1** Available
+- `ocpp-2.0.1-part2-specification pdf-page 457` — **2.13.2** AvailabilityState
+- `ocpp-2.0.1-part2-specification pdf-page 457` — **2.13.3** AllowReset
+- `ocpp-2.0.1-part2-specification pdf-page 457` — **2.13.4** ConnectorType
+- `ocpp-2.0.1-part2-specification pdf-page 457` — **2.13.5** PhaseRotation
+- `ocpp-2.0.1-part2-specification pdf-page 458` — **2.13.6** SupplyPhases
+- `ocpp-2.0.1-part2-specification pdf-page 458` — **2.13.7** Power
+- `ocpp-2.0.1-part2-specification pdf-page 459` — **2.14** ISO 15118 Related
+- `ocpp-2.0.1-part2-specification pdf-page 459` — **2.14.1** CentralContractValidationAllowed
+- `ocpp-2.0.1-part2-specification pdf-page 459` — **2.14.2** ContractValidationOffline
+
+---
+
+[OCPP 2.0.1 documents](../2.0.1.md) · [protocol reference](../../2.0.1/README.md)
