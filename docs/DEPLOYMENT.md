@@ -82,8 +82,13 @@ staging repository.
 
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on pushes to `dev` and on pull
 requests to any branch: JDK 21 (temurin), Gradle via `gradle/actions/setup-gradle`, then
-`./gradlew build`. That is the whole gate — build plus tests. There is no lint step, no coverage
-threshold, and no security scan. `concurrency: ocpp-ci` serialises runs.
+`./gradlew build`. That is the whole gate the workflow itself defines — build plus tests, with no
+lint step and no coverage threshold. `concurrency: ocpp-ci` serialises runs.
+
+A **SonarCloud Code Analysis** check also reports on pull requests (project
+`IZIVIA_ocpp-toolkit`). It is configured through the SonarCloud GitHub App rather than in this
+repository, so nothing in `.github/workflows/` or the Gradle build references it — which means you
+cannot reproduce or configure it locally, and its quality gate is managed on sonarcloud.io.
 
 Both workflows pin their actions to commit SHAs rather than tags; keep that practice when
 updating them.

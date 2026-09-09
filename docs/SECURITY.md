@@ -82,7 +82,12 @@ These are properties of the implementation that matter when a peer is untrusted:
 - GitHub Actions are pinned to commit SHAs rather than mutable tags in both workflows. Keep that.
 - Release artifacts are GPG-signed, but **only when `GPG_PRIVATE_KEY` is present in the
   environment** — signing is skipped silently otherwise. See [DEPLOYMENT.md](DEPLOYMENT.md).
-- There is no dependency scanning, SAST or secret scanning configured in CI.
+- **SonarCloud** analyses pull requests (project `IZIVIA_ocpp-toolkit`), configured via the
+  SonarCloud GitHub App — not from anything in this repository, so its rule set and quality gate
+  are not visible or version-controlled here.
+- Beyond that, there is no dependency scanning, no secret scanning and no SCA in CI. Nothing checks
+  the vendored OCPP JSON schemas against the editions OCA currently publishes either — see
+  [protocol/SPECS.md](protocol/SPECS.md).
 
 ## Reporting
 
