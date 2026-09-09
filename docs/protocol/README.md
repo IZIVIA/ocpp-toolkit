@@ -5,15 +5,23 @@ from the official JSON schemas the repo already vendors, but not *quickly*: they
 JSON files, one per direction per action, with no indication of who initiates an action and no way
 to compare versions.
 
-`generate.py` turns them into three flat, line-oriented reference files plus a cross-version
-matrix, so one grep answers the question:
+Two scripts make both halves of the specification grep-able. Run them in this order:
 
 ```bash
-python3 docs/protocol/generate.py          # generate (or refresh) the reference
+# 1. the normative PDFs -> page-cited text (needs your own licensed copy + ghostscript)
+OCA_DOCS=~/Documents/OCA python3 docs/protocol/extract-specs.py
 
+# 2. the vendored JSON schemas -> field reference, citing the sections extracted in step 1
+python3 docs/protocol/generate.py
+```
+
+Step 2 works on its own; without step 1 it simply omits the spec citations. Then:
+
+```bash
 grep -rn 'idTag`' docs/protocol/           # which actions carry idTag, in which version
 grep -n 'transactionEvent.req' docs/protocol/OCPP-2.0.1.md
-grep -n 'meterValues' docs/protocol/ACTIONS.md   # does 1.5 have it? who initiates it?
+grep -n 'meterValues' docs/protocol/ACTIONS.md    # does 1.5 have it? who initiates it?
+grep -rn -B2 -A8 'Authorization Cache' docs/protocol/spec/1.6/   # the normative prose
 ```
 
 Each field is one line keyed by its dotted JSON path, carrying everything needed to act on it:
@@ -30,7 +38,13 @@ Each field is one line keyed by its dotted JSON path, carrying everything needed
 | `OCPP-1.5.md` | 24 actions |
 | `OCPP-1.6.md` | 39 actions, including the Security Whitepaper extension |
 | `OCPP-2.0.1.md` | 64 actions |
-| [SPECS.md](SPECS.md) | where the normative documents are, **which edition the vendored schemas are from**, and the licensing |
+| `spec/<version>/*.txt` | extracted specification text, one line per source line, with `[[<slug> pdf-page N]]` markers |
+| `spec/INDEX.md` | every document and every heading, mapped to its PDF page |
+| `spec/sections.json` | the same, machine-readable; `generate.py` reads it to cite sections |
+| [SPECS.md](SPECS.md) | where the documents are, **which edition the vendored schemas match**, the verified divergences, and the licensing |
+
+Extraction covers 18 documents and about 1,090 pages across the three versions — the specifications,
+the OCPP-J and OCPP-S bindings, the 1.6 Security Whitepaper, and every errata sheet and changelog.
 
 Generated files are not committed — see [Licensing](SPECS.md#licensing). Generate them once and
 they stay until the schemas change. They are deliberately long and repetitive: they are a grep
@@ -71,10 +85,14 @@ schema files. Three checks, all of which have found something real in this repo:
 Re-run the generator after touching an `Actions` enum or the schema resources and those sections
 will tell you whether the two still agree.
 
+## Requirements
+
+`extract-specs.py` needs **ghostscript** (`brew install ghostscript`) and your own copy of the OCA
+PDFs. `generate.py` needs nothing beyond Python 3. Neither writes anything outside
+`docs/protocol/`, and all of their output is gitignored — see [SPECS.md](SPECS.md#licensing).
+
 ## What it deliberately does not cover
 
-The schemas describe payload shape only. Ordering, state machines, the meaning of a status value,
-error-code selection, profiles, and retry timing live in the specification documents — see
-[SPECS.md](SPECS.md#what-the-schemas-cannot-tell-you). SOAP is also out of scope here: no WSDL or
-XSD is vendored, so the OCPP-S wire contract's source of truth is the code, and its conventions are
-documented in [../SOAP.guidelines.md](../SOAP.guidelines.md).
+SOAP wire format: no WSDL or XSD is vendored, so the OCPP-S contract's source of truth is the code
+plus the OCPP-S specification text (which *is* extracted — `spec/1.6/ocpp-s-1.6-specification.txt`).
+Its conventions are documented in [../SOAP.guidelines.md](../SOAP.guidelines.md).

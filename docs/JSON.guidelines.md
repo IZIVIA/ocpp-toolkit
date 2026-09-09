@@ -39,8 +39,24 @@ flowchart LR
   `IllegalArgumentException: argument "in" is null`, so the action is unusable over OCPP-J rather
   than merely unchecked. **`get15118EVCertificate` (2.0.1) is in this state today**: it has an
   `Actions` entry and model classes, but no `Get15118EVCertificateRequest.json` /
-  `Get15118EVCertificateResponse.json`, and no test covers it. Adding an `Actions` entry therefore
-  obliges you to add both schema files in the same change.
+  `Get15118EVCertificateResponse.json`, and no test covers it. Both files *do* exist in OCA's
+  official `OCPP-2.0.1_part3_JSON_schemas.zip`, so the fix is to copy them in. Adding an `Actions`
+  entry always obliges you to add both schema files in the same change.
+- **Do not edit a vendored schema to match a Kotlin model.** The schemas are the protocol contract;
+  editing one makes validation agree with us and disagree with every conformant peer, and no test
+  can catch it. This has already happened twice, in `ClearVariableMonitoring` (2.0.1):
+
+  | Message | OCPP 2.0.1 | this repo |
+  |---|---|---|
+  | `ClearVariableMonitoringRequest` | `id` | `ids` |
+  | `ClearVariableMonitoringResponse` | `clearMonitoringResult` | `clearMonitoringResults` |
+
+  Both the shipped schema and the Kotlin property carry the plural name, so payloads round-trip
+  internally and fail against a real peer. Verified by diffing all 126 vendored 2.0.1 schemas
+  against OCA's `part3` zip: 124 differ only by the `$id` the project strips, and these two differ
+  in field names. Part 2 Errata v1.0 does not rename them. Fixing this means renaming the Kotlin
+  properties (a breaking API change) and restoring OCA's schema, so it needs a deliberate decision
+  — see [protocol/SPECS.md](protocol/SPECS.md#two-verified-divergences-from-the-official-201-schemas).
 - **Validation is opt-out, not opt-in.** The parser constructor takes
   `enableValidation: Boolean = true`; passing `false` drops the `OcppJsonValidator` entirely via
   `takeIf { enableValidation }`. Useful for talking to a non-conforming peer, at the cost of

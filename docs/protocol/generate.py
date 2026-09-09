@@ -145,6 +145,79 @@ def flatten(node, defs, prefix, lines, seen=(), depth=0):
                     seen + ((type_name,) if type_name else ()), depth + 1)
 
 
+_SPEC = None
+
+
+def spec_index():
+    """Sections extracted from the OCA PDFs by extract-specs.py, if it has been run."""
+    global _SPEC
+    if _SPEC is None:
+        path = os.path.join(ROOT, "docs", "protocol", "spec", "sections.json")
+        try:
+            _SPEC = json.load(open(path, encoding="utf-8"))
+        except (OSError, ValueError):
+            _SPEC = {}
+    return _SPEC
+
+
+def norm(s):
+    return re.sub(r"[^a-z0-9]", "", s.lower())
+
+
+def spec_refs(version, action):
+    """Spec sections for one action, as (doc, role, section id, title, pdf page)."""
+    want = norm(action)
+    # 1.5 documents the payloads as "Authorize.req" / "Authorize.conf" sections
+    variants = {want, want + "req", want + "conf", want + "request", want + "response"}
+    hits = []
+    for doc in spec_index().get(version, []):
+        for sec in doc["sections"]:
+            t = norm(sec["title"])
+            if t in variants or (t.startswith(want) and len(t) - len(want) <= 8):
+                hits.append((doc["slug"], doc["role"], sec["id"], sec["title"], sec["page"]))
+    order = {"spec": 0, "transport": 1, "errata": 2, "changelog": 3}
+    hits.sort(key=lambda h: (order.get(h[1], 9), h[0], h[4]))
+    return hits
+
+
+_PAGES = {}
+
+
+def doc_pages(text_rel):
+    """Extracted document split into {pdf page number: page text}."""
+    if text_rel not in _PAGES:
+        pages, cur = {}, None
+        try:
+            fh = open(os.path.join(ROOT, text_rel), encoding="utf-8")
+        except OSError:
+            _PAGES[text_rel] = {}
+            return _PAGES[text_rel]
+        with fh:
+            for line in fh:
+                m = re.match(r"\[\[\S+ pdf-page (\d+)\]\]", line)
+                if m:
+                    cur = int(m.group(1))
+                    pages[cur] = []
+                elif cur is not None:
+                    pages[cur].append(line)
+        _PAGES[text_rel] = {k: "".join(v) for k, v in pages.items()}
+    return _PAGES[text_rel]
+
+
+def errata_mentions(version, action):
+    """Pages of errata/changelog documents that name this action."""
+    camel = action[0].upper() + action[1:]
+    rx = re.compile(r"\b" + re.escape(camel) + r"\b")
+    out = []
+    for doc in spec_index().get(version, []):
+        if doc["role"] not in ("errata", "changelog"):
+            continue
+        hits = [n for n, txt in sorted(doc_pages(doc["text"]).items()) if rx.search(txt)]
+        if hits:
+            out.append((doc["slug"], doc["role"], hits))
+    return out
+
+
 _CLASS_INDEX = {}
 
 
@@ -190,6 +263,23 @@ def render_version(key, label, core_module, json_module, req_suffix, package):
     out.append("")
     out.append(f"{len(actions)} actions registered.")
     out.append("")
+    docs_for_version = spec_index().get(key) or []
+    if docs_for_version:
+        out.append("## Specification documents")
+        out.append("")
+        out.append("Each action below cites the section and PDF page of the normative document. "
+                   "The extracted text is grep-able too:")
+        out.append("")
+        out.append("| document | role | pages | extracted text |")
+        out.append("|---|---|--:|---|")
+        for d in docs_for_version:
+            out.append(f"| {d['label']} | {d['role']} | {d['pages']} | `{d['text']}` |")
+        out.append("")
+    else:
+        out.append("> Spec citations are absent: run `OCA_DOCS=<your OCA folder> python3 "
+                   "docs/protocol/extract-specs.py` to add the section and page reference from the "
+                   "official PDFs to every action below.")
+        out.append("")
     out.append("## Actions at a glance")
     out.append("")
     out.append("| action | direction | request schema | Kotlin |")
@@ -209,6 +299,20 @@ def render_version(key, label, core_module, json_module, req_suffix, package):
         for cls in (a["req"], a["resp"]):
             cp = class_path(core_module, cls)
             out.append(f"- Kotlin `{cls}`: " + (f"[`{cp}`](../../{cp})" if cp else "_class file not found_"))
+        refs = spec_refs(key, a["value"])
+        for slug, role, sid, title, page in refs:
+            tag = " **(errata)**" if role == "errata" else (" (changelog)" if role == "changelog" else "")
+            out.append(f"- spec{tag}: `{slug}` §{sid} {title} — pdf-page {page} "
+                       f"(`grep -n 'pdf-page {page}]]' docs/protocol/spec/{key}/{slug}.txt`)")
+        if not refs and spec_index().get(key):
+            out.append("- spec: _no matching section found in the extracted documents_")
+        for slug, role, pages in errata_mentions(key, a["value"]):
+            shown = ", ".join(str(p) for p in pages[:12])
+            more = f" (+{len(pages) - 12} more)" if len(pages) > 12 else ""
+            label = "errata" if role == "errata" else "changelog"
+            out.append(f"- {label} mentions: `{slug}` pdf-page {shown}{more} "
+                       f"(`grep -n '{a['req'][:-3] if a['req'].endswith('Req') else a['value']}' "
+                       f"docs/protocol/spec/{key}/{slug}.txt`)")
         out.append("")
         for kind, name in (("req", c + req_suffix), ("resp", c + "Response")):
             rel, full = schema_path(json_module, name)
