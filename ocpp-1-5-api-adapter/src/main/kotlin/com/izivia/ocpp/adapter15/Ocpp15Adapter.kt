@@ -303,7 +303,7 @@ class Ocpp15Adapter(
         meta: RequestMetadata,
         request: NotifyEVChargingScheduleReq
     ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> {
-        throw IllegalStateException("notifyCustomerInformation can't be called in OCPP 1.5")
+        throw IllegalStateException("notifyEVChargingSchedule can't be called in OCPP 1.5")
     }
 
     override fun notifyChargingLimit(
