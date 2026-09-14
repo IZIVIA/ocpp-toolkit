@@ -145,7 +145,7 @@ class MapperTest {
     }
 
     @Test
-    fun `get diagnostics maps to its own generic operation without a synthetic request id`() {
+    fun `get diagnostics maps field for field onto the generic request`() {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
 
         val req = mapper.coreToGenReq(

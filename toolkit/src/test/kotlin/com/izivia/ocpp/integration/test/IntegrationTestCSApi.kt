@@ -841,7 +841,6 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
-        // The core GetDiagnostics flow has its own generic operation: getLog keeps the whitepaper meaning.
         verify(csApiSpy, times(1)).getDiagnostics(any(), any())
         verify(csApiSpy, never()).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())

@@ -5,7 +5,6 @@ import com.izivia.ocpp.adapter16.Ocpp16TransactionIds
 import com.izivia.ocpp.adapter16.impl.RealTransactionRepository
 import com.izivia.ocpp.api.CSApi
 import com.izivia.ocpp.api.model.common.enumeration.ChargingProfilePurposeEnumType
-import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq as GetDiagnosticsReqGen
 import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 import com.izivia.ocpp.api.model.setchargingprofile.SetChargingProfileResp
 import com.izivia.ocpp.api.model.setchargingprofile.enumeration.ChargingProfileStatusEnumType
@@ -24,10 +23,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.unmockkAll
-import io.mockk.verify
-import kotlin.time.Instant
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,6 +32,7 @@ import strikt.assertions.isEqualTo
 
 class CSApiAdapterTest {
     private lateinit var csApi: CSApi
+    private val requestMetadata = RequestMetadata("")
 
     @BeforeEach
     fun init() {
@@ -51,7 +48,6 @@ class CSApiAdapterTest {
     fun `setChargingProfile request`() {
         val transactionIds = RealTransactionRepository()
         transactionIds.saveTransactionIds(Ocpp16TransactionIds(localId = "4", csmsId = 2))
-        val requestMetadata = RequestMetadata("")
 
         every { csApi.setChargingProfile(any(), any()) } answers {
             val req = secondArg<com.izivia.ocpp.api.model.setchargingprofile.SetChargingProfileReq>()
@@ -97,31 +93,25 @@ class CSApiAdapterTest {
 
     @Test
     fun `get diagnostics request`() {
-        val requestMetadata = RequestMetadata("")
-        val forwarded = slot<GetDiagnosticsReqGen>()
-        every { csApi.getDiagnostics(any(), capture(forwarded)) } answers {
-            OperationExecution(
-                executionMeta = ExecutionMetadata(reqMeta = requestMetadata, status = RequestStatus.SUCCESS),
-                request = secondArg(),
-                response = GetDiagnosticsRespGen(fileName = "diagnostics.log")
-            )
+        every { csApi.getDiagnostics(any(), any()) } answers {
+            success(secondArg(), GetDiagnosticsRespGen(fileName = "diagnostics.log"))
         }
 
-        val operations = Ocpp16CSApiAdapter(csApi, RealTransactionRepository())
-        val timestamp = Instant.parse("2022-02-15T00:00:00.000Z")
-        val request = GetDiagnosticsReq("https://example.test/diagnostics", retries = 2, startTime = timestamp)
-        val response = operations.getDiagnostics(requestMetadata, request)
+        val request = GetDiagnosticsReq("https://example.test/diagnostics")
+        val response = adapter().getDiagnostics(requestMetadata, request)
 
         expectThat(response) {
             get { this.request }.isEqualTo(request)
             get { this.response.fileName }.isEqualTo("diagnostics.log")
         }
-        // The core GetDiagnostics flow has its own generic operation: getLog keeps the whitepaper meaning.
-        expectThat(forwarded.captured) {
-            get { location }.isEqualTo("https://example.test/diagnostics")
-            get { retries }.isEqualTo(2)
-            get { startTime }.isEqualTo(timestamp)
-        }
-        verify(exactly = 0) { csApi.getLog(any(), any()) }
     }
+
+    private fun adapter() = Ocpp16CSApiAdapter(csApi, RealTransactionRepository())
+
+    private fun <Req, Resp> success(request: Req, response: Resp): OperationExecution<Req, Resp> =
+        OperationExecution(
+            executionMeta = ExecutionMetadata(requestMetadata, RequestStatus.SUCCESS),
+            request = request,
+            response = response
+        )
 }

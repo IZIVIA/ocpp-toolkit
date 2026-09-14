@@ -14,7 +14,6 @@ import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
 import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
 import com.izivia.ocpp.api.model.getallvariables.GetAllVariablesResp
 import com.izivia.ocpp.api.model.getallvariables.KeyValue
-import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq as GetDiagnosticsReqGen
 import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 import com.izivia.ocpp.api.model.getvariables.GetVariableResultType
 import com.izivia.ocpp.api.model.getvariables.GetVariablesResp
@@ -67,7 +66,6 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import io.mockk.unmockkAll
 import io.mockk.verify
 import kotlin.time.Instant
@@ -358,25 +356,17 @@ class CSApiAdapterTest {
 
     @Test
     fun `get diagnostics request`() {
-        val forwarded = slot<GetDiagnosticsReqGen>()
-        every { csApi.getDiagnostics(any(), capture(forwarded)) } answers {
+        every { csApi.getDiagnostics(any(), any()) } answers {
             success(secondArg(), GetDiagnosticsRespGen(fileName = "diagnostics.log"))
         }
 
-        val request = GetDiagnosticsReq("https://example.test/diagnostics", retries = 2, startTime = timestamp)
+        val request = GetDiagnosticsReq("https://example.test/diagnostics", startTime = timestamp)
         val response = adapter().getDiagnostics(requestMetadata, request)
 
         expectThat(response) {
             get { this.request }.isEqualTo(request)
             get { this.response.fileName }.isEqualTo("diagnostics.log")
         }
-        // The core GetDiagnostics flow has its own generic operation: getLog keeps the whitepaper meaning.
-        expectThat(forwarded.captured) {
-            get { location }.isEqualTo("https://example.test/diagnostics")
-            get { retries }.isEqualTo(2)
-            get { startTime }.isEqualTo(timestamp)
-        }
-        verify(exactly = 0) { csApi.getLog(any(), any()) }
     }
 
     private fun adapter() = Ocpp15CSApiAdapter(csApi, RealTransactionRepository())

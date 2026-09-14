@@ -10,8 +10,7 @@ import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnos
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class GetDiagnosticsMapper {
 
-    // Every field of GetDiagnosticsResp is optional, so MapStruct would pick its no-arg constructor
-    // and silently drop the file name.
+    // Hand-written: every target field is optional, so MapStruct would use the no-arg constructor.
     fun genToCoreResp(getDiagnosticsResp: GetDiagnosticsRespGen?): GetDiagnosticsResp =
         GetDiagnosticsResp(getDiagnosticsResp?.fileName)
 
