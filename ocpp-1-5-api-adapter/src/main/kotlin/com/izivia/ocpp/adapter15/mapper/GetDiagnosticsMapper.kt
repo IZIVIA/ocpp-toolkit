@@ -4,33 +4,16 @@ import com.izivia.ocpp.core15.model.getdiagnostics.GetDiagnosticsReq
 import com.izivia.ocpp.core15.model.getdiagnostics.GetDiagnosticsResp
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
-import com.izivia.ocpp.api.model.getlog.GetLogReq
-import com.izivia.ocpp.api.model.getlog.GetLogResp
-import com.izivia.ocpp.api.model.getlog.LogParametersType
-import com.izivia.ocpp.api.model.getlog.enumeration.LogEnumType
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq as GetDiagnosticsReqGen
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class GetDiagnosticsMapper {
 
-    fun genToCoreResp(getLogResp: GetLogResp?): GetDiagnosticsResp = GetDiagnosticsResp(getLogResp?.filename)
+    // Every field of GetDiagnosticsResp is optional, so MapStruct would pick its no-arg constructor
+    // and silently drop the file name.
+    fun genToCoreResp(getDiagnosticsResp: GetDiagnosticsRespGen?): GetDiagnosticsResp =
+        GetDiagnosticsResp(getDiagnosticsResp?.fileName)
 
-    /**
-     * OCPP 1.5 GetDiagnostics carries no request id, and neither does the DiagnosticsStatusNotification
-     * that answers it, so the id below is synthetic and constant: a unique value would suggest a
-     * correlation the protocol cannot provide. A CSApi implementation must therefore not index
-     * pending log requests by [GetLogReq.requestId] on this flow.
-     */
-    fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetLogReq =
-        GetLogReq(
-            requestId = 1,
-            logType = LogEnumType.DiagnosticsLog,
-            log = LogParametersType(
-                remoteLocation = getDiagnosticsReq.location,
-                oldestTimestamp = getDiagnosticsReq.startTime,
-                latestTimestamp = getDiagnosticsReq.stopTime
-            ),
-            retries = getDiagnosticsReq.retries,
-            retryInterval = getDiagnosticsReq.retryInterval
-        )
-
+    abstract fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetDiagnosticsReqGen
 }

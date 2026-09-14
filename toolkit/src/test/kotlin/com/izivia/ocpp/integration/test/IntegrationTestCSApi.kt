@@ -60,6 +60,8 @@ import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetCerti
 import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionReq
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionResp
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp
 import com.izivia.ocpp.api.model.getlog.GetLogReq
 import com.izivia.ocpp.api.model.getlog.GetLogResp
 import com.izivia.ocpp.api.model.getlog.enumeration.LogStatusEnumType
@@ -145,6 +147,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.lang.Thread.sleep
@@ -430,6 +433,14 @@ class IntegrationTestCSApi {
                 req: GetLogReq
             ): OperationExecution<GetLogReq, GetLogResp> {
                 val response = GetLogResp(LogStatusEnumType.Accepted)
+                return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+            }
+
+            override fun getDiagnostics(
+                meta: RequestMetadata,
+                req: GetDiagnosticsReq
+            ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> {
+                val response = GetDiagnosticsResp(fileName = "diagnostics.log")
                 return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
             }
 
@@ -830,7 +841,9 @@ class IntegrationTestCSApi {
         verify(csApiSpy, times(1)).triggerMessage(any(), any())
         verify(csApiSpy, times(1)).setChargingProfile(any(), any())
         verify(csApiSpy, times(1)).reserveNow(any(), any())
-        verify(csApiSpy, times(1)).getLog(any(), any())
+        // The core GetDiagnostics flow has its own generic operation: getLog keeps the whitepaper meaning.
+        verify(csApiSpy, times(1)).getDiagnostics(any(), any())
+        verify(csApiSpy, never()).getLog(any(), any())
         verify(csApiSpy, times(1)).dataTransfer(any(), any())
 
         csmsApi.close()

@@ -243,7 +243,7 @@ class Ocpp15CSApiAdapter(
         req: GetDiagnosticsReq
     ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
-        val response = csApi.getLog(meta, mapper.coreToGenReq(req))
+        val response = csApi.getDiagnostics(meta, mapper.coreToGenReq(req))
         return OperationExecution(
             ExecutionMetadata(meta, RequestStatus.SUCCESS),
             req,
