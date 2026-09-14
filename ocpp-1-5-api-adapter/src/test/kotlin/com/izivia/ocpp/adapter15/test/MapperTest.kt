@@ -1,17 +1,20 @@
 package com.izivia.ocpp.adapter15.test
 
+import com.izivia.ocpp.adapter15.mapper.GetDiagnosticsMapper
 import com.izivia.ocpp.adapter15.mapper.MeterValuesMapper
 import com.izivia.ocpp.adapter15.mapper.RemoteStartTransactionMapper
 import com.izivia.ocpp.adapter15.mapper.StatusNotificationMapper
 import com.izivia.ocpp.api.model.common.MeterValueType
 import com.izivia.ocpp.api.model.common.SampledValueType
 import com.izivia.ocpp.api.model.common.enumeration.MeasurandEnumType
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 import com.izivia.ocpp.api.model.metervalues.MeterValuesReq
 import com.izivia.ocpp.api.model.statusnotification.StatusNotificationReq
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ChargePointErrorCode
 import com.izivia.ocpp.api.model.statusnotification.enumeration.ConnectorStatusEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.ChargingStateEnumType
 import com.izivia.ocpp.api.model.transactionevent.enumeration.TransactionEventEnumType
+import com.izivia.ocpp.core15.model.getdiagnostics.GetDiagnosticsReq
 import com.izivia.ocpp.core15.model.remotestart.RemoteStartTransactionReq
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointStatus
 import com.izivia.ocpp.core15.model.statusnotification.enumeration.ChargePointErrorCode as ChargePointErrorCodeCore
@@ -139,5 +142,30 @@ class MapperTest {
             get { evseId }.isEqualTo(3)
             get { idToken.idToken }.isEqualTo("ABC123")
         }
+    }
+
+    @Test
+    fun `get diagnostics maps to its own generic operation without a synthetic request id`() {
+        val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
+
+        val req = mapper.coreToGenReq(
+            GetDiagnosticsReq(
+                location = "https://example.test/diagnostics",
+                retries = 2,
+                retryInterval = 3,
+                startTime = Instant.parse("2022-02-15T00:00:00.000Z"),
+                stopTime = Instant.parse("2022-02-16T00:00:00.000Z")
+            )
+        )
+        expectThat(req) {
+            get { location }.isEqualTo("https://example.test/diagnostics")
+            get { retries }.isEqualTo(2)
+            get { retryInterval }.isEqualTo(3)
+            get { startTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
+            get { stopTime }.isEqualTo(Instant.parse("2022-02-16T00:00:00.000Z"))
+        }
+
+        val resp = mapper.genToCoreResp(GetDiagnosticsRespGen(fileName = "diagnostics.log"))
+        expectThat(resp.fileName).isEqualTo("diagnostics.log")
     }
 }
