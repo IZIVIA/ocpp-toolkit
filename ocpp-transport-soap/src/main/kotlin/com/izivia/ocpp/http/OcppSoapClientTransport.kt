@@ -22,7 +22,7 @@ class OcppSoapClientTransport private constructor(
     private val ocppSoapParser: OcppSoapParser,
     private val headers: RequestHeaders,
     private val newMessageId: () -> String,
-    private val path: String,
+    private val settings: SoapClientSettings,
     config: ServerConfig,
 ) : ClientTransport {
 
@@ -38,7 +38,15 @@ class OcppSoapClientTransport private constructor(
                 "Content-Type" to "application/soap+xml;charset=utf-8;"
             ),
             newMessageId: () -> String = { UUID.randomUUID().toString() }
-        ) = OcppSoapClientTransport(ocppId, target, ocppSoapParser, headers, newMessageId, clientSettings.path, Undertow(port = clientSettings.port))
+        ) = OcppSoapClientTransport(
+            ocppId,
+            target,
+            ocppSoapParser,
+            headers,
+            newMessageId,
+            clientSettings,
+            Undertow(port = clientSettings.port)
+        )
     }
 
     private val server: Http4kServer
@@ -47,7 +55,7 @@ class OcppSoapClientTransport private constructor(
     private val handlers = mutableListOf<(HttpMessage) -> HttpMessage?>()
 
     init {
-        val route = "/" bindContract Method.POST to ::routeHandler
+        val route = settings.route bindContract Method.POST to ::routeHandler
         val app = contract {
             routes += route
         }
@@ -73,8 +81,11 @@ class OcppSoapClientTransport private constructor(
 
     override fun connect() {
         server.start()
-        logger.info("starting http server on port ${server.port()}")
+        logger.info("starting http server on ${settings.callbackUrl(server.port())}")
     }
+
+    /** Port the embedded HTTP server is bound to; meaningful once [connect] has been called. */
+    internal fun port(): Int = server.port()
 
     override fun close() {
         server.close()
@@ -89,7 +100,7 @@ class OcppSoapClientTransport private constructor(
                         messageId = newMessageId(),
                         chargingStationId = ocppId,
                         action = action,
-                        from = path + ":" + server.port(),
+                        from = settings.callbackUrl(server.port()),
                         to = targetRoute,
                         payload = message
                     )

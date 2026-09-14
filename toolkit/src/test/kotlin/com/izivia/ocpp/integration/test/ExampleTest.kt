@@ -53,8 +53,6 @@ class ExampleTest {
         val connection = ocpp16ConnectionToCSMS(
             chargePointId = chargPointId,
             csmsUrl = csmsUrl,
-            clientPath = null,
-            clientPort = null,
             transportType = transport,
             ocppCSCallbacks = object: OcppCSCallbacks16{}
         )
@@ -148,8 +146,6 @@ class ExampleTest {
             chargePointId = chargPointId,
             csmsUrl = csmsUrl,
             transportType = transport,
-            clientPath = null,
-            clientPort = null,
             ocppCSCallbacks = ocppCSCallbacks
         )
         connection.connect()
@@ -217,8 +213,6 @@ class ExampleTest {
             chargePointId = chargPointId,
             csmsUrl = csmsUrl,
             transportType = transport,
-            clientPath = null,
-            clientPort = null,
             ocppCSCallbacks = object : OcppCSCallbacks {}
         )
         connection.connect()
@@ -284,8 +278,6 @@ class ExampleTest {
             chargePointId = chargPointId,
             csmsUrl = csmsUrl,
             transportType = transport,
-            clientPath = null,
-            clientPort = null,
             ocppCSCallbacks = ocppCSCallbacks
         )
         connection.connect()

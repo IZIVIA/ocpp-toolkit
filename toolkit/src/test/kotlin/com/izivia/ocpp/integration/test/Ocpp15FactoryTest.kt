@@ -2,6 +2,7 @@ package com.izivia.ocpp.integration.test
 
 import com.izivia.ocpp.adapter15.Ocpp15Adapter
 import com.izivia.ocpp.api.CSApi
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.integration.ApiFactory
 import com.izivia.ocpp.integration.model.Settings
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
+import strikt.assertions.matches
 import com.izivia.ocpp.core15.model.heartbeat.HeartbeatResp as HeartbeatResp15
 
 class Ocpp15FactoryTest {
@@ -23,8 +26,7 @@ class Ocpp15FactoryTest {
             settings = Settings(
                 ocppVersion = OcppVersion.OCPP_1_5,
                 transportType = TransportEnum.SOAP,
-                clientPath = "/cp",
-                clientPort = 8081
+                soapClient = SoapClientSettings(port = 8081, path = "/cp")
             ),
             ocppId = "CP001",
             csApi = mockk<CSApi>(relaxed = true)
@@ -36,10 +38,12 @@ class Ocpp15FactoryTest {
     @Test
     fun `sends heartbeat through OCPP 1-5 SOAP generic adapter`() {
         val receivedActions = mutableListOf<String>()
+        val receivedFrom = mutableListOf<String?>()
         val server = soapServer(
             parser = Ocpp15SoapParser(),
             payload = HeartbeatResp15(TEST_CURRENT_TIME),
-            receivedActions = receivedActions
+            receivedActions = receivedActions,
+            receivedFrom = receivedFrom
         )
 
         try {
@@ -50,6 +54,7 @@ class Ocpp15FactoryTest {
 
                 expectThat(response.response.currentTime).isEqualTo(TEST_CURRENT_TIME)
                 expectThat(receivedActions.toList()).isEqualTo(listOf("Heartbeat"))
+                expectThat(receivedFrom.single()).isNotNull().matches(Regex("http://localhost:\\d+/cp"))
             } finally {
                 api.close()
             }

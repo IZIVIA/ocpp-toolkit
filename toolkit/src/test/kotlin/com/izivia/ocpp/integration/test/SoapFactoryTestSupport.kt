@@ -1,6 +1,7 @@
 package com.izivia.ocpp.integration.test
 
 import com.izivia.ocpp.api.CSApi
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.integration.ApiFactory
 import com.izivia.ocpp.integration.model.Settings
 import com.izivia.ocpp.integration.model.TransportEnum
@@ -26,8 +27,7 @@ internal fun soapApi(ocppVersion: OcppVersion, port: Int) =
             ocppVersion = ocppVersion,
             transportType = TransportEnum.SOAP,
             target = "http://localhost:$port/ocpp",
-            clientPath = "/cp",
-            clientPort = 0,
+            soapClient = SoapClientSettings(port = 0, path = "/cp"),
             newMessageId = { TEST_MESSAGE_ID }
         ),
         ocppId = "CP001",
@@ -37,11 +37,13 @@ internal fun soapApi(ocppVersion: OcppVersion, port: Int) =
 internal fun soapServer(
     parser: OcppSoapParser,
     payload: Any,
-    receivedActions: MutableList<String>
+    receivedActions: MutableList<String>,
+    receivedFrom: MutableList<String?> = mutableListOf()
 ) = routes(
     "/ocpp/" bind Method.POST to { request ->
         val soapRequest = parser.parseAnyRequestFromSoap(request.bodyString())
         receivedActions += soapRequest.action
+        receivedFrom += soapRequest.from
         Response(Status.OK).body(
             parser.mapResponseToSoap(
                 ResponseSoapMessage(
