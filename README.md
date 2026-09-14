@@ -42,6 +42,22 @@ The CSMS side is available through the `CSMS` entry point, and the SOAP (OCPP-S)
 
 Support for security requirements like SSL and mutual certificates is under discussion, as it can be achieved using a proxy like Envoy.
 
+### SOAP charge point settings
+
+Over SOAP, the charge point embeds an HTTP server on which the CSMS sends its own requests. Its settings are given through `SoapClientSettings`, on `Settings.soapClient` or on the `ocppXXConnectionToCSMS` factories:
+
+```kotlin
+val connection = ApiFactory.ocpp16ConnectionToCSMS(
+        chargePointId = chargePointId,
+        csmsUrl = "http://csms.example.com/ocpp",
+        transportType = TransportEnum.SOAP,
+        soapClient = SoapClientSettings(host = "192.168.0.3", port = 8081, path = "/cp"),
+        ocppCSCallbacks = OcppCSCallbacks16()
+)
+```
+
+The embedded server listens on `path` (`/cp` here), and the resulting URL `http://192.168.0.3:8081/cp` is advertised in the WS-Addressing `From` header of every request, as required by OCPP-S: this is how the CSMS addresses the charge point. `port = 0` binds an ephemeral port, then advertised once connected. Behind a reverse proxy or a TLS terminator, set `advertisedUrl` (e.g. `https://cp.example.com/ocpp/cp`) to advertise the public URL instead of the bound one.
+
 ## Usage of the API
 
 With the API, you can establish a connection to a CSMS with OCPP 1.6 or OCPP 2.0.

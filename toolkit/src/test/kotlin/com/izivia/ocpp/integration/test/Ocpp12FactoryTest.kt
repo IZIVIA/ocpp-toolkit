@@ -2,6 +2,7 @@ package com.izivia.ocpp.integration.test
 
 import com.izivia.ocpp.adapter12.Ocpp12Adapter
 import com.izivia.ocpp.api.CSApi
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.api.model.heartbeat.HeartbeatReq
 import com.izivia.ocpp.api12.OcppCSCallbacks
 import com.izivia.ocpp.core12.CSMSOperations
@@ -24,6 +25,8 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
+import strikt.assertions.matches
 import java.net.ServerSocket
 import com.izivia.ocpp.core12.model.authorize.AuthorizeReq as AuthorizeReq12
 import com.izivia.ocpp.core12.model.authorize.AuthorizeResp as AuthorizeResp12
@@ -41,8 +44,7 @@ class Ocpp12FactoryTest {
             chargePointId = "CP001",
             csmsUrl = "http://localhost:8080/ocpp",
             transportType = TransportEnum.SOAP,
-            clientPath = "/cp",
-            clientPort = 8081,
+            soapClient = SoapClientSettings(port = 8081, path = "/cp"),
             ocppCSCallbacks = object : OcppCSCallbacks {}
         )
 
@@ -55,8 +57,7 @@ class Ocpp12FactoryTest {
             chargePointId = "CP001",
             csmsUrl = "http://localhost:8080/ocpp",
             transportType = TransportEnum.SOAP,
-            clientPath = "/cp",
-            clientPort = 8081,
+            soapClient = SoapClientSettings(port = 8081, path = "/cp"),
             ocppCSCallbacks = object : OcppCSCallbacks {}
         )
         val csms = ApiFactory.csmsOcppServer(
@@ -83,8 +84,7 @@ class Ocpp12FactoryTest {
             settings = Settings(
                 ocppVersion = OcppVersion.OCPP_1_2,
                 transportType = TransportEnum.SOAP,
-                clientPath = "/cp",
-                clientPort = 8081
+                soapClient = SoapClientSettings(port = 8081, path = "/cp")
             ),
             ocppId = "CP001",
             csApi = mockk<CSApi>(relaxed = true)
@@ -96,10 +96,12 @@ class Ocpp12FactoryTest {
     @Test
     fun `sends heartbeat through OCPP 1-2 SOAP generic adapter`() {
         val receivedActions = mutableListOf<String>()
+        val receivedFrom = mutableListOf<String?>()
         val server = soapServer(
             parser = Ocpp12SoapParser(),
             payload = HeartbeatResp12(TEST_CURRENT_TIME),
-            receivedActions = receivedActions
+            receivedActions = receivedActions,
+            receivedFrom = receivedFrom
         )
 
         try {
@@ -110,6 +112,7 @@ class Ocpp12FactoryTest {
 
                 expectThat(response.response.currentTime).isEqualTo(TEST_CURRENT_TIME)
                 expectThat(receivedActions.toList()).isEqualTo(listOf("Heartbeat"))
+                expectThat(receivedFrom.single()).isNotNull().matches(Regex("http://localhost:\\d+/cp"))
             } finally {
                 api.close()
             }
@@ -181,8 +184,6 @@ class Ocpp12FactoryTest {
                 chargePointId = chargePointId,
                 csmsUrl = "ws://localhost:$port/$path",
                 transportType = TransportEnum.WEBSOCKET,
-                clientPath = null,
-                clientPort = null,
                 ocppCSCallbacks = object : OcppCSCallbacks {
                     override fun remoteStartTransaction(req: RemoteStartTransactionReq12) =
                         RemoteStartTransactionResp12(RemoteStartStopStatus12.Accepted)
