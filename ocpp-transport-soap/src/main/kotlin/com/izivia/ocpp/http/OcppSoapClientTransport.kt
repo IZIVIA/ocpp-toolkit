@@ -79,6 +79,8 @@ class OcppSoapClientTransport private constructor(
     private fun extractAction(payload: String): String =
         ocppSoapParser.readToEnvelop(payload).header.action?.value?.removePrefix("/") ?: ""
 
+    // Written by connect()/close() and read by sendMessageClass, possibly from other threads.
+    @Volatile
     private var callbackUrl: String? = null
 
     override fun connect() {
