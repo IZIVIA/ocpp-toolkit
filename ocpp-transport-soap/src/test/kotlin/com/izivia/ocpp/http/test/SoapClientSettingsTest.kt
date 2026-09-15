@@ -55,6 +55,20 @@ class SoapClientSettingsTest {
             .message.isNotNull().contains("SoapClientSettings.host")
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment"])
+    fun `rejects a path that is not a plain url path`(path: String) {
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, path = path) }
+            .message.isNotNull().contains("SoapClientSettings.path")
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = [-1, 65536])
+    fun `rejects a port outside the tcp range`(port: Int) {
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = port) }
+            .message.isNotNull().contains("SoapClientSettings.port")
+    }
+
     @Test
     fun `uses the configured scheme in the callback url`() {
         expectThat(SoapClientSettings(port = 8443, path = "/cp", host = "cp.example.com", scheme = "https").callbackUrl(8443))
@@ -76,8 +90,8 @@ class SoapClientSettingsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url"])
-    fun `rejects an advertised url that is not absolute`(advertisedUrl: String) {
+    @ValueSource(strings = ["cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url", "ftp://cp.example.com/cp"])
+    fun `rejects an advertised url that is not an absolute http url`(advertisedUrl: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, advertisedUrl = advertisedUrl) }
             .message.isNotNull().contains("SoapClientSettings.advertisedUrl")
     }

@@ -41,31 +41,37 @@ data class SoapClientSettings(
     private val authorityHost = host.toUriHost()
 
     init {
-        require(scheme == "http" || scheme == "https") { "SoapClientSettings.scheme must be http or https, got '$scheme'" }
+        require(scheme in SCHEMES) { "SoapClientSettings.scheme must be http or https, got '$scheme'" }
+        require(port in 0..65535) { "SoapClientSettings.port must be a TCP port, got $port" }
         val hostMessage = "SoapClientSettings.host must be a hostname or IP address without scheme, port or path, got '$host'"
         require(host.isNotBlank() && '/' !in host) { hostMessage }
         // java.net.URI validates a bracketed IPv6 literal but, unlike its multi-argument constructor,
         // tolerates registry-based names such as cp_1.example.com that are common in internal DNS zones.
-        try {
-            URI("$scheme://$authorityHost:$port/")
-        } catch (e: URISyntaxException) {
-            throw IllegalArgumentException(hostMessage, e)
-        }
+        requireParsable("$scheme://$authorityHost:$port/", hostMessage)
+        val pathMessage = "SoapClientSettings.path must be a URL path without query or fragment, got '$path'"
+        require('?' !in path && '#' !in path) { pathMessage }
+        requireParsable("http://localhost$route", pathMessage)
         advertisedUrl?.let { url ->
-            val uri = try {
-                URI(url)
-            } catch (e: URISyntaxException) {
-                throw IllegalArgumentException("SoapClientSettings.advertisedUrl must be an absolute URL, got '$url'", e)
-            }
-            require(uri.isAbsolute && !uri.authority.isNullOrBlank()) {
-                "SoapClientSettings.advertisedUrl must be an absolute URL, got '$url'"
-            }
+            val message = "SoapClientSettings.advertisedUrl must be an absolute http or https URL, got '$url'"
+            val uri = requireParsable(url, message)
+            require(uri.scheme in SCHEMES && !uri.authority.isNullOrBlank()) { message }
         }
     }
 
     /** URL advertised in the `From` header once the embedded server is bound to [boundPort]. */
     fun callbackUrl(boundPort: Int): String =
         advertisedUrl ?: ("$scheme://$authorityHost:$boundPort" + route.removeSuffix("/"))
+
+    private companion object {
+        val SCHEMES = setOf("http", "https")
+
+        fun requireParsable(url: String, message: String): URI =
+            try {
+                URI(url)
+            } catch (e: URISyntaxException) {
+                throw IllegalArgumentException(message, e)
+            }
+    }
 }
 
 interface ServerConfig {
