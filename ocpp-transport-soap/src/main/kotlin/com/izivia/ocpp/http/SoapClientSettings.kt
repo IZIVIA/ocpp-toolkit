@@ -1,5 +1,6 @@
 package com.izivia.ocpp.http
 
+import com.izivia.ocpp.utils.toUriHost
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.server.Http4kServer
 import org.http4k.server.asServer
@@ -37,8 +38,7 @@ data class SoapClientSettings(
     /** [path] normalised with a leading slash and no trailing slash; the root is `/`. */
     val route: String = "/" + path.trim('/')
 
-    // IPv6 literals must be bracketed in an authority; anything else is passed through untouched.
-    private val authorityHost = if (':' in host && !host.startsWith('[')) "[$host]" else host
+    private val authorityHost = host.toUriHost()
 
     init {
         require(scheme == "http" || scheme == "https") { "SoapClientSettings.scheme must be http or https, got '$scheme'" }
