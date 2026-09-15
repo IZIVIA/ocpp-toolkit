@@ -219,6 +219,8 @@ class CSApiAdapterTest {
             get { this.request }.isEqualTo(request)
             get { this.response.fileName }.isEqualTo("diagnostics.log")
         }
+        // Stated on purpose, so the guarantee survives a switch to a relaxed mock.
+        verify(exactly = 0) { csApi.getLog(any(), any()) }
     }
 
     private fun adapter() = Ocpp12CSApiAdapter(csApi, RealTransactionRepository())

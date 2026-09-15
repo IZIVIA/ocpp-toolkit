@@ -233,8 +233,14 @@ class MapperTest {
             get { startTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z"))
             get { stopTime }.isEqualTo(Instant.parse("2022-02-16T00:00:00.000Z"))
         }
+    }
+
+    @Test
+    fun `get diagnostics response keeps the file name`() {
+        val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
 
         val resp = mapper.genToCoreResp(GetDiagnosticsRespGen(fileName = "diagnostics.log"))
+
         expectThat(resp.fileName).isEqualTo("diagnostics.log")
     }
 }
