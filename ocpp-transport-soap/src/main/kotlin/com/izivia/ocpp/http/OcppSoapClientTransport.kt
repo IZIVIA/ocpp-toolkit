@@ -79,16 +79,22 @@ class OcppSoapClientTransport private constructor(
     private fun extractAction(payload: String): String =
         ocppSoapParser.readToEnvelop(payload).header.action?.value?.removePrefix("/") ?: ""
 
+    private var callbackUrl: String? = null
+
     override fun connect() {
         server.start()
-        logger.info("starting http server on ${settings.callbackUrl(server.port())}")
+        // Resolved once the server is bound: with port 0 the actual port is only known from here on.
+        callbackUrl = settings.callbackUrl(server.port())
+        logger.info("starting http server on $callbackUrl")
     }
 
-    /** Port the embedded HTTP server is bound to; meaningful once [connect] has been called. */
-    internal fun port(): Int = server.port()
+    /** URL advertised in the `From` header, where the central system reaches this charge point. */
+    fun callbackUrl(): String = callbackUrl
+        ?: throw IllegalStateException("connect() must be called first: the callback URL is resolved once the embedded server is bound")
 
     override fun close() {
         server.close()
+        callbackUrl = null
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, action: String, message: T): P {
@@ -100,7 +106,7 @@ class OcppSoapClientTransport private constructor(
                         messageId = newMessageId(),
                         chargingStationId = ocppId,
                         action = action,
-                        from = settings.callbackUrl(server.port()),
+                        from = callbackUrl(),
                         to = targetRoute,
                         payload = message
                     )

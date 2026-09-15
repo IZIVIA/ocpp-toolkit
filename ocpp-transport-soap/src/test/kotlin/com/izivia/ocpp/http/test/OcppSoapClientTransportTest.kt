@@ -220,12 +220,26 @@ class OcppSoapClientTransportTest {
             client.connect()
             client.sendMessage<HeartbeatReq, HeartbeatResp>("HeartBeat", HeartbeatReq())
 
-            expectThat(client.port()).isGreaterThan(0)
-            expectThat(receivedFrom).containsExactly("http://localhost:${client.port()}")
+            expectThat(client.callbackUrl()).matches(Regex("http://localhost:[1-9]\\d*"))
+            expectThat(receivedFrom).containsExactly(client.callbackUrl())
         } finally {
             client.close()
             server.stop()
         }
+    }
+
+    @Test
+    fun `should refuse to send before connect because the callback url is not resolved yet`() {
+        val client = OcppSoapClientTransport.createClient(
+            SoapClientSettings(port = 0),
+            ocppId = "ocppChargePoint",
+            target = "http://localhost:5002/api",
+            ocppSoapParser = Ocpp16SoapParser()
+        )
+
+        expectThrows<IllegalStateException> {
+            client.sendMessage<HeartbeatReq, HeartbeatResp>("HeartBeat", HeartbeatReq())
+        }.message.isNotNull().contains("connect()")
     }
 
     @Test

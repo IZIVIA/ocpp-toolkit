@@ -56,7 +56,7 @@ val connection = ApiFactory.ocpp16ConnectionToCSMS(
 )
 ```
 
-The embedded server listens on `path` (`/cp` here), and the resulting URL `http://192.168.0.3:8081/cp` is advertised in the WS-Addressing `From` header of every request, as required by OCPP-S: this is how the CSMS addresses the charge point. `port = 0` binds an ephemeral port, then advertised once connected. Behind a reverse proxy or a TLS terminator, set `advertisedUrl` (e.g. `https://cp.example.com/ocpp/cp`) to advertise the public URL instead of the bound one.
+The embedded server listens on `path` (`/cp` here), and the resulting URL `http://192.168.0.3:8081/cp` is advertised in the WS-Addressing `From` header of every request, as required by OCPP-S: this is how the CSMS addresses the charge point. `port = 0` binds an ephemeral port, then advertised once connected; the resolved URL is available through `OcppSoapClientTransport.callbackUrl()`. Behind a TLS terminator, set `scheme = "https"`; behind a reverse proxy rewriting the URL, set `advertisedUrl` (e.g. `https://cp.example.com/ocpp/cp`) to advertise the public URL instead of the bound one. Invalid settings (host with a scheme or a port, relative `advertisedUrl`…) are rejected when `SoapClientSettings` is built.
 
 ## Usage of the API
 
