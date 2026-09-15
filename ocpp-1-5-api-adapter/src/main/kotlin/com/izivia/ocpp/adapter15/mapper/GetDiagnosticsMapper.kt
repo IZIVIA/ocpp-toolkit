@@ -14,5 +14,8 @@ abstract class GetDiagnosticsMapper {
     fun genToCoreResp(getDiagnosticsResp: GetDiagnosticsRespGen?): GetDiagnosticsResp =
         GetDiagnosticsResp(getDiagnosticsResp?.fileName)
 
+    // Safe to generate only while the generic GetDiagnosticsReq.location has no default value: that is
+    // what keeps MapStruct on the full constructor, and no reporting policy would catch a switch to
+    // the no-arg one. The MapperTest is the safety net.
     abstract fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetDiagnosticsReqGen
 }
