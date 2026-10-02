@@ -49,14 +49,19 @@ class SoapClientSettingsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["http://192.168.0.3", "192.168.0.3:8081", "", " ", "example.com/cp", "2001:db8:::1"])
+    @ValueSource(
+        strings = [
+            "http://192.168.0.3", "192.168.0.3:8081", "", " ", "example.com/cp", "2001:db8:::1",
+            "cp.example.com?x", "cp.example.com#x", "user@cp.example.com"
+        ]
+    )
     fun `rejects a host that is not a bare hostname or ip address`(host: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = host) }
             .message.isNotNull().contains("SoapClientSettings.host")
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment"])
+    @ValueSource(strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment", "/cp%20x", "/cp%2Fx"])
     fun `rejects a path that is not a plain url path`(path: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, path = path) }
             .message.isNotNull().contains("SoapClientSettings.path")
@@ -78,6 +83,16 @@ class SoapClientSettingsTest {
     }
 
     @Test
+    fun `advertises the configured port instead of the bound one when provided`() {
+        expectThat(
+            SoapClientSettings(port = 8081, path = "/cp", host = "cp.example.com", scheme = "https", advertisedPort = 8443)
+                .callbackUrl(8081)
+        ).isEqualTo("https://cp.example.com:8443/cp")
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, advertisedPort = 65536) }
+            .message.isNotNull().contains("SoapClientSettings.advertisedPort")
+    }
+
+    @Test
     fun `advertises the configured url instead of the bound one when provided`() {
         val settings = SoapClientSettings(
             port = 8081,
@@ -90,7 +105,12 @@ class SoapClientSettingsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url", "ftp://cp.example.com/cp"])
+    @ValueSource(
+        strings = [
+            "cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url", "ftp://cp.example.com/cp",
+            "http://:8080/cp", "http://cp.example.com:99999/cp"
+        ]
+    )
     fun `rejects an advertised url that is not an absolute http url`(advertisedUrl: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, advertisedUrl = advertisedUrl) }
             .message.isNotNull().contains("SoapClientSettings.advertisedUrl")
