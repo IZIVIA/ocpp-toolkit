@@ -1,13 +1,97 @@
 package com.izivia.ocpp.http
 
+import com.izivia.ocpp.utils.toUriHost
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.server.Http4kServer
 import org.http4k.server.asServer
+import java.net.URI
+import java.net.URISyntaxException
 
+/**
+ * Settings of the HTTP server embedded in [OcppSoapClientTransport], on which the charge point
+ * receives the requests initiated by the central system.
+ *
+ * OCPP-S requires the WS-Addressing `From` header to carry the URL where the charge point listens
+ * for incoming SOAP requests; it is the only way for the central system to address it. That URL is
+ * built from [scheme], [host], the port the server is actually bound to and [path], unless
+ * [advertisedUrl] overrides it, see [callbackUrl]. Invalid settings are rejected at construction.
+ */
 data class SoapClientSettings(
-    val path: String,
+    /** Port the embedded HTTP server binds to; `0` picks an ephemeral port. */
     val port: Int,
-)
+    /** Route the embedded server listens on, also advertised in the `From` header. */
+    val path: String = "",
+    /**
+     * Host advertised in the `From` header, i.e. how the central system reaches this charge point:
+     * a hostname or an IP address, without scheme, port or path. IPv6 literals may be bracketed or not.
+     */
+    val host: String = "localhost",
+    /** Scheme advertised in the `From` header: `http`, or `https` behind a TLS terminator. */
+    val scheme: String = "http",
+    /**
+     * Port advertised in the `From` header instead of the bound one, for a TLS terminator or a port
+     * mapping in front of the charge point, e.g. `scheme = "https"` with `advertisedPort = 8443`.
+     */
+    val advertisedPort: Int? = null,
+    /**
+     * Full URL advertised in the `From` header, taking precedence over [scheme], [host],
+     * [advertisedPort], the bound port and [path]. Needed when the central system reaches the charge point through a reverse
+     * proxy rewriting the URL, i.e. on another host, port or path than the embedded server binds to.
+     */
+    val advertisedUrl: String? = null,
+) {
+    /** [path] normalised with a leading slash and no trailing slash; the root is `/`. */
+    val route: String = "/" + path.trim('/')
+
+    private val authorityHost = host.toUriHost()
+
+    init {
+        require(scheme in SCHEMES) { "SoapClientSettings.scheme must be http or https, got '$scheme'" }
+        require(port in 0..65535) { "SoapClientSettings.port must be a TCP port, got $port" }
+        advertisedPort?.let {
+            require(it in 1..65535) { "SoapClientSettings.advertisedPort must be a TCP port, got $it" }
+        }
+        val hostMessage = "SoapClientSettings.host must be a hostname or IP address without scheme, port or path, got '$host'"
+        require(host.isNotBlank() && HOST_DELIMITERS.none { it in host }) { hostMessage }
+        // java.net.URI validates a bracketed IPv6 literal but, unlike its multi-argument constructor,
+        // tolerates registry-based names such as cp_1.example.com that are common in internal DNS zones.
+        val uri = requireParsable("$scheme://$authorityHost:$port/", hostMessage)
+        // A delimiter inside the host would otherwise be re-read as userinfo, a query or a fragment.
+        require(uri.rawAuthority == "$authorityHost:$port") { hostMessage }
+        val pathMessage =
+            "SoapClientSettings.path must be a URL path without query, fragment or percent-escape, got '$path'"
+        require('?' !in path && '#' !in path && '%' !in path) { pathMessage }
+        requireParsable("http://localhost$route", pathMessage)
+        advertisedUrl?.let { url ->
+            val message = "SoapClientSettings.advertisedUrl must be an absolute http or https URL, got '$url'"
+            val advertised = requireParsable(url, message)
+            // rawAuthority keeps registry-based names that URI.getHost() drops; the port is only
+            // exposed by URI.getPort() when the authority parses as server-based.
+            val authority = advertised.rawAuthority.orEmpty().substringAfterLast('@')
+            require(
+                advertised.scheme in SCHEMES &&
+                    authority.isNotBlank() && !authority.startsWith(':') &&
+                    advertised.port in -1..65535
+            ) { message }
+        }
+    }
+
+    /** URL advertised in the `From` header once the embedded server is bound to [boundPort]. */
+    fun callbackUrl(boundPort: Int): String =
+        advertisedUrl ?: ("$scheme://$authorityHost:${advertisedPort ?: boundPort}" + route.removeSuffix("/"))
+
+    private companion object {
+        val SCHEMES = setOf("http", "https")
+        val HOST_DELIMITERS = charArrayOf('/', '?', '#', '@')
+
+        fun requireParsable(url: String, message: String): URI =
+            try {
+                URI(url)
+            } catch (e: URISyntaxException) {
+                throw IllegalArgumentException(message, e)
+            }
+    }
+}
 
 interface ServerConfig {
     val handler: RoutingHttpHandler
