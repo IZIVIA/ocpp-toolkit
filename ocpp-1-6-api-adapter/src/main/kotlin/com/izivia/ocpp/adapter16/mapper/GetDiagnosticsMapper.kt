@@ -4,27 +4,18 @@ import com.izivia.ocpp.core16.model.getdiagnostics.GetDiagnosticsReq
 import com.izivia.ocpp.core16.model.getdiagnostics.GetDiagnosticsResp
 import org.mapstruct.Mapper
 import org.mapstruct.ReportingPolicy
-import com.izivia.ocpp.api.model.getlog.GetLogReq
-import com.izivia.ocpp.api.model.getlog.GetLogResp
-import com.izivia.ocpp.api.model.getlog.LogParametersType
-import com.izivia.ocpp.api.model.getlog.enumeration.LogEnumType
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq as GetDiagnosticsReqGen
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 abstract class GetDiagnosticsMapper {
 
-    fun genToCoreResp(getLogResp: GetLogResp?): GetDiagnosticsResp = GetDiagnosticsResp(getLogResp?.filename)
+    // Hand-written: every target field is optional, so MapStruct would use the no-arg constructor.
+    fun genToCoreResp(getDiagnosticsResp: GetDiagnosticsRespGen?): GetDiagnosticsResp =
+        GetDiagnosticsResp(getDiagnosticsResp?.fileName)
 
-    fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetLogReq =
-        GetLogReq(
-            requestId = 1,
-            logType = LogEnumType.DiagnosticsLog,
-            log = LogParametersType(
-                remoteLocation = getDiagnosticsReq.location,
-                oldestTimestamp = getDiagnosticsReq.startTime,
-                latestTimestamp = getDiagnosticsReq.stopTime
-            ),
-            retries = getDiagnosticsReq.retries,
-            retryInterval = getDiagnosticsReq.retryInterval
-        )
-
+    // Safe to generate only while the generic GetDiagnosticsReq.location has no default value: that is
+    // what keeps MapStruct on the full constructor, and no reporting policy would catch a switch to
+    // the no-arg one. The MapperTest is the safety net.
+    abstract fun coreToGenReq(getDiagnosticsReq: GetDiagnosticsReq): GetDiagnosticsReqGen
 }
