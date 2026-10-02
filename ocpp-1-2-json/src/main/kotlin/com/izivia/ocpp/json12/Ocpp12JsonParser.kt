@@ -8,6 +8,7 @@ import com.izivia.ocpp.json.JsonMessage
 import com.izivia.ocpp.json.JsonMessageType
 import com.izivia.ocpp.json.OcppJsonParser
 import com.izivia.ocpp.json.OcppJsonValidator
+import com.izivia.ocpp.json.OcppSchemaFolder
 import com.izivia.ocpp.utils.MessageTypeException
 import com.networknt.schema.SpecVersion
 import com.networknt.schema.ValidationMessage
@@ -24,9 +25,7 @@ class Ocpp12JsonParser(
         forcedFieldTypes = forcedFieldTypes,
         ignoredValidationCodes = ignoredValidationCodes,
         ignoredNullRestrictions = ignoredNullRestrictions,
-        // OcppJsonValidator resolves schemas by name off the classpath, where 1.5, 1.6 and 2.0
-        // already ship colliding names, so the 1.2 schemas sit in their own resource folder.
-        ocppJsonValidator = OcppJsonValidator(SpecVersion.VersionFlag.V4, SCHEMA_FOLDER)
+        ocppJsonValidator = OcppJsonValidator(SpecVersion.VersionFlag.V4, OcppSchemaFolder.OCPP_1_2)
             .takeIf { enableValidation }
     ) {
 
@@ -62,14 +61,11 @@ class Ocpp12JsonParser(
                     messageId = jsonMessage.msgId
                 )
             },
-            payload = jsonMessage.payload
+            payload = jsonMessage.payload,
+            messageId = jsonMessage.msgId
         )
             ?.let {
                 errorsHandler(it)
             }
-    }
-
-    private companion object {
-        const val SCHEMA_FOLDER = "ocpp12"
     }
 }

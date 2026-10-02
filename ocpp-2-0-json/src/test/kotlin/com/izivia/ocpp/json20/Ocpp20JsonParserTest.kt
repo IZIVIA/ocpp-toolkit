@@ -4,6 +4,7 @@ import com.izivia.ocpp.core20.Ocpp20ForceTypeField
 import com.izivia.ocpp.core20.model.bootnotification.BootNotificationResp
 import com.izivia.ocpp.core20.model.common.enumeration.Actions
 import com.izivia.ocpp.core20.model.datatransfer.DataTransferReq
+import com.izivia.ocpp.core20.model.get15118evcertificate.Get15118EVCertificateReq
 import com.izivia.ocpp.utils.ActionTypeEnum
 import com.izivia.ocpp.utils.ErrorDetailCode
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -29,6 +30,19 @@ class Ocpp20JsonParserTest {
 
         expectThat(parser.parseAnyFromString(request))
             .get { action }.isEqualTo("Heartbeat")
+    }
+
+    @Test
+    fun `should parse Get15118EVCertificate request`() {
+        val request = """[2,"messageId","Get15118EVCertificate",
+            |{"iso15118SchemaVersion":"urn:iso:15118:2:2013:MsgDef","action":"Install","exiRequest":"AAAA"}]
+        """.trimMargin()
+
+        expectThat(parser.parseAnyFromString(request))
+            .and {
+                get { action }.isEqualTo("Get15118EVCertificate")
+                get { payload }.isA<Get15118EVCertificateReq>().get { exiRequest }.isEqualTo("AAAA")
+            }
     }
 
     @Test

@@ -13,7 +13,6 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:_")
     implementation("com.networknt:json-schema-validator:_")
 
-    testImplementation(kotlin("test-junit"))
 }
 
 java {

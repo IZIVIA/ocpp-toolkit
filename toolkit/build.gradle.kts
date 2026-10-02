@@ -38,6 +38,10 @@ dependencies {
     api(project(":operation-information"))
 
     testImplementation("org.mockito.kotlin:mockito-kotlin:_")
+    testImplementation(project(":ocpp-1-2-json"))
+    testImplementation(project(":ocpp-1-5-json"))
+    testImplementation(project(":ocpp-1-6-json"))
+    testImplementation(project(":ocpp-2-0-json"))
     testImplementation(project(":utils"))
     testImplementation("ch.qos.logback:logback-classic:_")
 }
