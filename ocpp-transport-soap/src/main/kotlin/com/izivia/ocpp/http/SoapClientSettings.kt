@@ -29,8 +29,13 @@ data class SoapClientSettings(
     /** Scheme advertised in the `From` header: `http`, or `https` behind a TLS terminator. */
     val scheme: String = "http",
     /**
-     * Full URL advertised in the `From` header, taking precedence over [scheme], [host], the bound
-     * port and [path]. Needed when the central system reaches the charge point through a reverse
+     * Port advertised in the `From` header instead of the bound one, for a TLS terminator or a port
+     * mapping in front of the charge point, e.g. `scheme = "https"` with `advertisedPort = 8443`.
+     */
+    val advertisedPort: Int? = null,
+    /**
+     * Full URL advertised in the `From` header, taking precedence over [scheme], [host],
+     * [advertisedPort], the bound port and [path]. Needed when the central system reaches the charge point through a reverse
      * proxy rewriting the URL, i.e. on another host, port or path than the embedded server binds to.
      */
     val advertisedUrl: String? = null,
@@ -43,27 +48,41 @@ data class SoapClientSettings(
     init {
         require(scheme in SCHEMES) { "SoapClientSettings.scheme must be http or https, got '$scheme'" }
         require(port in 0..65535) { "SoapClientSettings.port must be a TCP port, got $port" }
+        advertisedPort?.let {
+            require(it in 1..65535) { "SoapClientSettings.advertisedPort must be a TCP port, got $it" }
+        }
         val hostMessage = "SoapClientSettings.host must be a hostname or IP address without scheme, port or path, got '$host'"
-        require(host.isNotBlank() && '/' !in host) { hostMessage }
+        require(host.isNotBlank() && HOST_DELIMITERS.none { it in host }) { hostMessage }
         // java.net.URI validates a bracketed IPv6 literal but, unlike its multi-argument constructor,
         // tolerates registry-based names such as cp_1.example.com that are common in internal DNS zones.
-        requireParsable("$scheme://$authorityHost:$port/", hostMessage)
-        val pathMessage = "SoapClientSettings.path must be a URL path without query or fragment, got '$path'"
-        require('?' !in path && '#' !in path) { pathMessage }
+        val uri = requireParsable("$scheme://$authorityHost:$port/", hostMessage)
+        // A delimiter inside the host would otherwise be re-read as userinfo, a query or a fragment.
+        require(uri.rawAuthority == "$authorityHost:$port") { hostMessage }
+        val pathMessage =
+            "SoapClientSettings.path must be a URL path without query, fragment or percent-escape, got '$path'"
+        require('?' !in path && '#' !in path && '%' !in path) { pathMessage }
         requireParsable("http://localhost$route", pathMessage)
         advertisedUrl?.let { url ->
             val message = "SoapClientSettings.advertisedUrl must be an absolute http or https URL, got '$url'"
-            val uri = requireParsable(url, message)
-            require(uri.scheme in SCHEMES && !uri.authority.isNullOrBlank()) { message }
+            val advertised = requireParsable(url, message)
+            // rawAuthority keeps registry-based names that URI.getHost() drops; the port is only
+            // exposed by URI.getPort() when the authority parses as server-based.
+            val authority = advertised.rawAuthority.orEmpty().substringAfterLast('@')
+            require(
+                advertised.scheme in SCHEMES &&
+                    authority.isNotBlank() && !authority.startsWith(':') &&
+                    advertised.port in -1..65535
+            ) { message }
         }
     }
 
     /** URL advertised in the `From` header once the embedded server is bound to [boundPort]. */
     fun callbackUrl(boundPort: Int): String =
-        advertisedUrl ?: ("$scheme://$authorityHost:$boundPort" + route.removeSuffix("/"))
+        advertisedUrl ?: ("$scheme://$authorityHost:${advertisedPort ?: boundPort}" + route.removeSuffix("/"))
 
     private companion object {
         val SCHEMES = setOf("http", "https")
+        val HOST_DELIMITERS = charArrayOf('/', '?', '#', '@')
 
         fun requireParsable(url: String, message: String): URI =
             try {

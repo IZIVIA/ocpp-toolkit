@@ -54,7 +54,7 @@ class Ocpp15FactoryTest {
 
                 expectThat(response.response.currentTime).isEqualTo(TEST_CURRENT_TIME)
                 expectThat(receivedActions.toList()).isEqualTo(listOf("Heartbeat"))
-                expectThat(receivedFrom.single()).isNotNull().matches(Regex("http://localhost:\\d+/cp"))
+                expectThat(receivedFrom.single()).isNotNull().matches(Regex("http://localhost:[1-9]\\d*/cp"))
             } finally {
                 api.close()
             }
