@@ -111,11 +111,24 @@ class SoapClientSettingsTest {
     @ValueSource(
         strings = [
             "cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url", "ftp://cp.example.com/cp",
-            "http://:8080/cp", "http://cp.example.com:99999/cp"
+            "http://:8080/cp", "http://cp.example.com:99999/cp", "http://cp.example.com:80a/cp",
+            "http://cp.example.com:/cp", "http://cp_1.example.com:99999/cp"
         ]
     )
     fun `rejects an advertised url that is not an absolute http url`(advertisedUrl: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", advertisedUrl = advertisedUrl) }
             .message.isNotNull().contains("SoapClientSettings.advertisedUrl")
+    }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "http://cp.example.com/cp", "https://cp.example.com:8443/cp", "http://cp_1.example.com:8081/cp",
+            "http://[2001:db8::1]/cp", "https://[2001:db8::1]:8443/cp", "http://192.168.0.3:8081/cp"
+        ]
+    )
+    fun `advertises an absolute http url verbatim`(advertisedUrl: String) {
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", advertisedUrl = advertisedUrl).callbackUrl(8081))
+            .isEqualTo(advertisedUrl)
     }
 }

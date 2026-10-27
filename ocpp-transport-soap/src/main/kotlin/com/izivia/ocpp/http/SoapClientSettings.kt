@@ -77,13 +77,20 @@ data class SoapClientSettings(
         advertisedUrl?.let { url ->
             val message = "SoapClientSettings.advertisedUrl must be an absolute http or https URL, got '$url'"
             val advertised = requireParsable(url, message)
-            // rawAuthority keeps registry-based names that URI.getHost() drops; the port is only
-            // exposed by URI.getPort() when the authority parses as server-based.
+            // rawAuthority keeps registry-based names that URI.getHost() drops. The port is parsed
+            // from the text rather than read from URI.getPort(), which answers -1 both when there
+            // is no port and when the authority is registry-based, letting `:80a`, `:` and
+            // `cp_1.example.com:99999` through.
             val authority = advertised.rawAuthority.orEmpty().substringAfterLast('@')
+            val portText = if (authority.startsWith('[')) {
+                authority.substringAfter(']', missingDelimiterValue = ":")
+            } else {
+                authority.indexOf(':').let { if (it < 0) "" else authority.substring(it) }
+            }
+            val hostText = authority.removeSuffix(portText)
             require(
-                advertised.scheme in SCHEMES &&
-                    authority.isNotBlank() && !authority.startsWith(':') &&
-                    advertised.port in -1..65535
+                advertised.scheme in SCHEMES && hostText.isNotBlank() &&
+                    (portText.isEmpty() || portText.drop(1).toIntOrNull() in 1..65535)
             ) { message }
         }
     }
