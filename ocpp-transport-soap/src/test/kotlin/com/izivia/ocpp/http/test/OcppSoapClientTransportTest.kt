@@ -243,7 +243,23 @@ class OcppSoapClientTransportTest {
 
         expectThrows<IllegalStateException> {
             client.sendMessage<HeartbeatReq, HeartbeatResp>("HeartBeat", HeartbeatReq())
-        }.message.isNotNull().contains("connect()")
+        }.message.isNotNull().contains("not connected or closed")
+    }
+
+    @Test
+    fun `should refuse to send once closed`() {
+        val client = OcppSoapClientTransport.createClient(
+            SoapClientSettings(port = 0, host = "localhost"),
+            ocppId = "ocppChargePoint",
+            target = "http://localhost:5002/api",
+            ocppSoapParser = Ocpp16SoapParser()
+        )
+        client.connect()
+        client.close()
+
+        expectThrows<IllegalStateException> {
+            client.sendMessage<HeartbeatReq, HeartbeatResp>("HeartBeat", HeartbeatReq())
+        }.message.isNotNull().contains("not connected or closed")
     }
 
     @Test

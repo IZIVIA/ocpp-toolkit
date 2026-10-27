@@ -92,7 +92,10 @@ class OcppSoapClientTransport private constructor(
 
     /** URL advertised in the `From` header, where the central system reaches this charge point. */
     fun callbackUrl(): String = callbackUrl
-        ?: throw IllegalStateException("connect() must be called first: the callback URL is resolved once the embedded server is bound")
+        ?: throw IllegalStateException(
+            "transport not connected or closed: the callback URL is resolved by connect(), " +
+                "once the embedded server is bound, and dropped by close()"
+        )
 
     override fun close() {
         server.close()
