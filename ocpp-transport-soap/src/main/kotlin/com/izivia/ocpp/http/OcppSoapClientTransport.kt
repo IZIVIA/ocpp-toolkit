@@ -87,7 +87,9 @@ class OcppSoapClientTransport private constructor(
         server.start()
         // Resolved once the server is bound: with port 0 the actual port is only known from here on.
         callbackUrl = settings.callbackUrl(server.port())
-        logger.info("starting http server on $callbackUrl")
+        // Both ports are logged: they differ behind a terminator, and with port 0 the bound one is
+        // what a proxy in front of the charge point has to be pointed at.
+        logger.info("listening on port ${server.port()}, advertising $callbackUrl")
     }
 
     /** URL advertised in the `From` header, where the central system reaches this charge point. */
