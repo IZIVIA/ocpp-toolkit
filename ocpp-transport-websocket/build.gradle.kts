@@ -7,12 +7,13 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation("org.http4k:http4k-core:_")
+    api("org.http4k:http4k-core:_")
+    api(project(":ocpp-wamp"))
+    api(project(":ocpp-transport"))
+    api(project(":operation-information"))
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
     implementation(project(":utils"))
-    implementation(project(":ocpp-wamp"))
-    implementation(project(":ocpp-transport"))
-    implementation(project(":operation-information"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
     implementation(project(":ocpp-1-5-core"))
