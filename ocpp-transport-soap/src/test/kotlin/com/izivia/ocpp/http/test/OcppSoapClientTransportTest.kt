@@ -278,6 +278,38 @@ class OcppSoapClientTransportTest {
         }
     }
 
+    @Test
+    fun `should receive requests on the url it advertises when the path has empty segments`() {
+        var received = false
+        val client = OcppSoapClientTransport.createClient(
+            SoapClientSettings(
+                port = 5001,
+                host = "127.0.0.1",
+                path = "ocpp//soap"
+            ),
+            ocppId = "ocppChargePoint",
+            target = "http://localhost:5002/api",
+            ocppSoapParser = Ocpp16SoapParser()
+        )
+
+        client.receiveMessage<HeartbeatReq, HeartbeatResp>("HeartBeat") {
+            received = true
+            HeartbeatResp(currentTime = HEARTBEAT_TIME)
+        }
+
+        try {
+            client.connect()
+            val result = JavaHttpClient().invoke(
+                Request(Method.POST, client.callbackUrl()).body(HEARTBEAT_REQUEST)
+            )
+
+            expectThat(result.status).isEqualTo(Status.OK)
+            expectThat(received).isTrue()
+        } finally {
+            client.close()
+        }
+    }
+
     private fun createMockServerAndAlwaysRespond(
         handlerBody: String,
         onRequest: (RequestSoapMessage<Any>) -> Unit = {}

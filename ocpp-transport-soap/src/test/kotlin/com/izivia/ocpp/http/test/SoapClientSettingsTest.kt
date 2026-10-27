@@ -20,6 +20,7 @@ class SoapClientSettingsTest {
         expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "cp").route).isEqualTo("/cp")
         expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "/cp/").route).isEqualTo("/cp")
         expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "/ocpp/soap").route).isEqualTo("/ocpp/soap")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "ocpp//soap").route).isEqualTo("/ocpp/soap")
     }
 
     @Test

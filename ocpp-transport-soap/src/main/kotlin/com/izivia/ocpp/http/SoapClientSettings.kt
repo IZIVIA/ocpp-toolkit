@@ -42,8 +42,12 @@ data class SoapClientSettings(
      */
     val advertisedUrl: String? = null,
 ) {
-    /** [path] normalised with a leading slash and no trailing slash; the root is `/`. */
-    val route: String = "/" + path.trim('/')
+    /**
+     * [path] normalised with a leading slash, no trailing slash and no empty segment; the root is
+     * `/`. Empty segments are collapsed because the embedded server would otherwise not serve the
+     * URL this class advertises.
+     */
+    val route: String = "/" + path.split('/').filter { it.isNotEmpty() }.joinToString("/")
 
     private val authorityHost = host.toUriHost()
 
