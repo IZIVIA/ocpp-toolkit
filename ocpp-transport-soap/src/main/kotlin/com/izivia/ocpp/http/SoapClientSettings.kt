@@ -91,9 +91,11 @@ data class SoapClientSettings(
                 authority.indexOf(':').let { if (it < 0) "" else authority.substring(it) }
             }
             val hostText = authority.removeSuffix(portText)
+            // The shape is matched before the value: toIntOrNull() would take a leading `+` and
+            // non-ASCII decimal digits, both of which URI keeps in a registry-based authority.
             require(
                 advertised.scheme in SCHEMES && hostText.isNotBlank() &&
-                    (portText.isEmpty() || portText.drop(1).toIntOrNull() in 1..65535)
+                    (portText.isEmpty() || (PORT_PATTERN.matches(portText) && portText.drop(1).toInt() in 1..65535))
             ) { message }
         }
     }
@@ -105,6 +107,7 @@ data class SoapClientSettings(
     private companion object {
         val SCHEMES = setOf("http", "https")
         val HOST_PATTERN = Regex("[A-Za-z0-9._-]+")
+        val PORT_PATTERN = Regex(":[0-9]{1,5}")
 
         fun requireParsable(url: String, message: String): URI =
             try {

@@ -114,7 +114,8 @@ class SoapClientSettingsTest {
         strings = [
             "cp.example.com/ocpp/cp", "/ocpp/cp", "https://", "not a url", "ftp://cp.example.com/cp",
             "http://:8080/cp", "http://cp.example.com:99999/cp", "http://cp.example.com:80a/cp",
-            "http://cp.example.com:/cp", "http://cp_1.example.com:99999/cp"
+            "http://cp.example.com:/cp", "http://cp_1.example.com:99999/cp",
+            "http://cp.example.com:+80/cp", "http://cp.example.com:٨٠/cp"
         ]
     )
     fun `rejects an advertised url that is not an absolute http url`(advertisedUrl: String) {
