@@ -63,7 +63,9 @@ class SoapClientSettingsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment", "/cp%20x", "/cp%2Fx"])
+    @ValueSource(
+        strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment", "/cp%20x", "/cp%2Fx", "/borne-é", "/cp x"]
+    )
     fun `rejects a path that is not a plain url path`(path: String) {
         expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", path = path) }
             .message.isNotNull().contains("SoapClientSettings.path")

@@ -71,8 +71,11 @@ data class SoapClientSettings(
             require(HOST_PATTERN.matches(host)) { hostMessage }
         }
         val pathMessage =
-            "SoapClientSettings.path must be a URL path without query, fragment or percent-escape, got '$path'"
-        require('?' !in path && '#' !in path && '%' !in path) { pathMessage }
+            "SoapClientSettings.path must be an ASCII URL path without query, fragment or percent-escape, got '$path'"
+        // java.net.URI accepts non-ASCII in a path, which would put an IRI in the `From` header;
+        // the central system would then call back the percent-encoded form, which the raw route
+        // does not match.
+        require('?' !in path && '#' !in path && '%' !in path && path.all { it.code <= 0x7f }) { pathMessage }
         requireParsable("http://localhost$route", pathMessage)
         advertisedUrl?.let { url ->
             val message = "SoapClientSettings.advertisedUrl must be an absolute http or https URL, got '$url'"
