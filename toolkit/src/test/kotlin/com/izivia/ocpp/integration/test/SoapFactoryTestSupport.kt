@@ -27,7 +27,7 @@ internal fun soapApi(ocppVersion: OcppVersion, port: Int) =
             ocppVersion = ocppVersion,
             transportType = TransportEnum.SOAP,
             target = "http://localhost:$port/ocpp",
-            soapClient = SoapClientSettings(port = 0, path = "/cp"),
+            soapClient = SoapClientSettings(port = 0, host = "localhost", path = "/cp"),
             newMessageId = { TEST_MESSAGE_ID }
         ),
         ocppId = "CP001",

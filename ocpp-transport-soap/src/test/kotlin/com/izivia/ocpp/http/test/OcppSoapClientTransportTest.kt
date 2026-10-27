@@ -32,6 +32,7 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
+                host = "localhost",
                 path = "/ocpp/soap"
             ),
             ocppId = "ocppChargePoint",
@@ -55,6 +56,7 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
+                host = "localhost",
                 path = "/ocpp/soap"
             ),
             ocppId = "ocppChargePoint",
@@ -77,6 +79,7 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
+                host = "localhost",
                 path = ""
             ),
             ocppId = "ocppChargePoint",
@@ -134,6 +137,7 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
+                host = "localhost",
                 path = "/ocpp/soap"
             ),
             ocppId = "ocppChargePoint",
@@ -187,8 +191,8 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
-                path = "/ocpp/soap",
-                host = "192.168.0.3"
+                host = "192.168.0.3",
+                path = "/ocpp/soap"
             ),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
@@ -211,7 +215,7 @@ class OcppSoapClientTransportTest {
         val server = createMockServerAndAlwaysRespond(HEARTBEAT_RESPONSE) { receivedFrom += it.from }.start()
 
         val client = OcppSoapClientTransport.createClient(
-            SoapClientSettings(port = 0),
+            SoapClientSettings(port = 0, host = "localhost"),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
@@ -231,7 +235,7 @@ class OcppSoapClientTransportTest {
     @Test
     fun `should refuse to send before connect because the callback url is not resolved yet`() {
         val client = OcppSoapClientTransport.createClient(
-            SoapClientSettings(port = 0),
+            SoapClientSettings(port = 0, host = "localhost"),
             ocppId = "ocppChargePoint",
             target = "http://localhost:5002/api",
             ocppSoapParser = Ocpp16SoapParser()
@@ -248,6 +252,7 @@ class OcppSoapClientTransportTest {
         val client = OcppSoapClientTransport.createClient(
             SoapClientSettings(
                 port = 5001,
+                host = "localhost",
                 path = "/ocpp/soap"
             ),
             ocppId = "ocppChargePoint",

@@ -26,7 +26,7 @@ class Ocpp15FactoryTest {
             settings = Settings(
                 ocppVersion = OcppVersion.OCPP_1_5,
                 transportType = TransportEnum.SOAP,
-                soapClient = SoapClientSettings(port = 8081, path = "/cp")
+                soapClient = SoapClientSettings(port = 8081, host = "localhost", path = "/cp")
             ),
             ocppId = "CP001",
             csApi = mockk<CSApi>(relaxed = true)

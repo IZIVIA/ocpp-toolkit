@@ -44,7 +44,7 @@ class Ocpp12FactoryTest {
             chargePointId = "CP001",
             csmsUrl = "http://localhost:8080/ocpp",
             transportType = TransportEnum.SOAP,
-            soapClient = SoapClientSettings(port = 8081, path = "/cp"),
+            soapClient = SoapClientSettings(port = 8081, host = "localhost", path = "/cp"),
             ocppCSCallbacks = object : OcppCSCallbacks {}
         )
 
@@ -57,7 +57,7 @@ class Ocpp12FactoryTest {
             chargePointId = "CP001",
             csmsUrl = "http://localhost:8080/ocpp",
             transportType = TransportEnum.SOAP,
-            soapClient = SoapClientSettings(port = 8081, path = "/cp"),
+            soapClient = SoapClientSettings(port = 8081, host = "localhost", path = "/cp"),
             ocppCSCallbacks = object : OcppCSCallbacks {}
         )
         val csms = ApiFactory.csmsOcppServer(
@@ -84,7 +84,7 @@ class Ocpp12FactoryTest {
             settings = Settings(
                 ocppVersion = OcppVersion.OCPP_1_2,
                 transportType = TransportEnum.SOAP,
-                soapClient = SoapClientSettings(port = 8081, path = "/cp")
+                soapClient = SoapClientSettings(port = 8081, host = "localhost", path = "/cp")
             ),
             ocppId = "CP001",
             csApi = mockk<CSApi>(relaxed = true)

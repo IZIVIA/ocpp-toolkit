@@ -19,13 +19,15 @@ import java.net.URISyntaxException
 data class SoapClientSettings(
     /** Port the embedded HTTP server binds to; `0` picks an ephemeral port. */
     val port: Int,
-    /** Route the embedded server listens on, also advertised in the `From` header. */
-    val path: String = "",
     /**
      * Host advertised in the `From` header, i.e. how the central system reaches this charge point:
-     * a hostname or an IP address, without scheme, port or path. IPv6 literals may be bracketed or not.
+     * a hostname or an IP address, without scheme, port or path. IPv6 literals may be bracketed or
+     * not. Mandatory: a default would let a charge point advertise an address the central system
+     * cannot reach, which is the non-compliance this class exists to prevent.
      */
-    val host: String = "localhost",
+    val host: String,
+    /** Route the embedded server listens on, also advertised in the `From` header. */
+    val path: String = "",
     /** Scheme advertised in the `From` header: `http`, or `https` behind a TLS terminator. */
     val scheme: String = "http",
     /**

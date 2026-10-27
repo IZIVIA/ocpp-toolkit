@@ -15,20 +15,20 @@ class SoapClientSettingsTest {
 
     @Test
     fun `normalises the route with a leading slash and no trailing slash`() {
-        expectThat(SoapClientSettings(port = 8081, path = "").route).isEqualTo("/")
-        expectThat(SoapClientSettings(port = 8081, path = "/").route).isEqualTo("/")
-        expectThat(SoapClientSettings(port = 8081, path = "cp").route).isEqualTo("/cp")
-        expectThat(SoapClientSettings(port = 8081, path = "/cp/").route).isEqualTo("/cp")
-        expectThat(SoapClientSettings(port = 8081, path = "/ocpp/soap").route).isEqualTo("/ocpp/soap")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "").route).isEqualTo("/")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "/").route).isEqualTo("/")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "cp").route).isEqualTo("/cp")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "/cp/").route).isEqualTo("/cp")
+        expectThat(SoapClientSettings(port = 8081, host = "localhost", path = "/ocpp/soap").route).isEqualTo("/ocpp/soap")
     }
 
     @Test
     fun `builds the callback url from the host, the bound port and the route`() {
         expectThat(SoapClientSettings(port = 8081, path = "/cp", host = "192.168.0.3").callbackUrl(8081))
             .isEqualTo("http://192.168.0.3:8081/cp")
-        expectThat(SoapClientSettings(port = 0, path = "cp/").callbackUrl(51234))
+        expectThat(SoapClientSettings(port = 0, host = "localhost", path = "cp/").callbackUrl(51234))
             .isEqualTo("http://localhost:51234/cp")
-        expectThat(SoapClientSettings(port = 8081).callbackUrl(8081))
+        expectThat(SoapClientSettings(port = 8081, host = "localhost").callbackUrl(8081))
             .isEqualTo("http://localhost:8081")
     }
 
@@ -63,14 +63,14 @@ class SoapClientSettingsTest {
     @ParameterizedTest
     @ValueSource(strings = ["/ma route", "/cp\\bad", "/cp?x=1", "/cp#fragment", "/cp%20x", "/cp%2Fx"])
     fun `rejects a path that is not a plain url path`(path: String) {
-        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, path = path) }
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", path = path) }
             .message.isNotNull().contains("SoapClientSettings.path")
     }
 
     @ParameterizedTest
     @ValueSource(ints = [-1, 65536])
     fun `rejects a port outside the tcp range`(port: Int) {
-        expectThrows<IllegalArgumentException> { SoapClientSettings(port = port) }
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = port, host = "localhost") }
             .message.isNotNull().contains("SoapClientSettings.port")
     }
 
@@ -78,7 +78,7 @@ class SoapClientSettingsTest {
     fun `uses the configured scheme in the callback url`() {
         expectThat(SoapClientSettings(port = 8443, path = "/cp", host = "cp.example.com", scheme = "https").callbackUrl(8443))
             .isEqualTo("https://cp.example.com:8443/cp")
-        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, scheme = "ftp") }
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", scheme = "ftp") }
             .message.isNotNull().contains("SoapClientSettings.scheme")
     }
 
@@ -88,7 +88,7 @@ class SoapClientSettingsTest {
             SoapClientSettings(port = 8081, path = "/cp", host = "cp.example.com", scheme = "https", advertisedPort = 8443)
                 .callbackUrl(8081)
         ).isEqualTo("https://cp.example.com:8443/cp")
-        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, advertisedPort = 65536) }
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", advertisedPort = 65536) }
             .message.isNotNull().contains("SoapClientSettings.advertisedPort")
     }
 
@@ -96,6 +96,7 @@ class SoapClientSettingsTest {
     fun `advertises the configured url instead of the bound one when provided`() {
         val settings = SoapClientSettings(
             port = 8081,
+            host = "localhost",
             path = "/cp",
             advertisedUrl = "https://cp.example.com/ocpp/cp"
         )
@@ -112,7 +113,7 @@ class SoapClientSettingsTest {
         ]
     )
     fun `rejects an advertised url that is not an absolute http url`(advertisedUrl: String) {
-        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, advertisedUrl = advertisedUrl) }
+        expectThrows<IllegalArgumentException> { SoapClientSettings(port = 8081, host = "localhost", advertisedUrl = advertisedUrl) }
             .message.isNotNull().contains("SoapClientSettings.advertisedUrl")
     }
 }
