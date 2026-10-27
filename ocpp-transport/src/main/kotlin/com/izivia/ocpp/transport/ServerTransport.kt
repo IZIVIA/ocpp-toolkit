@@ -20,6 +20,17 @@ interface ServerTransport {
 
     fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean
 
+    /**
+     * Gracefully shuts the transport down: stop accepting connections and calls, then wait for
+     * the pending calls to complete before closing the open connections.
+     *
+     * The shutdown is irreversible and may block until the pending calls time out. It does not
+     * stop the HTTP server the transport is mounted on: stop that server afterwards.
+     *
+     * The default implementation does nothing, for transports with no pending call to drain.
+     */
+    fun shutdown() {}
+
 }
 
 inline fun <T, reified P : Any> ServerTransport.sendMessage(csOcppId: String, action: String, message: T): P =

@@ -36,6 +36,9 @@ import kotlin.reflect.KClass
  * There is no call timeout either, because the server side never sends calls to charging stations
  * ([sendMessageClass] is not implemented). That is why this transport has no counterpart to the
  * WebSocket server's `OcppWampServerSettings`.
+ *
+ * For the same reason it keeps the default no-op [ServerTransport.shutdown]: each SOAP call is a
+ * synchronous HTTP exchange owned by the HTTP server, so the transport holds nothing to drain.
  */
 class OcppSoapServerTransport private constructor(
     private val ocppVersion: OcppVersion,
