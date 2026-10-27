@@ -232,11 +232,12 @@ class OcppWampServerApp(
         val errorInfo = t?.let { " onError $t - " } ?: ""
         logger.info("$logContext disconnected - $duration -$errorInfo number of connections : ${connections.size}")
 
-        if (connections[chargingStationOcppId] == null) {
-            // we notify only if we remove the connection, otherwise we are still connected
+        if (removed && connections[chargingStationOcppId] == null) {
+            // we notify only if we remove the connection, otherwise we are still connected,
+            // or the station disconnection has already been notified by the removal of its current connection
             listeners.onWsCloseHandler(chargingStationOcppId, chargingStationConnection.request.headers)
         } else {
-            logger.debug("$logContext not notifying disconnection - still connected")
+            logger.debug("$logContext not notifying disconnection - still connected or already notified")
         }
     }
 
@@ -270,7 +271,10 @@ class OcppWampServerApp(
             c?.let {
                 it.callManager.await()
                 it.close()
-                connections.remove(it)
+                // the close completes later, when the connection is no longer registered: notify it now
+                if (synchronized(it) { connections.remove(it) }) {
+                    listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                }
             }
         }
     }

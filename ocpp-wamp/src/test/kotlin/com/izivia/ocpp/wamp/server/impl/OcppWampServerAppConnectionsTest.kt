@@ -104,6 +104,28 @@ class OcppWampServerAppConnectionsTest {
     }
 
     @Test
+    fun `should not notify the close of a replaced connection closing after the current one`() {
+        val previous = connect("CS1")
+        val current = connect("CS1")
+
+        current.disconnect()
+        previous.disconnect()
+
+        expectThat(closeEvents).containsExactly("CS1")
+    }
+
+    @Test
+    fun `should notify the close of a station once on shutdown`() {
+        val socket = connect("CS1")
+
+        app.shutdown()
+        expectThat(closeEvents).containsExactly("CS1")
+
+        socket.disconnect()
+        expectThat(closeEvents).containsExactly("CS1")
+    }
+
+    @Test
     fun `should deliver an accepted frame before notifying the reconnection`() {
         val previous = connect("CS1")
         val release = blockNextPong { previous.receivePong() }
