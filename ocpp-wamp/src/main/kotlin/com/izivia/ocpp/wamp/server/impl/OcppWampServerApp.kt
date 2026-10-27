@@ -73,8 +73,10 @@ class OcppWampServerApp(
                 ocppVersion,
                 settings.timeoutInMs,
                 shutdown
-            ).also {
-                connections[chargingStationOcppId] = it
+            )
+            // a control frame of the previous connection being notified completes before the replacement
+            synchronized(previousConnection ?: chargingStationConnection) {
+                connections[chargingStationOcppId] = chargingStationConnection
             }
 
             val reconnect = previousConnection != null
@@ -107,6 +109,13 @@ class OcppWampServerApp(
                 if (e.isConnectionReset()) {
                     handleWebSocketClosed(logContext, chargingStationConnection, e)
                 }
+            }
+
+            if (ws is ControlFrameAwareWebsocket) {
+                ws.onPong { notifyControlFrame(logContext, chargingStationConnection, listeners.onWsPongHandler) }
+                ws.onPing { notifyControlFrame(logContext, chargingStationConnection, listeners.onWsPingHandler) }
+            } else {
+                logger.warn("$logContext websocket does not expose control frames - ping/pong will not be notified")
             }
 
             logger.info("$logContext connected - number of connections : ${connections.size}")
@@ -210,7 +219,9 @@ class OcppWampServerApp(
     ) {
         val chargingStationOcppId = chargingStationConnection.ocppId
         val currentConnection = connections[chargingStationOcppId]
-        if (!connections.remove(chargingStationConnection)) {
+        // a control frame being notified completes before the removal
+        val removed = synchronized(chargingStationConnection) { connections.remove(chargingStationConnection) }
+        if (!removed) {
             logger.info(
                 "$logContext warn: do not clear ws on close - not current connection in map" +
                     " - registered connection: $currentConnection" +
@@ -226,6 +237,30 @@ class OcppWampServerApp(
             listeners.onWsCloseHandler(chargingStationOcppId, chargingStationConnection.request.headers)
         } else {
             logger.debug("$logContext not notifying disconnection - still connected")
+        }
+    }
+
+    private fun notifyControlFrame(
+        logContext: String,
+        chargingStationConnection: ChargingStationConnection,
+        handler: (WsControlFrameEvent) -> Unit
+    ) {
+        val receivedAt = clock.now()
+        // holding the connection lock, the connection can be neither replaced nor removed before the handler returns,
+        // so a frame from a replaced or closed connection cannot be taken as a sign of life of the station
+        synchronized(chargingStationConnection) {
+            if (connections[chargingStationConnection.ocppId] !== chargingStationConnection) {
+                logger.debug("$logContext control frame ignored - not current connection")
+                return
+            }
+            handler(
+                WsControlFrameEvent(
+                    chargingStationConnection.ocppId,
+                    chargingStationConnection.wsConnectionId,
+                    chargingStationConnection.request.headers,
+                    receivedAt
+                )
+            )
         }
     }
 
