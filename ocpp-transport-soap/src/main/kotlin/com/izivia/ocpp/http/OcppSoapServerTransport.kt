@@ -21,6 +21,22 @@ import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.reflect.KClass
 
+/**
+ * Server side of the SOAP (OCPP-S) transport.
+ *
+ * This transport owns no server and no threads: it only provides the HTTP handler exposed by
+ * [serverConfig]. Each inbound request is handled synchronously on a worker thread of the HTTP
+ * server that hosts this handler, so concurrency is bounded and tuned by that server:
+ * - under the toolkit's `CSMS`, the Undertow server built for each port, which is shared with any
+ *   WebSocket transport listening on the same port;
+ * - with [asServer], http4k's stock Undertow server.
+ *
+ * Both currently size their worker pool at 32 threads per available processor.
+ *
+ * There is no call timeout either, because the server side never sends calls to charging stations
+ * ([sendMessageClass] is not implemented). That is why this transport has no counterpart to the
+ * WebSocket server's `OcppWampServerSettings`.
+ */
 class OcppSoapServerTransport private constructor(
     private val ocppVersion: OcppVersion,
     private val ocppSoapParser: OcppSoapParser,
