@@ -58,12 +58,18 @@ data class SoapClientSettings(
             require(it in 1..65535) { "SoapClientSettings.advertisedPort must be a TCP port, got $it" }
         }
         val hostMessage = "SoapClientSettings.host must be a hostname or IP address without scheme, port or path, got '$host'"
-        require(host.isNotBlank() && HOST_DELIMITERS.none { it in host }) { hostMessage }
-        // java.net.URI validates a bracketed IPv6 literal but, unlike its multi-argument constructor,
-        // tolerates registry-based names such as cp_1.example.com that are common in internal DNS zones.
-        val uri = requireParsable("$scheme://$authorityHost:$port/", hostMessage)
-        // A delimiter inside the host would otherwise be re-read as userinfo, a query or a fragment.
-        require(uri.rawAuthority == "$authorityHost:$port") { hostMessage }
+        // An IPv6 literal goes to java.net.URI, which checks its shape. Everything else is matched
+        // against a whitelist: URI falls back to a registry-based authority, where a character no
+        // central system can resolve, such as `;` or `%`, would go through unnoticed. `_` is kept,
+        // as internal DNS zones commonly use it. A zone id (fe80::1%eth0) is rejected rather than
+        // escaped per RFC 6874, since it only names an interface of this charge point.
+        if (host.startsWith('[') || ':' in host) {
+            require('%' !in host) { hostMessage }
+            val uri = requireParsable("$scheme://$authorityHost:$port/", hostMessage)
+            require(uri.rawAuthority == "$authorityHost:$port" && uri.host == authorityHost) { hostMessage }
+        } else {
+            require(HOST_PATTERN.matches(host)) { hostMessage }
+        }
         val pathMessage =
             "SoapClientSettings.path must be a URL path without query, fragment or percent-escape, got '$path'"
         require('?' !in path && '#' !in path && '%' !in path) { pathMessage }
@@ -88,7 +94,7 @@ data class SoapClientSettings(
 
     private companion object {
         val SCHEMES = setOf("http", "https")
-        val HOST_DELIMITERS = charArrayOf('/', '?', '#', '@')
+        val HOST_PATTERN = Regex("[A-Za-z0-9._-]+")
 
         fun requireParsable(url: String, message: String): URI =
             try {

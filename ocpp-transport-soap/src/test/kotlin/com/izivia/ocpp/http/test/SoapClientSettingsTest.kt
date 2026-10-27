@@ -53,7 +53,8 @@ class SoapClientSettingsTest {
     @ValueSource(
         strings = [
             "http://192.168.0.3", "192.168.0.3:8081", "", " ", "example.com/cp", "2001:db8:::1",
-            "cp.example.com?x", "cp.example.com#x", "user@cp.example.com"
+            "cp.example.com?x", "cp.example.com#x", "user@cp.example.com",
+            "a;b", "cp%41", "cp,1.example.com", "fe80::1%eth0", "[fe80::1%eth0]"
         ]
     )
     fun `rejects a host that is not a bare hostname or ip address`(host: String) {
