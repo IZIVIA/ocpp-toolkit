@@ -10,6 +10,7 @@ import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import kotlin.time.Clock
 import kotlin.time.Instant
+import kotlin.time.TimeSource
 import org.http4k.core.Request
 import org.http4k.routing.websockets
 import org.http4k.routing.websocket.bind
@@ -22,7 +23,9 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.Executor
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Websocket Server
@@ -43,6 +46,7 @@ class OcppWampServerApp(
 
     private val connections = ConnectionsMap()
     private val shutdown = AtomicBoolean(false)
+    private val inFlightInboundCalls = AtomicInteger()
     private val callsExecutor: Executor = settings.buildCallsExecutor()
 
     private fun newConnection(request: Request) = WsResponse { ws: Websocket ->
@@ -147,7 +151,11 @@ class OcppWampServerApp(
                 msg.also { wampMessage ->
                     when (wampMessage.msgType) {
                         WampMessageType.CALL -> {
+                            // count the call before checking the flag, so that shutdown either waits for it
+                            // or this call sees the flag and is rejected
+                            inFlightInboundCalls.incrementAndGet()
                             if (shutdown.get()) {
+                                inFlightInboundCalls.decrementAndGet()
                                 logger.info("$logContext - rejected call - shutting down - $msgString")
                                 ws.send(
                                     WsMessage(
@@ -163,7 +171,7 @@ class OcppWampServerApp(
                             }
 
                             val startCall = clock.now()
-                            callsExecutor.execute {
+                            executeInboundCall {
                                 val callQueueLatency = clock.now() - startCall
                                 logger.info(
                                     "$logContext [IN][CALL][REQ] -> ${it.bodyString()} -- " +
@@ -265,8 +273,28 @@ class OcppWampServerApp(
         }
     }
 
+    /**
+     * Runs an inbound call on the calls executor, keeping it counted in [inFlightInboundCalls]
+     * until its response has been sent. The caller must have incremented the counter.
+     */
+    private fun executeInboundCall(call: () -> Unit) {
+        try {
+            callsExecutor.execute {
+                try {
+                    call()
+                } finally {
+                    inFlightInboundCalls.decrementAndGet()
+                }
+            }
+        } catch (e: RejectedExecutionException) {
+            inFlightInboundCalls.decrementAndGet()
+            throw e
+        }
+    }
+
     fun shutdown() {
         shutdown.set(true)
+        awaitInFlightInboundCalls()
         connections.values.toList().forEach { c ->
             c?.let {
                 it.callManager.await()
@@ -276,6 +304,21 @@ class OcppWampServerApp(
                     listeners.onWsCloseHandler(it.ocppId, it.request.headers)
                 }
             }
+        }
+    }
+
+    private fun awaitInFlightInboundCalls() {
+        // a monotonic source, not the injectable clock: a fixed clock would never reach the deadline
+        val start = TimeSource.Monotonic.markNow()
+        while (
+            inFlightInboundCalls.get() > 0 &&
+            start.elapsedNow().inWholeMilliseconds < settings.timeoutInMs
+        ) {
+            Thread.sleep(10)
+        }
+        val remaining = inFlightInboundCalls.get()
+        if (remaining > 0) {
+            logger.warn("shutting down - $remaining inbound calls not answered within ${settings.timeoutInMs}ms")
         }
     }
 

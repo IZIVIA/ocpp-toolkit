@@ -20,6 +20,9 @@ import org.junit.jupiter.api.Test
 import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.assertions.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -425,6 +428,90 @@ class WampIntegrationTest {
             expectThat(time).isLessThan(100) // make sure we dont wait for the 500ms of auto reconnect
 
             client.close()
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `shutdown should answer an in-flight inbound call before closing the connection`() {
+        val handlerStarted = CountDownLatch(1)
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage {
+                handlerStarted.countDown()
+                Thread.sleep(300)
+                return WampMessage.CallResult(msg.msgId, "{}")
+            }
+        })
+        server.start()
+
+        try {
+            val client = OcppWampClient.newClient(
+                Uri.of("ws://localhost:$port/ws"),
+                "TEST1",
+                OCPP_1_6,
+                timeoutInMs = 5_000,
+                autoReconnect = false
+            )
+            client.connect()
+
+            val response = CompletableFuture.supplyAsync {
+                client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+            }
+            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+
+            transport.shutdown()
+
+            expectThat(response.get(5, TimeUnit.SECONDS)) {
+                get { msgId }.isEqualTo("1")
+                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+            }
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `shutdown should reject an inbound call received while draining`() {
+        val handlerStarted = CountDownLatch(1)
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = ocppId in setOf("TEST1", "TEST2")
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage {
+                handlerStarted.countDown()
+                Thread.sleep(500)
+                return WampMessage.CallResult(msg.msgId, "{}")
+            }
+        })
+        server.start()
+
+        try {
+            val slowClient = OcppWampClient.newClient(
+                Uri.of("ws://localhost:$port/ws"), "TEST1", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
+            )
+            val lateClient = OcppWampClient.newClient(
+                Uri.of("ws://localhost:$port/ws"), "TEST2", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
+            )
+            slowClient.connect()
+            lateClient.connect()
+
+            CompletableFuture.runAsync { slowClient.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }
+            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+
+            val shutdown = CompletableFuture.runAsync { transport.shutdown() }
+            Thread.sleep(100) // let shutdown raise its flag while the slow call is still running
+
+            expectThat(lateClient.sendBlocking(WampMessage.Call("2", "Heartbeat", "{}"))) {
+                get { msgId }.isEqualTo("2")
+                get { msgType }.isEqualTo(WampMessageType.CALL_ERROR)
+            }
+            shutdown.get(5, TimeUnit.SECONDS)
         } finally {
             server.stop()
         }
