@@ -31,15 +31,13 @@ import com.izivia.ocpp.core12.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.core12.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.operation.information.ActionOcpp
 import com.izivia.ocpp.operation.information.ChargingStationConfig
-import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
+import com.izivia.ocpp.transport.transportFor
 
 class RealCSMSOperations(
     private val servers: Set<ServerTransport>,
@@ -163,26 +161,13 @@ class RealCSMSOperations(
     ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> =
         sendMessage(meta, meta.chargingStationId, getActionFromReq(req), req)
 
-    private inline fun <T, reified P> sendMessage(
+    private inline fun <T, reified P : Any> sendMessage(
         meta: RequestMetadata,
         ocppId: String,
         action: String,
         request: T
-    ): OperationExecution<T, P> {
-        val transport = getTransport(ocppId)
-        val requestTime = Clock.System.now()
-        val response: P = transport.sendMessage(ocppId, action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(
-            ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime),
-            request,
-            response
-        )
-    }
-
-    private fun getTransport(ocppId: String): ServerTransport =
-        servers.firstOrNull { it.canSendToChargingStation(acceptConnection(ocppId)) }
-            ?: throw IllegalStateException("No transport to send a message to $ocppId")
+    ): OperationExecution<T, P> =
+        servers.transportFor(ocppId, acceptConnection).execute(meta, ocppId, action, request)
 
     private fun <T : Any> getActionFromReq(req: T): String = when (req) {
         is ResetReq -> ActionOcpp.RESET.value

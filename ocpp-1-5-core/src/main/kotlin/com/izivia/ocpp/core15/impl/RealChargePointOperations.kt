@@ -38,9 +38,8 @@ import com.izivia.ocpp.core15.model.unlockconnector.UnlockConnectorReq
 import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.operation.information.*
 import com.izivia.ocpp.transport.ClientTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
 import java.net.ConnectException
 
 typealias OcppId = String
@@ -146,17 +145,6 @@ class RealChargePointOperations(
 
     }
 
-    private inline fun <T, reified P> sendMessage(
-        meta: RequestMetadata, action: String, request: T
-    ): OperationExecution<T, P> {
-        val requestTime = Clock.System.now()
-        val response: P = client.sendMessage(action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(
-            ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime), request, response
-        )
-    }
-
     override fun connect() {
         client.connect()
     }
@@ -170,7 +158,7 @@ class RealChargePointOperations(
         meta: RequestMetadata,
         request: HeartbeatReq
     ): OperationExecution<HeartbeatReq, HeartbeatResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
 
     @Throws(IllegalStateException::class, ConnectException::class)
@@ -178,7 +166,7 @@ class RealChargePointOperations(
         meta: RequestMetadata,
         request: AuthorizeReq
     ): OperationExecution<AuthorizeReq, AuthorizeResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
 
     @Throws(IllegalStateException::class, ConnectException::class)
@@ -186,7 +174,7 @@ class RealChargePointOperations(
         meta: RequestMetadata,
         request: MeterValuesReq
     ): OperationExecution<MeterValuesReq, MeterValuesResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
 
     @Throws(IllegalStateException::class, ConnectException::class)
@@ -194,48 +182,48 @@ class RealChargePointOperations(
         meta: RequestMetadata,
         request: StartTransactionReq
     ): OperationExecution<StartTransactionReq, StartTransactionResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun stopTransaction(
         meta: RequestMetadata,
         request: StopTransactionReq
     ): OperationExecution<StopTransactionReq, StopTransactionResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun statusNotification(
         meta: RequestMetadata,
         request: StatusNotificationReq
     ): OperationExecution<StatusNotificationReq, StatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun dataTransfer(
         meta: RequestMetadata,
         request: DataTransferReq
     ): OperationExecution<DataTransferReq, DataTransferResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun bootNotification(
         meta: RequestMetadata,
         request: BootNotificationReq
     ): OperationExecution<BootNotificationReq, BootNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     @Throws(IllegalStateException::class, ConnectException::class)
     override fun firmwareStatusNotification(
         meta: RequestMetadata,
         request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun diagnosticsStatusNotification(
         meta: RequestMetadata,
         request: DiagnosticsStatusNotificationReq
     ): OperationExecution<DiagnosticsStatusNotificationReq, DiagnosticsStatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     private fun <T : Any> getActionFromReq(req: T): Action =
         when (req) {
