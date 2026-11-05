@@ -74,7 +74,7 @@ object WampMessageParser {
     private fun String.removeBracketsAndTrim(): String = this.trim().removePrefix("[").removeSuffix("]")
 
     fun String.removeSingleDoubleQuoteInPayload(): String {
-        this.indexOf("{", 0).let { indexOfFirstBrace ->
+        this.indexOfFirstBraceOutsideQuotes().let { indexOfFirstBrace ->
             if (indexOfFirstBrace != -1) {
                 return this.substring(0, indexOfFirstBrace)
                     .plus(
@@ -87,6 +87,21 @@ object WampMessageParser {
                 return this
             }
         }
+    }
+
+    // a brace in a quoted error description doesn't start the payload
+    private fun String.indexOfFirstBraceOutsideQuotes(): Int {
+        var inQuotes = false
+        var index = 0
+        while (index < length) {
+            when (this[index]) {
+                '\\' -> if (inQuotes) index++
+                '"' -> inQuotes = !inQuotes
+                '{' -> if (!inQuotes) return index
+            }
+            index++
+        }
+        return indexOf('{') // unbalanced quotes, can't tell what is quoted
     }
 
     object Patterns {

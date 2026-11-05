@@ -231,6 +231,30 @@ class WampParserTest {
     }
 
     @Test
+    fun `should parse call error with a brace in the description`() {
+        mapOf(
+            """[4,"1","InternalError","bad { thing",{}]""" to """bad { thing""",
+            """[4,"1","InternalError","{",{}]""" to """{""",
+            """[4,"1","InternalError","say \"{",{}]""" to """say \"{""",
+            """[4,"1","InternalError","C:\\{",{}]""" to """C:\\{""",
+            """[4,"1","InternalError","bad { thing",{"}]""" to """bad { thing""",
+        ).forEach { (message, description) ->
+            expectThat(WampMessageParser.parse(message)).isNotNull().and {
+                get { errorDescription }.isEqualTo(description)
+                get { payload }.isEqualTo("{}")
+            }
+        }
+    }
+
+    @Test
+    fun `should remove a single double quote in the payload after a lone backslash`() {
+        expectThat(WampMessageParser.parse("""[4,"1","InternalError","C:\",{"}]""")).isNotNull().and {
+            get { errorDescription }.isEqualTo("""C:\""")
+            get { payload }.isEqualTo("{}")
+        }
+    }
+
+    @Test
     fun `should parse all without error`() {
         val path = "src/test/resources/listeWampMsgTest.txt"
         val file = File(path)
