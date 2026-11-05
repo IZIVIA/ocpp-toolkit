@@ -21,6 +21,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
     runtimeOnly("ch.qos.logback:logback-classic:_")
+
+    testImplementation("com.fasterxml.jackson.core:jackson-databind:_")
 }
 
 java {
