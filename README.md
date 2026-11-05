@@ -371,6 +371,63 @@ not block.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
+## Observing OCPP errors
+
+The toolkit handles some failures on its own: it logs them and, over WebSocket, answers with a `CALLERROR`. To report
+them to your monitoring system, give an `OcppErrorListener` to `ServerSetting`. It is optional, works the same for the
+WebSocket and SOAP servers, and depends on no monitoring provider.
+
+```kotlin
+val errorListener = OcppErrorListener { event ->
+    when (event.category) {
+        OcppErrorCategory.UNHANDLED_ACTION ->
+            metrics.incrementUnhandledAction(event.ocppVersion)
+
+        OcppErrorCategory.PROTOCOL_ERROR,
+        OcppErrorCategory.HANDLER_ERROR,
+        OcppErrorCategory.TRANSPORT_ERROR ->
+            Sentry.captureException(event.cause ?: IllegalStateException("OCPP failure: $event"))
+    }
+}
+
+val csms = ApiFactory.csmsOcppServer(
+    csmsSettings = CSMSSettings(
+        listOf(
+            ServerSetting(
+                port = 8080,
+                path = "ws",
+                ocppVersion = setOf(OcppVersion.OCPP_1_6),
+                transportType = TransportEnum.WEBSOCKET,
+                errorListener = errorListener
+            )
+        )
+    ),
+    csmsApiCallbacks = listOf(csmsCallbacks),
+    fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+)
+```
+
+| Category           | Reported when                                                                      |
+|--------------------|------------------------------------------------------------------------------------|
+| `UNHANDLED_ACTION` | an incoming message has no registered handler                                      |
+| `PROTOCOL_ERROR`   | an incoming message or payload cannot be parsed, or a response cannot be serialized |
+| `HANDLER_ERROR`    | a registered handler throws an exception                                           |
+| `TRANSPORT_ERROR`  | the transport fails while processing a message, for instance when sending a response |
+
+Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
+`action`, for instance.
+
+- The listener only observes: the answer to the charging station is the same with and without it, and anything it
+  throws is logged and ignored.
+- It is called concurrently, on the threads processing the messages, and must not block.
+- `ocppId` and `action` come from the charging station and are not validated. Bound them before using them as a metric
+  dimension, and do not trust them as an identity.
+- An event never carries a message payload, but the message of `cause` may quote a fragment of it. Sanitize it before
+  sending it to a third party.
+
+Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
+the client side of the toolkit: only the servers report errors for now.
+
 ## Code Organisation
 
 The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.

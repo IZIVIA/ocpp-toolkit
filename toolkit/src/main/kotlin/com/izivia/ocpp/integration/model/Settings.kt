@@ -2,6 +2,7 @@ package com.izivia.ocpp.integration.model
 
 import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.transport.OcppVersion
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.toUriHost
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
@@ -46,5 +47,7 @@ data class ServerSetting(
      * requests run on the HTTP server's worker threads (see [com.izivia.ocpp.http.OcppSoapServerTransport]).
      */
     val wampSettings: OcppWampServerSettings = OcppWampServerSettings(),
-    var listeners: EventsListeners = EventsListeners()
+    var listeners: EventsListeners = EventsListeners(),
+    /** Observes the failures while processing OCPP messages, whatever the [transportType]. */
+    val errorListener: OcppErrorListener? = null
 )
