@@ -1,5 +1,6 @@
 package com.izivia.ocpp.wamp.messages
 
+import com.fasterxml.jackson.core.io.JsonStringEncoder
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -7,6 +8,14 @@ import com.izivia.ocpp.wamp.messages.WampMessageType.*
 import org.slf4j.LoggerFactory
 import kotlin.text.RegexOption.DOT_MATCHES_ALL
 
+/**
+ * [WampMessageParser] doesn't decode JSON escapes, so the fields of a parsed message hold their wire form.
+ *
+ * [toJson] writes [msgId] verbatim: it is echoed in every response, and escaping it again would break the
+ * correlation with the call. [payload] is raw JSON and is also written verbatim, so it must be valid JSON.
+ * [action] and [errorDescription] are escaped, so build a message from their decoded value: calling [toJson] on a
+ * parsed message escapes them a second time.
+ */
 data class WampMessage(
     val msgType: WampMessageType,
     val msgId: String,
@@ -17,10 +26,13 @@ data class WampMessage(
 ) {
 
     fun toJson(): String = when (msgType) {
-        CALL -> """[${msgType.id},"$msgId","${action!!}",$payload]"""
+        CALL -> """[${msgType.id},"$msgId","${action!!.escapeJson()}",$payload]"""
         CALL_RESULT -> """[${msgType.id},"$msgId",$payload]"""
-        CALL_ERROR -> """[${msgType.id},"$msgId","${errorCode!!.errorCode}","${errorDescription!!}",$payload]"""
+        CALL_ERROR ->
+            """[${msgType.id},"$msgId","${errorCode!!.errorCode}","${errorDescription!!.escapeJson()}",$payload]"""
     }
+
+    private fun String.escapeJson() = String(JsonStringEncoder.getInstance().quoteAsString(this))
 
     companion object {
         fun Call(msgId: String, action: String, payload: String) =
@@ -84,8 +96,9 @@ object WampMessageParser {
         const val ERROR_CODE = """\s*"?([^,"]+)"?\s*""" // anything except comma or quote, maybe surrounded by quotes
         const val PAYLOAD = """\s*(.*)""" // anything
 
-        const val ERROR_DESCRIPTION = """\s*(?:"([^"]*)"|([^"][^,]*))\s*"""
-            // either anything but quote surrounded by quotes,
+        const val ERROR_DESCRIPTION = """\s*(?:"([^"\\]*+(?:\\.[^"\\]*+)*+|[^"]*)"|([^"][^,]*))\s*"""
+            // either a JSON string surrounded by quotes (possessive, to not overflow the stack on a long one),
+            // or anything but quote surrounded by quotes (a lone backslash isn't an escape),
             // or anything but a comma
     }
 

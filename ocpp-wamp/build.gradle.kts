@@ -13,6 +13,7 @@ dependencies {
     api("org.http4k:http4k-realtime-core:_")
     api("io.undertow:undertow-core:_")
 
+    implementation("com.fasterxml.jackson.core:jackson-core:_")
     implementation("org.http4k:http4k-client-websocket:_")
     implementation("org.http4k:http4k-server-undertow:_")
     implementation("org.http4k:http4k-client-apache:_")
