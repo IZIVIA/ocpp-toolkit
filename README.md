@@ -419,7 +419,8 @@ Each failure produces one event. Only `category` is always set: a message that c
 
 - The listener only observes: the answer to the charging station is the same with and without it, and anything it
   throws is logged and ignored.
-- It is called concurrently, on the threads processing the messages, and must not block.
+- It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
+  charging station served by that thread. Hand the event off to your own executor.
 - `ocppId` and `action` come from the charging station and are not validated. Bound them before using them as a metric
   dimension, and do not trust them as an identity.
 - An event never carries a message payload, but the message of `cause` may quote a fragment of it. Sanitize it before

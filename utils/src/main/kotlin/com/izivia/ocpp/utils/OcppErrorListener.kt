@@ -48,8 +48,9 @@ data class OcppErrorEvent(
  * Observes the failures of the toolkit while processing OCPP messages. It cannot change how they are handled: the
  * answer sent to the charging station is the same with and without a listener.
  *
- * It is called concurrently, on the threads processing the messages, and must not block: a blocked call delays the
- * messages of this charging station. Anything it throws is logged and ignored.
+ * It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
+ * charging station served by that thread. Hand the event off to your own executor. Anything it throws is logged and
+ * ignored.
  */
 fun interface OcppErrorListener {
     fun onError(event: OcppErrorEvent)
