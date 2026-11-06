@@ -235,8 +235,8 @@ class WampParserTest {
         mapOf(
             """[4,"1","InternalError","bad { thing",{}]""" to """bad { thing""",
             """[4,"1","InternalError","{",{}]""" to """{""",
-            """[4,"1","InternalError","say \"{",{}]""" to """say \"{""",
-            """[4,"1","InternalError","C:\\{",{}]""" to """C:\\{""",
+            """[4,"1","InternalError","say \"{",{}]""" to """say "{""",
+            """[4,"1","InternalError","C:\\{",{}]""" to """C:\{""",
             """[4,"1","InternalError","bad { thing",{"}]""" to """bad { thing""",
         ).forEach { (message, description) ->
             expectThat(WampMessageParser.parse(message)).isNotNull().and {
