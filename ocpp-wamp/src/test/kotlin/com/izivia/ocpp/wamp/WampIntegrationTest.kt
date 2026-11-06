@@ -447,16 +447,16 @@ class WampIntegrationTest {
                 return WampMessage.CallResult(msg.msgId, "{}")
             }
         })
+        val client = OcppWampClient.newClient(
+            Uri.of("ws://localhost:$port/ws"),
+            "TEST1",
+            OCPP_1_6,
+            timeoutInMs = 5_000,
+            autoReconnect = false
+        )
         server.start()
 
         try {
-            val client = OcppWampClient.newClient(
-                Uri.of("ws://localhost:$port/ws"),
-                "TEST1",
-                OCPP_1_6,
-                timeoutInMs = 5_000,
-                autoReconnect = false
-            )
             client.connect()
 
             val response = CompletableFuture.supplyAsync {
@@ -471,6 +471,7 @@ class WampIntegrationTest {
                 get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
             }
         } finally {
+            client.close()
             server.stop()
         }
     }

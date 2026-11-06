@@ -46,12 +46,12 @@ class CSMSStopTest {
             csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
             fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
         )
+        val client = WebsocketClient("TEST1", OcppVersionWamp.OCPP_1_6, "ws://localhost:$port/ws")
         csms.start()
 
         var stopped = false
         try {
             val handlerStarted = CountDownLatch(1)
-            val client = WebsocketClient("TEST1", OcppVersionWamp.OCPP_1_6, "ws://localhost:$port/ws")
             client.receiveMessageClass(ClearCacheReq::class, "ClearCache") { _: ClearCacheReq ->
                 handlerStarted.countDown()
                 Thread.sleep(300)
@@ -69,6 +69,7 @@ class CSMSStopTest {
 
             expectThat(response.get(5, TimeUnit.SECONDS).status).isEqualTo(ClearCacheStatus.Accepted)
         } finally {
+            client.close()
             if (!stopped) csms.stop()
         }
     }

@@ -46,11 +46,11 @@ class WebsocketServerShutdownTest {
             accept = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
         )
         val server = transport.asServer(port)
+        val client = WebsocketClient("TEST1", OcppVersionWamp.OCPP_1_6, "ws://localhost:$port/ws")
         server.start()
 
         try {
             val handlerStarted = CountDownLatch(1)
-            val client = WebsocketClient("TEST1", OcppVersionWamp.OCPP_1_6, "ws://localhost:$port/ws")
             client.receiveMessageClass(ClearCacheReq::class, "ClearCache") { _: ClearCacheReq ->
                 handlerStarted.countDown()
                 Thread.sleep(300)
@@ -68,6 +68,7 @@ class WebsocketServerShutdownTest {
             expectThat(response.get(5, TimeUnit.SECONDS).status).isEqualTo(ClearCacheStatus.Accepted)
             expectThat(shutdownDuration).isLessThan(2_000)
         } finally {
+            client.close()
             server.stop()
         }
     }
