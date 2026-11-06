@@ -18,6 +18,7 @@ import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.containsExactly
+import strikt.assertions.hasSize
 import strikt.assertions.isEqualTo
 import strikt.assertions.isSuccess
 import strikt.assertions.isTrue
@@ -149,4 +150,33 @@ class CSMSStopTest {
         expectCatching { ServerSocket(firstPort).close() }.isSuccess()
         expectCatching { ServerSocket(secondPort).close() }.isSuccess()
     }
+
+    @Test
+    fun `stop keeps an http server failure as suppressed when a transport failed too`() {
+        val failingTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalArgumentException("transport failure")
+        }
+        val csms = csmsWithServerFailingOnStop(failingTransport)
+        csms.start()
+
+        expectThrows<IllegalArgumentException> { csms.stop() }.and {
+            get { message }.isEqualTo("transport failure")
+            get { suppressed.toList() }.hasSize(1)
+        }
+    }
+
+    @Test
+    fun `stop rethrows an http server failure when every transport shut down`() {
+        val csms = csmsWithServerFailingOnStop(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws"))
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }
+    }
+
+    // Bound on port 0, the server resolves its port from its listeners, which are gone once stopped.
+    private fun csmsWithServerFailingOnStop(transport: WebsocketServer) = CSMS(
+        transports = mapOf(transport to (0 to setOf(OcppVersion.OCPP_1_6))),
+        csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+        fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+    )
 }

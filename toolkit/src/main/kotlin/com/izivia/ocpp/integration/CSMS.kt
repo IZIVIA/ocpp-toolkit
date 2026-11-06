@@ -124,21 +124,19 @@ class CSMS(
      * rethrown once the servers are stopped, with the later ones added as suppressed.
      */
     fun stop() {
-        var failure: Throwable? = null
+        val failures = mutableListOf<Throwable>()
         for (transport in serverTransports) {
-            try {
-                transport.shutdown()
-            } catch (e: Throwable) {
-                if (failure == null) failure = e else failure.addSuppressed(e)
-            }
+            runCatching { transport.shutdown() }.onFailure { failures += it }
         }
-        try {
+        runCatching {
             servers.forEach {
                 server -> server.first.stop()
                 logger.info("stopping on port ${server.first.port()}")
             }
-        } finally {
-            failure?.let { throw it }
+        }.onFailure { failures += it }
+        failures.firstOrNull()?.let { first ->
+            failures.drop(1).forEach(first::addSuppressed)
+            throw first
         }
     }
 
