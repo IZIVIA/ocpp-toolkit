@@ -62,7 +62,7 @@ interface OcppWampServer {
      * It is used to check if ocpp id is accepted, and then to handle actions if charging station has been accepted by the handler.
      *
      * The checks are iterated in order, the first returning true will be used to handle the charging station.
-     * if no handler accepts by returning true boolean, the connection is refused.
+     * if no handler accepts by returning true boolean, the connection is refused with an HTTP 404.
      *
      * The handler which accepted the charging station is later used for action handling.
      *

@@ -42,10 +42,17 @@ class UndertowOcppWampServer(
         val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean = { exch ->
             // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
             ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId ->
-                handlers
-                    .filter { h -> h.accept(ocppId) }
-                    .also { selectedHandler[ocppId] = it }
-            } != null
+                val acceptingHandlers = handlers.filter { h -> h.accept(ocppId) }
+                if (acceptingHandlers.isEmpty()) {
+                    // an entry memoized earlier stays: a handshake in flight may still read it,
+                    // and it is rewritten before the next accepted connection reads it
+                    logger.info("[$ocppId] connection refused - no handler accepts it")
+                    false
+                } else {
+                    selectedHandler[ocppId] = acceptingHandlers
+                    true
+                }
+            } ?: false
         }
         val wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
         serverConfig = object : WsServerConfig {
