@@ -12,10 +12,12 @@ import com.izivia.ocpp.websocket.WebsocketServer
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
 import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.api.expectThrows
+import strikt.assertions.containsExactly
 import strikt.assertions.isEqualTo
 import strikt.assertions.isSuccess
 import strikt.assertions.isTrue
@@ -88,5 +90,62 @@ class CSMSStopTest {
         expectThrows<IllegalStateException> { csms.stop() }
 
         expectCatching { ServerSocket(port).close() }.isSuccess()
+    }
+
+    @Test
+    fun `stop drains the next transport when the first one fails to shut down`() {
+        val failingPort = getFreePort()
+        val nextPort = getFreePort()
+        val failingTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalStateException("first failure")
+        }
+        val nextTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws"))
+        val csms = CSMS(
+            transports = mapOf(
+                failingTransport to (failingPort to setOf(OcppVersion.OCPP_1_6)),
+                nextTransport to (nextPort to setOf(OcppVersion.OCPP_1_6))
+            ),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }
+            .get { message }.isEqualTo("first failure")
+
+        verify(exactly = 1) { nextTransport.shutdown() }
+        expectCatching { ServerSocket(failingPort).close() }.isSuccess()
+        expectCatching { ServerSocket(nextPort).close() }.isSuccess()
+    }
+
+    @Test
+    fun `stop rethrows the first failure with the later ones suppressed once the ports are released`() {
+        val firstPort = getFreePort()
+        val secondPort = getFreePort()
+        // an Error, not an Exception: stop must release the ports whatever a transport throws
+        val secondFailure = Error("second failure")
+        val firstTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalStateException("first failure")
+        }
+        val secondTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws secondFailure
+        }
+        val csms = CSMS(
+            transports = mapOf(
+                firstTransport to (firstPort to setOf(OcppVersion.OCPP_1_6)),
+                secondTransport to (secondPort to setOf(OcppVersion.OCPP_1_6))
+            ),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }.and {
+            get { message }.isEqualTo("first failure")
+            get { suppressed.toList() }.containsExactly(secondFailure)
+        }
+
+        expectCatching { ServerSocket(firstPort).close() }.isSuccess()
+        expectCatching { ServerSocket(secondPort).close() }.isSuccess()
     }
 }

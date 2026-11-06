@@ -119,17 +119,26 @@ class CSMS(
      * then the HTTP servers are stopped.
      *
      * This blocks until the pending calls are answered or time out, and is irreversible: the CSMS
-     * cannot be started again afterwards. The HTTP servers are stopped even if a transport fails
-     * to shut down.
+     * cannot be started again afterwards. A transport that fails to shut down does not prevent the
+     * other transports from draining nor the HTTP servers from stopping: the first failure is
+     * rethrown once the servers are stopped, with the later ones added as suppressed.
      */
     fun stop() {
+        var failure: Throwable? = null
+        for (transport in serverTransports) {
+            try {
+                transport.shutdown()
+            } catch (e: Throwable) {
+                if (failure == null) failure = e else failure.addSuppressed(e)
+            }
+        }
         try {
-            serverTransports.forEach { it.shutdown() }
-        } finally {
             servers.forEach {
                 server -> server.first.stop()
                 logger.info("stopping on port ${server.first.port()}")
             }
+        } finally {
+            failure?.let { throw it }
         }
     }
 
