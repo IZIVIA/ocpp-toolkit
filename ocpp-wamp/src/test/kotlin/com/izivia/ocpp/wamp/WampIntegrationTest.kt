@@ -27,6 +27,7 @@ import kotlin.system.measureTimeMillis
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 
 class WampIntegrationTest {
     private val port = getFreePort()
@@ -479,41 +480,61 @@ class WampIntegrationTest {
     @Test
     fun `shutdown should reject an inbound call received while draining`() {
         val handlerStarted = CountDownLatch(1)
+        val release = CountDownLatch(1)
         val transport = OcppWampServer.newServer(setOf(OCPP_1_6))
         val server = transport.asServer(port)
         transport.register(object : OcppWampServerHandler {
             override fun accept(ocppId: CSOcppId): Boolean = ocppId in setOf("TEST1", "TEST2")
 
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage {
-                handlerStarted.countDown()
-                Thread.sleep(500)
+                if (meta.ocppId == "TEST1") {
+                    handlerStarted.countDown()
+                    release.await(5, TimeUnit.SECONDS)
+                }
                 return WampMessage.CallResult(msg.msgId, "{}")
             }
         })
+        val slowClient = OcppWampClient.newClient(
+            Uri.of("ws://localhost:$port/ws"), "TEST1", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
+        )
+        val lateClient = OcppWampClient.newClient(
+            Uri.of("ws://localhost:$port/ws"), "TEST2", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
+        )
         server.start()
 
         try {
-            val slowClient = OcppWampClient.newClient(
-                Uri.of("ws://localhost:$port/ws"), "TEST1", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
-            )
-            val lateClient = OcppWampClient.newClient(
-                Uri.of("ws://localhost:$port/ws"), "TEST2", OCPP_1_6, timeoutInMs = 5_000, autoReconnect = false
-            )
             slowClient.connect()
             lateClient.connect()
 
-            CompletableFuture.runAsync { slowClient.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }
+            val slowResponse = CompletableFuture.supplyAsync {
+                slowClient.sendBlocking(WampMessage.Call("slow", "Heartbeat", "{}"))
+            }
             expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
 
             val shutdown = CompletableFuture.runAsync { transport.shutdown() }
-            Thread.sleep(100) // let shutdown raise its flag while the slow call is still running
 
-            expectThat(lateClient.sendBlocking(WampMessage.Call("2", "Heartbeat", "{}"))) {
-                get { msgId }.isEqualTo("2")
+            // The slow call holds the drain open until released, so the flag can only rise while the
+            // connections are up. Calls sent before it rises are answered, so retry until rejected.
+            val deadline = TimeSource.Monotonic.markNow() + 2.seconds
+            var attempt = 0
+            var lateResponse: WampMessage
+            do {
+                attempt++
+                lateResponse = lateClient.sendBlocking(WampMessage.Call("late-$attempt", "Heartbeat", "{}"))
+            } while (lateResponse.msgType != WampMessageType.CALL_ERROR && deadline.hasNotPassedNow())
+
+            expectThat(lateResponse) {
+                get { msgId }.isEqualTo("late-$attempt")
                 get { msgType }.isEqualTo(WampMessageType.CALL_ERROR)
             }
+
+            release.countDown()
             shutdown.get(5, TimeUnit.SECONDS)
+            expectThat(slowResponse.get(5, TimeUnit.SECONDS).msgType).isEqualTo(WampMessageType.CALL_RESULT)
         } finally {
+            release.countDown()
+            slowClient.close()
+            lateClient.close()
             server.stop()
         }
     }
