@@ -12,8 +12,7 @@ import com.izivia.ocpp.api.model.common.IdTokenType
 import com.izivia.ocpp.api.model.common.VariableType
 import com.izivia.ocpp.api.model.common.enumeration.IdTokenEnumType
 import com.izivia.ocpp.api.model.common.enumeration.RequestStartStopStatusEnumType
-import com.izivia.ocpp.api.model.getlog.GetLogResp
-import com.izivia.ocpp.api.model.getlog.enumeration.LogStatusEnumType
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 import com.izivia.ocpp.api.model.remotestart.RequestStartTransactionResp
 import com.izivia.ocpp.api.model.remotestop.RequestStopTransactionReq
 import com.izivia.ocpp.api.model.remotestop.RequestStopTransactionResp
@@ -209,8 +208,8 @@ class CSApiAdapterTest {
 
     @Test
     fun `get diagnostics request`() {
-        every { csApi.getLog(any(), any()) } answers {
-            success(secondArg(), GetLogResp(LogStatusEnumType.Accepted, filename = "diagnostics.log"))
+        every { csApi.getDiagnostics(any(), any()) } answers {
+            success(secondArg(), GetDiagnosticsRespGen(fileName = "diagnostics.log"))
         }
 
         val request = GetDiagnosticsReq("https://example.test/diagnostics", startTime = timestamp)
@@ -220,6 +219,8 @@ class CSApiAdapterTest {
             get { this.request }.isEqualTo(request)
             get { this.response.fileName }.isEqualTo("diagnostics.log")
         }
+        // Stated on purpose, so the guarantee survives a switch to a relaxed mock.
+        verify(exactly = 0) { csApi.getLog(any(), any()) }
     }
 
     private fun adapter() = Ocpp12CSApiAdapter(csApi, RealTransactionRepository())

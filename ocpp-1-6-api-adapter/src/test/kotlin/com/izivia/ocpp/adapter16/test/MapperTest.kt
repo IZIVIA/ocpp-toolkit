@@ -22,9 +22,7 @@ import com.izivia.ocpp.api.model.getcompositeschedule.CompositeScheduleType
 import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleResp
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionReq
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionResp
-import com.izivia.ocpp.api.model.getlog.GetLogResp
-import com.izivia.ocpp.api.model.getlog.enumeration.LogEnumType
-import com.izivia.ocpp.api.model.getlog.enumeration.LogStatusEnumType
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp as GetDiagnosticsRespGen
 import com.izivia.ocpp.api.model.getvariables.GetVariableResultType
 import com.izivia.ocpp.api.model.getvariables.GetVariablesResp
 import com.izivia.ocpp.api.model.getvariables.enumeration.GetVariableStatusEnumType
@@ -787,13 +785,7 @@ class MapperTest {
     @Test
     fun getDiagnosticsMapper() {
         val mapper: GetDiagnosticsMapper = Mappers.getMapper(GetDiagnosticsMapper::class.java)
-        val resp = mapper.genToCoreResp(
-            GetLogResp(
-                status = LogStatusEnumType.Accepted,
-                filename = "filename",
-                statusInfo = StatusInfoType("reason", "additional")
-            )
-        )
+        val resp = mapper.genToCoreResp(GetDiagnosticsRespGen(fileName = "filename"))
         expectThat(resp)
             .and { get { fileName }.isEqualTo("filename") }
 
@@ -803,17 +795,15 @@ class MapperTest {
                 retries = 2,
                 retryInterval = 3,
                 startTime = Instant.parse("2022-02-15T00:00:00.000Z"),
-                stopTime = Instant.parse("2022-02-15T00:00:00.000Z")
+                stopTime = Instant.parse("2022-02-16T00:00:00.000Z")
             )
         )
         expectThat(req)
-            .and { get { requestId }.isEqualTo(1) }
-            .and { get { logType }.isEqualTo(LogEnumType.DiagnosticsLog) }
-            .and { get { log.remoteLocation }.isEqualTo("http://www.ietf.org/rfc/rfc2396.txt") }
-            .and { get { log.oldestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
-            .and { get { log.latestTimestamp }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { location }.isEqualTo("http://www.ietf.org/rfc/rfc2396.txt") }
             .and { get { retries }.isEqualTo(2) }
             .and { get { retryInterval }.isEqualTo(3) }
+            .and { get { startTime }.isEqualTo(Instant.parse("2022-02-15T00:00:00.000Z")) }
+            .and { get { stopTime }.isEqualTo(Instant.parse("2022-02-16T00:00:00.000Z")) }
     }
 
     @ParameterizedTest

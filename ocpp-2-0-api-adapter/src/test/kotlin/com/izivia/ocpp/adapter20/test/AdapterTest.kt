@@ -65,6 +65,8 @@ import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetCerti
 import com.izivia.ocpp.api.model.getinstalledcertificateids.enumeration.GetInstalledCertificateStatusEnumType
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionReq
 import com.izivia.ocpp.api.model.getlocallistversion.GetLocalListVersionResp
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp
 import com.izivia.ocpp.api.model.getlog.GetLogReq
 import com.izivia.ocpp.api.model.getlog.GetLogResp
 import com.izivia.ocpp.api.model.getlog.enumeration.LogStatusEnumType
@@ -551,6 +553,14 @@ class AdapterTest {
         ): OperationExecution<GetLogReq, GetLogResp> {
             val response = GetLogResp(LogStatusEnumType.Accepted)
             return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS), req, response)
+        }
+
+        override fun getDiagnostics(
+            meta: RequestMetadata,
+            req: GetDiagnosticsReq
+        ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> {
+            // OCPP 2.0.1 replaced GetDiagnostics by GetLog, so the 2.0 adapter never issues it.
+            throw NotImplementedError()
         }
 
         override fun clearDisplayMessage(

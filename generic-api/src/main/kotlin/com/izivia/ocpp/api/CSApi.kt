@@ -30,6 +30,8 @@ import com.izivia.ocpp.api.model.getchargingprofiles.GetChargingProfilesReq
 import com.izivia.ocpp.api.model.getchargingprofiles.GetChargingProfilesResp
 import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleReq
 import com.izivia.ocpp.api.model.getcompositeschedule.GetCompositeScheduleResp
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsReq
+import com.izivia.ocpp.api.model.getdiagnostics.GetDiagnosticsResp
 import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesReq
 import com.izivia.ocpp.api.model.getdisplaymessages.GetDisplayMessagesResp
 import com.izivia.ocpp.api.model.getinstalledcertificateids.GetInstalledCertificateIdsReq
@@ -149,7 +151,18 @@ interface CSApi {
 
     fun certificateSigned(meta: RequestMetadata, req: CertificateSignedReq): OperationExecution<CertificateSignedReq, CertificateSignedResp>
 
+    /**
+     * GetLog, an OCPP 2.0.1 message also defined by the OCPP 1.6 security whitepaper. The core 1.x
+     * GetDiagnostics flow goes through [getDiagnostics] instead.
+     */
     fun getLog(meta: RequestMetadata, req: GetLogReq): OperationExecution<GetLogReq, GetLogResp>
+
+    /**
+     * GetDiagnostics, an OCPP 1.x message. OCPP 2.0.1 replaced it by GetLog, so the 2.0 adapter
+     * never issues it. Neither the request nor the DiagnosticsStatusNotification answering it
+     * carries a request id on the wire, so the two cannot be correlated.
+     */
+    fun getDiagnostics(meta: RequestMetadata, req: GetDiagnosticsReq): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp>
 
     fun clearDisplayMessage(meta: RequestMetadata, req: ClearDisplayMessageReq): OperationExecution<ClearDisplayMessageReq, ClearDisplayMessageResp>
 
