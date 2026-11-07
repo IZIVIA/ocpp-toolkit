@@ -30,17 +30,15 @@ import com.izivia.ocpp.operation.information.ActionOcpp.SIGN_CERTIFICATE
 import com.izivia.ocpp.operation.information.ActionOcpp.SIGNED_FIRMWARE_STATUS_NOTIFICATION
 import com.izivia.ocpp.operation.information.ActionOcpp.SIGNED_UPDATE_FIRMWARE
 import com.izivia.ocpp.operation.information.ChargingStationConfig
-import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.security16.SecurityCSMSOperations
 import com.izivia.ocpp.security16.SecurityChargePointOperations
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
+import com.izivia.ocpp.transport.transportFor
 
 class RealSecurityCSMSOperations(
     private val servers: Set<ServerTransport>,
@@ -129,21 +127,6 @@ class RealSecurityCSMSOperations(
         ocppId: String,
         action: String,
         request: T
-    ): OperationExecution<T, P> {
-        val transport = getTransport(ocppId)
-        val requestTime = Clock.System.now()
-        val response: P = transport.sendMessage(ocppId, action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(
-            ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime),
-            request,
-            response
-        )
-    }
-
-    private fun getTransport(ocppId: String): ServerTransport {
-        val config = acceptConnection(ocppId)
-        return servers.firstOrNull { it.canSendToChargingStation(config) }
-            ?: throw IllegalStateException("No transport to send a message to $ocppId")
-    }
+    ): OperationExecution<T, P> =
+        servers.transportFor(ocppId, acceptConnection).execute(meta, ocppId, action, request)
 }

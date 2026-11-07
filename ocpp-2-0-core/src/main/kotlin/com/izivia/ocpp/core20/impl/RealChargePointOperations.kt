@@ -90,14 +90,11 @@ import com.izivia.ocpp.core20.model.unlockconnector.UnlockConnectorReq
 import com.izivia.ocpp.core20.model.unpublishfirmware.UnpublishFirmwareReq
 import com.izivia.ocpp.core20.model.updatefirmware.UpdateFirmwareReq
 import com.izivia.ocpp.operation.information.ActionOcpp.*
-import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.ClientTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
 
 class RealChargePointOperations(
     private val chargeStationId: String,
@@ -389,136 +386,136 @@ class RealChargePointOperations(
     }
 
     override fun heartbeat(meta: RequestMetadata, request: HeartbeatReq): OperationExecution<HeartbeatReq, HeartbeatResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun authorize(meta: RequestMetadata, request: AuthorizeReq): OperationExecution<AuthorizeReq, AuthorizeResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun meterValues(meta: RequestMetadata, request: MeterValuesReq): OperationExecution<MeterValuesReq, MeterValuesResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun transactionEvent(
         meta: RequestMetadata,
         request: TransactionEventReq
     ): OperationExecution<TransactionEventReq, TransactionEventResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun statusNotification(
         meta: RequestMetadata,
         request: StatusNotificationReq
     ): OperationExecution<StatusNotificationReq, StatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun dataTransfer(meta: RequestMetadata, request: DataTransferReq): OperationExecution<DataTransferReq, DataTransferResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun bootNotification(
         meta: RequestMetadata,
         request: BootNotificationReq
     ): OperationExecution<BootNotificationReq, BootNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyReport(
         meta: RequestMetadata,
         request: NotifyReportReq
     ): OperationExecution<NotifyReportReq, NotifyReportResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun firmwareStatusNotification(
         meta: RequestMetadata,
         request: FirmwareStatusNotificationReq
     ): OperationExecution<FirmwareStatusNotificationReq, FirmwareStatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun clearedChargingLimit(
         meta: RequestMetadata,
         request: ClearedChargingLimitReq
     ): OperationExecution<ClearedChargingLimitReq, ClearedChargingLimitResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun getCertificateStatus(
         meta: RequestMetadata,
         request: GetCertificateStatusReq
     ): OperationExecution<GetCertificateStatusReq, GetCertificateStatusResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyCustomerInformation(
         meta: RequestMetadata,
         request: NotifyCustomerInformationReq
     ): OperationExecution<NotifyCustomerInformationReq, NotifyCustomerInformationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyEvent(
         meta: RequestMetadata,
         request: NotifyEventReq
     ): OperationExecution<NotifyEventReq, NotifyEventResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyEVChargingSchedule(
         meta: RequestMetadata,
         request: NotifyEVChargingScheduleReq
     ): OperationExecution<NotifyEVChargingScheduleReq, NotifyEVChargingScheduleResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyChargingLimit(
         meta: RequestMetadata,
         request: NotifyChargingLimitReq
     ): OperationExecution<NotifyChargingLimitReq, NotifyChargingLimitResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyDisplayMessages(
         meta: RequestMetadata,
         request: NotifyDisplayMessagesReq
     ): OperationExecution<NotifyDisplayMessagesReq, NotifyDisplayMessagesResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyEVChargingNeeds(
         meta: RequestMetadata,
         request: NotifyEVChargingNeedsReq
     ): OperationExecution<NotifyEVChargingNeedsReq, NotifyEVChargingNeedsResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun logStatusNotification(
         meta: RequestMetadata,
         request: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun publishFirmwareStatusNotification(
         meta: RequestMetadata,
         request: PublishFirmwareStatusNotificationReq
     ): OperationExecution<PublishFirmwareStatusNotificationReq, PublishFirmwareStatusNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun notifyMonitoringReport(
         meta: RequestMetadata,
         request: NotifyMonitoringReportReq
     ): OperationExecution<NotifyMonitoringReportReq, NotifyMonitoringReportResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun reservationStatusUpdate(
         meta: RequestMetadata,
         request: ReservationStatusUpdateReq
     ): OperationExecution<ReservationStatusUpdateReq, ReservationStatusUpdateResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun securityEventNotification(
         meta: RequestMetadata,
         request: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun signCertificate(
         meta: RequestMetadata,
         request: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun reportChargingProfiles(
             meta: RequestMetadata,
             request: ReportChargingProfilesReq
     ): OperationExecution<ReportChargingProfilesReq, ReportChargingProfilesResp> =
-        sendMessage(meta, getActionFromReq(request), request)
+        client.execute(meta, getActionFromReq(request), request)
 
     override fun connect() {
         client.connect()
@@ -526,17 +523,6 @@ class RealChargePointOperations(
 
     override fun close() {
         client.close()
-    }
-
-    private inline fun <T, reified P> sendMessage(
-        meta: RequestMetadata,
-        action: Action,
-        request: T
-    ): OperationExecution<T, P> {
-        val requestTime = Clock.System.now()
-        val response: P = client.sendMessage(action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime), request, response)
     }
 
     private fun <T : Any> getActionFromReq(req: T): Action =

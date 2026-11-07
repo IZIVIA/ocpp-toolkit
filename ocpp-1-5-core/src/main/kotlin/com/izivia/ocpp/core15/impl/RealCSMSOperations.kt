@@ -44,9 +44,9 @@ import com.izivia.ocpp.core15.model.updatefirmware.UpdateFirmwareResp
 import com.izivia.ocpp.operation.information.*
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
+import com.izivia.ocpp.transport.transportFor
 
 class RealCSMSOperations(
     private val servers: Set<ServerTransport>,
@@ -235,22 +235,9 @@ class RealCSMSOperations(
     ): OperationExecution<GetDiagnosticsReq, GetDiagnosticsResp> =
         sendMessage(meta, meta.chargingStationId, getActionFromReq(req), req)
 
-    private inline fun <T, reified P> sendMessage(meta: RequestMetadata, ocppId: String, action: String, request: T)
-            : OperationExecution<T, P> {
-        val transport = getTransport(ocppId)
-        val requestTime = Clock.System.now()
-        val response: P = transport.sendMessage(ocppId, action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(
-            ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime),
-            request,
-            response
-        )
-    }
-
-    private fun getTransport(ocppId: String): ServerTransport =
-        servers.filter { it.canSendToChargingStation(acceptConnection(ocppId)) }.firstOrNull()
-            ?: throw IllegalStateException("No transport to send a message to $ocppId")
+    private inline fun <T, reified P : Any> sendMessage(meta: RequestMetadata, ocppId: String, action: String, request: T)
+            : OperationExecution<T, P> =
+        servers.transportFor(ocppId, acceptConnection).execute(meta, ocppId, action, request)
 
     private fun <T : Any> getActionFromReq(req: T): Action = when (req) {
         is ResetReq -> ActionOcpp.RESET.value

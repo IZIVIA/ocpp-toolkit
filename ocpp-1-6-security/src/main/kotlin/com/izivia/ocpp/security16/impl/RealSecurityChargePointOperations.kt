@@ -26,16 +26,13 @@ import com.izivia.ocpp.operation.information.ActionOcpp.SECURITY_EVENT_NOTIFICAT
 import com.izivia.ocpp.operation.information.ActionOcpp.SIGN_CERTIFICATE
 import com.izivia.ocpp.operation.information.ActionOcpp.SIGNED_FIRMWARE_STATUS_NOTIFICATION
 import com.izivia.ocpp.operation.information.ActionOcpp.SIGNED_UPDATE_FIRMWARE
-import com.izivia.ocpp.operation.information.ExecutionMetadata
 import com.izivia.ocpp.operation.information.OperationExecution
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.security16.SecurityCSMSOperations
 import com.izivia.ocpp.security16.SecurityChargePointOperations
 import com.izivia.ocpp.transport.ClientTransport
+import com.izivia.ocpp.transport.execute
 import com.izivia.ocpp.transport.receiveMessage
-import com.izivia.ocpp.transport.sendMessage
-import kotlin.time.Clock
 
 class RealSecurityChargePointOperations(
     private val chargingStationId: String,
@@ -71,38 +68,23 @@ class RealSecurityChargePointOperations(
         meta: RequestMetadata,
         req: LogStatusNotificationReq
     ): OperationExecution<LogStatusNotificationReq, LogStatusNotificationResp> =
-        sendMessage(meta, LOG_STATUS_NOTIFICATION.value, req)
+        client.execute(meta, LOG_STATUS_NOTIFICATION.value, req)
 
     override fun securityEventNotification(
         meta: RequestMetadata,
         req: SecurityEventNotificationReq
     ): OperationExecution<SecurityEventNotificationReq, SecurityEventNotificationResp> =
-        sendMessage(meta, SECURITY_EVENT_NOTIFICATION.value, req)
+        client.execute(meta, SECURITY_EVENT_NOTIFICATION.value, req)
 
     override fun signCertificate(
         meta: RequestMetadata,
         req: SignCertificateReq
     ): OperationExecution<SignCertificateReq, SignCertificateResp> =
-        sendMessage(meta, SIGN_CERTIFICATE.value, req)
+        client.execute(meta, SIGN_CERTIFICATE.value, req)
 
     override fun signedFirmwareStatusNotification(
         meta: RequestMetadata,
         req: SignedFirmwareStatusNotificationReq
     ): OperationExecution<SignedFirmwareStatusNotificationReq, SignedFirmwareStatusNotificationResp> =
-        sendMessage(meta, SIGNED_FIRMWARE_STATUS_NOTIFICATION.value, req)
-
-    private inline fun <T, reified P : Any> sendMessage(
-        meta: RequestMetadata,
-        action: String,
-        request: T
-    ): OperationExecution<T, P> {
-        val requestTime = Clock.System.now()
-        val response: P = client.sendMessage(action, request)
-        val responseTime = Clock.System.now()
-        return OperationExecution(
-            ExecutionMetadata(meta, RequestStatus.SUCCESS, requestTime, responseTime),
-            request,
-            response
-        )
-    }
+        client.execute(meta, SIGNED_FIRMWARE_STATUS_NOTIFICATION.value, req)
 }
