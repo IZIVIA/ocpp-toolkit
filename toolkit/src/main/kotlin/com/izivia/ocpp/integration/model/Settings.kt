@@ -1,5 +1,6 @@
 package com.izivia.ocpp.integration.model
 
+import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.utils.OcppErrorListener
@@ -8,6 +9,7 @@ import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
+import java.time.ZoneId
 import java.util.*
 
 data class Settings(
@@ -74,5 +76,11 @@ data class ServerSetting(
      * HTTP Basic authentication (see [ConnectionAuthorizer]).
      * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
      */
-    val authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL
+    val authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL,
+    /**
+     * Zone in which to read the timestamps without timezone sent by a charging station; `null` refuses them.
+     * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
+     * See [com.izivia.ocpp.websocket.WebsocketServer].
+     */
+    val timestampZoneFallback: (CSOcppId) -> ZoneId? = { ZoneId.of("UTC") },
 )

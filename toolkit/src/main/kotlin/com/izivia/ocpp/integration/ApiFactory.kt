@@ -1,5 +1,6 @@
 package com.izivia.ocpp.integration
 
+import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.adapter12.Ocpp12Adapter
 import com.izivia.ocpp.adapter12.impl.RealTransactionRepository as RealTransactionRepository12
@@ -33,6 +34,7 @@ import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
+import java.time.ZoneId
 import java.util.*
 import com.izivia.ocpp.api20.DefaultCSMSOperations as DefaultCSMSOperations20
 import com.izivia.ocpp.api20.OcppCSCallbacks as OcppCSCallbacks20
@@ -119,9 +121,19 @@ class ApiFactory {
             settings: OcppWampServerSettings,
             listeners: EventsListeners = EventsListeners(),
             errorListener: OcppErrorListener? = null,
-            authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL
+            authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL,
+            timestampZoneFallback: (CSOcppId) -> ZoneId? = { ZoneId.of("UTC") }
         ): ServerTransport =
-            WebsocketServer(ocppVersion, path, newMessageId, settings, listeners, errorListener, authorizer)
+            WebsocketServer(
+                ocppVersion,
+                path,
+                newMessageId,
+                settings,
+                listeners,
+                errorListener,
+                authorizer,
+                timestampZoneFallback
+            )
 
         private fun createServerTransportSoap(
             path: String,
@@ -269,7 +281,8 @@ class ApiFactory {
                                 s.wampSettings,
                                 s.listeners,
                                 s.errorListener,
-                                s.authorizer
+                                s.authorizer,
+                                s.timestampZoneFallback
                             ) to (s.port to s.ocppVersion)
                         )
                         SOAP -> s.ocppVersion.map { version ->
