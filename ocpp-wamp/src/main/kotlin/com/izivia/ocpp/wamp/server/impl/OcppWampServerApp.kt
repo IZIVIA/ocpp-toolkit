@@ -195,7 +195,7 @@ class OcppWampServerApp(
                                         wampMessage.msgId,
                                         MessageErrorCode.INTERNAL_ERROR,
                                         "No action handler found",
-                                        """{"message":"$wampMessage"}"""
+                                        "{}"
                                     ).also { logger.warn("$logContext no action handler found for $wampMessage") }
 
                                 val duration = clock.now() - startCall
