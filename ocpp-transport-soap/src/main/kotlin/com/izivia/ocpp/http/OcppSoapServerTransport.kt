@@ -3,10 +3,15 @@ package com.izivia.ocpp.http
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.soap.OcppSoapParser
+import com.izivia.ocpp.soap.RequestSoapMessage
 import com.izivia.ocpp.soap.ResponseSoapMessage
 import com.izivia.ocpp.soap.parseRequestFromSoap
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.utils.OcppErrorCategory
+import com.izivia.ocpp.utils.OcppErrorEvent
+import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.utils.notifySafely
 import org.http4k.contract.contract
 import org.http4k.contract.div
 import org.http4k.core.HttpHandler
@@ -45,6 +50,7 @@ class OcppSoapServerTransport private constructor(
     private val ocppSoapParser: OcppSoapParser,
     private val newMessageId: () -> String = { UUID.randomUUID().toString() },
     private val path: String,
+    private val errorListener: OcppErrorListener? = null,
 ) : ServerTransport {
 
     companion object {
@@ -54,8 +60,15 @@ class OcppSoapServerTransport private constructor(
             ocppVersion: OcppVersion,
             path: String,
             ocppSoapParser: OcppSoapParser,
-            newMessageId: () -> String = { UUID.randomUUID().toString() }
-        ) = OcppSoapServerTransport(ocppVersion, ocppSoapParser, newMessageId, path = path)
+            newMessageId: () -> String = { UUID.randomUUID().toString() },
+            errorListener: OcppErrorListener? = null
+        ) = OcppSoapServerTransport(
+            ocppVersion,
+            ocppSoapParser,
+            newMessageId,
+            path = path,
+            errorListener = errorListener
+        )
     }
 
     private val handler: RoutingHttpHandler
@@ -84,13 +97,18 @@ class OcppSoapServerTransport private constructor(
             payload = request.bodyString(),
             headers = request.headers
         )
-        handlers
-            .asSequence()
-            .filter { it.accept(ocppId) }
-            .map { it.onAction(message) }
-            .firstOrNull()
+        val acceptingHandler = handlers.firstOrNull { it.accept(ocppId) }
+        acceptingHandler?.onAction(message)
             ?.let { Response(OK).body(it.payload) }
-            ?: Response(NOT_FOUND).also { logger.warn("no action handler found for $message") }
+            ?: Response(NOT_FOUND).also {
+                logger.warn("no action handler found for $message")
+                // anyone can reach this route: a refused charging station must not produce events about its chosen id
+                if (acceptingHandler != null) {
+                    errorListener?.notifySafely(
+                        OcppErrorEvent(OcppErrorCategory.UNHANDLED_ACTION, ocppId, ocppVersion.subprotocol, action)
+                    )
+                }
+            }
     }
 
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P {
@@ -112,19 +130,39 @@ class OcppSoapServerTransport private constructor(
                     if (this@OcppSoapServerTransport.ocppVersion == ocppVersion &&
                         msg.action?.lowercase() == action.lowercase()
                     ) {
-                        val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
-                        val response = onAction(RequestMetadata(message.chargingStationId, message.messageId), message.payload)
-                        val payload = ocppSoapParser.mapResponseToSoap(
-                            ResponseSoapMessage(
-                                messageId = "urn:uuid:${newMessageId()}",
-                                relatesTo = message.messageId,
-                                action = message.action,
-                                payload = response,
-                                from = message.to,
-                                to = message.from
+                        var parsed: RequestSoapMessage<T>? = null
+                        var failureCategory = OcppErrorCategory.PROTOCOL_ERROR
+                        try {
+                            val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
+                            parsed = message
+                            failureCategory = OcppErrorCategory.HANDLER_ERROR
+                            val response =
+                                onAction(RequestMetadata(message.chargingStationId, message.messageId), message.payload)
+                            failureCategory = OcppErrorCategory.PROTOCOL_ERROR
+                            val payload = ocppSoapParser.mapResponseToSoap(
+                                ResponseSoapMessage(
+                                    messageId = "urn:uuid:${newMessageId()}",
+                                    relatesTo = message.messageId,
+                                    action = message.action,
+                                    payload = response,
+                                    from = message.to,
+                                    to = message.from
+                                )
                             )
-                        )
-                        HttpMessage(msg.ocppId, action, payload)
+                            HttpMessage(msg.ocppId, action, payload)
+                        } catch (e: Exception) {
+                            errorListener?.notifySafely(
+                                OcppErrorEvent(
+                                    failureCategory,
+                                    parsed?.chargingStationId ?: msg.ocppId,
+                                    ocppVersion.subprotocol,
+                                    msg.action,
+                                    parsed?.messageId,
+                                    cause = e
+                                )
+                            )
+                            throw e
+                        }
                     } else {
                         null
                     }

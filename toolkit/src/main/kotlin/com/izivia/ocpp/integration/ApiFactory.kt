@@ -26,6 +26,7 @@ import com.izivia.ocpp.soap16.Ocpp16SoapParser
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.websocket.WebsocketClient
@@ -111,15 +112,17 @@ class ApiFactory {
             ocppVersion: Set<OcppVersionTransport>,
             newMessageId: () -> String,
             settings: OcppWampServerSettings,
-            listeners: EventsListeners = EventsListeners()
-        ): ServerTransport = WebsocketServer(ocppVersion, path, newMessageId, settings, listeners)
+            listeners: EventsListeners = EventsListeners(),
+            errorListener: OcppErrorListener? = null
+        ): ServerTransport = WebsocketServer(ocppVersion, path, newMessageId, settings, listeners, errorListener)
 
         private fun createServerTransportSoap(
             path: String,
             ocppVersion: OcppVersionTransport,
-            newMessageId: () -> String
+            newMessageId: () -> String,
+            errorListener: OcppErrorListener? = null
         ): ServerTransport =
-            OcppSoapServerTransport.create(ocppVersion, path, getSoapParser(ocppVersion), newMessageId)
+            OcppSoapServerTransport.create(ocppVersion, path, getSoapParser(ocppVersion), newMessageId, errorListener)
 
         fun getCSMSApi(
             settings: Settings,
@@ -248,14 +251,16 @@ class ApiFactory {
                                 s.ocppVersion,
                                 s.newMessageId,
                                 s.wampSettings,
-                                s.listeners
+                                s.listeners,
+                                s.errorListener
                             ) to (s.port to s.ocppVersion)
                         )
                         SOAP -> s.ocppVersion.map { version ->
                             createServerTransportSoap(
                                 s.path,
                                 version,
-                                s.newMessageId
+                                s.newMessageId,
+                                s.errorListener
                             ) to (s.port to setOf(version))
                         }
                     }
