@@ -3,7 +3,13 @@ package com.izivia.ocpp.http
 import com.izivia.ocpp.soap.*
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.OcppCallErrorException
+import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.RequestHeaders
+import com.izivia.ocpp.utils.OcppErrorCategory
+import com.izivia.ocpp.utils.OcppErrorEvent
+import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.utils.fault.FAULT
+import com.izivia.ocpp.utils.notifySafely
 import org.http4k.client.JavaHttpClient
 import org.http4k.contract.bindContract
 import org.http4k.contract.contract
@@ -24,6 +30,8 @@ class OcppSoapClientTransport private constructor(
     private val newMessageId: () -> String,
     private val settings: SoapClientSettings,
     config: ServerConfig,
+    private val ocppVersion: OcppVersion?,
+    private val errorListener: OcppErrorListener?,
 ) : ClientTransport {
 
     companion object {
@@ -37,7 +45,10 @@ class OcppSoapClientTransport private constructor(
             headers: RequestHeaders = listOf(
                 "Content-Type" to "application/soap+xml;charset=utf-8;"
             ),
-            newMessageId: () -> String = { UUID.randomUUID().toString() }
+            newMessageId: () -> String = { UUID.randomUUID().toString() },
+            /** Only reported in the events of [errorListener]: the transport speaks the version of [ocppSoapParser]. */
+            ocppVersion: OcppVersion? = null,
+            errorListener: OcppErrorListener? = null
         ) = OcppSoapClientTransport(
             ocppId,
             target,
@@ -45,7 +56,9 @@ class OcppSoapClientTransport private constructor(
             headers,
             newMessageId,
             clientSettings,
-            Undertow(port = clientSettings.port)
+            Undertow(port = clientSettings.port),
+            ocppVersion,
+            errorListener
         )
     }
 
@@ -73,8 +86,25 @@ class OcppSoapClientTransport private constructor(
         )
         handlers.firstNotNullOfOrNull { it(message) }
             ?.let { Response(Status.OK).body(it.payload) }
-            ?: Response(Status.NOT_FOUND).also { logger.warn("no action handler found for $message") }
+            ?: Response(Status.NOT_FOUND).also {
+                logger.warn("no action handler found for $message")
+                errorListener?.notifySafely(
+                    // the parser turns an envelope it cannot read into a Fault, without the cause
+                    if (action == FAULT) {
+                        errorEvent(OcppErrorCategory.PROTOCOL_ERROR)
+                    } else {
+                        errorEvent(OcppErrorCategory.UNHANDLED_ACTION, action)
+                    }
+                )
+            }
     }
+
+    private fun errorEvent(
+        category: OcppErrorCategory,
+        action: String? = null,
+        messageId: String? = null,
+        cause: Throwable? = null
+    ) = OcppErrorEvent(category, ocppId, ocppVersion?.subprotocol, action, messageId, cause = cause)
 
     private fun extractAction(payload: String): String =
         ocppSoapParser.readToEnvelop(payload).header.action?.value?.removePrefix("/") ?: ""
@@ -131,19 +161,29 @@ class OcppSoapClientTransport private constructor(
     override fun <T : Any, P> receiveMessageClass(clazz: KClass<T>, action: String, fn: (T) -> P) {
         handlers.add { msg ->
             if (msg.action?.lowercase() == action.lowercase()) {
-                val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
-                val response = fn(message.payload)
-                val payload = ocppSoapParser.mapResponseToSoap(
-                    ResponseSoapMessage(
-                        messageId = "urn:uuid:${newMessageId()}",
-                        relatesTo = message.messageId,
-                        action = message.action,
-                        payload = response,
-                        from = message.from,
-                        to = message.to
+                var messageId: String? = null
+                var failureCategory = OcppErrorCategory.PROTOCOL_ERROR
+                try {
+                    val message = ocppSoapParser.parseRequestFromSoap(msg.payload, clazz)
+                    messageId = message.messageId
+                    failureCategory = OcppErrorCategory.HANDLER_ERROR
+                    val response = fn(message.payload)
+                    failureCategory = OcppErrorCategory.PROTOCOL_ERROR
+                    val payload = ocppSoapParser.mapResponseToSoap(
+                        ResponseSoapMessage(
+                            messageId = "urn:uuid:${newMessageId()}",
+                            relatesTo = message.messageId,
+                            action = message.action,
+                            payload = response,
+                            from = message.from,
+                            to = message.to
+                        )
                     )
-                )
-                HttpMessage(msg.ocppId, action, payload)
+                    HttpMessage(msg.ocppId, action, payload)
+                } catch (e: Exception) {
+                    errorListener?.notifySafely(errorEvent(failureCategory, msg.action, messageId, e))
+                    throw e
+                }
             } else {
                 null
             }
