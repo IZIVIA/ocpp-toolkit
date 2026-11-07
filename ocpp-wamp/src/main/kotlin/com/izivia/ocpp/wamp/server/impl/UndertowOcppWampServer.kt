@@ -3,6 +3,7 @@ package com.izivia.ocpp.wamp.server.impl
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.OcppWampServer
@@ -19,7 +20,8 @@ class UndertowOcppWampServer(
     val ocppVersions: Set<OcppVersion>,
     path: String = "ws",
     val settings: OcppWampServerSettings = OcppWampServerSettings(),
-    private val listeners: EventsListeners = EventsListeners()
+    private val listeners: EventsListeners = EventsListeners(),
+    private val errorListener: OcppErrorListener? = null
 ) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
     private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
@@ -33,16 +35,24 @@ class UndertowOcppWampServer(
             handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
             listeners = listeners,
             ocppWsEndpoint = ocppWsEndpoint,
-            settings = settings
+            settings = settings,
+            errorListener = errorListener
         )
         val handler = wsApp.newRoutingHandler()
         val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean = { exch ->
             // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
             ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId ->
-                handlers
-                    .filter { h -> h.accept(ocppId) }
-                    .also { selectedHandler[ocppId] = it }
-            } != null
+                val acceptingHandlers = handlers.filter { h -> h.accept(ocppId) }
+                if (acceptingHandlers.isEmpty()) {
+                    // an entry memoized earlier stays: a handshake in flight may still read it,
+                    // and it is rewritten before the next accepted connection reads it
+                    logger.info("[$ocppId] connection refused - no handler accepts it")
+                    false
+                } else {
+                    selectedHandler[ocppId] = acceptingHandlers
+                    true
+                }
+            } ?: false
         }
         val wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
         serverConfig = object : WsServerConfig {

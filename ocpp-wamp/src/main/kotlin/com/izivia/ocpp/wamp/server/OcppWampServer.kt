@@ -2,6 +2,7 @@ package com.izivia.ocpp.wamp.server
 
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
@@ -61,7 +62,7 @@ interface OcppWampServer {
      * It is used to check if ocpp id is accepted, and then to handle actions if charging station has been accepted by the handler.
      *
      * The checks are iterated in order, the first returning true will be used to handle the charging station.
-     * if no handler accepts by returning true boolean, the connection is refused.
+     * if no handler accepts by returning true boolean, the connection is refused with an HTTP 404.
      *
      * The handler which accepted the charging station is later used for action handling.
      *
@@ -80,8 +81,9 @@ interface OcppWampServer {
             ocppVersions: Set<OcppVersion> = OcppVersion.values().toSet(),
             path: String = "ws",
             settings: OcppWampServerSettings = OcppWampServerSettings(),
-            listeners: EventsListeners = EventsListeners()
-        ) = UndertowOcppWampServer(ocppVersions, path, settings, listeners)
+            listeners: EventsListeners = EventsListeners(),
+            errorListener: OcppErrorListener? = null
+        ) = UndertowOcppWampServer(ocppVersions, path, settings, listeners, errorListener)
     }
 }
 

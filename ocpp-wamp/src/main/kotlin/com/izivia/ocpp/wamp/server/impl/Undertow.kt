@@ -5,6 +5,7 @@ import io.undertow.Undertow
 import io.undertow.UndertowOptions.ENABLE_HTTP2
 import io.undertow.server.HttpServerExchange
 import io.undertow.server.handlers.BlockingHandler
+import io.undertow.server.handlers.ResponseCodeHandler
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler
 import io.undertow.websockets.core.protocol.version07.Hybi07Handshake
 import io.undertow.websockets.core.protocol.version08.Hybi08Handshake
@@ -43,9 +44,14 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean,
             }
         }
 
-        val handlerWithWs = predicate(
-            { exch -> requiresWebSocketUpgrade()(exch) && acceptWebSocketPredicate(exch)},
-            wsCallback, httpHandler)
+        // a refused upgrade gets the 404 of OCPP-J, it never reaches the http handler
+        val handlerWithWs = wsCallback?.let {
+            predicate(
+                { exch -> requiresWebSocketUpgrade()(exch) },
+                predicate({ exch -> acceptWebSocketPredicate(exch) }, it, ResponseCodeHandler.HANDLE_404),
+                httpHandler
+            )
+        } ?: httpHandler
 
         return object : Http4kServer {
             val server = Undertow.builder()
