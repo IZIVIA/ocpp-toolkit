@@ -40,6 +40,11 @@ data class ServerSetting(
     val ocppVersion: Set<OcppVersion>,
     val transportType: TransportEnum,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    /**
+     * Call timeout and calls executor of the WebSocket server.
+     * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP], whose
+     * requests run on the HTTP server's worker threads (see [com.izivia.ocpp.http.OcppSoapServerTransport]).
+     */
     val wampSettings: OcppWampServerSettings = OcppWampServerSettings(),
     var listeners: EventsListeners = EventsListeners()
 )
