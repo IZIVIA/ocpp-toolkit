@@ -1,0 +1,182 @@
+package com.izivia.ocpp.integration.test
+
+import com.izivia.ocpp.core16.model.clearcache.ClearCacheReq
+import com.izivia.ocpp.core16.model.clearcache.ClearCacheResp
+import com.izivia.ocpp.core16.model.clearcache.enumeration.ClearCacheStatus
+import com.izivia.ocpp.integration.CSMS
+import com.izivia.ocpp.operation.information.ChargingStationConfig
+import com.izivia.ocpp.transport.OcppVersion
+import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
+import com.izivia.ocpp.websocket.WebsocketClient
+import com.izivia.ocpp.websocket.WebsocketServer
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.spyk
+import io.mockk.verify
+import org.junit.jupiter.api.Test
+import strikt.api.expectCatching
+import strikt.api.expectThat
+import strikt.api.expectThrows
+import strikt.assertions.containsExactly
+import strikt.assertions.hasSize
+import strikt.assertions.isEqualTo
+import strikt.assertions.isSuccess
+import strikt.assertions.isTrue
+import java.net.ServerSocket
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import com.izivia.ocpp.OcppVersion as OcppVersionWamp
+import com.izivia.ocpp.core16.ChargePointOperations as ChargePointOperations16
+
+class CSMSStopTest {
+
+    private fun getFreePort(): Int =
+        ServerSocket(0).use { it.localPort }
+
+    @Test
+    fun `stop lets a pending call to a charging station complete`() {
+        val port = getFreePort()
+        val transport = WebsocketServer(
+            setOf(OcppVersion.OCPP_1_6),
+            "ws",
+            settings = OcppWampServerSettings(timeoutInMs = 5_000)
+        )
+        val csms = CSMS(
+            transports = mapOf(transport to (port to setOf(OcppVersion.OCPP_1_6))),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        val client = WebsocketClient("TEST1", OcppVersionWamp.OCPP_1_6, "ws://localhost:$port/ws")
+        csms.start()
+
+        var stopped = false
+        try {
+            val handlerStarted = CountDownLatch(1)
+            client.receiveMessageClass(ClearCacheReq::class, "ClearCache") { _: ClearCacheReq ->
+                handlerStarted.countDown()
+                Thread.sleep(300)
+                ClearCacheResp(ClearCacheStatus.Accepted)
+            }
+            client.connect()
+
+            val response = CompletableFuture.supplyAsync {
+                transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
+            }
+            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+
+            csms.stop()
+            stopped = true
+
+            expectThat(response.get(5, TimeUnit.SECONDS).status).isEqualTo(ClearCacheStatus.Accepted)
+        } finally {
+            client.close()
+            if (!stopped) csms.stop()
+        }
+    }
+
+    @Test
+    fun `stop releases the ports even when a transport fails to shut down`() {
+        val port = getFreePort()
+        val transport = WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")
+        val failingTransport = spyk(transport) {
+            every { shutdown() } throws IllegalStateException("shutdown failed")
+        }
+        val csms = CSMS(
+            transports = mapOf(failingTransport to (port to setOf(OcppVersion.OCPP_1_6))),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }
+
+        expectCatching { ServerSocket(port).close() }.isSuccess()
+    }
+
+    @Test
+    fun `stop drains the next transport when the first one fails to shut down`() {
+        val failingPort = getFreePort()
+        val nextPort = getFreePort()
+        val failingTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalStateException("first failure")
+        }
+        val nextTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws"))
+        val csms = CSMS(
+            transports = mapOf(
+                failingTransport to (failingPort to setOf(OcppVersion.OCPP_1_6)),
+                nextTransport to (nextPort to setOf(OcppVersion.OCPP_1_6))
+            ),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }
+            .get { message }.isEqualTo("first failure")
+
+        verify(exactly = 1) { nextTransport.shutdown() }
+        expectCatching { ServerSocket(failingPort).close() }.isSuccess()
+        expectCatching { ServerSocket(nextPort).close() }.isSuccess()
+    }
+
+    @Test
+    fun `stop rethrows the first failure with the later ones suppressed once the ports are released`() {
+        val firstPort = getFreePort()
+        val secondPort = getFreePort()
+        // an Error, not an Exception: stop must release the ports whatever a transport throws
+        val secondFailure = Error("second failure")
+        val firstTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalStateException("first failure")
+        }
+        val secondTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws secondFailure
+        }
+        val csms = CSMS(
+            transports = mapOf(
+                firstTransport to (firstPort to setOf(OcppVersion.OCPP_1_6)),
+                secondTransport to (secondPort to setOf(OcppVersion.OCPP_1_6))
+            ),
+            csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+            fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+        )
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }.and {
+            get { message }.isEqualTo("first failure")
+            get { suppressed.toList() }.containsExactly(secondFailure)
+        }
+
+        expectCatching { ServerSocket(firstPort).close() }.isSuccess()
+        expectCatching { ServerSocket(secondPort).close() }.isSuccess()
+    }
+
+    @Test
+    fun `stop keeps an http server failure as suppressed when a transport failed too`() {
+        val failingTransport = spyk(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws")) {
+            every { shutdown() } throws IllegalArgumentException("transport failure")
+        }
+        val csms = csmsWithServerFailingOnStop(failingTransport)
+        csms.start()
+
+        expectThrows<IllegalArgumentException> { csms.stop() }.and {
+            get { message }.isEqualTo("transport failure")
+            get { suppressed.toList() }.hasSize(1)
+        }
+    }
+
+    @Test
+    fun `stop rethrows an http server failure when every transport shut down`() {
+        val csms = csmsWithServerFailingOnStop(WebsocketServer(setOf(OcppVersion.OCPP_1_6), "ws"))
+        csms.start()
+
+        expectThrows<IllegalStateException> { csms.stop() }
+    }
+
+    // Bound on port 0, the server resolves its port from its listeners, which are gone once stopped.
+    private fun csmsWithServerFailingOnStop(transport: WebsocketServer) = CSMS(
+        transports = mapOf(transport to (0 to setOf(OcppVersion.OCPP_1_6))),
+        csmsApis = setOf(mockk<ChargePointOperations16>(relaxed = true)),
+        fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+    )
+}

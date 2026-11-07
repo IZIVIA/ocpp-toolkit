@@ -40,6 +40,8 @@ class CSMS(
         private val logger = LoggerFactory.getLogger(CSMS::class.java)
     }
 
+    private val serverTransports: Set<ServerTransport> = transports.keys
+
     private val serverByVersion: Map<OcppVersion, Set<ServerTransport>> =
         transports
             .flatMap { (server, pair) -> pair.second.map { it to server } }
@@ -112,10 +114,29 @@ class CSMS(
         }
     }
 
+    /**
+     * Gracefully stops the CSMS: every transport is shut down first, so that pending calls complete,
+     * then the HTTP servers are stopped.
+     *
+     * This blocks until the pending calls are answered or time out, and is irreversible: the CSMS
+     * cannot be started again afterwards. A transport that fails to shut down does not prevent the
+     * other transports from draining nor the HTTP servers from stopping: the first failure is
+     * rethrown once the servers are stopped, with the later ones added as suppressed.
+     */
     fun stop() {
-        servers.forEach {
-            server -> server.first.stop()
-            logger.info("stopping on port ${server.first.port()}")
+        val failures = mutableListOf<Throwable>()
+        for (transport in serverTransports) {
+            runCatching { transport.shutdown() }.onFailure { failures += it }
+        }
+        runCatching {
+            servers.forEach {
+                server -> server.first.stop()
+                logger.info("stopping on port ${server.first.port()}")
+            }
+        }.onFailure { failures += it }
+        failures.firstOrNull()?.let { first ->
+            failures.drop(1).forEach(first::addSuppressed)
+            throw first
         }
     }
 

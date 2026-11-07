@@ -38,6 +38,12 @@ interface OcppWampServer {
      * - do not accept connection any more
      * - do not accept new calls any more
      * - close opened connections when pending calls are done
+     *
+     * Pending calls are both the calls received from charging stations and the calls sent to them.
+     * This blocks until they are answered, waiting at most the settings timeout for the received
+     * calls, then at most the call timeout for each sent call.
+     *
+     * The shutdown is irreversible: the server rejects every connection afterwards.
      */
     fun shutdown()
 

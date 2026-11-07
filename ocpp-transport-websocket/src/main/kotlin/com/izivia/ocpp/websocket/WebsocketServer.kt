@@ -101,6 +101,8 @@ class WebsocketServer(
 
     override fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean =
         chargingStationConfig.acceptConnection
+
+    override fun shutdown() = server.shutdown()
 }
 
 fun WebsocketServer.asServer(port: Int = 8000): Http4kServer = server.asServer(port)
