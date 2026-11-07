@@ -36,17 +36,20 @@ enum class OcppErrorCategory {
  * The event never carries a message payload, but the message of [cause] may quote a fragment of it: parsing errors
  * usually do. Sanitize it before sending it to a third party.
  *
- * [ocppId] and [action] come from the charging station and are not validated. Bound them before using them as a metric
- * dimension, and do not trust them as an identity.
+ * On a server, [ocppId] and [action] come from the charging station and are not validated. Bound them before using them
+ * as a metric dimension, and do not trust them as an identity. On a client, [action] comes from the peer and is not
+ * validated either: over SOAP, anyone who reaches the callback port of the charging station can send it, and every POST
+ * that no handler answers produces an event.
  *
  * The toolkit builds the events, and later versions may add properties: this is not a data class, so that adding one
  * breaks no `copy` nor destructuring declaration.
  *
- * @property ocppId the OCPP id of the charging station, as received by the handler once a SOAP message is parsed, and
- * from the URL until then
- * @property ocppVersion the OCPP version as a WebSocket subprotocol name, for instance `ocpp1.6`
- * @property errorCode the OCPP error code answered to the charging station, if any: never set over SOAP, which answers
- * with an HTTP status
+ * @property ocppId the OCPP id of the charging station: on a server, as received by the handler once a SOAP message is
+ * parsed, and from the URL until then; on a client, its own id
+ * @property ocppVersion the OCPP version as a WebSocket subprotocol name, for instance `ocpp1.6`: unknown to a SOAP
+ * client created without a version
+ * @property errorCode the OCPP error code answered to the peer, if any: never set over SOAP, which answers with an HTTP
+ * status
  */
 class OcppErrorEvent(
     val category: OcppErrorCategory,
@@ -76,11 +79,12 @@ class OcppErrorEvent(
 
 /**
  * Observes the failures of the toolkit while processing OCPP messages. It cannot change how they are handled: the
- * answer sent to the charging station is the same with and without a listener.
+ * answer sent to the peer is the same with and without a listener, though a slow listener delays it.
  *
  * It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
- * charging station served by that thread. Hand the event off to your own executor. Anything it throws is logged and
- * ignored.
+ * charging station served by that thread. On a charging station, it is called on the thread that handles the call of
+ * the central system, before the answer is sent: a blocked call delays that answer, and the call timeout of the client
+ * does not interrupt it. Hand the event off to your own executor. Anything it throws is logged and ignored.
  */
 fun interface OcppErrorListener {
     fun onError(event: OcppErrorEvent)
