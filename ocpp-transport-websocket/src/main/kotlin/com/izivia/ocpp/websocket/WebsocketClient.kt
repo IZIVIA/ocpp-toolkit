@@ -2,6 +2,10 @@ package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.OcppErrorCategory
+import com.izivia.ocpp.utils.OcppErrorEvent
+import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppCallErrorPayload
@@ -23,9 +27,10 @@ class WebsocketClient(ocppId: String,
                       target: String,
                       headers: RequestHeaders = emptyList(),
                       val newMessageId: () -> String = { UUID.randomUUID().toString() },
+                      private val errorListener: OcppErrorListener? = null,
 ) : ClientTransport {
     private val client: OcppWampClient =
-        OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion, headers = headers)
+        OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion, headers = headers, errorListener = errorListener)
     private val parser = getJsonMapper(ocppVersion)
     private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 
@@ -60,12 +65,27 @@ class WebsocketClient(ocppId: String,
         val handler: (WampMessageMeta, WampMessage) -> WampMessage? =
             { msgMeta: WampMessageMeta, wampMsg: WampMessage ->
                 if (msgMeta == wampMessageMeta && wampMsg.action == action) {
+                    var failureCategory = OcppErrorCategory.PROTOCOL_ERROR
                     try {
-                        val response = fn(parser.parsePayloadFromJson(wampMsg.payload, clazz))
+                        val request = parser.parsePayloadFromJson(wampMsg.payload, clazz)
+                        failureCategory = OcppErrorCategory.HANDLER_ERROR
+                        val response = fn(request)
+                        failureCategory = OcppErrorCategory.PROTOCOL_ERROR
                         val payload = parser.mapPayloadToString(response)
                         WampMessage.CallResult(wampMsg.msgId, payload)
                     } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
                         logger.error(e.message)
+                        errorListener?.notifySafely(
+                            OcppErrorEvent(
+                                failureCategory,
+                                msgMeta.ocppId,
+                                msgMeta.ocppVersion.subprotocol,
+                                wampMsg.action,
+                                wampMsg.msgId,
+                                MessageErrorCode.INTERNAL_ERROR,
+                                e
+                            )
+                        )
                         WampMessage.CallError(
                             msgId = wampMsg.msgId,
                             errorCode = MessageErrorCode.INTERNAL_ERROR,
