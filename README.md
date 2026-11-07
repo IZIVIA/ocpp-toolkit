@@ -374,8 +374,8 @@ With the `toolkit` module, pass the listeners through `Settings.listeners`.
 ## Observing OCPP errors
 
 The toolkit handles some failures on its own: it logs them and, over WebSocket, answers with a `CALLERROR`. To report
-them to your monitoring system, give an `OcppErrorListener` to `ServerSetting`. It is optional, works the same for the
-WebSocket and SOAP servers, and depends on no monitoring provider.
+them to your monitoring system, give an `OcppErrorListener` to `ServerSetting` on a CSMS, or to `Settings` on a
+charging station. It is optional, works the same over WebSocket and SOAP, and depends on no monitoring provider.
 
 ```kotlin
 val errorListener = OcppErrorListener { event ->
@@ -407,6 +407,23 @@ val csms = ApiFactory.csmsOcppServer(
 )
 ```
 
+On a charging station, the listener observes the calls of the CSMS:
+
+```kotlin
+val csmsApi = ApiFactory.getCSMSApi(
+    settings = Settings(
+        ocppVersion = OcppVersion.OCPP_1_6,
+        transportType = TransportEnum.WEBSOCKET,
+        errorListener = errorListener
+    ),
+    ocppId = "chargingStation1",
+    csApi = csApi
+)
+```
+
+The `ocppNNConnectionToCSMS` builders take an `errorListener` parameter as well. On a charging station, `ocppId` is the
+station's own id.
+
 | Category           | Reported when                                                                      |
 |--------------------|------------------------------------------------------------------------------------|
 | `UNHANDLED_ACTION` | an incoming message has no registered handler                                      |
@@ -417,17 +434,18 @@ val csms = ApiFactory.csmsOcppServer(
 Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
 `action`, for instance.
 
-- The listener only observes: the answer to the charging station is the same with and without it, and anything it
-  throws is logged and ignored.
+- The listener only observes: the answer to the peer is the same with and without it, and anything it throws is logged
+  and ignored.
 - It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
   charging station served by that thread. Hand the event off to your own executor.
-- `ocppId` and `action` come from the charging station and are not validated. Bound them before using them as a metric
-  dimension, and do not trust them as an identity.
+- On a CSMS, `ocppId` and `action` come from the charging station and are not validated. Bound them before using them
+  as a metric dimension, and do not trust them as an identity.
 - An event never carries a message payload, but the message of `cause` may quote a fragment of it. Sanitize it before
   sending it to a third party.
 
-Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
-the client side of the toolkit: only the servers report errors for now.
+Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither are
+the failures an adapter of the generic API turns into a result, nor the slow handlers of a charging station: its
+WebSocket client does not time them out.
 
 ## Code Organisation
 

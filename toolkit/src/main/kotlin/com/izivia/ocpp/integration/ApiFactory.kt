@@ -60,7 +60,8 @@ class ApiFactory {
             ocppVersion: OcppVersionTransport,
             target: String,
             headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String = { UUID.randomUUID().toString() }
+            newMessageId: () -> String = { UUID.randomUUID().toString() },
+            errorListener: OcppErrorListener? = null
         ): ClientTransport =
             when (transportType) {
                 WEBSOCKET -> createClientTransportWebsocket(
@@ -68,7 +69,8 @@ class ApiFactory {
                     ocppId,
                     target,
                     headers,
-                    newMessageId
+                    newMessageId,
+                    errorListener
                 )
 
                 SOAP -> createClientTransportSoap(
@@ -77,7 +79,8 @@ class ApiFactory {
                     ocppVersion,
                     target,
                     headers,
-                    newMessageId
+                    newMessageId,
+                    errorListener
                 )
             }
 
@@ -86,9 +89,10 @@ class ApiFactory {
             ocppId: String,
             target: String,
             headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String
+            newMessageId: () -> String,
+            errorListener: OcppErrorListener?
         ): ClientTransport =
-            WebsocketClient(ocppId, getWampVersion(ocppVersion), target, headers, newMessageId)
+            WebsocketClient(ocppId, getWampVersion(ocppVersion), target, headers, newMessageId, errorListener)
 
         private fun createClientTransportSoap(
             soapClient: SoapClientSettings,
@@ -96,7 +100,8 @@ class ApiFactory {
             ocppVersion: OcppVersionTransport,
             target: String,
             headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String
+            newMessageId: () -> String,
+            errorListener: OcppErrorListener?
         ): ClientTransport =
             OcppSoapClientTransport.createClient(
                 soapClient,
@@ -104,7 +109,9 @@ class ApiFactory {
                 target,
                 getSoapParser(ocppVersion),
                 headers,
-                newMessageId
+                newMessageId,
+                ocppVersion,
+                errorListener
             )
 
         private fun createServerTransportWebsocket(
@@ -137,7 +144,8 @@ class ApiFactory {
                 settings.ocppVersion,
                 settings.target,
                 headers,
-                settings.newMessageId
+                settings.newMessageId,
+                settings.errorListener
             )
             return when (settings.ocppVersion) {
                 OcppVersionTransport.OCPP_2_0 -> Ocpp20Adapter(ocppId, transport, csApi)
@@ -159,7 +167,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks20
+            ocppCSCallbacks: OcppCSCallbacks20,
+            errorListener: OcppErrorListener? = null
         ): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
@@ -169,7 +178,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    errorListener = errorListener
                 ),
                 csmsOperations = DefaultCSMSOperations20(ocppCSCallbacks)
             )
@@ -180,7 +190,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks16
+            ocppCSCallbacks: OcppCSCallbacks16,
+            errorListener: OcppErrorListener? = null
         ): ChargePointOperations16 =
             RealChargePointOperations16(
                 chargeStationId = chargePointId,
@@ -190,7 +201,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    errorListener = errorListener
                 ),
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
@@ -201,7 +213,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks15
+            ocppCSCallbacks: OcppCSCallbacks15,
+            errorListener: OcppErrorListener? = null
         ): ChargePointOperations15 =
             RealChargePointOperations15(
                 chargeStationId = chargePointId,
@@ -211,7 +224,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    errorListener = errorListener
                 ),
                 csmsOperations = DefaultCSMSOperations15(ocppCSCallbacks)
             )
@@ -222,7 +236,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks12
+            ocppCSCallbacks: OcppCSCallbacks12,
+            errorListener: OcppErrorListener? = null
         ): ChargePointOperations12 =
             RealChargePointOperations12(
                 chargeStationId = chargePointId,
@@ -232,7 +247,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    errorListener = errorListener
                 ),
                 csmsOperations = DefaultCSMSOperations12(ocppCSCallbacks)
             )

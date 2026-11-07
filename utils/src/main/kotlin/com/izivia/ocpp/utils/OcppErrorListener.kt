@@ -25,14 +25,15 @@ enum class OcppErrorCategory {
  * The event never carries a message payload, but the message of [cause] may quote a fragment of it: parsing errors
  * usually do. Sanitize it before sending it to a third party.
  *
- * [ocppId] and [action] come from the charging station and are not validated. Bound them before using them as a metric
- * dimension, and do not trust them as an identity.
+ * On a server, [ocppId] and [action] come from the charging station and are not validated. Bound them before using them
+ * as a metric dimension, and do not trust them as an identity.
  *
- * @property ocppId the OCPP id of the charging station, as received by the handler once a SOAP message is parsed, and
- * from the URL until then
- * @property ocppVersion the OCPP version as a WebSocket subprotocol name, for instance `ocpp1.6`
- * @property errorCode the OCPP error code answered to the charging station, if any: never set over SOAP, which answers
- * with an HTTP status
+ * @property ocppId the OCPP id of the charging station: on a server, as received by the handler once a SOAP message is
+ * parsed, and from the URL until then; on a client, its own id
+ * @property ocppVersion the OCPP version as a WebSocket subprotocol name, for instance `ocpp1.6`: unknown to a SOAP
+ * client created without a version
+ * @property errorCode the OCPP error code answered to the peer, if any: never set over SOAP, which answers with an HTTP
+ * status
  */
 data class OcppErrorEvent(
     val category: OcppErrorCategory,
@@ -46,7 +47,7 @@ data class OcppErrorEvent(
 
 /**
  * Observes the failures of the toolkit while processing OCPP messages. It cannot change how they are handled: the
- * answer sent to the charging station is the same with and without a listener.
+ * answer sent to the peer is the same with and without a listener.
  *
  * It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
  * charging station served by that thread. Hand the event off to your own executor. Anything it throws is logged and

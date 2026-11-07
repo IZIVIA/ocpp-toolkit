@@ -29,6 +29,8 @@ data class Settings(
      */
     val ocpp16SecurityExtensions: Boolean = false,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    /** Observes the failures while processing the calls of the CSMS, whatever the [transportType]. */
+    val errorListener: OcppErrorListener? = null,
 )
 
 data class CSMSSettings(
