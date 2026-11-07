@@ -5,7 +5,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":operation-information"))
+    api(project(":operation-information"))
 }
 
 java {

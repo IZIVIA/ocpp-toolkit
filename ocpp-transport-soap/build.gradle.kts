@@ -6,14 +6,14 @@ plugins {
 coreProject()
 
 dependencies {
-    implementation("org.http4k:http4k-core:_")
+    api("org.http4k:http4k-core:_")
     implementation("org.http4k:http4k-api-openapi:_")
     implementation("org.http4k:http4k-server-undertow:_")
 
-    implementation(project(":ocpp-soap"))
-    implementation(project(":ocpp-transport"))
+    api(project(":ocpp-soap"))
+    api(project(":ocpp-transport"))
+    api(project(":operation-information"))
     implementation(project(":utils"))
-    implementation(project(":operation-information"))
 
     testImplementation(project(":ocpp-1-6-soap"))
     testImplementation(kotlin("test-junit"))
