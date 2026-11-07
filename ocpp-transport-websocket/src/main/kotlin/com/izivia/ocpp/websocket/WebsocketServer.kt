@@ -4,15 +4,10 @@ import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.OcppCallErrorException
-import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
-import com.izivia.ocpp.utils.MessageErrorCode
-import com.izivia.ocpp.utils.OcppErrorCategory
-import com.izivia.ocpp.utils.OcppErrorEvent
 import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.TimestampZoneContext
-import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
@@ -98,33 +93,8 @@ class WebsocketServer(
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
                     val parser = getJsonMapper(OcppVersionWamp.valueOf(ocppVersion.name))
-                    var failureCategory = OcppErrorCategory.PROTOCOL_ERROR
-                    try {
-                        val request = parser.parsePayloadFromJson(msg.payload, clazz, timestampZone(meta.ocppId))
-                        failureCategory = OcppErrorCategory.HANDLER_ERROR
-                        val response = onAction(RequestMetadata(meta.ocppId, msg.msgId), request)
-                        failureCategory = OcppErrorCategory.PROTOCOL_ERROR
-                        val payload = parser.mapPayloadToString(response)
-                        WampMessage.CallResult(msg.msgId, payload)
-                    } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
-                        logger.error(e.message)
-                        errorListener?.notifySafely(
-                            OcppErrorEvent(
-                                failureCategory,
-                                meta.ocppId,
-                                meta.ocppVersion.subprotocol,
-                                msg.action,
-                                msg.msgId,
-                                MessageErrorCode.INTERNAL_ERROR,
-                                e
-                            )
-                        )
-                        WampMessage.CallError(
-                            msgId = msg.msgId,
-                            errorCode = MessageErrorCode.INTERNAL_ERROR,
-                            errorDescription = "",
-                            payload = OcppCallErrorPayload(e.message).toJson(parser)
-                        )
+                    answerCall(parser, meta, msg, clazz, errorListener, logger, timestampZone(meta.ocppId)) { request ->
+                        onAction(RequestMetadata(meta.ocppId, msg.msgId), request)
                     }
                 } else {
                     null
