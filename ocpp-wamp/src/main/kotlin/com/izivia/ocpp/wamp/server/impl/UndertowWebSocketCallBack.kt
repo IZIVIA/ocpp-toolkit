@@ -11,6 +11,7 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Taken from Http4kUndertowWebSocketCallBack
@@ -43,7 +44,22 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
         val logContext = upgradeRequest.uri.toString()
         logger.debug("{} - connection attempt: upgrade request={}", logContext, upgradeRequest)
 
-        val socket = object : PushPullAdaptingWebSocket() {
+        val socket = object : PushPullAdaptingWebSocket(), ControlFrameAwareWebsocket {
+            private val pingHandlers = CopyOnWriteArrayList<() -> Unit>()
+            private val pongHandlers = CopyOnWriteArrayList<() -> Unit>()
+
+            override fun onPing(fn: () -> Unit) {
+                pingHandlers.add(fn)
+            }
+
+            override fun onPong(fn: () -> Unit) {
+                pongHandlers.add(fn)
+            }
+
+            fun triggerPing() = pingHandlers.forEach { it() }
+
+            fun triggerPong() = pongHandlers.forEach { it() }
+
             override fun send(message: WsMessage) =
                 if (message.body is StreamBody) {
                     WebSockets.sendBinary(
@@ -92,6 +108,17 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
                 message: BufferedBinaryMessage
             ) =
                 message.data.resource.forEach { socket.triggerMessage(WsMessage(it)) }
+
+            override fun onFullPingMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) {
+                // replies with a pong and frees the message
+                super.onFullPingMessage(channel, message)
+                socket.triggerPing()
+            }
+
+            override fun onFullPongMessage(channel: WebSocketChannel, message: BufferedBinaryMessage) {
+                message.data.free()
+                socket.triggerPong()
+            }
 
             override fun onError(channel: WebSocketChannel, error: Throwable) {
                 logger.warn("$logContext - Exception $error", error)

@@ -337,6 +337,40 @@ if (remoteStartTransactionReq != null) {
 connection.close()
 ```
 
+### WebSocket events
+
+On the CSMS side, `EventsListeners` notifies the WebSocket lifecycle of the charging stations: connection,
+reconnection, close, and the Ping and Pong control frames they send.
+
+A station may keep answering control frames while its OCPP application is stuck, so a recent Pong only proves
+that the transport is responsive. Keep it apart from the last OCPP message when assessing a station.
+The toolkit only reports the frames: recording, persisting and interpreting them is up to the application.
+The server does not send Ping frames yet, so Pongs only arrive when a station sends them unsolicited.
+
+```kotlin
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.wamp.server.OcppWampServer
+import com.izivia.ocpp.wamp.server.impl.EventsListeners
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.time.Instant
+
+val lastPongs = ConcurrentHashMap<CSOcppId, Instant>()
+
+val listeners = EventsListeners(
+    onWsPongHandler = { event -> lastPongs[event.ocppId] = event.receivedAt },
+    onWsCloseHandler = { ocppId, _ -> lastPongs.remove(ocppId) }
+)
+val server = OcppWampServer.newServer(listeners = listeners)
+```
+
+Control frames are reported only if they arrive on the current connection of the station: frames from a
+replaced or closed connection are dropped, and a reported frame is always notified before the reconnection or
+close event that ends its connection. `WsControlFrameEvent.wsConnectionId` tells the connections of a station
+apart. The handlers run on the WebSocket IO thread and hold up the replacement of the connection, so they must
+not block.
+
+With the `toolkit` module, pass the listeners through `Settings.listeners`.
+
 ## Code Organisation
 
 The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.
