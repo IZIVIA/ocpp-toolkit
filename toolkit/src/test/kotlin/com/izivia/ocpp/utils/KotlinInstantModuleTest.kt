@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.Logger
 import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.read.ListAppender
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.time.ZoneId
 import java.util.TimeZone
@@ -14,10 +15,14 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.fail
 import org.slf4j.LoggerFactory
 import strikt.api.DescribeableBuilder
 import strikt.api.expectThat
+import strikt.assertions.contains
+import strikt.assertions.containsExactly
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
 
 class KotlinInstantModuleTest {
     private val mapper = ObjectMapper().registerModule(KotlinInstantModule())
@@ -137,6 +142,100 @@ class KotlinInstantModuleTest {
             .isEqualTo(Instant.parse("2023-03-26T02:30:00Z"))
     }
 
+    @Test
+    fun `should read timestamp without timezone in the zone resolved for the charging station`() {
+        TimeZone.setDefault(TimeZone.getTimeZone(ZoneId.of("Asia/Tokyo")))
+
+        expectThat(readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1") { PARIS }))
+            .isEqualTo(Instant.parse("2024-03-15T11:00:00Z"))
+    }
+
+    @Test
+    fun `should resolve the zone with the charging station id`() {
+        val ids = mutableListOf<String>()
+
+        readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1") { ids.add(it); PARIS })
+
+        expectThat(ids).containsExactly("CS1")
+    }
+
+    @Test
+    fun `should not resolve the zone of timestamps with a timezone`() {
+        val context = TimestampZoneContext("CS1") { fail("zone resolved for $it") }
+
+        expectThat(readInstant("2024-03-15T12:00:00Z", context)).isEqualTo(Instant.parse("2024-03-15T12:00:00Z"))
+        expectThat(readInstant("2024-03-15T12:00:00+02:00", context)).isEqualTo(Instant.parse("2024-03-15T10:00:00Z"))
+        expectThat(readInstant("2024-03-15T12:00:00+02", context)).isEqualTo(Instant.parse("2024-03-15T10:00:00Z"))
+    }
+
+    @Test
+    fun `should refuse a value that is no timestamp without resolving the zone`() {
+        val context = TimestampZoneContext("CS1") { fail("zone resolved for $it") }
+
+        val exception = assertThrows<Exception> { readInstant("not a timestamp", context) }
+
+        expectThat(exception.message).isNotNull().contains("must use Z")
+    }
+
+    @Test
+    fun `should refuse timestamp without timezone when no zone is resolved`() {
+        val exception = assertThrows<Exception> {
+            readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1") { null })
+        }
+
+        expectThat(exception.message).isNotNull().contains("CS1").contains("2024-03-15T12:00:00")
+    }
+
+    @Test
+    fun `should resolve the zone once per context`() {
+        var resolutions = 0
+        val context = TimestampZoneContext("CS1") { resolutions++; PARIS }
+
+        val instants: List<Instant> = mapper.readerFor(object : TypeReference<List<Instant>>() {})
+            .withTimestampZone(context)
+            .readValue("""["2024-03-15T12:00:00","2024-03-15T13:00:00","2024-03-15T14:00:00"]""")
+
+        expectThat(instants).containsExactly(
+            Instant.parse("2024-03-15T11:00:00Z"),
+            Instant.parse("2024-03-15T12:00:00Z"),
+            Instant.parse("2024-03-15T13:00:00Z"),
+        )
+        expectThat(resolutions).isEqualTo(1)
+    }
+
+    @Test
+    fun `should follow LocalDateTime atZone in a daylight saving gap of the resolved zone`() {
+        // 02:30 does not exist in Paris on 2024-03-31: atZone shifts it forward by the gap, to 03:30+02:00.
+        expectThat(readInstant("2024-03-31T02:30:00", TimestampZoneContext("CS1") { PARIS }))
+            .isEqualTo(Instant.parse("2024-03-31T01:30:00Z"))
+    }
+
+    @Test
+    fun `should follow LocalDateTime atZone in a daylight saving overlap of the resolved zone`() {
+        // 02:30 happens twice in Paris on 2024-10-27: atZone keeps the earlier offset, +02:00.
+        expectThat(readInstant("2024-10-27T02:30:00", TimestampZoneContext("CS1") { PARIS }))
+            .isEqualTo(Instant.parse("2024-10-27T00:30:00Z"))
+    }
+
+    @Test
+    fun `should warn with the charging station id and the zone used`() {
+        withInstantDeserializerLogs { events ->
+            readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1") { PARIS })
+
+            assertTrue(
+                events.any {
+                    it.level == Level.WARN &&
+                        it.formattedMessage ==
+                        "Timestamp without timezone received from charging station CS1: 2024-03-15T12:00:00. " +
+                        "Interpreting it in Europe/Paris."
+                }
+            )
+        }
+    }
+
+    private fun readInstant(value: String, context: TimestampZoneContext): Instant =
+        mapper.readerFor(Instant::class.java).withTimestampZone(context).readValue("\"$value\"")
+
     private fun DescribeableBuilder<String>.serializesWithMapperTo(expected: String) {
         expectThat(mapper.writeValueAsString(Instant.parse(this.subject))).isEqualTo('"' + expected + '"')
     }
@@ -152,5 +251,9 @@ class KotlinInstantModuleTest {
             logger.detachAppender(appender)
             appender.stop()
         }
+    }
+
+    private companion object {
+        val PARIS: ZoneId = ZoneId.of("Europe/Paris")
     }
 }

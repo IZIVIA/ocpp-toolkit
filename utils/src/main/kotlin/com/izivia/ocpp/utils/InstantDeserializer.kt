@@ -16,18 +16,21 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
     @Throws(IllegalStateException::class)
     override fun deserialize(jsonParser: JsonParser?, deserializationContext: DeserializationContext?): Instant =
         if (jsonParser != null) {
-            parseInstant(jsonParser.valueAsString)
+            parseInstant(
+                jsonParser.valueAsString,
+                deserializationContext?.getAttribute(TimestampZoneContext::class.java) as? TimestampZoneContext
+            )
         } else {
             throw IllegalStateException("Error while deserialization : jsonParser null")
         }
 
-    private fun parseInstant(value: String): Instant =
+    private fun parseInstant(value: String, timestampZone: TimestampZoneContext?): Instant =
         try {
             Instant.parse(value).also {
                 warnIfIncompleteTimezoneOffset(value)
             }
         } catch (exception: IllegalArgumentException) {
-            parseInstantWithoutTimezone(value)
+            parseInstantWithoutTimezone(value, timestampZone)
         }
 
     private fun warnIfIncompleteTimezoneOffset(value: String) {
@@ -42,23 +45,33 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
         }
     }
 
-    private fun parseInstantWithoutTimezone(value: String): Instant {
-        return try {
-            // Compatibility fallback inspired by SteVe, which encountered charge points omitting the timezone:
-            // https://github.com/steve-community/ocpp-jaxb/blob/main/ocpp-jaxb/src/main/java/de/rwth/idsg/ocpp/jaxb/Utils.java
-            LocalDateTime
-                .parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                .atZone(ZoneOffset.UTC)
-                .toInstant()
-                .toKotlinInstant()
+    private fun parseInstantWithoutTimezone(value: String, timestampZone: TimestampZoneContext?): Instant {
+        // Compatibility fallback inspired by SteVe, which encountered charge points omitting the timezone:
+        // https://github.com/steve-community/ocpp-jaxb/blob/main/ocpp-jaxb/src/main/java/de/rwth/idsg/ocpp/jaxb/Utils.java
+        val localDateTime = try {
+            LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         } catch (exception: DateTimeException) {
             throw IllegalArgumentException("Timestamp must use Z, +HH:mm/-HH:mm, or omit timezone entirely: $value", exception)
-        }.also {
+        }
+        if (timestampZone == null) {
             logger.warn(
                 "Timestamp without timezone received: {}. Interpreting it as UTC.",
                 value,
             )
+            return localDateTime.atZone(ZoneOffset.UTC).toInstant().toKotlinInstant()
         }
+        val zone = timestampZone.zone ?: throw IllegalArgumentException(
+            "Timestamp without timezone refused for charging station ${timestampZone.chargingStationId}: $value"
+        )
+        logger.warn(
+            "Timestamp without timezone received from charging station {}: {}. Interpreting it in {}.",
+            timestampZone.chargingStationId,
+            value,
+            zone,
+        )
+        // Follows LocalDateTime.atZone: a time in a daylight saving gap is shifted forward by the length of the gap,
+        // a time in an overlap takes the earlier offset.
+        return localDateTime.atZone(zone).toInstant().toKotlinInstant()
     }
 
     companion object {
