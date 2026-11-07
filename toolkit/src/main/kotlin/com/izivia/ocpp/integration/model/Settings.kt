@@ -1,6 +1,8 @@
 package com.izivia.ocpp.integration.model
 
+import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.transport.OcppVersion
+import com.izivia.ocpp.utils.toUriHost
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import java.util.*
@@ -12,11 +14,14 @@ data class Settings(
     val port: String = "8080",
     val path: String = "",
     val target: String = when (transportType) {
-        TransportEnum.WEBSOCKET -> "ws://${domain}:${port}/${path}"
-        TransportEnum.SOAP -> "http://$domain:$port/$path"
+        TransportEnum.WEBSOCKET -> "ws://${domain.toUriHost()}:$port/$path"
+        TransportEnum.SOAP -> "http://${domain.toUriHost()}:$port/$path"
     },
-    val clientPort: Int? = null,
-    val clientPath: String? = null,
+    /**
+     * Embedded HTTP server of the charge point, advertised to the CSMS in the WS-Addressing `From`
+     * header. Required for SOAP, ignored for WebSocket.
+     */
+    val soapClient: SoapClientSettings? = null,
     /**
      * Whether the OCPP 1.6 charge point speaks the OCPP 1.6-J Security Whitepaper.
      * Ignored for the other OCPP versions.

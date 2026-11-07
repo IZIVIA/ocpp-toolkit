@@ -285,8 +285,6 @@ class ExampleCSApiTest {
             chargePointId = chargePointId1,
             csmsUrl = "ws://localhost:$port/$path",
             transportType = TransportEnum.WEBSOCKET,
-            clientPath = null,
-            clientPort = null,
             ocppCSCallbacks = ocppCSCallbacks16
         )
         connection16.connect()
@@ -314,8 +312,6 @@ class ExampleCSApiTest {
             chargePointId = chargePointId2,
             csmsUrl = "ws://localhost:$port/$path",
             transportType = TransportEnum.WEBSOCKET,
-            clientPath = null,
-            clientPort = null,
             ocppCSCallbacks = ocppCSCallbacks20
         )
         connection20.connect()
