@@ -369,6 +369,11 @@ close event that ends its connection. `WsControlFrameEvent.wsConnectionId` tells
 apart. The handlers run on the WebSocket IO thread and hold up the replacement of the connection, so they must
 not block.
 
+The connection, reconnection and close events of a station arrive one at a time, in the order its connections are
+registered and removed: the close of a connection is never notified after the connection that follows it, so the
+`onWsCloseHandler` above cannot erase the Pongs of a station that has just reconnected. These listeners also run on
+the WebSocket IO thread and hold up the connection and close of their station, so they must not block either.
+
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
 ## Code Organisation
