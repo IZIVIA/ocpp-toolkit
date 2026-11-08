@@ -6,6 +6,7 @@ import com.izivia.ocpp.core16.model.clearcache.enumeration.ClearCacheStatus
 import com.izivia.ocpp.integration.CSMS
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
+import com.izivia.ocpp.wamp.server.impl.NoConnectionException
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
@@ -34,6 +35,22 @@ class CSMSStopTest {
     private fun getFreePort(): Int =
         ServerSocket(0).use { it.localPort }
 
+    /**
+     * Retries [action] until the charging station connection is registered server-side: the client is connected
+     * once it gets the handshake response, before the server registers the connection.
+     */
+    private fun <T> awaitConnected(timeoutMs: Long = 5_000, action: () -> T): T {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (true) {
+            try {
+                return action()
+            } catch (e: NoConnectionException) {
+                if (System.currentTimeMillis() >= deadline) throw e
+                Thread.sleep(50)
+            }
+        }
+    }
+
     @Test
     fun `stop lets a pending call to a charging station complete`() {
         val port = getFreePort()
@@ -61,7 +78,9 @@ class CSMSStopTest {
             client.connect()
 
             val response = CompletableFuture.supplyAsync {
-                transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
+                awaitConnected {
+                    transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
+                }
             }
             expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
 
