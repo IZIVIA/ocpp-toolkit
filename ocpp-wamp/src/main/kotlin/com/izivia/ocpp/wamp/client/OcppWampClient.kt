@@ -2,6 +2,7 @@ package com.izivia.ocpp.wamp.client
 
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.client.autoreconnect.AutoReconnectConfig
 import com.izivia.ocpp.wamp.client.autoreconnect.AutoReconnectOcppWampClient
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
@@ -27,8 +28,9 @@ interface OcppWampClient {
             timeoutInMs: Long = 30_000,
             autoReconnect: Boolean = true,
             baseAutoReconnectDelayInMs: Long = 250,
-            headers: WampMessageMetaHeaders = emptyList()
-        ) = OkHttpOcppWampClient(target, ocppId, ocppVersion, timeoutInMs, headers).let {
+            headers: WampMessageMetaHeaders = emptyList(),
+            errorListener: OcppErrorListener? = null
+        ) = OkHttpOcppWampClient(target, ocppId, ocppVersion, timeoutInMs, headers, errorListener = errorListener).let {
             if (autoReconnect) {
                 AutoReconnectOcppWampClient(
                     it,

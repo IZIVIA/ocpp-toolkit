@@ -60,10 +60,15 @@ class CSMSStopTest {
             }
             client.connect()
 
+            // connect() returns before the server registers the connection, which a loaded runner can delay
             val response = CompletableFuture.supplyAsync {
-                transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
+                awaitConnected {
+                    transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
+                }
             }
-            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+            expectThat(handlerStarted.await(5, TimeUnit.SECONDS))
+                .describedAs { "handler started, call $response" }
+                .isTrue()
 
             csms.stop()
             stopped = true

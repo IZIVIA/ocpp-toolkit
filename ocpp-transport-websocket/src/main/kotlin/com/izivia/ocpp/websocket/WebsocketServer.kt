@@ -1,11 +1,10 @@
 package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.CSOcppId
-import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.OcppCallErrorException
-import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.wamp.messages.WampMessage
@@ -30,6 +29,7 @@ class WebsocketServer(
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
     settings: OcppWampServerSettings = OcppWampServerSettings(),
     listeners: EventsListeners = EventsListeners(),
+    private val errorListener: OcppErrorListener? = null,
 ) : ServerTransport {
 
     internal val server: OcppWampServer =
@@ -37,7 +37,8 @@ class WebsocketServer(
             ocppVersions = ocppVersions.map { OcppVersionWamp.valueOf(it.name) }.toSet(),
             path = path,
             settings = settings,
-            listeners = listeners
+            listeners = listeners,
+            errorListener = errorListener
         )
     val serverConfig = server.config()
 
@@ -76,22 +77,8 @@ class WebsocketServer(
             override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
                     val parser = getJsonMapper(OcppVersionWamp.valueOf(ocppVersion.name))
-                    try {
-                        val response =
-                            onAction(
-                                RequestMetadata(meta.ocppId, msg.msgId),
-                                parser.parsePayloadFromJson(msg.payload, clazz)
-                            )
-                        val payload = parser.mapPayloadToString(response)
-                        WampMessage.CallResult(msg.msgId, payload)
-                    } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
-                        logger.error(e.message)
-                        WampMessage.CallError(
-                            msgId = msg.msgId,
-                            errorCode = MessageErrorCode.INTERNAL_ERROR,
-                            errorDescription = "",
-                            payload = OcppCallErrorPayload(e.message).toJson(parser)
-                        )
+                    answerCall(parser, meta, msg, clazz, errorListener, logger) { request ->
+                        onAction(RequestMetadata(meta.ocppId, msg.msgId), request)
                     }
                 } else {
                     null

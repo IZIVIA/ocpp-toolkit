@@ -11,9 +11,9 @@ dependencies {
     api(project(":ocpp-wamp"))
     api(project(":ocpp-transport"))
     api(project(":operation-information"))
+    api(project(":utils"))
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
-    implementation(project(":utils"))
     implementation(project(":ocpp-2-0-core"))
     implementation(project(":ocpp-1-6-core"))
     implementation(project(":ocpp-1-5-core"))
