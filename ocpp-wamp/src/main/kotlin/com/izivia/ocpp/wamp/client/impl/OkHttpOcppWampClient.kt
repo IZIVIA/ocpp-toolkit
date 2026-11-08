@@ -5,6 +5,7 @@ import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.wamp.client.ConnectionListener
 import com.izivia.ocpp.wamp.client.ConnectionState
+import com.izivia.ocpp.wamp.client.NotConnectedException
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.WampOnActionHandler
 import com.izivia.ocpp.wamp.core.WampCallManager
@@ -289,7 +290,7 @@ class OkHttpOcppWampClient(
 
     private fun getCallManager(): WampCallManager {
         return wampConnection?.callManager
-            ?: throw IllegalStateException("not connected to $serverUri")
+            ?: throw NotConnectedException("not connected to $serverUri")
     }
 
     /**

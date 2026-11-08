@@ -56,3 +56,10 @@ interface ConnectionListener {
     fun onConnectionFailure(t: Throwable) {}
     fun onConnectionLost(t: Throwable?) {}
 }
+
+/**
+ * Thrown by [OcppWampClient.sendBlocking] when there is no connection to send the message on.
+ *
+ * Nothing has been sent when it is thrown, so the call can safely be retried once connected again.
+ */
+class NotConnectedException(message: String) : IllegalStateException(message)
