@@ -45,6 +45,7 @@ class OcppWampServerApp(
     }
 
     private val connections = ConnectionsMap()
+    private val stationLocks = StationLocks()
     private val shutdown = AtomicBoolean(false)
     private val inFlightInboundCalls = AtomicInteger()
     private val callsExecutor: Executor = settings.buildCallsExecutor()
@@ -67,7 +68,6 @@ class OcppWampServerApp(
                     "malformed request - unsupported or invalid ocpp version - $request"
                 )
 
-            val previousConnection = connections[chargingStationOcppId]
             val chargingStationConnection = ChargingStationConnection(
                 clock.now(),
                 wsConnectionId,
@@ -78,10 +78,7 @@ class OcppWampServerApp(
                 settings.timeoutInMs,
                 shutdown
             )
-            // a control frame of the previous connection being notified completes before the replacement
-            synchronized(previousConnection ?: chargingStationConnection) {
-                connections[chargingStationOcppId] = chargingStationConnection
-            }
+            val previousConnection = register(chargingStationConnection)
 
             val reconnect = previousConnection != null
 
@@ -219,6 +216,27 @@ class OcppWampServerApp(
             throw e
         }
     }
+
+    /**
+     * Registers [connection] as the current connection of its station and returns the one it replaced, so that
+     * concurrent connections of a station each replace, and close, a distinct connection.
+     */
+    private fun register(connection: ChargingStationConnection): ChargingStationConnection? =
+        withStationLock(connection.ocppId) {
+            val previous = connections[connection.ocppId]
+            // a control frame of the previous connection being notified completes before the replacement
+            synchronized(previous ?: connection) {
+                connections[connection.ocppId] = connection
+            }
+            previous
+        }
+
+    /**
+     * Runs [block] holding the lock of the station [ocppId], which is always taken before the lock of one of its
+     * connections, never while holding it.
+     */
+    private fun <T> withStationLock(ocppId: CSOcppId, block: () -> T): T =
+        stationLocks.withLock(ocppId.lowercase(), block)
 
     private fun handleWebSocketClosed(
         logContext: String,
