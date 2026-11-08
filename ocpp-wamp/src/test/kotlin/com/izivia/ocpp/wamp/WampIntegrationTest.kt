@@ -4,6 +4,7 @@ import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.OcppVersion.OCPP_1_6
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.wamp.client.ConnectionState
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
@@ -14,6 +15,9 @@ import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import kotlin.time.Clock
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -535,6 +539,67 @@ class WampIntegrationTest {
             release.countDown()
             slowClient.close()
             lateClient.close()
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `should not lose a call result received right before the connection is closed`() {
+        val handlerStarted = CountDownLatch(1)
+        val transport = OcppWampServer.newServer(setOf(OCPP_1_6))
+        val server = transport.asServer(port)
+        transport.register(object : OcppWampServerHandler {
+            override fun accept(ocppId: CSOcppId): Boolean = "TEST1" == ocppId
+
+            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage {
+                handlerStarted.countDown()
+                return WampMessage.CallResult(msg.msgId, "{}")
+            }
+        })
+        val client = OcppWampClient.newClient(
+            Uri.of("ws://localhost:$port/ws"),
+            "TEST1",
+            OCPP_1_6,
+            timeoutInMs = 5_000,
+            autoReconnect = false
+        )
+        // the client handles incoming messages on the default dispatcher: holding all its threads delays the
+        // handling of the call result until the connection is closed, as a loaded machine can do
+        val dispatcherThreads = Runtime.getRuntime().availableProcessors().coerceAtLeast(2)
+        val dispatcherHeld = CountDownLatch(dispatcherThreads)
+        val releaseDispatcher = CountDownLatch(1)
+        server.start()
+
+        try {
+            client.connect()
+            repeat(dispatcherThreads) {
+                CoroutineScope(Dispatchers.Default).launch {
+                    dispatcherHeld.countDown()
+                    releaseDispatcher.await(10, TimeUnit.SECONDS)
+                }
+            }
+            expectThat(dispatcherHeld.await(5, TimeUnit.SECONDS)).isTrue()
+
+            val response = CompletableFuture.supplyAsync {
+                client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+            }
+            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+            // answers the in-flight call, then closes the connection
+            transport.shutdown()
+            val deadline = TimeSource.Monotonic.markNow() + 5.seconds
+            while (client.state != ConnectionState.DISCONNECTED && deadline.hasNotPassedNow()) {
+                Thread.sleep(10)
+            }
+            expectThat(client.state).isEqualTo(ConnectionState.DISCONNECTED)
+            releaseDispatcher.countDown()
+
+            expectThat(response.get(10, TimeUnit.SECONDS)) {
+                get { msgId }.isEqualTo("1")
+                get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
+            }
+        } finally {
+            releaseDispatcher.countDown()
+            client.close()
             server.stop()
         }
     }

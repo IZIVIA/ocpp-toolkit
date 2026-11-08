@@ -197,6 +197,9 @@ class OkHttpOcppWampClient(
     }
 
     private fun onMessage(text: String) {
+        // read on the websocket thread, before a close that follows the message clears it,
+        // so that a call result received right before the close still completes its pending call
+        val connection = wampConnection
         CoroutineScope(Dispatchers.Default).launch {
             val msgString = text
             logger.info("OkHttpOcppWampClient onMessage : $msgString")
@@ -210,8 +213,8 @@ class OkHttpOcppWampClient(
                         // outcoming call result
                         try {
                             withTimeout(timeoutInMs) {
-                                logger.info("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
-                                wampConnection?.callManager?.handleResult("[$ocppId]", msg)
+                                logger.info("OkHttpOcppWampClient connect callManager : ${connection?.callManager}")
+                                connection?.callManager?.handleResult("[$ocppId]", msg)
                             }
                         } catch (e: TimeoutCancellationException) {
                             logger.error(
