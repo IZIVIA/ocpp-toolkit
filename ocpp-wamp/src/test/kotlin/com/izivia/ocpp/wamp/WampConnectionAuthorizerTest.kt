@@ -169,7 +169,7 @@ class WampConnectionAuthorizerTest {
         expectThat(request.toString()).isEqualTo("ConnectionRequest(ocppId=CS1)")
     }
 
-    // the example of the README, verbatim
+    // a hand-written Basic authorizer, as an application may write its own ConnectionAuthorizer
     private val authorizer = ConnectionAuthorizer { request ->
         val expected = passwords[request.ocppId] ?: return@ConnectionAuthorizer false
         val credentials = request.headers
