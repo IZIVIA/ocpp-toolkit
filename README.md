@@ -371,6 +371,122 @@ not block.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
+### Charging station authentication
+
+Security profiles 1 and 2 authenticate a charging station with HTTP Basic authentication on its WebSocket upgrade
+request. A `ConnectionAuthorizer` checks it before the handshake, from the `ConnectionRequest` holding the station id
+and the headers of the request:
+
+```kotlin
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
+import com.izivia.ocpp.wamp.server.OcppWampServer
+import java.security.MessageDigest
+import java.util.Base64
+
+// the passwords each station may send, as bytes
+val passwords: Map<CSOcppId, List<ByteArray>> = mapOf(
+    // OCPP 2.0.1: the BasicAuthPassword, a UTF-8 string
+    "CS201" to listOf("passwordString-of-CS201".toByteArray()),
+    // OCPP 1.6: the AuthorizationKey, binary and configured in hexadecimal
+    "CS16" to "0123456789abcdef0123456789abcdef".let { listOf(it.hexToByteArray(), it.toByteArray()) },
+)
+
+val authorizer = ConnectionAuthorizer { request ->
+    val expected = passwords[request.ocppId] ?: return@ConnectionAuthorizer false
+    val credentials = request.headers
+        .firstOrNull { (name, _) -> name.equals("Authorization", ignoreCase = true) }?.second
+        ?.takeIf { it.startsWith("Basic ", ignoreCase = true) }
+        ?.let { Base64.getDecoder().decode(it.substring(6).trim()) }
+        ?: return@ConnectionAuthorizer false
+    // compared as bytes: the username cannot hold a ':', but an OCPP 1.6 binary password can, and is not UTF-8
+    val colon = credentials.indexOf(':'.code.toByte())
+    if (colon < 0) return@ConnectionAuthorizer false
+    val password = credentials.copyOfRange(colon + 1, credentials.size)
+    // the username is the station id (A00.FR.204)
+    String(credentials, 0, colon, Charsets.UTF_8) == request.ocppId &&
+        expected.any { MessageDigest.isEqual(password, it) }
+}
+val server = OcppWampServer.newServer(authorizer = authorizer)
+```
+
+The password is not encoded the same way in both versions, which the OCPP 2.0.1 specification points out. OCPP 2.0.1
+uses a UTF-8 string. The OCPP 1.6 Security Whitepaper advises a random binary `AuthorizationKey`, represented in
+hexadecimal, but does not say whether a station sends its bytes or that hexadecimal form: the example accepts both.
+
+- A refused station gets an HTTP 401 with a `WWW-Authenticate: Basic` challenge: it is never registered, and no
+  connection, reconnection or close event is notified for it.
+- The authorizer runs before `OcppWampServerHandler.accept`, so an unknown station without valid credentials gets a
+  401 too, not the 404 of a station no handler accepts.
+- An authorizer that throws refuses the station. Only the station id and the exception class are logged, never the
+  headers nor the exception message.
+- It runs on the WebSocket IO thread and must not block: keep the passwords in memory rather than querying a database
+  on each connection.
+
+With the `toolkit` module, pass the authorizer through `ServerSetting.authorizer`, and with `ocpp-transport-websocket`
+through the `WebsocketServer` constructor.
+
+Applications calling `Undertow` or `WsServerConfig` directly: `acceptWebSocketPredicate` is now `admitWebSocket`, which
+returns a `WebSocketUpgradeDecision` instead of a `Boolean`, and `null` when the request is not for that endpoint.
+
+## Observing OCPP errors
+
+The toolkit handles some failures on its own: it logs them and, over WebSocket, answers with a `CALLERROR`. To report
+them to your monitoring system, give an `OcppErrorListener` to `ServerSetting`. It is optional, works the same for the
+WebSocket and SOAP servers, and depends on no monitoring provider.
+
+```kotlin
+val errorListener = OcppErrorListener { event ->
+    when (event.category) {
+        OcppErrorCategory.UNHANDLED_ACTION ->
+            metrics.incrementUnhandledAction(event.ocppVersion)
+
+        OcppErrorCategory.PROTOCOL_ERROR,
+        OcppErrorCategory.HANDLER_ERROR,
+        OcppErrorCategory.TRANSPORT_ERROR ->
+            Sentry.captureException(event.cause ?: IllegalStateException("OCPP failure: $event"))
+    }
+}
+
+val csms = ApiFactory.csmsOcppServer(
+    csmsSettings = CSMSSettings(
+        listOf(
+            ServerSetting(
+                port = 8080,
+                path = "ws",
+                ocppVersion = setOf(OcppVersion.OCPP_1_6),
+                transportType = TransportEnum.WEBSOCKET,
+                errorListener = errorListener
+            )
+        )
+    ),
+    csmsApiCallbacks = listOf(csmsCallbacks),
+    fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+)
+```
+
+| Category           | Reported when                                                                      |
+|--------------------|------------------------------------------------------------------------------------|
+| `UNHANDLED_ACTION` | an incoming message has no registered handler                                      |
+| `PROTOCOL_ERROR`   | an incoming message or payload cannot be parsed, or a response cannot be serialized |
+| `HANDLER_ERROR`    | a registered handler throws an exception                                           |
+| `TRANSPORT_ERROR`  | the transport fails while processing a message, for instance when sending a response |
+
+Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
+`action`, for instance.
+
+- The listener only observes: the answer to the charging station is the same with and without it, and anything it
+  throws is logged and ignored.
+- It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
+  charging station served by that thread. Hand the event off to your own executor.
+- `ocppId` and `action` come from the charging station and are not validated. Bound them before using them as a metric
+  dimension, and do not trust them as an identity.
+- An event never carries a message payload, but the message of `cause` may quote a fragment of it. Sanitize it before
+  sending it to a third party.
+
+Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
+the client side of the toolkit: only the servers report errors for now.
+
 ## Code Organisation
 
 The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.
