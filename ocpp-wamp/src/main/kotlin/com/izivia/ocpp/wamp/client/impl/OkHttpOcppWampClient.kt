@@ -196,63 +196,56 @@ class OkHttpOcppWampClient(
     }
 
     private fun onMessage(text: String) {
-        CoroutineScope(Dispatchers.Default).launch {
-            val msgString = text
-            logger.info("OkHttpOcppWampClient onMessage : $msgString")
-            val msg = WampMessage.parse(msgString)
+        val msgString = text
+        logger.info("OkHttpOcppWampClient onMessage : $msgString")
+        val msg = WampMessage.parse(msgString)
 
-            if (msg == null) {
-                logger.warn("can't parse wamp message from server: $msgString")
-            } else {
-                when (msg.msgType) {
-                    WampMessageType.CALL_RESULT, WampMessageType.CALL_ERROR -> {
-                        // outcoming call result
-                        try {
-                            withTimeout(timeoutInMs) {
-                                logger.info("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
-                                wampConnection?.callManager?.handleResult("[$ocppId]", msg)
-                            }
-                        } catch (e: TimeoutCancellationException) {
-                            logger.error(
-                                "[$ocppId] timeout during call result handling of" +
-                                    " ${msg.action} - $msgString -- ${e.message}"
-                            )
-                        }
-                    }
+        if (msg == null) {
+            logger.warn("can't parse wamp message from server: $msgString")
+            return
+        }
+        when (msg.msgType) {
+            WampMessageType.CALL_RESULT, WampMessageType.CALL_ERROR -> {
+                // outcoming call result, handled on the reader thread: it does not block, and it must not wait
+                // for a pool that call handlers may be occupying while they wait for this very result
+                logger.info("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
+                wampConnection?.callManager?.handleResult("[$ocppId]", msg)
+            }
 
-                    WampMessageType.CALL -> {
-                        try {
-                            withTimeout(timeoutInMs) {
-                                // incoming call
-                                logger.info("[$ocppId] <- ${msg.action} - $msgString")
-                                val r = handlers.asSequence()
-                                    // use sequence to avoid greedy mapping, to find the first handler with non null result
-                                    .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
-                                    .filterNotNull()
-                                    .firstOrNull()
-                                    ?: WampMessage.CallError(
-                                        msg.msgId,
-                                        MessageErrorCode.INTERNAL_ERROR,
-                                        "No handler found",
-                                        "{}"
-                                    )
-                                logger.info("[$ocppId] -> ${r.toJson()}")
-                                wampConnection?.websocket?.send(r.toJson())
-                            }
-                        } catch (e: TimeoutCancellationException) {
-                            logger.error(
-                                "[$ocppId] timeout during call handling of" +
-                                    " ${msg.action} - $msgString -- ${e.message}"
-                            )
-                            wampConnection?.websocket?.send(
-                                WampMessage.CallError(
+            WampMessageType.CALL -> {
+                // call handlers block their thread, so they run on the elastic pool meant for blocking work
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        withTimeout(timeoutInMs) {
+                            // incoming call
+                            logger.info("[$ocppId] <- ${msg.action} - $msgString")
+                            val r = handlers.asSequence()
+                                // use sequence to avoid greedy mapping, to find the first handler with non null result
+                                .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
+                                .filterNotNull()
+                                .firstOrNull()
+                                ?: WampMessage.CallError(
                                     msg.msgId,
                                     MessageErrorCode.INTERNAL_ERROR,
-                                    "Timeout during call handling",
+                                    "No handler found",
                                     "{}"
-                                ).toJson()
-                            )
+                                )
+                            logger.info("[$ocppId] -> ${r.toJson()}")
+                            wampConnection?.websocket?.send(r.toJson())
                         }
+                    } catch (e: TimeoutCancellationException) {
+                        logger.error(
+                            "[$ocppId] timeout during call handling of" +
+                                " ${msg.action} - $msgString -- ${e.message}"
+                        )
+                        wampConnection?.websocket?.send(
+                            WampMessage.CallError(
+                                msg.msgId,
+                                MessageErrorCode.INTERNAL_ERROR,
+                                "Timeout during call handling",
+                                "{}"
+                            ).toJson()
+                        )
                     }
                 }
             }
