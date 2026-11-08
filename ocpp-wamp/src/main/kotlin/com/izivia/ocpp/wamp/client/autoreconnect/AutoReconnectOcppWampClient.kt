@@ -114,18 +114,21 @@ class AutoReconnectOcppWampClient(
     }
 
     private fun awaitStateChange(from: AutoReconnectState, deadline: TimeMark, cause: NotConnectedException) {
+        val notConnected = { IOException("[$debugContext] currently not connected - retry later", cause) }
         lock.withLock {
             while (true) {
                 // checked even when the state has already changed, so that a connection that keeps dropping
                 // cannot retry the call past the deadline
                 val remaining = -deadline.elapsedNow()
                 if (!remaining.isPositive()) {
-                    throw IOException("[$debugContext] currently not connected - retry later", cause)
+                    throw notConnected()
                 }
                 if (autoReconnectState !== from) {
                     return
                 }
-                stateChanged.await(remaining.inWholeNanoseconds, TimeUnit.NANOSECONDS)
+                if (!stateChanged.await(remaining.inWholeNanoseconds, TimeUnit.NANOSECONDS)) {
+                    throw notConnected()
+                }
             }
         }
     }
