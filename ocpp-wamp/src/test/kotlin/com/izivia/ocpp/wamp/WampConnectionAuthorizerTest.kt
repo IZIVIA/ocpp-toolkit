@@ -11,11 +11,6 @@ import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
 import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import strikt.api.expect
@@ -25,9 +20,7 @@ import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 import java.security.MessageDigest
 import java.util.Base64
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 class WampConnectionAuthorizerTest {
@@ -52,7 +45,7 @@ class WampConnectionAuthorizerTest {
             seen += request
             authorizer.authorize(request)
         })
-        val client = client("CS1", basic("CS1", "s3cr3t"))
+        val client = client("CS1", basicAuthorization("CS1", "s3cr3t"))
 
         try {
             client.connect()
@@ -60,7 +53,7 @@ class WampConnectionAuthorizerTest {
             expectThat(client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")).payload)
                 .isEqualTo("""{"handled":true}""")
             expectThat(seen.single().ocppId).isEqualTo("CS1")
-            expectThat(seen.single().headers).contains("Authorization" to basic("CS1", "s3cr3t").second)
+            expectThat(seen.single().headers).contains("Authorization" to basicAuthorization("CS1", "s3cr3t").second)
         } finally {
             client.close()
             server.stop()
@@ -72,7 +65,7 @@ class WampConnectionAuthorizerTest {
         val server = start(authorizer)
 
         try {
-            val handshake = handshake("CS1", basic("CS1", "wrong"))
+            val handshake = handshake("CS1", basicAuthorization("CS1", "wrong"))
 
             expect {
                 that(handshake.status).isEqualTo(401)
@@ -110,13 +103,13 @@ class WampConnectionAuthorizerTest {
     @Test
     fun `refused station does not evict the connected station with the same id`() {
         val (wamp, server) = startWamp(authorizer)
-        val connected = client("CS1", basic("CS1", "s3cr3t"))
+        val connected = client("CS1", basicAuthorization("CS1", "s3cr3t"))
         connected.onAction { _, msg -> WampMessage.CallResult(msg.msgId, """{"answeredBy":"CS1"}""") }
 
         try {
             connected.connect()
 
-            val refused = handshake("CS1", basic("CS1", "wrong"))
+            val refused = handshake("CS1", basicAuthorization("CS1", "wrong"))
             val answer = wamp.sendBlocking("CS1", WampMessage.Call("1", "Reset", "{}"), timeoutInMs = 5_000)
 
             expect {
@@ -135,7 +128,7 @@ class WampConnectionAuthorizerTest {
         val server = start(ConnectionAuthorizer { _ -> error("password store unavailable") })
 
         try {
-            val handshake = handshake("CS1", basic("CS1", "s3cr3t"))
+            val handshake = handshake("CS1", basicAuthorization("CS1", "s3cr3t"))
 
             expect {
                 that(handshake.status).isEqualTo(401)
@@ -152,7 +145,7 @@ class WampConnectionAuthorizerTest {
         val server = start(authorizer)
 
         try {
-            expectThat(handshake("CS16", basic("CS16", AUTHORIZATION_KEY.hexToByteArray())).status).isEqualTo(101)
+            expectThat(handshake("CS16", basicAuthorization("CS16", AUTHORIZATION_KEY.hexToByteArray())).status).isEqualTo(101)
         } finally {
             server.stop()
         }
@@ -163,7 +156,7 @@ class WampConnectionAuthorizerTest {
         val server = start(authorizer)
 
         try {
-            expectThat(handshake("CS16", basic("CS16", AUTHORIZATION_KEY)).status).isEqualTo(101)
+            expectThat(handshake("CS16", basicAuthorization("CS16", AUTHORIZATION_KEY)).status).isEqualTo(101)
         } finally {
             server.stop()
         }
@@ -171,7 +164,7 @@ class WampConnectionAuthorizerTest {
 
     @Test
     fun `connection request does not show its headers when printed`() {
-        val request = ConnectionRequest("CS1", listOf(basic("CS1", "s3cr3t")))
+        val request = ConnectionRequest("CS1", listOf(basicAuthorization("CS1", "s3cr3t")))
 
         expectThat(request.toString()).isEqualTo("ConnectionRequest(ocppId=CS1)")
     }
@@ -220,38 +213,7 @@ class WampConnectionAuthorizerTest {
             headers = headers.toList()
         )
 
-    private fun basic(user: String, password: String) = basic(user, password.toByteArray())
-
-    private fun basic(user: String, password: ByteArray) =
-        "Authorization" to "Basic " + Base64.getEncoder().encodeToString("$user:".toByteArray() + password)
-
-    private data class Handshake(val status: Int?, val wwwAuthenticate: String?)
-
-    private fun handshake(ocppId: CSOcppId, vararg headers: Pair<String, String>): Handshake {
-        val result = CompletableFuture<Handshake>()
-        val request = Request.Builder()
-            .url("ws://localhost:$port/ws/$ocppId")
-            .header("Sec-WebSocket-Protocol", OCPP_1_6.subprotocol)
-            .apply { headers.forEach { (name, value) -> header(name, value) } }
-            .build()
-        val webSocket = OkHttpClient().newWebSocket(
-            request,
-            object : WebSocketListener() {
-                override fun onOpen(webSocket: WebSocket, response: Response) {
-                    result.complete(Handshake(response.code, response.header("WWW-Authenticate")))
-                }
-
-                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                    result.complete(Handshake(response?.code, response?.header("WWW-Authenticate")))
-                }
-            }
-        )
-        return try {
-            result.get(5, TimeUnit.SECONDS)
-        } finally {
-            webSocket.cancel()
-        }
-    }
+    private fun handshake(ocppId: CSOcppId, vararg headers: Pair<String, String>) = handshake(port, ocppId, *headers)
 
     companion object {
         // 16 random-looking bytes holding a ':' (3a) and a sequence that is not valid UTF-8 (c3 28)
