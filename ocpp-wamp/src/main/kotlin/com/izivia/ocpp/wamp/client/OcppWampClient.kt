@@ -28,20 +28,35 @@ interface OcppWampClient {
             autoReconnect: Boolean = true,
             baseAutoReconnectDelayInMs: Long = 250,
             headers: WampMessageMetaHeaders = emptyList()
-        ) = OkHttpOcppWampClient(target, ocppId, ocppVersion, timeoutInMs, headers).let {
-            if (autoReconnect) {
-                AutoReconnectOcppWampClient(
-                    it,
-                    it.debugContext,
-                    AutoReconnectConfig(
-                        timeoutInMs.milliseconds,
-                        baseAutoReconnectDelayInMs.milliseconds
+        ) = newClient(
+            target,
+            ocppId,
+            ocppVersion,
+            OcppWampClientSettings(timeoutInMs, autoReconnect, baseAutoReconnectDelayInMs),
+            headers
+        )
+
+        fun newClient(
+            target: Uri,
+            ocppId: CSOcppId,
+            ocppVersion: OcppVersion,
+            settings: OcppWampClientSettings,
+            headers: WampMessageMetaHeaders = emptyList()
+        ): OcppWampClient =
+            OkHttpOcppWampClient(target, ocppId, ocppVersion, settings.timeoutInMs, headers).let {
+                if (settings.autoReconnect) {
+                    AutoReconnectOcppWampClient(
+                        it,
+                        it.debugContext,
+                        AutoReconnectConfig(
+                            settings.timeoutInMs.milliseconds,
+                            settings.baseAutoReconnectDelayInMs.milliseconds
+                        )
                     )
-                )
-            } else {
-                it
+                } else {
+                    it
+                }
             }
-        }
     }
 }
 

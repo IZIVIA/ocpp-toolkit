@@ -180,6 +180,7 @@ import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.operation.information.RequestStatus
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
@@ -642,7 +643,7 @@ class IntegrationTest {
         every { ocppWampClient.close() } returns Unit
         every { ocppWampClient.onAction(any()) } returns Unit
         mockkObject(OcppWampClient.Companion)
-        every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
+        every { OcppWampClient.Companion.newClient(any(), any(), any(), any<OcppWampClientSettings>(), any()) } returns ocppWampClient
     }
 
     @AfterEach
@@ -1280,7 +1281,7 @@ class IntegrationTest {
         // ApiFactory maps the transport version onto the WAMP subprotocol enum by hand, so an
         // inverted entry would go unnoticed for any version no other test connects with.
         val negotiated = mutableListOf<OcppVersionWamp>()
-        every { OcppWampClient.newClient(any(), any(), capture(negotiated), any()) } returns ocppWampClient
+        every { OcppWampClient.newClient(any(), any(), capture(negotiated), any<OcppWampClientSettings>(), any()) } returns ocppWampClient
 
         mapOf(
             OcppVersion.OCPP_1_5 to OcppVersionWamp.OCPP_1_5,
