@@ -65,12 +65,14 @@ class OcppWampServerApp(
             val wsConnectionId = UUID.randomUUID().toString()
             val chargingStationOcppId = ocppWsEndpoint.extractChargingStationOcppId(request.uri.path)
                 ?.takeUnless { it.isEmpty() }
-                ?: throw IllegalArgumentException("malformed request - no chargingStationOcppId - $request")
+                ?: throw IllegalArgumentException(
+                    "malformed request - no chargingStationOcppId - ${request.withoutCredentials()}"
+                )
             val ocppVersion = request.header("Sec-WebSocket-Protocol")
                 ?.split(",")?.firstOrNull()?.trim()
                 ?.let { ocppVersions.filter { v -> v.subprotocol == it.lowercase() }.firstOrNull() }
                 ?: throw IllegalArgumentException(
-                    "malformed request - unsupported or invalid ocpp version - $request"
+                    "malformed request - unsupported or invalid ocpp version - ${request.withoutCredentials()}"
                 )
 
             val previousConnection = connections[chargingStationOcppId]
@@ -254,7 +256,7 @@ class OcppWampServerApp(
                 }
             }
         } catch (e: Exception) {
-            logger.error("Error during new connection with $request: $e", e)
+            logger.error("Error during new connection with ${request.withoutCredentials()}: $e", e)
             throw e
         }
     }

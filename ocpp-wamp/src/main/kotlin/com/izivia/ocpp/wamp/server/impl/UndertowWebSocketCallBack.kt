@@ -42,7 +42,11 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
 
         val upgradeRequest = exchange.asRequest(channel)
         val logContext = upgradeRequest.uri.toString()
-        logger.debug("{} - connection attempt: upgrade request={}", logContext, upgradeRequest)
+        logger.debug(
+            "{} - connection attempt: upgrade request={}",
+            logContext,
+            upgradeRequest.withoutCredentials()
+        )
 
         val socket = object : PushPullAdaptingWebSocket(), ControlFrameAwareWebsocket {
             private val pingHandlers = CopyOnWriteArrayList<() -> Unit>()
@@ -139,6 +143,9 @@ private fun WebSocketHttpExchange.asRequest(channel: WebSocketChannel) =
                 channel.requestScheme
             )
         )
+
+/** The upgrade request without the headers carrying the credentials of the station, to be logged. */
+internal fun Request.withoutCredentials() = removeHeader("Authorization").removeHeader("Proxy-Authorization")
 
 fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = { httpServerExchange ->
     val containsValidConnectionHeader = httpServerExchange.requestHeaders["Connection"]
