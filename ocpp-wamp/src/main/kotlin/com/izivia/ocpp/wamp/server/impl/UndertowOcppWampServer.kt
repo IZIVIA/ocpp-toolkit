@@ -3,14 +3,19 @@ package com.izivia.ocpp.wamp.server.impl
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
+import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
+import com.izivia.ocpp.wamp.server.ConnectionRequest
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
+import com.izivia.ocpp.wamp.server.WebSocketUpgradeDecision
 import com.izivia.ocpp.wamp.server.WsServerConfig
 import com.izivia.ocpp.wamp.server.asServer
 import io.undertow.server.HttpServerExchange
 import kotlin.time.Clock
+import org.http4k.core.Status
 import org.http4k.routing.RoutingWsHandler
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -19,7 +24,9 @@ class UndertowOcppWampServer(
     val ocppVersions: Set<OcppVersion>,
     path: String = "ws",
     val settings: OcppWampServerSettings = OcppWampServerSettings(),
-    private val listeners: EventsListeners = EventsListeners()
+    private val listeners: EventsListeners = EventsListeners(),
+    private val errorListener: OcppErrorListener? = null,
+    private val authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL
 ) : OcppWampServer {
     private val handlers = mutableListOf<OcppWampServerHandler>()
     private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
@@ -33,26 +40,51 @@ class UndertowOcppWampServer(
             handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
             listeners = listeners,
             ocppWsEndpoint = ocppWsEndpoint,
-            settings = settings
+            settings = settings,
+            errorListener = errorListener
         )
         val handler = wsApp.newRoutingHandler()
-        val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean = { exch ->
-            // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
-            ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI)?.let { ocppId ->
-                handlers
-                    .filter { h -> h.accept(ocppId) }
-                    .also { selectedHandler[ocppId] = it }
-            } != null
-        }
         val wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
         serverConfig = object : WsServerConfig {
             override val handler: RoutingWsHandler
                 get() = handler
-            override val acceptWebSocketPredicate: (HttpServerExchange) -> Boolean
-                get() = acceptWebSocketPredicate
+            override val admitWebSocket: (HttpServerExchange) -> WebSocketUpgradeDecision?
+                get() = ::admit
             override val wsSubprotocols: Set<String>
                 get() = wsSubprotocols
         }
+    }
+
+    private fun admit(exch: HttpServerExchange): WebSocketUpgradeDecision? {
+        val ocppId = ocppWsEndpoint.extractChargingStationOcppId(exch.requestURI) ?: return null
+        // authorized first, so that an unknown station cannot tell its id apart from bad credentials
+        if (!isAuthorized(ocppId, exch)) return UNAUTHORIZED
+
+        // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
+        val acceptingHandlers = handlers.filter { h -> h.accept(ocppId) }
+        if (acceptingHandlers.isEmpty()) {
+            // an entry memoized earlier stays: a handshake in flight may still read it,
+            // and it is rewritten before the next accepted connection reads it
+            logger.info("[$ocppId] connection refused - no handler accepts it")
+            return WebSocketUpgradeDecision.Refuse(Status.NOT_FOUND)
+        }
+        selectedHandler[ocppId] = acceptingHandlers
+        return WebSocketUpgradeDecision.Accept
+    }
+
+    // fails closed, and logs neither the headers nor the exception message, which may echo them
+    private fun isAuthorized(ocppId: CSOcppId, exch: HttpServerExchange): Boolean {
+        val headers = exch.requestHeaders.flatMap { hv -> hv.map { hv.headerName.toString() to it } }
+        val authorized = try {
+            authorizer.authorize(ConnectionRequest(ocppId, headers))
+        } catch (e: Exception) {
+            logger.warn("[$ocppId] connection refused - authorizer failed with ${e::class.qualifiedName}")
+            return false
+        }
+        if (!authorized) {
+            logger.info("[$ocppId] connection refused - not authorized")
+        }
+        return authorized
     }
 
     override fun config(): WsServerConfig {
@@ -76,6 +108,11 @@ class UndertowOcppWampServer(
 
     companion object {
         private val logger = LoggerFactory.getLogger(UndertowOcppWampServer::class.java)
+
+        private val UNAUTHORIZED = WebSocketUpgradeDecision.Refuse(
+            Status.UNAUTHORIZED,
+            listOf("WWW-Authenticate" to "Basic realm=\"OCPP\"")
+        )
     }
 }
 

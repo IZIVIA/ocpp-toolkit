@@ -371,6 +371,144 @@ not block.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
+### Charging station authentication
+
+Security profiles 1 and 2 authenticate a charging station with HTTP Basic authentication on its WebSocket upgrade
+request. A `SecurityProfileAuthorizer` checks it before the handshake, against the secret you expect for each station:
+
+```kotlin
+import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.wamp.server.OcppWampServer
+import com.izivia.ocpp.wamp.server.security.Enforcement
+import com.izivia.ocpp.wamp.server.security.SecurityProfileAuthorizer
+import com.izivia.ocpp.wamp.server.security.StationSecurity
+import java.util.concurrent.ConcurrentHashMap
+
+val stations: Map<CSOcppId, StationSecurity> = mapOf(
+    // OCPP 2.0.1: the BasicAuthPassword
+    "CS201" to StationSecurity.BasicAuthPassword("passwordString-of-CS201"),
+    // OCPP 1.6: the AuthorizationKey, in hexadecimal
+    "CS16" to StationSecurity.AuthorizationKey("0123456789abcdef0123456789abcdef"),
+    // being migrated: a failed check is reported, but the station is still admitted
+    "CS16-MIGRATING" to StationSecurity.AuthorizationKey("fedcba9876543210fedcba9876543210", Enforcement.REPORT),
+    // legacy station without credentials: nothing is checked
+    "CS-LEGACY" to StationSecurity.Unsecured,
+)
+
+// the stations still failing their check while being migrated
+val stillFailing: MutableSet<CSOcppId> = ConcurrentHashMap.newKeySet()
+
+val authorizer = SecurityProfileAuthorizer(
+    securityOf = stations::get,
+    onFailure = { failure ->
+        when (failure.enforcement) {
+            // admitted anyway: the station still has to be configured before it is switched to BLOCK
+            Enforcement.REPORT -> stillFailing += failure.ocppId
+            // refused with a 401
+            Enforcement.BLOCK -> logger.warn("[{}] connection refused: {}", failure.ocppId, failure.reason)
+        }
+    },
+)
+val server = OcppWampServer.newServer(authorizer = authorizer)
+```
+
+A failed check of a `REPORT` station only reaches `onFailure`: the station is admitted, connects, and is notified to
+`EventsListeners` like any other, with nothing telling that its check failed. `failure.enforcement` is what tells a
+reported failure (`REPORT`, the station is admitted) from a refusal (`BLOCK`). `onFailure` is called during the
+admission, before the WebSocket handshake, so it always comes before the connection event of that attempt: a migrating
+station that connects without having been reported passes its check, and its secret can be switched to
+`Enforcement.BLOCK`.
+
+- The username must be the station id (A00.FR.204). A station that `securityOf` does not know (`null`) is refused.
+- `Enforcement.BLOCK`, the default, refuses a station whose check fails; `REPORT` admits it anyway, which helps while
+  a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
+- `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
+  `MALFORMED_CREDENTIALS`, `USERNAME_MISMATCH`, `WRONG_PASSWORD`) and the enforcement applied. It never carries the
+  credentials. If it throws, the decision is kept.
+- The secrets are validated when created: 16 to 40 characters of the OCPP 2.0.1 charset for a `BasicAuthPassword`,
+  16 to 20 bytes in hexadecimal for an `AuthorizationKey`. They are never shown by `toString`.
+
+The password is not encoded the same way in both versions, which the OCPP 2.0.1 specification points out. OCPP 2.0.1
+uses a UTF-8 string. The OCPP 1.6 Security Whitepaper advises a random binary `AuthorizationKey`, represented in
+hexadecimal, but does not say whether a station sends its bytes or that hexadecimal form: `AuthorizationKey` accepts
+both. The rule follows the type of the secret, not the OCPP version the station negotiates.
+
+- A refused station gets an HTTP 401 with a `WWW-Authenticate: Basic` challenge: it is never registered, and no
+  connection, reconnection or close event is notified for it.
+- The authorizer runs before `OcppWampServerHandler.accept`, so an unknown station without valid credentials gets a
+  401 too, not the 404 of a station no handler accepts.
+- An authorizer that throws refuses the station, as does a `securityOf` that throws, for instance on an invalid
+  secret. Only the station id and the exception class are logged, never the headers nor the exception message.
+- `securityOf` and `onFailure` run on the WebSocket IO thread and must not block: keep the secrets in memory rather
+  than querying a database on each connection.
+
+`SecurityProfileAuthorizer` is a `ConnectionAuthorizer`. For other checks, implement `ConnectionAuthorizer` yourself:
+it receives a `ConnectionRequest` holding the station id and the headers of the upgrade request.
+
+With the `toolkit` module, pass the authorizer through `ServerSetting.authorizer`, and with `ocpp-transport-websocket`
+through the `WebsocketServer` constructor.
+
+Applications calling `Undertow` or `WsServerConfig` directly: `acceptWebSocketPredicate` is now `admitWebSocket`, which
+returns a `WebSocketUpgradeDecision` instead of a `Boolean`, and `null` when the request is not for that endpoint.
+
+## Observing OCPP errors
+
+The toolkit handles some failures on its own: it logs them and, over WebSocket, answers with a `CALLERROR`. To report
+them to your monitoring system, give an `OcppErrorListener` to `ServerSetting`. It is optional, works the same for the
+WebSocket and SOAP servers, and depends on no monitoring provider.
+
+```kotlin
+val errorListener = OcppErrorListener { event ->
+    when (event.category) {
+        OcppErrorCategory.UNHANDLED_ACTION ->
+            metrics.incrementUnhandledAction(event.ocppVersion)
+
+        OcppErrorCategory.PROTOCOL_ERROR,
+        OcppErrorCategory.HANDLER_ERROR,
+        OcppErrorCategory.TRANSPORT_ERROR ->
+            Sentry.captureException(event.cause ?: IllegalStateException("OCPP failure: $event"))
+    }
+}
+
+val csms = ApiFactory.csmsOcppServer(
+    csmsSettings = CSMSSettings(
+        listOf(
+            ServerSetting(
+                port = 8080,
+                path = "ws",
+                ocppVersion = setOf(OcppVersion.OCPP_1_6),
+                transportType = TransportEnum.WEBSOCKET,
+                errorListener = errorListener
+            )
+        )
+    ),
+    csmsApiCallbacks = listOf(csmsCallbacks),
+    fn = { ChargingStationConfig(acceptConnection = true, soapUrl = null) }
+)
+```
+
+| Category           | Reported when                                                                      |
+|--------------------|------------------------------------------------------------------------------------|
+| `UNHANDLED_ACTION` | an incoming message has no registered handler                                      |
+| `PROTOCOL_ERROR`   | an incoming message or payload cannot be parsed, or a response cannot be serialized |
+| `HANDLER_ERROR`    | a registered handler throws an exception                                           |
+| `TRANSPORT_ERROR`  | the transport fails while processing a message, for instance when sending a response |
+
+Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
+`action`, for instance.
+
+- The listener only observes: the answer to the charging station is the same with and without it, and anything it
+  throws is logged and ignored.
+- It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
+  charging station served by that thread. Hand the event off to your own executor.
+- `ocppId` and `action` come from the charging station and are not validated. Bound them before using them as a metric
+  dimension, and do not trust them as an identity.
+- An event never carries a message payload, but the message of `cause` may quote a fragment of it. Sanitize it before
+  sending it to a third party.
+
+Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
+the client side of the toolkit: only the servers report errors for now.
+
 ## Code Organisation
 
 The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.
