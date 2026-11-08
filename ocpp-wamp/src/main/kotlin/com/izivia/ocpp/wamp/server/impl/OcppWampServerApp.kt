@@ -67,7 +67,6 @@ class OcppWampServerApp(
                     "malformed request - unsupported or invalid ocpp version - $request"
                 )
 
-            val previousConnection = connections[chargingStationOcppId]
             val chargingStationConnection = ChargingStationConnection(
                 clock.now(),
                 wsConnectionId,
@@ -78,10 +77,7 @@ class OcppWampServerApp(
                 settings.timeoutInMs,
                 shutdown
             )
-            // a control frame of the previous connection being notified completes before the replacement
-            synchronized(previousConnection ?: chargingStationConnection) {
-                connections[chargingStationOcppId] = chargingStationConnection
-            }
+            val previousConnection = register(chargingStationConnection)
 
             val reconnect = previousConnection != null
 
@@ -217,6 +213,24 @@ class OcppWampServerApp(
         } catch (e: Exception) {
             logger.error("Error during new connection with $request: $e", e)
             throw e
+        }
+    }
+
+    /**
+     * Registers [connection] as the current connection of its station and returns the one it replaced, so that
+     * concurrent connections of a station each replace, and close, a distinct connection.
+     */
+    private fun register(connection: ChargingStationConnection): ChargingStationConnection? {
+        while (true) {
+            val previous = connections[connection.ocppId]
+            // a control frame of the previous connection being notified completes before the replacement;
+            // the swap fails, and is retried, when another connection has replaced the previous one meanwhile
+            val replaced = synchronized(previous ?: connection) {
+                connections.replace(connection.ocppId, previous, connection)
+            }
+            if (replaced) {
+                return previous
+            }
         }
     }
 
@@ -380,9 +394,13 @@ class OcppWampServerApp(
         val values get() = connections.values
 
         operator fun get(ocppId: String) = connections[ocppId.lowercase()]
-        operator fun set(ocppId: String, connection: ChargingStationConnection) {
-            connections[ocppId.lowercase()] = connection
-        }
+        /** Registers [connection] only if [expected] is still the registered one, none when null. */
+        fun replace(ocppId: String, expected: ChargingStationConnection?, connection: ChargingStationConnection) =
+            if (expected == null) {
+                connections.putIfAbsent(ocppId.lowercase(), connection) == null
+            } else {
+                connections.replace(ocppId.lowercase(), expected, connection)
+            }
 
         fun remove(connection: ChargingStationConnection) =
             connections.remove(connection.ocppId.lowercase(), connection)
