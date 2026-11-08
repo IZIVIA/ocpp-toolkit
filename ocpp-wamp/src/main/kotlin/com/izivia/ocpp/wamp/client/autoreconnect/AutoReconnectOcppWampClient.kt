@@ -2,12 +2,17 @@ package com.izivia.ocpp.wamp.client.autoreconnect
 
 import com.izivia.ocpp.wamp.client.ConnectionListener
 import com.izivia.ocpp.wamp.client.ConnectionState
+import com.izivia.ocpp.wamp.client.NotConnectedException
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.WampOnActionHandler
 import com.izivia.ocpp.wamp.messages.WampMessage
 import org.slf4j.LoggerFactory
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * An ocpp wamp client that wraps another client to add auto reconnection feature.
@@ -23,6 +28,10 @@ class AutoReconnectOcppWampClient(
 ) : OcppWampClient {
 
     private val lock = ReentrantLock()
+    private val stateChanged = lock.newCondition()
+
+    // written under lock, read without it
+    @Volatile
     private var autoReconnectState: AutoReconnectState = AutoReconnectIdleState(debugContext)
     private var connectionListener: ConnectionListener? = null
 
@@ -80,9 +89,48 @@ class AutoReconnectOcppWampClient(
         }
     }
 
+    /**
+     * Sends the message, waiting for a reconnection if the client is not connected.
+     *
+     * The underlying client drops its connection before notifying it as lost, so a call made in between finds
+     * this client still connected while the underlying one is not. Such a call waits for the connection lost to be
+     * notified, then for the reconnection, like a call made once the connection lost has been notified.
+     *
+     * The wait for that notification is bounded by the call timeout, and so is the wait for the reconnection
+     * that follows it.
+     */
     override fun sendBlocking(message: WampMessage): WampMessage {
-        autoReconnectState.onBeforeCall()
-        return client.sendBlocking(message)
+        val deadline = TimeSource.Monotonic.markNow() + config.callTimeout
+        while (true) {
+            val current = autoReconnectState
+            current.onBeforeCall()
+            try {
+                return client.sendBlocking(message)
+            } catch (e: NotConnectedException) {
+                logger.debug("[$debugContext] connection dropped before being notified as lost - waiting")
+                awaitStateChange(current, deadline, e)
+            }
+        }
+    }
+
+    private fun awaitStateChange(from: AutoReconnectState, deadline: TimeMark, cause: NotConnectedException) {
+        val notConnected = { IOException("[$debugContext] currently not connected - retry later", cause) }
+        lock.withLock {
+            while (true) {
+                // checked even when the state has already changed, so that a connection that keeps dropping
+                // cannot retry the call past the deadline
+                val remaining = -deadline.elapsedNow()
+                if (!remaining.isPositive()) {
+                    throw notConnected()
+                }
+                if (autoReconnectState !== from) {
+                    return
+                }
+                if (!stateChanged.await(remaining.inWholeNanoseconds, TimeUnit.NANOSECONDS)) {
+                    throw notConnected()
+                }
+            }
+        }
     }
 
     override fun onAction(fn: WampOnActionHandler) {
@@ -152,6 +200,7 @@ class AutoReconnectOcppWampClient(
             autoReconnectState.exit(to)
             autoReconnectState = to
             to.enter()
+            stateChanged.signalAll()
         }
     }
 }

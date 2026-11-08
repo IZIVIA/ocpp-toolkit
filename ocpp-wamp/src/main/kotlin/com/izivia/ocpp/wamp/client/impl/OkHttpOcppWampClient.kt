@@ -5,6 +5,7 @@ import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.wamp.client.ConnectionListener
 import com.izivia.ocpp.wamp.client.ConnectionState
+import com.izivia.ocpp.wamp.client.NotConnectedException
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.WampOnActionHandler
 import com.izivia.ocpp.wamp.core.WampCallManager
@@ -196,6 +197,9 @@ class OkHttpOcppWampClient(
     }
 
     private fun onMessage(text: String) {
+        // read on the websocket thread, before a close that follows the message clears it,
+        // so that a call result received right before the close still completes its pending call
+        val connection = wampConnection
         CoroutineScope(Dispatchers.Default).launch {
             val msgString = text
             logger.info("OkHttpOcppWampClient onMessage : $msgString")
@@ -209,8 +213,8 @@ class OkHttpOcppWampClient(
                         // outcoming call result
                         try {
                             withTimeout(timeoutInMs) {
-                                logger.info("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
-                                wampConnection?.callManager?.handleResult("[$ocppId]", msg)
+                                logger.info("OkHttpOcppWampClient connect callManager : ${connection?.callManager}")
+                                connection?.callManager?.handleResult("[$ocppId]", msg)
                             }
                         } catch (e: TimeoutCancellationException) {
                             logger.error(
@@ -289,7 +293,7 @@ class OkHttpOcppWampClient(
 
     private fun getCallManager(): WampCallManager {
         return wampConnection?.callManager
-            ?: throw IllegalStateException("not connected to $serverUri")
+            ?: throw NotConnectedException("not connected to $serverUri")
     }
 
     /**

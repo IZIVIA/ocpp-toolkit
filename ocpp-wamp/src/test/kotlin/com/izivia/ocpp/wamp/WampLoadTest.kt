@@ -23,6 +23,10 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration
 
+/**
+ * Not run by `check`, since its outcome depends on the throughput of the machine: run it with
+ * `./gradlew :ocpp-wamp:loadTest`.
+ */
 class WampLoadTest {
     private val port = getFreePort()
 
