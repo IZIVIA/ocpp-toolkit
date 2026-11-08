@@ -58,6 +58,22 @@ val connection = ApiFactory.ocpp16ConnectionToCSMS(
 
 The embedded server listens on `path` (`/cp` here), and the resulting URL `http://192.168.0.3:8081/cp` is advertised in the WS-Addressing `From` header of every request, as required by OCPP-S: this is how the CSMS addresses the charge point. `host` is mandatory, as a default would let a charge point advertise an address the CSMS cannot reach. `port = 0` binds an ephemeral port, then advertised once connected; the resolved URL is available through `OcppSoapClientTransport.callbackUrl()` when the transport is built directly, as `ApiFactory` does not expose it. Behind a TLS terminator, set `scheme = "https"` and `advertisedPort` to the port the terminator listens on; behind a reverse proxy rewriting the URL, set `advertisedUrl` (e.g. `https://cp.example.com/ocpp/cp`) to advertise the public URL instead of the bound one. Invalid settings (host with a scheme, a port or a delimiter, relative `advertisedUrl`…) are rejected when `SoapClientSettings` is built.
 
+### WebSocket charge point settings
+
+Over WebSocket, the call timeout and the auto-reconnect of the charge point are given through `OcppWampClientSettings`, on `Settings.wampSettings`, on the `ocppXXConnectionToCSMS` factories, or on `WebsocketClient` when the transport is built directly:
+
+```kotlin
+val connection = ApiFactory.ocpp16ConnectionToCSMS(
+        chargePointId = chargePointId,
+        csmsUrl = "ws://csms.example.com/ocpp",
+        transportType = TransportEnum.WEBSOCKET,
+        ocppCSCallbacks = OcppCSCallbacks16(),
+        wampSettings = OcppWampClientSettings(timeoutInMs = 10_000, autoReconnect = true, baseAutoReconnectDelayInMs = 500)
+)
+```
+
+The defaults are a 30 s timeout and auto-reconnect starting at 250 ms, doubled after each failed attempt. With auto-reconnect, the timeout also bounds the time a call waits for the connection to come back. A non-positive timeout or a negative delay is rejected when `OcppWampClientSettings` is built. These settings are ignored over SOAP.
+
 ## Usage of the API
 
 With the API, you can establish a connection to a CSMS with OCPP 1.6 or OCPP 2.0.
