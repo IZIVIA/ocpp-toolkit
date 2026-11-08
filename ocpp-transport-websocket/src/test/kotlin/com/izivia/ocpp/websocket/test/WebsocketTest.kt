@@ -8,6 +8,7 @@ import com.izivia.ocpp.core20.model.authorize.AuthorizeResp
 import com.izivia.ocpp.core20.model.common.IdTokenInfoType
 import com.izivia.ocpp.core20.model.common.enumeration.AuthorizationStatusEnumType
 import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.client.impl.OkHttpOcppWampClient
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
@@ -69,7 +70,7 @@ class WebsocketTest {
             payload = "{\"currentTime\":\"2022-02-15T00:00:00.000Z\"}"
         )
         mockkObject(OcppWampClient.Companion)
-        every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
+        every { OcppWampClient.Companion.newClient(any(), any(), any(), any<OcppWampClientSettings>(), any()) } returns ocppWampClient
 
         val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "", newMessageId = { id })
         val heartbeatResponse =
@@ -91,7 +92,7 @@ class WebsocketTest {
             payload = "{\"currentTime\":\"2022-02-15T00:00:00.000Z\"}"
         )
         mockkObject(OcppWampClient.Companion)
-        every { OcppWampClient.Companion.newClient(any(), any(), any(), any()) } returns ocppWampClient
+        every { OcppWampClient.Companion.newClient(any(), any(), any(), any<OcppWampClientSettings>(), any()) } returns ocppWampClient
 
         val websocketClient = WebsocketClient("chargePoint2", OcppVersion.OCPP_1_6, "", newMessageId = { id })
         expectCatching { websocketClient.sendMessageClass(HeartbeatResp::class, "heartbeat", HeartbeatReq()) }

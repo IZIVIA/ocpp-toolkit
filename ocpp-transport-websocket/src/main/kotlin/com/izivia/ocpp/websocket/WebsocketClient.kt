@@ -7,6 +7,7 @@ import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
@@ -23,9 +24,10 @@ class WebsocketClient(ocppId: String,
                       target: String,
                       headers: RequestHeaders = emptyList(),
                       val newMessageId: () -> String = { UUID.randomUUID().toString() },
+                      settings: OcppWampClientSettings = OcppWampClientSettings(),
 ) : ClientTransport {
     private val client: OcppWampClient =
-        OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion, headers = headers)
+        OcppWampClient.newClient(Uri.of(target), ocppId, ocppVersion, settings, headers)
     private val parser = getJsonMapper(ocppVersion)
     private val wampMessageMeta = WampMessageMeta(ocppVersion, ocppId)
 

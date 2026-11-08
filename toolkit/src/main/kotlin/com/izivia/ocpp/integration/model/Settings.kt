@@ -3,6 +3,7 @@ package com.izivia.ocpp.integration.model
 import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.utils.toUriHost
+import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import java.util.*
@@ -28,6 +29,11 @@ data class Settings(
      */
     val ocpp16SecurityExtensions: Boolean = false,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
+    /**
+     * Call timeout and auto-reconnect of the WebSocket client.
+     * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
+     */
+    val wampSettings: OcppWampClientSettings = OcppWampClientSettings(),
 )
 
 data class CSMSSettings(
