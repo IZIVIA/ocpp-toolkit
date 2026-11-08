@@ -119,19 +119,6 @@ class SettingsErrorListenerTest {
         expectThat(events.map { it.copy(errorCode = null, messageId = null) }).containsExactly(unhandled)
     }
 
-    /** Retries [action] until the server has registered the connection, which it does asynchronously. */
-    private fun <T> awaitConnected(timeoutMs: Long = 5_000, action: () -> T): T {
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (true) {
-            try {
-                return action()
-            } catch (e: IllegalStateException) {
-                if (System.currentTimeMillis() >= deadline) throw e
-                Thread.sleep(50)
-            }
-        }
-    }
-
     private fun freePort() = ServerSocket(0).use { it.localPort }
 
     private companion object {
