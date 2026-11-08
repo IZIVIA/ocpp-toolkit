@@ -9,12 +9,15 @@ import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 import strikt.assertions.*
+import java.lang.management.ManagementFactory
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
+import kotlin.time.TimeSource
 
 /**
  * Drives [OcppWampServerApp] with in-memory sockets: a control frame arriving on a replaced or closed connection
@@ -24,6 +27,7 @@ class OcppWampServerAppConnectionsTest {
     private val now = Instant.parse("2026-10-27T06:00:00Z")
     private val pongEvents = CopyOnWriteArrayList<WsControlFrameEvent>()
     private val pingEvents = CopyOnWriteArrayList<WsControlFrameEvent>()
+    private val connectEvents = CopyOnWriteArrayList<String>()
     private val reconnectEvents = CopyOnWriteArrayList<String>()
     private val closeEvents = CopyOnWriteArrayList<String>()
 
@@ -34,6 +38,7 @@ class OcppWampServerAppConnectionsTest {
         ocppVersions = setOf(OCPP_1_6),
         handlers = { emptyList() },
         listeners = EventsListeners(
+            onWsConnectHandler = { id, _ -> connectEvents.add(id) },
             onWsReconnectHandler = { id, _ -> reconnectEvents.add(id) },
             onWsCloseHandler = { id, _ -> closeEvents.add(id) },
             onWsPongHandler = { pongHandler(it) },
@@ -155,6 +160,69 @@ class OcppWampServerAppConnectionsTest {
         expectThat(closeEvents).containsExactly("CS1")
     }
 
+    @Test
+    fun `should close every connection replaced by concurrent connections`() {
+        val previous = connect("CS1")
+        // holding the lock of the previous connection, both new connections are registering when it is released
+        val release = blockNextPong { previous.receivePong() }
+
+        val sockets = CopyOnWriteArrayList<FakeWebsocket>()
+        val connecting = List(2) { thread { sockets.add(connect("CS1")) } }
+        awaitBlockedRegistering(connecting)
+
+        release()
+        connecting.forEach { it.join(5_000) }
+
+        expectThat(previous.closed).isTrue()
+        expectThat(sockets).hasSize(2)
+        expectThat(sockets.filterNot { it.closed }).hasSize(1)
+        expectThat(connectEvents).containsExactly("CS1")
+        expectThat(reconnectEvents).containsExactly("CS1", "CS1")
+
+        // the released pong handler still lets frames through: only the remaining connection is current
+        expectThat(pongEvents).hasSize(1)
+        sockets.single { it.closed }.receivePong()
+        expectThat(pongEvents).hasSize(1)
+        sockets.single { !it.closed }.receivePong()
+        expectThat(pongEvents).hasSize(2)
+    }
+
+    @Test
+    fun `should notify a single connect when first connections race`() {
+        repeat(200) { round ->
+            val ocppId = "CS$round"
+            val start = CountDownLatch(1)
+            val sockets = CopyOnWriteArrayList<FakeWebsocket>()
+            val connecting = List(4) { thread { start.await(); sockets.add(connect(ocppId)) } }
+            start.countDown()
+            connecting.forEach { it.join(5_000) }
+
+            expectThat(sockets).describedAs("sockets of $ocppId").hasSize(4)
+            expectThat(sockets.filterNot { it.closed }).describedAs("open sockets of $ocppId").hasSize(1)
+            expectThat(connectEvents.filter { it == ocppId }).describedAs("connections of $ocppId").hasSize(1)
+            expectThat(reconnectEvents.filter { it == ocppId }).describedAs("reconnections of $ocppId").hasSize(3)
+        }
+    }
+
+    /**
+     * Waits until every thread is blocked registering its connection, entering the monitor of the station or of the
+     * connection it is about to replace.
+     */
+    private fun awaitBlockedRegistering(threads: List<Thread>) {
+        val threadsBean = ManagementFactory.getThreadMXBean()
+        val deadline = TimeSource.Monotonic.markNow() + 5.seconds
+        while (
+            threads.any { t ->
+                val info = threadsBean.getThreadInfo(t.threadId())
+                info?.threadState != Thread.State.BLOCKED ||
+                    listOf("ChargingStationConnection", "StationLock").none { info.lockName?.contains(it) == true }
+            }
+        ) {
+            check(deadline.hasNotPassedNow()) { "connections not blocked registering" }
+            Thread.sleep(5)
+        }
+    }
+
     /**
      * Receives a pong in another thread whose handler blocks until the returned function is called, which then
      * waits for that thread to end.
@@ -196,10 +264,16 @@ class OcppWampServerAppConnectionsTest {
 
         fun receivePong() = pongHandlers.forEach { it() }
 
+        @Volatile
+        var closed = false
+            private set
+
         override fun send(message: WsMessage) = Unit
 
         // like a real connection, closing only completes once the peer answers, see disconnect
-        override fun close(status: WsStatus) = Unit
+        override fun close(status: WsStatus) {
+            closed = true
+        }
 
         fun disconnect() = triggerClose(WsStatus.NORMAL)
     }
