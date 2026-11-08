@@ -91,6 +91,8 @@ class OkHttpOcppWampClient(
 
             override fun onConnectionFailure(t: Throwable) {
                 error = t
+                // notify before releasing connect(), whose cleanup drops the listener
+                connectionListener?.onConnectionFailure(t)
                 latch.countDown()
             }
 
@@ -177,9 +179,10 @@ class OkHttpOcppWampClient(
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
-                    if (connectionState == ConnectionState.CONNECTING) {
+                    if (previousState == ConnectionState.CONNECTING) {
                         if (t is ConnectException) {
                             logger.warn("[$ocppId] web socket failed to connect to $serverUri: $t")
                         } else {
