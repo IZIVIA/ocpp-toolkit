@@ -78,6 +78,9 @@ class OcppWampServerApp(
                 settings.timeoutInMs,
                 shutdown
             )
+            val logContext = "[$chargingStationOcppId] [$wsConnectionId]"
+            // resolved before the connection is registered: a failure then leaves nothing registered
+            val handler = handlers(chargingStationOcppId)
             var replacedConnection: ChargingStationConnection? = null
             try {
                 withStationLock(chargingStationOcppId) {
@@ -93,18 +96,21 @@ class OcppWampServerApp(
                                 | - existing connection will be closed
                             """.trimMargin()
                         )
-                        listeners.onWsReconnectHandler(chargingStationOcppId, request.headers)
+                        notifyConnection(logContext, "reconnect") {
+                            listeners.onWsReconnectHandler(chargingStationOcppId, request.headers)
+                        }
                     } else {
-                        listeners.onWsConnectHandler(chargingStationOcppId, request.headers)
+                        notifyConnection(logContext, "connect") {
+                            listeners.onWsConnectHandler(chargingStationOcppId, request.headers)
+                        }
                     }
                 }
             } finally {
                 // this close wont trigger a onWsCloseHandler, because we have already changed the current registered
-                // connection; it runs out of the station lock, and even when a listener fails
+                // connection; it runs out of the station lock, and even when a listener throws an Error
                 replacedConnection?.close()
             }
 
-            val logContext = "[$chargingStationOcppId] [$wsConnectionId]"
             ws.onClose {
                 handleWebSocketClosed(logContext, chargingStationConnection)
             }
@@ -124,7 +130,6 @@ class OcppWampServerApp(
             }
 
             logger.info("$logContext connected - number of connections : ${connections.size}")
-            val handler = handlers(chargingStationOcppId)
             ws.onMessage {
                 val msgString = it.bodyString()
                 if (logger.isDebugEnabled) {
@@ -233,6 +238,19 @@ class OcppWampServerApp(
             connections[connection.ocppId] = connection
         }
         return previous
+    }
+
+    /**
+     * Notifies the [event] of a new connection to its [listener], which only observes it: a failure is logged and
+     * leaves the connection registered and served, so that the station stays reachable and its next connection is
+     * notified as a reconnection.
+     */
+    private fun notifyConnection(logContext: String, event: String, listener: () -> Unit) {
+        try {
+            listener()
+        } catch (e: Exception) {
+            logger.error("$logContext $event listener failed - connection kept: $e", e)
+        }
     }
 
     /**

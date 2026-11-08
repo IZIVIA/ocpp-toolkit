@@ -1,6 +1,9 @@
 package com.izivia.ocpp.wamp.server.impl
 
 import com.izivia.ocpp.OcppVersion.OCPP_1_6
+import com.izivia.ocpp.wamp.messages.WampMessage
+import com.izivia.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import org.http4k.core.Method.GET
 import org.http4k.core.Request
 import org.http4k.websocket.PushPullAdaptingWebSocket
@@ -8,8 +11,10 @@ import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.api.expectThrows
 import strikt.assertions.*
 import java.lang.management.ManagementFactory
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -41,9 +46,12 @@ class OcppWampServerAppConnectionsTest {
     @Volatile
     private var lifecycleHook: (String) -> Unit = {}
 
+    @Volatile
+    private var handlers: (String) -> List<OcppWampServerHandler> = { emptyList() }
+
     private val app = OcppWampServerApp(
         ocppVersions = setOf(OCPP_1_6),
-        handlers = { emptyList() },
+        handlers = { handlers(it) },
         listeners = EventsListeners(
             onWsConnectHandler = { id, _ -> lifecycleEvent("connect:$id") { connectEvents.add(id) } },
             onWsReconnectHandler = { id, _ -> lifecycleEvent("reconnect:$id") { reconnectEvents.add(id) } },
@@ -267,11 +275,75 @@ class OcppWampServerAppConnectionsTest {
     @Test
     fun `should close a replaced connection even when the reconnection listener fails`() {
         val previous = connect("CS1")
-        lifecycleHook = { if (it == "reconnect:CS1") error("listener failure") }
+        // an Error, as an Exception is caught with the listener
+        lifecycleHook = { if (it == "reconnect:CS1") throw AssertionError("listener failure") }
 
         runCatching { connect("CS1") }
 
         expectThat(previous.closed).isTrue()
+    }
+
+    @Test
+    fun `should keep the connection when the connection listener fails`() {
+        lifecycleHook = { if (it == "connect:CS1") error("listener failure") }
+        val socket = connect("CS1")
+        lifecycleHook = {}
+
+        expectThat(callAnsweredBy(socket).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+
+        socket.disconnect()
+        expectThat(events).containsExactly("close:CS1")
+        expectThrows<NoConnectionException> { call("CS1") }
+    }
+
+    @Test
+    fun `should notify a reconnection after a connection whose listener failed`() {
+        lifecycleHook = { if (it == "connect:CS1") error("listener failure") }
+        connect("CS1")
+        lifecycleHook = {}
+
+        connect("CS1")
+
+        expectThat(events).containsExactly("reconnect:CS1")
+    }
+
+    @Test
+    fun `should keep the connection when the reconnection listener fails`() {
+        connect("CS1")
+        lifecycleHook = { if (it == "reconnect:CS1") error("listener failure") }
+        val socket = connect("CS1")
+        lifecycleHook = {}
+
+        expectThat(callAnsweredBy(socket).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+
+        socket.disconnect()
+        expectThat(events).containsExactly("connect:CS1", "close:CS1")
+        expectThrows<NoConnectionException> { call("CS1") }
+    }
+
+    @Test
+    fun `should notify a reconnection after a reconnection whose listener failed`() {
+        connect("CS1")
+        lifecycleHook = { if (it == "reconnect:CS1") error("listener failure") }
+        connect("CS1")
+        lifecycleHook = {}
+
+        connect("CS1")
+
+        expectThat(events).containsExactly("connect:CS1", "reconnect:CS1")
+    }
+
+    @Test
+    fun `should register nothing when the handlers of a station fail`() {
+        handlers = { error("handlers failure") }
+        expectThrows<IllegalStateException> { connect("CS1") }
+        handlers = { emptyList() }
+
+        expectThat(events).isEmpty()
+        expectThrows<NoConnectionException> { call("CS1") }
+
+        connect("CS1")
+        expectThat(events).containsExactly("connect:CS1")
     }
 
     @Test
@@ -361,6 +433,24 @@ class OcppWampServerAppConnectionsTest {
         }
     }
 
+    private fun call(ocppId: String): WampMessage =
+        app.sendBlocking(ocppId, WampMessage.Call("1", "Heartbeat", "{}"), timeoutInMs = 5_000)
+
+    /** Sends a call to the station `CS1` and answers it through [socket], returning what the call received. */
+    private fun callAnsweredBy(socket: FakeWebsocket): WampMessage {
+        val response = CompletableFuture.supplyAsync { call("CS1") }
+        val deadline = TimeSource.Monotonic.markNow() + 5.seconds
+        while (socket.sent.isEmpty()) {
+            // a call failing before it is sent reports its own failure
+            if (response.isDone) response.get()
+            check(deadline.hasNotPassedNow()) { "call not sent" }
+            Thread.sleep(5)
+        }
+        val msgId = WampMessage.parse(socket.sent.first())!!.msgId
+        socket.triggerMessage(WsMessage(WampMessage.CallResult(msgId, "{}").toJson()))
+        return response.get(5, TimeUnit.SECONDS)
+    }
+
     private fun connect(ocppId: String): FakeWebsocket =
         FakeWebsocket().also {
             routing(Request(GET, "/ws/$ocppId").header("Sec-WebSocket-Protocol", "ocpp1.6")).consumer(it)
@@ -386,7 +476,11 @@ class OcppWampServerAppConnectionsTest {
         var closed = false
             private set
 
-        override fun send(message: WsMessage) = Unit
+        val sent = CopyOnWriteArrayList<String>()
+
+        override fun send(message: WsMessage) {
+            sent.add(message.bodyString())
+        }
 
         // like a real connection, closing only completes once the peer answers, see disconnect
         override fun close(status: WsStatus) {
