@@ -45,6 +45,7 @@ class OcppWampServerApp(
     }
 
     private val connections = ConnectionsMap()
+    private val stationLocks = StationLocks()
     private val shutdown = AtomicBoolean(false)
     private val inFlightInboundCalls = AtomicInteger()
     private val callsExecutor: Executor = settings.buildCallsExecutor()
@@ -67,7 +68,6 @@ class OcppWampServerApp(
                     "malformed request - unsupported or invalid ocpp version - $request"
                 )
 
-            val previousConnection = connections[chargingStationOcppId]
             val chargingStationConnection = ChargingStationConnection(
                 clock.now(),
                 wsConnectionId,
@@ -78,32 +78,39 @@ class OcppWampServerApp(
                 settings.timeoutInMs,
                 shutdown
             )
-            // a control frame of the previous connection being notified completes before the replacement
-            synchronized(previousConnection ?: chargingStationConnection) {
-                connections[chargingStationOcppId] = chargingStationConnection
-            }
-
-            val reconnect = previousConnection != null
-
-            if (reconnect) {
-                logger.warn(
-                    """[$chargingStationOcppId] already connected
-                        | - the new connection will replace the previous one
-                        | - a connection reconnect notification will be sent
-                        | - existing connection=$previousConnection
-                        | - new connection=$chargingStationConnection
-                        | - existing connection will be closed
-                    """.trimMargin()
-                )
-                // this close wont trigger a onWsCloseHandler,
-                // because we have already changed the current registered connection
-                previousConnection?.close()
-                listeners.onWsReconnectHandler(chargingStationOcppId, request.headers)
-            } else {
-                listeners.onWsConnectHandler(chargingStationOcppId, request.headers)
-            }
-
             val logContext = "[$chargingStationOcppId] [$wsConnectionId]"
+            // resolved before the connection is registered: a failure then leaves nothing registered
+            val handler = handlers(chargingStationOcppId)
+            var replacedConnection: ChargingStationConnection? = null
+            try {
+                withStationLock(chargingStationOcppId) {
+                    val previousConnection = register(chargingStationConnection)
+                    replacedConnection = previousConnection
+                    if (previousConnection != null) {
+                        logger.warn(
+                            """[$chargingStationOcppId] already connected
+                                | - the new connection will replace the previous one
+                                | - a connection reconnect notification will be sent
+                                | - existing connection=$previousConnection
+                                | - new connection=$chargingStationConnection
+                                | - existing connection will be closed
+                            """.trimMargin()
+                        )
+                        notifyConnection(logContext, "reconnect") {
+                            listeners.onWsReconnectHandler(chargingStationOcppId, request.headers)
+                        }
+                    } else {
+                        notifyConnection(logContext, "connect") {
+                            listeners.onWsConnectHandler(chargingStationOcppId, request.headers)
+                        }
+                    }
+                }
+            } finally {
+                // this close wont trigger a onWsCloseHandler, because we have already changed the current registered
+                // connection; it runs out of the station lock, and even when a listener throws an Error
+                replacedConnection?.close()
+            }
+
             ws.onClose {
                 handleWebSocketClosed(logContext, chargingStationConnection)
             }
@@ -123,7 +130,6 @@ class OcppWampServerApp(
             }
 
             logger.info("$logContext connected - number of connections : ${connections.size}")
-            val handler = handlers(chargingStationOcppId)
             ws.onMessage {
                 val msgString = it.bodyString()
                 if (logger.isDebugEnabled) {
@@ -220,11 +226,46 @@ class OcppWampServerApp(
         }
     }
 
+    /**
+     * Registers [connection] as the current connection of its station and returns the one it replaced, so that
+     * concurrent connections of a station each replace, and close, a distinct connection. The caller holds the lock
+     * of the station.
+     */
+    private fun register(connection: ChargingStationConnection): ChargingStationConnection? {
+        val previous = connections[connection.ocppId]
+        // a control frame of the previous connection being notified completes before the replacement
+        synchronized(previous ?: connection) {
+            connections[connection.ocppId] = connection
+        }
+        return previous
+    }
+
+    /**
+     * Notifies the [event] of a new connection to its [listener], which only observes it: a failure is logged and
+     * leaves the connection registered and served, so that the station stays reachable and its next connection is
+     * notified as a reconnection.
+     */
+    private fun notifyConnection(logContext: String, event: String, listener: () -> Unit) {
+        try {
+            listener()
+        } catch (e: Exception) {
+            logger.error("$logContext $event listener failed - connection kept: $e", e)
+        }
+    }
+
+    /**
+     * Runs [block] holding the lock of the station [ocppId], which is always taken before the lock of one of its
+     * connections, never while holding it. Registering or removing a connection and notifying the matching event
+     * under it delivers the events of a station in the order its connections were registered and removed.
+     */
+    private fun <T> withStationLock(ocppId: CSOcppId, block: () -> T): T =
+        stationLocks.withLock(ocppId.lowercase(), block)
+
     private fun handleWebSocketClosed(
         logContext: String,
         chargingStationConnection: ChargingStationConnection,
         t: Throwable? = null
-    ) {
+    ) = withStationLock(chargingStationConnection.ocppId) {
         val chargingStationOcppId = chargingStationConnection.ocppId
         val currentConnection = connections[chargingStationOcppId]
         // a control frame being notified completes before the removal
@@ -240,9 +281,10 @@ class OcppWampServerApp(
         val errorInfo = t?.let { " onError $t - " } ?: ""
         logger.info("$logContext disconnected - $duration -$errorInfo number of connections : ${connections.size}")
 
-        if (removed && connections[chargingStationOcppId] == null) {
-            // we notify only if we remove the connection, otherwise we are still connected,
-            // or the station disconnection has already been notified by the removal of its current connection
+        if (removed) {
+            // we notify only if we remove the connection, otherwise it has been replaced, and the station is still
+            // connected, or the station disconnection has already been notified by the removal of its current one;
+            // no connection can register before the notification, under the station lock
             listeners.onWsCloseHandler(chargingStationOcppId, chargingStationConnection.request.headers)
         } else {
             logger.debug("$logContext not notifying disconnection - still connected or already notified")
@@ -300,8 +342,10 @@ class OcppWampServerApp(
                 it.callManager.await()
                 it.close()
                 // the close completes later, when the connection is no longer registered: notify it now
-                if (synchronized(it) { connections.remove(it) }) {
-                    listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                withStationLock(it.ocppId) {
+                    if (synchronized(it) { connections.remove(it) }) {
+                        listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                    }
                 }
             }
         }
