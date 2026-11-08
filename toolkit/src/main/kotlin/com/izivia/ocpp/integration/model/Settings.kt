@@ -4,6 +4,7 @@ import com.izivia.ocpp.http.SoapClientSettings
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.toUriHost
+import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import java.util.*
@@ -49,5 +50,11 @@ data class ServerSetting(
     val wampSettings: OcppWampServerSettings = OcppWampServerSettings(),
     var listeners: EventsListeners = EventsListeners(),
     /** Observes the failures while processing OCPP messages, whatever the [transportType]. */
-    val errorListener: OcppErrorListener? = null
+    val errorListener: OcppErrorListener? = null,
+    /**
+     * Decides from the upgrade request whether a charging station may connect, for instance from its
+     * HTTP Basic authentication (see [ConnectionAuthorizer]).
+     * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
+     */
+    val authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL
 )
