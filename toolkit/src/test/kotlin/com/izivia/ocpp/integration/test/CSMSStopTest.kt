@@ -6,7 +6,6 @@ import com.izivia.ocpp.core16.model.clearcache.enumeration.ClearCacheStatus
 import com.izivia.ocpp.integration.CSMS
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
-import com.izivia.ocpp.wamp.server.impl.NoConnectionException
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.websocket.WebsocketClient
 import com.izivia.ocpp.websocket.WebsocketServer
@@ -35,22 +34,6 @@ class CSMSStopTest {
     private fun getFreePort(): Int =
         ServerSocket(0).use { it.localPort }
 
-    /**
-     * Retries [action] until the charging station connection is registered server-side: the client is connected
-     * once it gets the handshake response, before the server registers the connection.
-     */
-    private fun <T> awaitConnected(timeoutMs: Long = 5_000, action: () -> T): T {
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (true) {
-            try {
-                return action()
-            } catch (e: NoConnectionException) {
-                if (System.currentTimeMillis() >= deadline) throw e
-                Thread.sleep(50)
-            }
-        }
-    }
-
     @Test
     fun `stop lets a pending call to a charging station complete`() {
         val port = getFreePort()
@@ -77,12 +60,16 @@ class CSMSStopTest {
             }
             client.connect()
 
+            // connect() returns before the server registers the connection, which a loaded runner can delay by
+            // more than 5 s. The handler wait outlasts the retry, so a connection that never comes fails explicitly.
             val response = CompletableFuture.supplyAsync {
-                awaitConnected {
+                awaitConnected(timeoutMs = 10_000) {
                     transport.sendMessageClass(ClearCacheResp::class, "TEST1", "ClearCache", ClearCacheReq())
                 }
             }
-            expectThat(handlerStarted.await(5, TimeUnit.SECONDS)).isTrue()
+            expectThat(handlerStarted.await(15, TimeUnit.SECONDS))
+                .describedAs { "handler started, call $response" }
+                .isTrue()
 
             csms.stop()
             stopped = true
