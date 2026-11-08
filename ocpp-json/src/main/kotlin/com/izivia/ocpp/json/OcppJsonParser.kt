@@ -308,6 +308,13 @@ abstract class OcppJsonParser(
     fun <T : Any> parsePayloadFromJson(payload: String, clazz: KClass<T>): T =
         mapper.readValue(payload, clazz.java)
 
+    /**
+     * Same as [parsePayloadFromJson], reading the timestamps without timezone as [timestampZone] says
+     * instead of as UTC.
+     */
+    fun <T : Any> parsePayloadFromJson(payload: String, clazz: KClass<T>, timestampZone: TimestampZoneContext): T =
+        mapper.readerFor(clazz.java).withTimestampZone(timestampZone).readValue(payload)
+
     fun <T> mapPayloadToString(payload: T): String =
         mapper.writeValueAsString(payload)
 

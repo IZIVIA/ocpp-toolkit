@@ -34,6 +34,16 @@ Outbound timestamps are serialized in a canonical UTC ISO-8601 form and truncate
 
 Inbound timestamp parsing is intentionally more tolerant for OCPP interoperability. The toolkit accepts canonical `Z` timestamps, full timezone offsets such as `+02:00`, incomplete offsets such as `+02`, and timestamps without timezone information. When a timestamp omits the timezone, it is interpreted as UTC and a warning is logged. This avoids depending on the CSMS JVM default timezone, but a charge point sending local time without a timezone may still produce shifted transaction timestamps.
 
+On the CSMS side over WebSocket, `timestampZoneFallback` chooses that zone per charging station, in its calls and in the results of the calls sent to it. Pass it to `WebsocketServer`, or to `ServerSetting` with the `toolkit` module. Returning `null` refuses these timestamps: the station gets a CallError for its call, and a call sent by the CSMS fails with an exception. Timestamps with `Z` or an offset are never affected, and the resolver is only called when a message holds a timestamp without timezone, at most once per message. A local time in a daylight saving gap or overlap follows `LocalDateTime.atZone`. The SOAP transport and `OcppJsonParser.parseAnyFromString` still read these timestamps as UTC.
+
+```kotlin
+val server = WebsocketServer(
+    ocppVersions = setOf(OcppVersion.OCPP_1_6),
+    path = "ws",
+    timestampZoneFallback = { ocppId -> stationZones[ocppId] ?: ZoneOffset.UTC },
+)
+```
+
 ## Status
 
 Currently the ChargingStation side of versions 1.6 and 2.0.1 are fully supported in OCPP-J flavor - except the security requirements besides support for http basic auth. This includes all the data structures described by the specification, with json serialisation verified against the json schemas provided in the specification.

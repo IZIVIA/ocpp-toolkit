@@ -2,6 +2,7 @@ package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.TimestampZoneContext
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
 import com.izivia.ocpp.transport.OcppCallErrorException
@@ -18,18 +19,28 @@ import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import mu.KotlinLogging
 import org.http4k.server.Http4kServer
+import java.time.ZoneId
 import java.util.*
 import kotlin.reflect.KClass
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 
 private val logger = KotlinLogging.logger {}
 
+/**
+ * @param timestampZoneFallback zone in which to read the timestamps without timezone sent by a charging station,
+ * in its calls and in the results of the calls sent to it. Called at most once per message, and only when such a
+ * timestamp is met; timestamps with `Z` or an offset never use it. Returning `null` refuses them: an inbound call
+ * gets a CallError, and [sendMessageClass] throws. An exception thrown by the resolver has the same effect.
+ * It runs on the thread handling the message, the calls executor or the [sendMessageClass] caller, possibly
+ * concurrently: it must be thread-safe, and a slow lookup holds up that message.
+ */
 class WebsocketServer(
     ocppVersions: Set<OcppVersion>,
     path: String,
     val newMessageId: () -> String = { UUID.randomUUID().toString() },
     settings: OcppWampServerSettings = OcppWampServerSettings(),
     listeners: EventsListeners = EventsListeners(),
+    private val timestampZoneFallback: (CSOcppId) -> ZoneId? = { ZoneId.of("UTC") },
 ) : ServerTransport {
 
     internal val server: OcppWampServer =
@@ -55,7 +66,8 @@ class WebsocketServer(
                 )
             }
             when (response.msgType) {
-                WampMessageType.CALL_RESULT -> parser.parsePayloadFromJson(response.payload, clazz)
+                WampMessageType.CALL_RESULT ->
+                    parser.parsePayloadFromJson(response.payload, clazz, timestampZone(csOcppId))
                 WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
                 else -> throw IllegalStateException(
                     "The message received type ${response.msgType} is not the one expected\n"
@@ -80,7 +92,7 @@ class WebsocketServer(
                         val response =
                             onAction(
                                 RequestMetadata(meta.ocppId, msg.msgId),
-                                parser.parsePayloadFromJson(msg.payload, clazz)
+                                parser.parsePayloadFromJson(msg.payload, clazz, timestampZone(meta.ocppId))
                             )
                         val payload = parser.mapPayloadToString(response)
                         WampMessage.CallResult(msg.msgId, payload)
@@ -98,6 +110,8 @@ class WebsocketServer(
                 }
         })
     }
+
+    private fun timestampZone(ocppId: CSOcppId) = TimestampZoneContext(ocppId, timestampZoneFallback)
 
     override fun canSendToChargingStation(chargingStationConfig: ChargingStationConfig): Boolean =
         chargingStationConfig.acceptConnection
