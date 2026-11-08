@@ -31,16 +31,23 @@ class OcppWampServerAppConnectionsTest {
     private val reconnectEvents = CopyOnWriteArrayList<String>()
     private val closeEvents = CopyOnWriteArrayList<String>()
 
+    /** The lifecycle events of every station, in the order the listeners received them: `connect:CS1`, ... */
+    private val events = CopyOnWriteArrayList<String>()
+
     @Volatile
     private var pongHandler: (WsControlFrameEvent) -> Unit = { pongEvents.add(it) }
+
+    /** Called with a lifecycle event as its listener is entered, before the event is recorded. */
+    @Volatile
+    private var lifecycleHook: (String) -> Unit = {}
 
     private val app = OcppWampServerApp(
         ocppVersions = setOf(OCPP_1_6),
         handlers = { emptyList() },
         listeners = EventsListeners(
-            onWsConnectHandler = { id, _ -> connectEvents.add(id) },
-            onWsReconnectHandler = { id, _ -> reconnectEvents.add(id) },
-            onWsCloseHandler = { id, _ -> closeEvents.add(id) },
+            onWsConnectHandler = { id, _ -> lifecycleEvent("connect:$id") { connectEvents.add(id) } },
+            onWsReconnectHandler = { id, _ -> lifecycleEvent("reconnect:$id") { reconnectEvents.add(id) } },
+            onWsCloseHandler = { id, _ -> lifecycleEvent("close:$id") { closeEvents.add(id) } },
             onWsPongHandler = { pongHandler(it) },
             onWsPingHandler = { pingEvents.add(it) }
         ),
@@ -204,6 +211,89 @@ class OcppWampServerAppConnectionsTest {
         }
     }
 
+    @Test
+    fun `should notify the close of a station before the connection that follows it`() {
+        val previous = connect("CS1")
+        val release = blockNextLifecycleEvent("close:CS1") { previous.disconnect() }
+
+        val connecting = thread { connect("CS1") }
+        connecting.join(300)
+        expectThat(events).containsExactly("connect:CS1")
+
+        release()
+        connecting.join(5_000)
+        expectThat(events).containsExactly("connect:CS1", "close:CS1", "connect:CS1")
+    }
+
+    @Test
+    fun `should notify a reconnection after the connection it follows`() {
+        val release = blockNextLifecycleEvent("connect:CS1") { connect("CS1") }
+
+        val reconnecting = thread { connect("CS1") }
+        reconnecting.join(300)
+        expectThat(events).isEmpty()
+
+        release()
+        reconnecting.join(5_000)
+        expectThat(events).containsExactly("connect:CS1", "reconnect:CS1")
+    }
+
+    @Test
+    fun `should order the events of a station whatever the case of its id`() {
+        val release = blockNextLifecycleEvent("connect:CS1") { connect("CS1") }
+
+        val reconnecting = thread { connect("cs1") }
+        reconnecting.join(300)
+        expectThat(events).isEmpty()
+
+        release()
+        reconnecting.join(5_000)
+        expectThat(events).containsExactly("connect:CS1", "reconnect:cs1")
+    }
+
+    @Test
+    fun `should notify the close on shutdown after the connection being notified`() {
+        val release = blockNextLifecycleEvent("connect:CS1") { connect("CS1") }
+
+        val stopping = thread { app.shutdown() }
+        stopping.join(300)
+        expectThat(events).isEmpty()
+
+        release()
+        stopping.join(5_000)
+        expectThat(events).containsExactly("connect:CS1", "close:CS1")
+    }
+
+    @Test
+    fun `should close a replaced connection even when the reconnection listener fails`() {
+        val previous = connect("CS1")
+        lifecycleHook = { if (it == "reconnect:CS1") error("listener failure") }
+
+        runCatching { connect("CS1") }
+
+        expectThat(previous.closed).isTrue()
+    }
+
+    @Test
+    fun `should leave the station connected when a close races the next connection`() {
+        repeat(200) { round ->
+            val ocppId = "CS$round"
+            val previous = connect(ocppId)
+            val start = CountDownLatch(1)
+            val racing = listOf(
+                thread { start.await(); previous.disconnect() },
+                thread { start.await(); connect(ocppId) }
+            )
+            start.countDown()
+            racing.forEach { it.join(5_000) }
+
+            // the close is notified before the next connection registers, or not at all once it has replaced it
+            expectThat(events.filter { it.substringAfter(':') == ocppId }.map { it.substringBefore(':') })
+                .describedAs("events of $ocppId")
+                .isContainedIn(listOf(listOf("connect", "close", "connect"), listOf("connect", "reconnect")))
+        }
+    }
+
     /**
      * Waits until every thread is blocked registering its connection, entering the monitor of the station or of the
      * connection it is about to replace.
@@ -240,6 +330,34 @@ class OcppWampServerAppConnectionsTest {
         return {
             released.countDown()
             receiving.join(5_000)
+        }
+    }
+
+    private fun lifecycleEvent(event: String, record: () -> Unit) {
+        lifecycleHook(event)
+        events.add(event)
+        record()
+    }
+
+    /**
+     * Runs [trigger] in another thread whose listener of [event] blocks until the returned function is called, which
+     * then waits for that thread to end.
+     */
+    private fun blockNextLifecycleEvent(event: String, trigger: () -> Unit): () -> Unit {
+        val started = CountDownLatch(1)
+        val released = CountDownLatch(1)
+        lifecycleHook = {
+            if (it == event) {
+                lifecycleHook = {}
+                started.countDown()
+                released.await(5, TimeUnit.SECONDS)
+            }
+        }
+        val triggering = thread { trigger() }
+        expectThat(started.await(5, TimeUnit.SECONDS)).isTrue()
+        return {
+            released.countDown()
+            triggering.join(5_000)
         }
     }
 
