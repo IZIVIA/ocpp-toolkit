@@ -15,6 +15,7 @@ import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
+import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
@@ -35,6 +36,8 @@ class WebsocketServer(
     settings: OcppWampServerSettings = OcppWampServerSettings(),
     listeners: EventsListeners = EventsListeners(),
     private val errorListener: OcppErrorListener? = null,
+    /** Decides from the upgrade request whether a charging station may connect, see [ConnectionAuthorizer]. */
+    authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL,
 ) : ServerTransport {
 
     internal val server: OcppWampServer =
@@ -43,7 +46,8 @@ class WebsocketServer(
             path = path,
             settings = settings,
             listeners = listeners,
-            errorListener = errorListener
+            errorListener = errorListener,
+            authorizer = authorizer
         )
     val serverConfig = server.config()
 
