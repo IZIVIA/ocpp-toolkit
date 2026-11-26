@@ -75,6 +75,8 @@ class OkHttpOcppWampClient(
                 logger.info("[$debugContext] connected")
             } else {
                 logger.error("[$debugContext] error when connecting - $t")
+                // covers both a failure reported by OkHttp and the timeout, before the cleanup drops the listener
+                connectionListener?.onConnectionFailure(t)
                 cleanupStateOnClose()
                 throw IOException("[$debugContext] connection failed: $t", t)
             }
@@ -105,8 +107,6 @@ class OkHttpOcppWampClient(
 
             override fun onConnectionFailure(t: Throwable) {
                 error = t
-                // notify before releasing connect(), whose cleanup drops the listener
-                connectionListener?.onConnectionFailure(t)
                 latch.countDown()
             }
 
