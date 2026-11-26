@@ -63,6 +63,8 @@ interface OcppWampServer {
      *
      * The checks are iterated in order, the first returning true will be used to handle the charging station.
      * if no handler accepts by returning true boolean, the connection is refused with an HTTP 404.
+     * The checks run on the WebSocket IO thread for every upgrade request, so they must be fast and must not throw:
+     * a check that throws fails the handshake with an HTTP 500.
      *
      * The handler which accepted the charging station is later used for action handling.
      *
@@ -92,6 +94,9 @@ interface OcppWampServerHandler {
      * check for ocpp id existence
      *
      * this is used by server to accept connection for a given ocpp id.
+     *
+     * It runs on the WebSocket IO thread for every upgrade request, before the handshake, so it must be fast (no
+     * blocking database or network call) and must not throw: an exception fails the handshake with an HTTP 500.
      */
     fun accept(ocppId: CSOcppId): Boolean
 

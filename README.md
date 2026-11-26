@@ -394,7 +394,8 @@ The CSMS decides which charging stations may connect: through `ChargingStationCo
 decides whether the CSMS may send requests to the station.
 
 On WebSocket, a station that no handler accepts fails its handshake with an HTTP 404, as OCPP-J recommends: it never
-has a connection, and no connection listener is notified.
+has a connection, and no connection listener is notified. The check runs on the WebSocket IO thread for every upgrade
+request, so `fn` and `accept` must be fast and must not throw: an exception fails the handshake with an HTTP 500.
 
 Earlier versions completed the handshake of a refused station, then answered each of its calls, BootNotification
 included, with a CALLERROR `InternalError` "No action handler found". Such a station now gets a 404 instead. To keep a
