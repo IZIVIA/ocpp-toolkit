@@ -65,14 +65,29 @@ class AutoReconnectOcppWampClientTest {
         awaitState(ConnectionState.CONNECTED)
 
         underlying.dropped = true
-        val response = CompletableFuture.supplyAsync { client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}")) }
+        var caller: Thread? = null
+        val response = CompletableFuture.supplyAsync {
+            caller = Thread.currentThread()
+            client.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+        }
         expectThat(underlying.refusedCall.await(5, TimeUnit.SECONDS)).isTrue()
+        // close while the call waits for the connection lost to be notified, not before it starts waiting
+        awaitWaiting(caller!!)
 
         client.close()
 
         expectThat(runCatching { response.get(5, TimeUnit.SECONDS) }.exceptionOrNull())
             .isA<ExecutionException>()
-            .get { cause }.isA<IllegalStateException>()
+            // the closed client refuses the call, rather than the dropped connection leaking out
+            .get { cause?.javaClass?.name }.isEqualTo(IllegalStateException::class.java.name)
+    }
+
+    private fun awaitWaiting(thread: Thread) {
+        val deadline = TimeSource.Monotonic.markNow() + 5.seconds
+        while (thread.state != Thread.State.TIMED_WAITING && deadline.hasNotPassedNow()) {
+            Thread.sleep(5)
+        }
+        expectThat(thread.state).isEqualTo(Thread.State.TIMED_WAITING)
     }
 
     @Test
