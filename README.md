@@ -599,3 +599,10 @@ Plus, you will find:
 - `operation-information`, used to described operations in whatever version of apis
 - `utils`, used to ease some common needs between apis
 - `ocpp-wamp`, a client & server implementation of the WAMP-like RPC-over-websocket system defined in the OCPP-J protcols
+
+## Changelog
+
+Notable changes of each release are listed in [CHANGELOG.md](CHANGELOG.md), following
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A pull request that changes the
+behaviour or the API of a published module adds its entry under `[Unreleased]`, and marks a
+change that breaks consumers with **BREAKING**.
