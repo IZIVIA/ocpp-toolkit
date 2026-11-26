@@ -2,6 +2,7 @@ package com.izivia.ocpp.utils
 
 import com.fasterxml.jackson.databind.ObjectReader
 import java.time.ZoneId
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Tells [InstantDeserializer] how to read the timestamps without timezone sent by a charging station.
@@ -18,6 +19,11 @@ class TimestampZoneContext(val chargingStationId: String, resolveZone: (String) 
      * exception thrown by the resolver. `null` refuses such timestamps.
      */
     val zone: ZoneId? get() = resolution.getOrThrow()
+
+    private val warned = AtomicBoolean()
+
+    /** `true` on the first call only: [InstantDeserializer] logs one warning per context, not per timestamp. */
+    internal fun firstWarning(): Boolean = warned.compareAndSet(false, true)
 }
 
 fun ObjectReader.withTimestampZone(context: TimestampZoneContext): ObjectReader =

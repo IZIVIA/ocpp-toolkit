@@ -216,6 +216,20 @@ class KotlinInstantModuleTest {
     }
 
     @Test
+    fun `should warn once per context about timestamps without timezone`() {
+        withInstantDeserializerLogs { events ->
+            mapper.readerFor(object : TypeReference<List<Instant>>() {})
+                .withTimestampZone(TimestampZoneContext("CS1") { PARIS })
+                .readValue<List<Instant>>("""["2024-03-15T12:00:00","2024-03-15T13:00:00","2024-03-15T14:00:00"]""")
+
+            expectThat(events.filter { it.level == Level.WARN }.map { it.formattedMessage }).containsExactly(
+                "Timestamp without timezone received from charging station CS1: 2024-03-15T12:00:00. " +
+                    "Interpreting it in Europe/Paris."
+            )
+        }
+    }
+
+    @Test
     fun `should follow LocalDateTime atZone in a daylight saving gap of the resolved zone`() {
         // 02:30 does not exist in Paris on 2024-03-31: atZone shifts it forward by the gap, to 03:30+02:00.
         expectThat(readInstant("2024-03-31T02:30:00", TimestampZoneContext("CS1") { PARIS }))

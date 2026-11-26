@@ -63,12 +63,14 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
         val zone = timestampZone.zone ?: throw IllegalArgumentException(
             "Timestamp without timezone refused for charging station ${timestampZone.chargingStationId}: $value"
         )
-        logger.warn(
-            "Timestamp without timezone received from charging station {}: {}. Interpreting it in {}.",
-            timestampZone.chargingStationId,
-            value,
-            zone,
-        )
+        if (timestampZone.firstWarning()) {
+            logger.warn(
+                "Timestamp without timezone received from charging station {}: {}. Interpreting it in {}.",
+                timestampZone.chargingStationId,
+                value,
+                zone,
+            )
+        }
         // Follows LocalDateTime.atZone: a time in a daylight saving gap is shifted forward by the length of the gap,
         // a time in an overlap takes the earlier offset.
         return localDateTime.atZone(zone).toInstant().toKotlinInstant()
