@@ -21,7 +21,8 @@ import java.util.Base64
  * @param securityOf the security expected for a station, or `null` for an unknown station, which is refused.
  *   If it throws, the exception propagates and the server refuses the station.
  * @param onFailure notified of each failed check, whether the station is refused ([Enforcement.BLOCK], unknown
- *   station) or admitted anyway ([Enforcement.REPORT]). If it throws, the decision is kept.
+ *   station) or admitted anyway ([Enforcement.REPORT]). If it throws, the decision is kept, be it an exception or
+ *   an error such as a `NoClassDefFoundError`: only a `VirtualMachineError` propagates.
  *
  * Both run on the WebSocket IO thread and must not block: keep the secrets in memory rather than querying a
  * database on each connection.
@@ -79,7 +80,10 @@ class SecurityProfileAuthorizer(
     private fun fail(failure: AuthenticationFailure): Boolean {
         try {
             onFailure(failure)
-        } catch (e: Exception) {
+        } catch (e: VirtualMachineError) {
+            throw e
+        } catch (e: Throwable) {
+            // Throwable on purpose, as in notifySafely: a library missing at runtime fails with a NoClassDefFoundError
             logger.warn("[${failure.ocppId}] authentication failure listener failed with ${e::class.qualifiedName}")
         }
         return failure.enforcement == Enforcement.REPORT

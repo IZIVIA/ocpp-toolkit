@@ -206,6 +206,19 @@ class SecurityProfileAuthorizerTest {
     }
 
     @Test
+    fun `failure listener failing with an error keeps the decision, but a fatal error propagates`() {
+        stations["MIGRATING"] = BasicAuthPassword(PASSWORD, REPORT)
+        val erroring = SecurityProfileAuthorizer(stations::get) { throw NoClassDefFoundError("com/example/Metrics") }
+        val fatal = SecurityProfileAuthorizer(stations::get) { throw OutOfMemoryError("simulated") }
+
+        expect {
+            that(erroring.authorize(request("CS201", basicAuthorization("CS201", "wrong-password-1234")))).isFalse()
+            that(erroring.authorize(request("MIGRATING", basicAuthorization("MIGRATING", "wrong")))).isTrue()
+            catching { fatal.authorize(request("UNKNOWN")) }.isFailure().isA<OutOfMemoryError>()
+        }
+    }
+
+    @Test
     fun `credentials are parsed before the station is looked up, so that an unknown one is not answered sooner`() {
         val steps = CopyOnWriteArrayList<String>()
         val recording = SecurityProfileAuthorizer({ id -> steps += "lookup"; stations[id] })
