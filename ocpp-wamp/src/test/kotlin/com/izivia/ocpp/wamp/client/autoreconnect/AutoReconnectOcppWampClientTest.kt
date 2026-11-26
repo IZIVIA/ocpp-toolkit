@@ -128,6 +128,45 @@ class AutoReconnectOcppWampClientTest {
         }
     }
 
+    @Test
+    fun `should bound the whole wait for the reconnection by the call timeout`() {
+        // long enough for the bound to stand out from the scheduling noise of a loaded machine
+        val callTimeout = 3.seconds
+        val shortTimeoutClient = AutoReconnectOcppWampClient(
+            underlying,
+            "TEST1",
+            AutoReconnectConfig(
+                callTimeout = callTimeout,
+                baseAutoReconnectDelay = 10.milliseconds,
+                minDelayBetweenAttempts = 10.milliseconds
+            )
+        )
+        try {
+            shortTimeoutClient.connect()
+            awaitState(ConnectionState.CONNECTED, shortTimeoutClient)
+
+            underlying.refuseConnections = true
+            underlying.dropped = true
+            val start = TimeSource.Monotonic.markNow()
+            val response = CompletableFuture.supplyAsync {
+                shortTimeoutClient.sendBlocking(WampMessage.Call("1", "Heartbeat", "{}"))
+            }
+            expectThat(underlying.refusedCall.await(5, TimeUnit.SECONDS)).isTrue()
+
+            // most of the call timeout is spent waiting for the connection lost, the reconnection gets what is left
+            Thread.sleep((callTimeout * 0.8).inWholeMilliseconds)
+            underlying.notifyConnectionLost()
+
+            expectThat(runCatching { response.get(10, TimeUnit.SECONDS) }.exceptionOrNull())
+                .isA<ExecutionException>()
+                .get { cause }.isA<IOException>()
+            expectThat(start.elapsedNow()).isLessThan(callTimeout * 1.5)
+        } finally {
+            underlying.refuseConnections = false
+            shortTimeoutClient.close()
+        }
+    }
+
     private fun awaitState(expected: ConnectionState, c: OcppWampClient = client) {
         val deadline = TimeSource.Monotonic.markNow() + 5.seconds
         while (c.state != expected && deadline.hasNotPassedNow()) {
@@ -148,6 +187,10 @@ class AutoReconnectOcppWampClientTest {
         @Volatile
         var flapping = false
 
+        // when set, every connection attempt fails
+        @Volatile
+        var refuseConnections = false
+
         @Volatile
         private var listener: ConnectionListener? = null
 
@@ -157,6 +200,9 @@ class AutoReconnectOcppWampClientTest {
             get() = if (dropped) ConnectionState.DISCONNECTED else ConnectionState.CONNECTED
 
         override fun connect(listener: ConnectionListener?) {
+            if (refuseConnections) {
+                throw IOException("connection refused")
+            }
             this.listener = listener
             if (!flapping) {
                 dropped = false

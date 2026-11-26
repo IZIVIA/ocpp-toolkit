@@ -96,14 +96,14 @@ class AutoReconnectOcppWampClient(
      * this client still connected while the underlying one is not. Such a call waits for the connection lost to be
      * notified, then for the reconnection, like a call made once the connection lost has been notified.
      *
-     * The wait for that notification is bounded by the call timeout, and so is the wait for the reconnection
-     * that follows it.
+     * The wait for that notification and for the reconnection, together, is bounded by the call timeout. Once
+     * connected, the call itself is bounded by the timeout of the underlying client.
      */
     override fun sendBlocking(message: WampMessage): WampMessage {
         val deadline = TimeSource.Monotonic.markNow() + config.callTimeout
         while (true) {
             val current = autoReconnectState
-            current.onBeforeCall()
+            current.onBeforeCall(-deadline.elapsedNow())
             try {
                 return client.sendBlocking(message)
             } catch (e: NotConnectedException) {

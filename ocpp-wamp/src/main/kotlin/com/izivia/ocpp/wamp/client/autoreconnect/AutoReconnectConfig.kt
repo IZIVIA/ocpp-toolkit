@@ -5,7 +5,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 data class AutoReconnectConfig(
-    // the timeout used for calls (sendBlocking), including time to make auto reconnection attempts.
+    // the time a call (sendBlocking) may wait for the connection, auto reconnection attempts included. Once
+    // connected, the call itself is bounded by the timeout of the underlying client.
     val callTimeout: Duration = 30.seconds,
     // initial delay before trying to reconnect. This delay will be doubled after each attempt, until successful
     val baseAutoReconnectDelay: Duration = 250.milliseconds,
