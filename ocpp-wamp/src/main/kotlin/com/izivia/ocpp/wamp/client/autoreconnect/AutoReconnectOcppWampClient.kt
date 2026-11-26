@@ -199,8 +199,12 @@ class AutoReconnectOcppWampClient(
             }
             autoReconnectState.exit(to)
             autoReconnectState = to
-            to.enter()
-            stateChanged.signalAll()
+            // waiting calls must see the new state even if entering it fails
+            try {
+                to.enter()
+            } finally {
+                stateChanged.signalAll()
+            }
         }
     }
 }
