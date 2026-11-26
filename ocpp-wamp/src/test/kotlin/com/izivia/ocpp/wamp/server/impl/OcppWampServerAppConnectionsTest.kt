@@ -349,6 +349,18 @@ class OcppWampServerAppConnectionsTest {
     }
 
     @Test
+    fun `should keep the thread interrupted when the connection listener is interrupted`() {
+        lifecycleHook = { if (it == "connect:CS1") throw InterruptedException("listener interrupted") }
+        val socket = connect("CS1")
+        // read, and cleared, before anything else can block on it
+        val interrupted = Thread.interrupted()
+        lifecycleHook = {}
+
+        expectThat(interrupted).isTrue()
+        expectThat(callAnsweredBy(socket).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+    }
+
+    @Test
     fun `should register nothing when the handlers of a station fail`() {
         handlers = { error("handlers failure") }
         expectThrows<IllegalStateException> { connect("CS1") }

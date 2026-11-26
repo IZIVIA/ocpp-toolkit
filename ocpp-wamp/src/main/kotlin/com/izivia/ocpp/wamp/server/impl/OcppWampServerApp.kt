@@ -243,12 +243,15 @@ class OcppWampServerApp(
     /**
      * Notifies the [event] of a new connection to its [listener], which only observes it: a failure is logged and
      * leaves the connection registered and served, so that the station stays reachable and its next connection is
-     * notified as a reconnection.
+     * notified as a reconnection. An interrupted listener leaves the calling thread interrupted.
      */
     private fun notifyConnection(logContext: String, event: String, listener: () -> Unit) {
         try {
             listener()
         } catch (e: Exception) {
+            if (e is InterruptedException) {
+                Thread.currentThread().interrupt()
+            }
             logger.error("$logContext $event listener failed - connection kept: $e", e)
         }
     }
