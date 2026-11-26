@@ -209,19 +209,18 @@ class OkHttpOcppWampClient(
     }
 
     private fun onMessage(text: String) {
-        val msgString = text
-        logger.info("OkHttpOcppWampClient onMessage : $msgString")
-        val msg = WampMessage.parse(msgString)
+        logger.info("OkHttpOcppWampClient onMessage : $text")
+        val msg = WampMessage.parse(text)
 
         if (msg == null) {
-            logger.warn("can't parse wamp message from server: $msgString")
+            logger.warn("can't parse wamp message from server: $text")
             return
         }
         when (msg.msgType) {
             WampMessageType.CALL_RESULT, WampMessageType.CALL_ERROR -> {
                 // outcoming call result, handled on the reader thread: it does not block, and it must not wait
                 // for a pool that call handlers may be occupying while they wait for this very result
-                logger.info("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
+                logger.debug("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
                 wampConnection?.callManager?.handleResult("[$ocppId]", msg)
             }
 
@@ -231,7 +230,7 @@ class OkHttpOcppWampClient(
                     try {
                         withTimeout(timeoutInMs) {
                             // incoming call
-                            logger.info("[$ocppId] <- ${msg.action} - $msgString")
+                            logger.info("[$ocppId] <- ${msg.action} - $text")
                             val r = handlers.asSequence()
                                 // use sequence to avoid greedy mapping, to find the first handler with non null result
                                 .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
@@ -249,7 +248,7 @@ class OkHttpOcppWampClient(
                     } catch (e: TimeoutCancellationException) {
                         logger.error(
                             "[$ocppId] timeout during call handling of" +
-                                " ${msg.action} - $msgString -- ${e.message}"
+                                " ${msg.action} - $text -- ${e.message}"
                         )
                         wampConnection?.websocket?.send(
                             WampMessage.CallError(
