@@ -18,6 +18,10 @@ enum class Enforcement {
  *
  * The type of the secret, not the negotiated OCPP version, decides how the password it sends is compared.
  * The secret is never shown by [toString].
+ *
+ * A secret is validated when created, and one outside the OCPP format throws [IllegalArgumentException]. Build them
+ * when the secrets are loaded: built inside `SecurityProfileAuthorizer.securityOf`, an invalid one would refuse the
+ * station on each connection, whatever its [Enforcement].
  */
 sealed interface StationSecurity {
 

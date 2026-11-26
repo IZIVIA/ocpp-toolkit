@@ -460,7 +460,13 @@ station that connects without having been reported passes its check, and its sec
   `MALFORMED_CREDENTIALS`, `USERNAME_MISMATCH`, `WRONG_PASSWORD`) and the enforcement applied. It never carries the
   credentials. If it throws, the decision is kept.
 - The secrets are validated when created: 16 to 40 characters of the OCPP 2.0.1 charset for a `BasicAuthPassword`,
-  16 to 20 bytes in hexadecimal for an `AuthorizationKey`. They are never shown by `toString`.
+  16 to 20 bytes in hexadecimal for an `AuthorizationKey`. They are never shown by `toString`. Build them when the
+  secrets are loaded, as the map above does, so that an invalid secret fails at startup: built inside `securityOf`,
+  it would throw on each connection of the station, which is then refused whatever its enforcement, even `REPORT`.
+- A secret outside these formats, such as a short password or a non-hexadecimal 1.6 key of an existing fleet,
+  cannot be enforced. To migrate such a fleet, give each station the compliant secret it will be configured with,
+  with `Enforcement.REPORT`: it is admitted with its old password until it sends the new one. To keep enforcing the
+  old secret meanwhile, write your own `ConnectionAuthorizer`.
 
 The password is not encoded the same way in both versions, which the OCPP 2.0.1 specification points out. OCPP 2.0.1
 uses a UTF-8 string. The OCPP 1.6 Security Whitepaper advises a random binary `AuthorizationKey`, represented in
