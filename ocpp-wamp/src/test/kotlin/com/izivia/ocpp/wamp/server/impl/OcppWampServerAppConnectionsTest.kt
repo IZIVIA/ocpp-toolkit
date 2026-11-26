@@ -314,13 +314,15 @@ class OcppWampServerAppConnectionsTest {
      * connection it is about to replace.
      */
     private fun awaitBlockedRegistering(threads: List<Thread>) {
+        // a monitor of a nested class of the server or of its station locks, named after classes a rename updates
+        val registeringMonitors = listOf(OcppWampServerApp::class, StationLocks::class).map { "${it.java.name}$" }
         val threadsBean = ManagementFactory.getThreadMXBean()
         val deadline = TimeSource.Monotonic.markNow() + 5.seconds
         while (
             threads.any { t ->
                 val info = threadsBean.getThreadInfo(t.threadId())
                 info?.threadState != Thread.State.BLOCKED ||
-                    listOf("ChargingStationConnection", "StationLock").none { info.lockName?.contains(it) == true }
+                    registeringMonitors.none { info.lockName?.startsWith(it) == true }
             }
         ) {
             check(deadline.hasNotPassedNow()) { "connections not blocked registering" }
