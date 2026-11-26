@@ -9,6 +9,7 @@ import com.izivia.ocpp.integration.model.TransportEnum
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
 import io.mockk.mockk
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import strikt.api.expect
 import strikt.assertions.isEqualTo
@@ -25,11 +26,18 @@ import com.izivia.ocpp.OcppVersion as WampOcppVersion
 
 class WebsocketEndpointPathTest {
     private val port = ServerSocket(0).use { it.localPort }
+    private val httpClient = HttpClient.newHttpClient()
     private val clientErrors = 400..499
     private val twoPathsOnOnePort = listOf(
         websocketSetting("ws16", OcppVersion.OCPP_1_6),
         websocketSetting("ws20", OcppVersion.OCPP_2_0)
     )
+
+    // shutdownNow rather than close, which would wait for a handshake left hanging by orTimeout
+    @AfterEach
+    fun shutdownHttpClient() {
+        httpClient.shutdownNow()
+    }
 
     @Test
     fun `station connects on each websocket path of a port`() {
@@ -96,7 +104,7 @@ class WebsocketEndpointPathTest {
 
     private fun handshakeStatus(path: String, version: WampOcppVersion): Int? =
         try {
-            HttpClient.newHttpClient().newWebSocketBuilder()
+            httpClient.newWebSocketBuilder()
                 .subprotocols(version.subprotocol)
                 .buildAsync(URI("ws://localhost:$port$path"), object : WebSocket.Listener {})
                 .orTimeout(5, TimeUnit.SECONDS)

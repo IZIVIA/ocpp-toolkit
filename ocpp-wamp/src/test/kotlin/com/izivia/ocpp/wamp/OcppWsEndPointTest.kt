@@ -44,9 +44,14 @@ class OcppWsEndPointTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["/ws/OK/extra", "/xws/OK", "/ocpp/ws/OK"])
+    @ValueSource(strings = ["/ws/OK/extra", "/xws/OK", "/wsx/OK", "/ocpp/ws/OK"])
     fun `should not find an id in a url that only contains the endpoint`(uri: String) {
         expectThat(ocppWsEndpoint.extractChargingStationOcppId(uri)).isNull()
+    }
+
+    @Test
+    fun `should decode a percent-encoded id`() {
+        expectThat(ocppWsEndpoint.extractChargingStationOcppId("/ws/a%20b")).isEqualTo("a b")
     }
 
     @Test

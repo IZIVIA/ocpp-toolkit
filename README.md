@@ -337,6 +337,14 @@ if (remoteStartTransactionReq != null) {
 connection.close()
 ```
 
+### WebSocket endpoint path
+
+A CSMS WebSocket server set with `ServerSetting(path = "ws", …)` accepts a station only at exactly
+`/ws/<chargingStationOcppId>`, with the id percent-decoded. A trailing slash (`/ws/CS1/`) and a doubled slash
+(`/ws//CS1`) are tolerated. Any other URL is refused with a 4xx response before the upgrade, including an extra
+segment (`/ws/CS1/extra`) and a prefix (`/ocpp/ws/CS1`). A reverse proxy that publishes the server under a prefix
+must strip it before forwarding.
+
 ### WebSocket events
 
 On the CSMS side, `EventsListeners` notifies the WebSocket lifecycle of the charging stations: connection,
