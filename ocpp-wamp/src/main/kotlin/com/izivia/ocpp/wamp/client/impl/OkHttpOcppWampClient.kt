@@ -22,6 +22,19 @@ import java.net.ConnectException
 import java.util.concurrent.*
 import javax.net.ssl.HostnameVerifier
 
+/**
+ * OCPP-J client over OkHttp.
+ *
+ * Inbound CALLs are handled on [Dispatchers.IO]. Its threads are shared with the rest of the application, and by
+ * default at most 64 of them, or as many as there are cores if that is larger, run at once (system property
+ * `kotlinx.coroutines.io.parallelism`). Beyond that, a CALL waits for a thread, and [timeoutInMs] does not count
+ * that wait: the server may give up on the CALL before its handler has started.
+ *
+ * [timeoutInMs] does not interrupt a handler either. Handlers do not suspend, so one that blocks (`Thread.sleep`,
+ * a blocking call) holds its thread until it returns, and its answer is sent then.
+ *
+ * CALLRESULT and CALLERROR messages are handled on the OkHttp reader thread.
+ */
 class OkHttpOcppWampClient(
     target: Uri,
     val ocppId: CSOcppId,
