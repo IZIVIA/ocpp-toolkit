@@ -40,12 +40,11 @@ tasks.test {
     }
 }
 
-val test by testing.suites.existing(JvmTestSuite::class)
 tasks.register<Test>("loadTest") {
     description = "Runs the WAMP load test, which is not part of check."
     group = LifecycleBasePlugin.VERIFICATION_GROUP
-    testClassesDirs = files(test.map { it.sources.output.classesDirs })
-    classpath = files(test.map { it.sources.runtimeClasspath })
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
     useJUnitPlatform()
     filter {
         includeTestsMatching(loadTestClass)
