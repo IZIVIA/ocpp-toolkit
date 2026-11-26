@@ -458,7 +458,8 @@ station that connects without having been reported passes its check, and its sec
   a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
 - `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
   `MALFORMED_CREDENTIALS`, `USERNAME_MISMATCH`, `WRONG_PASSWORD`) and the enforcement applied. It never carries the
-  credentials. If it throws, the decision is kept.
+  credentials. If it throws, the decision is kept, be it an exception or an error such as a `NoClassDefFoundError`:
+  only a `VirtualMachineError` propagates.
 - The secrets are validated when created: 16 to 40 characters of the OCPP 2.0.1 charset for a `BasicAuthPassword`,
   16 to 20 bytes in hexadecimal for an `AuthorizationKey`. They are never shown by `toString`. Build them when the
   secrets are loaded, as the map above does, so that an invalid secret fails at startup: built inside `securityOf`,
