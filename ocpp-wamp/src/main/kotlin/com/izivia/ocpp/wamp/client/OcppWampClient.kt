@@ -20,6 +20,13 @@ interface OcppWampClient {
     val state: ConnectionState
 
     companion object {
+        /**
+         * Equivalent to the [OcppWampClientSettings] overload, and validated the same way.
+         *
+         * @throws IllegalArgumentException if [timeoutInMs] is not positive or [baseAutoReconnectDelayInMs]
+         * is negative. A `timeoutInMs` of 0 used to be accepted, but the client then gave up on the
+         * connection and on every call without waiting.
+         */
         fun newClient(
             target: Uri,
             ocppId: CSOcppId,
@@ -28,7 +35,7 @@ interface OcppWampClient {
             autoReconnect: Boolean = true,
             baseAutoReconnectDelayInMs: Long = 250,
             headers: WampMessageMetaHeaders = emptyList()
-        ) = newClient(
+        ): OcppWampClient = newClient(
             target,
             ocppId,
             ocppVersion,
