@@ -48,7 +48,7 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean,
         }
 
         val handlerWithWs = wsCallback?.let {
-            predicate({ exch -> requiresWebSocketUpgrade()(exch) }, admissionHandler(it), httpHandler)
+            predicate(requiresWebSocketUpgrade(), admissionHandler(it), httpHandler)
         } ?: httpHandler
 
         return object : Http4kServer {
