@@ -321,13 +321,18 @@ class OcppWampServerApp(
         awaitInFlightInboundCalls()
         connections.values.toList().forEach { c ->
             c?.let {
-                it.callManager.await()
-                it.close()
-                // the close completes later, when the connection is no longer registered: notify it now
-                withStationLock(it.ocppId) {
-                    if (synchronized(it) { connections.remove(it) }) {
-                        listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                // a failure is logged, so that it does not leave the next connections open
+                try {
+                    it.callManager.await()
+                    it.close()
+                    // the close completes later, when the connection is no longer registered: notify it now
+                    withStationLock(it.ocppId) {
+                        if (synchronized(it) { connections.remove(it) }) {
+                            listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                        }
                     }
+                } catch (e: Exception) {
+                    logger.error("[${it.ocppId}] [${it.wsConnectionId}] shutting down - closing failed: $e", e)
                 }
             }
         }

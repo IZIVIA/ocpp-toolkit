@@ -13,6 +13,7 @@ import java.lang.management.ManagementFactory
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.concurrent.thread
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
@@ -135,6 +136,20 @@ class OcppWampServerAppConnectionsTest {
 
         socket.disconnect()
         expectThat(closeEvents).containsExactly("CS1")
+    }
+
+    @Test
+    fun `should close every station on shutdown when a close listener fails`() {
+        val sockets = listOf(connect("CS1"), connect("CS2"))
+        val failed = AtomicBoolean(false)
+        // the first close notified fails, whichever station it belongs to
+        lifecycleHook = { if (it.startsWith("close:") && failed.compareAndSet(false, true)) error("listener failed") }
+
+        val shutdown = runCatching { app.shutdown() }
+
+        expectThat(sockets.filterNot { it.closed }).describedAs("connections left open").isEmpty()
+        expectThat(closeEvents).hasSize(1)
+        expectThat(shutdown.exceptionOrNull()).isNull()
     }
 
     @Test
