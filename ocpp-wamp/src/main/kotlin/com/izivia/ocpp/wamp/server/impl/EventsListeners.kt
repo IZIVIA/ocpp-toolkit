@@ -9,8 +9,9 @@ import kotlin.time.Instant
  *
  * [onWsConnectHandler], [onWsReconnectHandler] and [onWsCloseHandler] receive the events of a station one at a time,
  * in the order its connections are registered and removed: the close of a connection is never notified after the
- * connection that follows it. They run on the WebSocket IO thread, holding a lock of the station, and must not
- * block: while they run, the station can neither connect, reconnect nor close.
+ * connection that follows it. They run holding a lock of the station, on the WebSocket IO thread or, for the closes
+ * notified on shutdown, on the thread shutting the server down, and must not block: while they run, the station can
+ * neither connect, reconnect nor close, and the shutdown waits for them.
  *
  * [onWsPongHandler] and [onWsPingHandler] report transport-level activity only: a station whose OCPP
  * application is stuck may still answer control frames. They never imply that an OCPP message was received.
