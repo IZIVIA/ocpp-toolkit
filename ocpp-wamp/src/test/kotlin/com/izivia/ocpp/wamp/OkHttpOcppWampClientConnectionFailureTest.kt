@@ -11,6 +11,7 @@ import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isTrue
 import java.io.IOException
+import java.net.ConnectException
 import java.net.ServerSocket
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -34,6 +35,7 @@ class OkHttpOcppWampClientConnectionFailureTest {
         expectThrows<IOException> { client.connect(listener) }
 
         expectThat(listener.failures.get()).isEqualTo(1)
+        expectThat(listener.lastFailure.get()).isA<ConnectException>()
         expectThat(listener.losses.get()).isEqualTo(0)
     }
 
