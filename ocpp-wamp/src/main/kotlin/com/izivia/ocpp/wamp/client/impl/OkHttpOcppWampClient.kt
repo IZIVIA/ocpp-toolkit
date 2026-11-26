@@ -50,6 +50,8 @@ class OkHttpOcppWampClient(
         get() = connectionState
 
     private val handlers = mutableListOf<WampOnActionHandler>()
+    // written by the caller's thread, read by OkHttp's
+    @Volatile
     private var connectionListener: ConnectionListener? = null
 
     private val socketOkHttpClient = OkHttpClient.Builder()
