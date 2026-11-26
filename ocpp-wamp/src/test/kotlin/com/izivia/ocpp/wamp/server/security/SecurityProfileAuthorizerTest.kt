@@ -12,6 +12,7 @@ import com.izivia.ocpp.wamp.server.ConnectionRequest
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
+import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason.MALFORMED_CREDENTIALS
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason.MISSING_CREDENTIALS
@@ -36,7 +37,9 @@ import strikt.assertions.isFalse
 import strikt.assertions.isTrue
 import strikt.assertions.succeeded
 import java.util.Base64
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 
 class SecurityProfileAuthorizerTest {
     private val failures = CopyOnWriteArrayList<AuthenticationFailure>()
@@ -116,6 +119,23 @@ class SecurityProfileAuthorizerTest {
     @Test
     fun `station using another scheme than basic is refused`() {
         expectRefused(request("CS201", "Authorization" to "Bearer $PASSWORD"), "CS201", MISSING_CREDENTIALS)
+    }
+
+    @Test
+    fun `station sending the basic scheme without credentials is refused`() {
+        expectRefused(request("CS201", "Authorization" to "Basic"), "CS201", MISSING_CREDENTIALS)
+    }
+
+    @Test
+    fun `only the first authorization header is checked`() {
+        val right = basicAuthorization("CS201", PASSWORD)
+        val wrong = basicAuthorization("CS201", "wrong-password-1234")
+
+        expect {
+            that(authorizer.authorize(request("CS201", right, wrong))).isTrue()
+            that(failures).isEmpty()
+        }
+        expectRefused(request("CS201", wrong, right), "CS201", WRONG_PASSWORD)
     }
 
     @Test
@@ -229,16 +249,7 @@ class SecurityProfileAuthorizerTest {
 
     @Test
     fun `server answers 401 to a wrong password and connects the right one`() {
-        val port = getFreePort()
-        val server = OcppWampServer.newServer(setOf(OCPP_1_6), authorizer = authorizer).let { wamp ->
-            wamp.register(object : OcppWampServerHandler {
-                override fun accept(ocppId: CSOcppId) = true
-                override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
-            })
-            wamp.asServer(port).start()
-        }
-
-        try {
+        withServer { port ->
             expect {
                 that(handshake(port, "CS16", basicAuthorization("CS16", "wrong")))
                     .isEqualTo(Handshake(401, """Basic realm="OCPP""""))
@@ -246,6 +257,63 @@ class SecurityProfileAuthorizerTest {
                     .isEqualTo(101)
                 that(failures.map { it.describe() }).contains("CS16 WRONG_PASSWORD BLOCK")
             }
+        }
+    }
+
+    @Test
+    fun `server connects a station with enforcement report despite a wrong password, after notifying the failure`() {
+        stations["MIGRATING"] = BasicAuthPassword(PASSWORD, REPORT)
+        val events = CopyOnWriteArrayList<String>()
+        val connected = CompletableFuture<Unit>()
+        val listeners = EventsListeners(onWsConnectHandler = { id, _ ->
+            events += "connect $id"
+            connected.complete(Unit)
+        })
+
+        withServer(listeners) { port ->
+            val handshake = handshake(port, "MIGRATING", basicAuthorization("MIGRATING", "wrong-password-1234"))
+            connected.get(5, TimeUnit.SECONDS)
+
+            expect {
+                that(handshake.status).isEqualTo(101)
+                that(failures.map { it.describe() }).isEqualTo(listOf("MIGRATING WRONG_PASSWORD REPORT"))
+                that(events.toList()).isEqualTo(listOf("connect MIGRATING"))
+            }
+        }
+    }
+
+    @Test
+    fun `station whose id is percent-encoded in its URL authenticates with the decoded id`() {
+        // the example of OCPP-J 2.0.1 section 3.1.1: the identity "RDAM 123" connects to /ocppj/RDAM%20123
+        stations["RDAM 123"] = BasicAuthPassword(PASSWORD)
+
+        withServer { port ->
+            expect {
+                that(handshake(port, "RDAM%20123", basicAuthorization("RDAM 123", PASSWORD)).status).isEqualTo(101)
+                that(failures).isEmpty()
+            }
+        }
+    }
+
+    @Test
+    fun `station id holding a colon cannot authenticate, the username ending at the first colon`() {
+        stations["CS:1"] = BasicAuthPassword(PASSWORD)
+
+        expectRefused(request("CS:1", basicAuthorization("CS:1", PASSWORD)), "CS:1", USERNAME_MISMATCH)
+    }
+
+    private fun withServer(listeners: EventsListeners = EventsListeners(), block: (port: Int) -> Unit) {
+        val port = getFreePort()
+        val server = OcppWampServer.newServer(setOf(OCPP_1_6), listeners = listeners, authorizer = authorizer)
+            .let { wamp ->
+                wamp.register(object : OcppWampServerHandler {
+                    override fun accept(ocppId: CSOcppId) = true
+                    override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? = null
+                })
+                wamp.asServer(port).start()
+            }
+        try {
+            block(port)
         } finally {
             server.stop()
         }
