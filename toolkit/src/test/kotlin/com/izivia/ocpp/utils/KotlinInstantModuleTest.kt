@@ -204,6 +204,18 @@ class KotlinInstantModuleTest {
     }
 
     @Test
+    fun `should resolve the zone once per context when the resolver throws`() {
+        var resolutions = 0
+        val context = TimestampZoneContext("CS1") { resolutions++; error("zone lookup failed") }
+
+        repeat(2) {
+            val exception = assertThrows<IllegalStateException> { context.zone }
+            expectThat(exception.message).isEqualTo("zone lookup failed")
+        }
+        expectThat(resolutions).isEqualTo(1)
+    }
+
+    @Test
     fun `should follow LocalDateTime atZone in a daylight saving gap of the resolved zone`() {
         // 02:30 does not exist in Paris on 2024-03-31: atZone shifts it forward by the gap, to 03:30+02:00.
         expectThat(readInstant("2024-03-31T02:30:00", TimestampZoneContext("CS1") { PARIS }))

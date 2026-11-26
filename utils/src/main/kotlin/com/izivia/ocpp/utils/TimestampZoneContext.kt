@@ -11,11 +11,13 @@ import java.time.ZoneId
  */
 class TimestampZoneContext(val chargingStationId: String, resolveZone: (String) -> ZoneId?) {
 
+    private val resolution: Result<ZoneId?> by lazy { runCatching { resolveZone(chargingStationId) } }
+
     /**
-     * Zone of [chargingStationId], resolved on the first timestamp without timezone only, then reused.
-     * `null` refuses such timestamps.
+     * Zone of [chargingStationId], resolved on the first timestamp without timezone only, then reused, as is an
+     * exception thrown by the resolver. `null` refuses such timestamps.
      */
-    val zone: ZoneId? by lazy { resolveZone(chargingStationId) }
+    val zone: ZoneId? get() = resolution.getOrThrow()
 }
 
 fun ObjectReader.withTimestampZone(context: TimestampZoneContext): ObjectReader =
