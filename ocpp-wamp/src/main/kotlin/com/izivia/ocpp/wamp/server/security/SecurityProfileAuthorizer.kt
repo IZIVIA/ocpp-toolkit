@@ -33,6 +33,8 @@ class SecurityProfileAuthorizer(
 
     override fun authorize(request: ConnectionRequest): Boolean {
         val ocppId = request.ocppId
+        // parsed before the lookup, so that an unknown station is not answered sooner than a known one
+        val credentials = parse(request)
         val security = securityOf(ocppId)
             ?: return fail(AuthenticationFailure(ocppId, Reason.UNKNOWN_STATION, Enforcement.BLOCK))
         val (accepted, enforcement) = when (security) {
@@ -40,27 +42,38 @@ class SecurityProfileAuthorizer(
             is StationSecurity.BasicAuthPassword -> security.accepted to security.enforcement
             is StationSecurity.AuthorizationKey -> security.accepted to security.enforcement
         }
-        val reason = check(request, accepted) ?: return true
+        val reason = when (credentials) {
+            is Credentials.Invalid -> credentials.reason
+            is Credentials.Password -> Reason.WRONG_PASSWORD.takeUnless {
+                accepted.any { MessageDigest.isEqual(credentials.bytes, it) }
+            }
+        } ?: return true
         return fail(AuthenticationFailure(ocppId, reason, enforcement))
     }
 
-    private fun check(request: ConnectionRequest, accepted: List<ByteArray>): Reason? {
+    private fun parse(request: ConnectionRequest): Credentials {
         val encoded = request.headers
             .firstOrNull { (name, _) -> name.equals("Authorization", ignoreCase = true) }?.second
             ?.takeIf { it.startsWith("Basic ", ignoreCase = true) }
             ?.substring(6)?.trim()
-            ?: return Reason.MISSING_CREDENTIALS
+            ?: return Credentials.Invalid(Reason.MISSING_CREDENTIALS)
         val credentials = try {
             Base64.getDecoder().decode(encoded)
         } catch (_: IllegalArgumentException) {
-            return Reason.MALFORMED_CREDENTIALS
+            return Credentials.Invalid(Reason.MALFORMED_CREDENTIALS)
         }
         // split as bytes: the username cannot hold a ':', but an OCPP 1.6 binary password can, and is not UTF-8
         val colon = credentials.indexOf(':'.code.toByte())
-        if (colon < 0) return Reason.MALFORMED_CREDENTIALS
-        if (String(credentials, 0, colon, Charsets.UTF_8) != request.ocppId) return Reason.USERNAME_MISMATCH
-        val password = credentials.copyOfRange(colon + 1, credentials.size)
-        return if (accepted.any { MessageDigest.isEqual(password, it) }) null else Reason.WRONG_PASSWORD
+        if (colon < 0) return Credentials.Invalid(Reason.MALFORMED_CREDENTIALS)
+        if (String(credentials, 0, colon, Charsets.UTF_8) != request.ocppId) {
+            return Credentials.Invalid(Reason.USERNAME_MISMATCH)
+        }
+        return Credentials.Password(credentials.copyOfRange(colon + 1, credentials.size))
+    }
+
+    private sealed interface Credentials {
+        class Password(val bytes: ByteArray) : Credentials
+        class Invalid(val reason: Reason) : Credentials
     }
 
     private fun fail(failure: AuthenticationFailure): Boolean {

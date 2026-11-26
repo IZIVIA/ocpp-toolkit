@@ -206,6 +206,32 @@ class SecurityProfileAuthorizerTest {
     }
 
     @Test
+    fun `credentials are parsed before the station is looked up, so that an unknown one is not answered sooner`() {
+        val steps = CopyOnWriteArrayList<String>()
+        val recording = SecurityProfileAuthorizer({ id -> steps += "lookup"; stations[id] })
+        val headers = object : AbstractList<Pair<String, String>>() {
+            val header = basicAuthorization("UNKNOWN", PASSWORD)
+            override val size get() = 1
+            override fun get(index: Int) = header.also { steps += "headers" }
+        }
+
+        expect {
+            that(recording.authorize(ConnectionRequest("UNKNOWN", headers))).isFalse()
+            that(steps.toList()).isEqualTo(listOf("headers", "lookup"))
+        }
+    }
+
+    @Test
+    fun `unknown station is refused as unknown, whatever its credentials`() {
+        expect {
+            that(authorizer.authorize(request("UNKNOWN"))).isFalse()
+            that(authorizer.authorize(request("UNKNOWN", "Authorization" to "Basic not*base64"))).isFalse()
+            that(authorizer.authorize(request("UNKNOWN", basicAuthorization("CS201", PASSWORD)))).isFalse()
+            that(failures.map { it.describe() }).isEqualTo(List(3) { "UNKNOWN UNKNOWN_STATION BLOCK" })
+        }
+    }
+
+    @Test
     fun `station security lookup that throws propagates`() {
         val throwing = SecurityProfileAuthorizer({ BasicAuthPassword("short") })
 
