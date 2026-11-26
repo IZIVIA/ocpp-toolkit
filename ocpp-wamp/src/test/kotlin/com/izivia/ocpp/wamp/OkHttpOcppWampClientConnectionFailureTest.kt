@@ -41,12 +41,13 @@ class OkHttpOcppWampClientConnectionFailureTest {
 
     @Test
     fun `should not report a connection lost while auto-reconnect attempts fail`() {
-        val listener = RecordingListener()
+        // a second failure proves the reconnection cycle does not report a connection lost either
+        val listener = RecordingListener(expectedFailureCount = 2)
         val client = newClient(autoReconnect = true)
 
         client.connect(listener)
         try {
-            expectThat(listener.firstFailure.await(5, TimeUnit.SECONDS)).isTrue()
+            expectThat(listener.expectedFailures.await(5, TimeUnit.SECONDS)).isTrue()
         } finally {
             client.close()
         }
@@ -95,16 +96,16 @@ class OkHttpOcppWampClientConnectionFailureTest {
     private fun newClient(autoReconnect: Boolean, target: Uri = this.target, timeoutInMs: Long = 5_000) =
         OcppWampClient.newClient(target, "chargepoint1", OCPP_1_6, timeoutInMs, autoReconnect = autoReconnect)
 
-    private class RecordingListener : ConnectionListener {
+    private class RecordingListener(expectedFailureCount: Int = 1) : ConnectionListener {
         val failures = AtomicInteger()
         val losses = AtomicInteger()
         val lastFailure = AtomicReference<Throwable>()
-        val firstFailure = CountDownLatch(1)
+        val expectedFailures = CountDownLatch(expectedFailureCount)
 
         override fun onConnectionFailure(t: Throwable) {
             failures.incrementAndGet()
             lastFailure.set(t)
-            firstFailure.countDown()
+            expectedFailures.countDown()
         }
 
         override fun onConnectionLost(t: Throwable?) {
