@@ -451,6 +451,9 @@ station that connects without having been reported passes its check, and its sec
 `Enforcement.BLOCK`.
 
 - The username must be the station id (A00.FR.204). A station that `securityOf` does not know (`null`) is refused.
+  The id is the one decoded from the URL, which `securityOf` receives too: a station connecting to
+  `/ocppj/RDAM%20123` sends the username `RDAM 123`. An id holding a `:` cannot authenticate, since the username ends
+  at the first `:` (RFC 7617), which is why OCPP-J 2.0.1 keeps it out of the identity.
 - `Enforcement.BLOCK`, the default, refuses a station whose check fails; `REPORT` admits it anyway, which helps while
   a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
 - `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
