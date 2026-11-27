@@ -1,5 +1,9 @@
 package com.izivia.ocpp.wamp.server.impl
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion.OCPP_1_6
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -25,6 +29,7 @@ import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.all
@@ -435,6 +440,55 @@ class OcppWampServerErrorListenerTest {
     }
 
     @Test
+    fun `should not report again a CALLERROR that cannot be sent for a call the executor rejects`() {
+        val sendFailure = IllegalStateException("cannot send $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val (app, websocket) = connectApp(FakeWebsocket(sendFailure), events, rejectingSettings)
+
+        websocket.triggerMessage(WsMessage(call))
+
+        expectThat(websocket.sent.toList()).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.TRANSPORT_ERROR)
+            get { cause }.isSameInstanceAs(rejection)
+        }
+        expectThat(measureTime { app.shutdown() }).isLessThan(1.seconds)
+    }
+
+    @Test
+    fun `should not report again a CALLERROR that cannot be sent for a throwing handler`() {
+        val sendFailure = IllegalStateException("cannot send $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val websocket = connect(FakeWebsocket(sendFailure), events) { throw handlerFailure }
+
+        websocket.triggerMessage(WsMessage(call))
+
+        expectThat(websocket.sent.toList()).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.HANDLER_ERROR)
+            get { cause }.isSameInstanceAs(handlerFailure)
+        }
+    }
+
+    @Test
+    fun `should log an answered handler failure once with its class only`() {
+        val websocket = connect(FakeWebsocket(), mutableListOf()) { throw handlerFailure }
+
+        val warnings = warningsOf { websocket.triggerMessage(WsMessage(call)) }
+
+        expectLoggedOnce(warnings, OcppErrorCategory.HANDLER_ERROR, handlerFailure)
+    }
+
+    @Test
+    fun `should log an answered call the executor rejects once with its class only`() {
+        val (_, websocket) = connectApp(FakeWebsocket(), mutableListOf(), rejectingSettings)
+
+        val warnings = warningsOf { websocket.triggerMessage(WsMessage(call)) }
+
+        expectLoggedOnce(warnings, OcppErrorCategory.TRANSPORT_ERROR, rejection)
+    }
+
+    @Test
     fun `should neither answer nor swallow a handler failing with a virtual machine error`() {
         val failure = OutOfMemoryError("handler $SENTINEL")
         val events = mutableListOf<OcppErrorEvent>()
@@ -494,6 +548,31 @@ class OcppWampServerErrorListenerTest {
             get { errorCode }.isEqualTo(MessageErrorCode.INTERNAL_ERROR)
             get { this.cause }.isSameInstanceAs(cause)
         }
+    }
+
+    /** Expects one warning naming the [category] and the class of the [cause], without its message or stack trace. */
+    private fun expectLoggedOnce(warnings: List<ILoggingEvent>, category: OcppErrorCategory, cause: Throwable) {
+        expectThat(warnings).single().and {
+            get { formattedMessage }.contains("[msg-1] [Heartbeat]")
+            get { formattedMessage }.contains("($category)")
+            get { formattedMessage }.contains(cause.javaClass.name)
+            get { formattedMessage }.not().contains(SENTINEL)
+            get { throwableProxy }.isNull()
+        }
+    }
+
+    /** Runs [block] and returns the warnings and errors the server logger logged meanwhile. */
+    private fun warningsOf(block: () -> Unit): List<ILoggingEvent> {
+        val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server") as Logger
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
+        logger.addAppender(appender)
+        try {
+            block()
+        } finally {
+            logger.detachAppender(appender)
+            appender.stop()
+        }
+        return appender.list.filter { it.level.isGreaterOrEqual(Level.WARN) }
     }
 
     private fun expectSameResponseWhateverTheListener(

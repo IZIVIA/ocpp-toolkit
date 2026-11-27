@@ -273,7 +273,7 @@ class OcppWampServerApp(
                                             t
                                         )
                                     )
-                                    chargingStationConnection.answerFailedCall(wampMessage)
+                                    chargingStationConnection.answerFailedCall(wampMessage, failureCategory, t)
                                 }
                             }
                         }
@@ -337,7 +337,7 @@ class OcppWampServerApp(
      */
     private fun ChargingStationConnection.submitCall(message: WampMessage, call: () -> Unit) {
         // Claimed by the call when it starts, or by the submission when the executor fails without running it:
-        // whichever claims it releases the count, exactly once, and only the submission may answer the call.
+        // whichever claims it releases the count, exactly once, and only whichever claims it answers the call.
         val claimed = AtomicBoolean(false)
         try {
             callsExecutor.execute {
@@ -357,7 +357,11 @@ class OcppWampServerApp(
                         errorListener?.notifySafely(
                             errorEvent(OcppErrorCategory.TRANSPORT_ERROR, message, MessageErrorCode.INTERNAL_ERROR, t)
                         )
-                        answerFailedCall(message)
+                        answerFailedCall(message, OcppErrorCategory.TRANSPORT_ERROR, t)
+                    } catch (e: VirtualMachineError) {
+                        // thrown by the send of the answer: reported by nobody, ws.onError must not report it either
+                        reportedFailure = e
+                        throw e
                     } finally {
                         inFlightInboundCalls.decrementAndGet()
                     }
@@ -374,10 +378,19 @@ class OcppWampServerApp(
     }
 
     /**
-     * Answers the failed call [message] with an `InternalError` CALLERROR that never carries the failure. A send that
-     * fails is the network failing, which is not reported again: it is only logged, without its message.
+     * Answers the call [message], failed with [failure] of [category], with an `InternalError` CALLERROR that never
+     * carries the failure, and logs it once with the class of the failure only, since its message may quote a frame.
+     * A send that fails is the network failing, which is not reported again: it is only logged, without its message.
      */
-    private fun ChargingStationConnection.answerFailedCall(message: WampMessage) {
+    private fun ChargingStationConnection.answerFailedCall(
+        message: WampMessage,
+        category: OcppErrorCategory,
+        failure: Throwable
+    ) {
+        logger.warn(
+            "[$ocppId] [$wsConnectionId] [${message.msgId}] [${message.action}] call failed ($category)" +
+                " - answered InternalError: ${failure.javaClass.name}"
+        )
         try {
             ws.send(WsMessage(internalErrorFor(message.msgId).toJson()))
         } catch (e: Throwable) {
