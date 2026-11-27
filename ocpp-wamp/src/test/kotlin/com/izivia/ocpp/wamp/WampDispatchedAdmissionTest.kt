@@ -296,6 +296,30 @@ class WampDispatchedAdmissionTest {
     }
 
     @Test
+    fun `admission whose executor fails gets a 503 with Retry-After and gives its slot back`() {
+        val failNext = AtomicBoolean(true)
+        val executor = Executor { task ->
+            if (failNext.getAndSet(false)) throw IllegalStateException("executor unavailable") else pool.execute(task)
+        }
+        val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = Duration.ofSeconds(10), executor))
+
+        try {
+            val failed = handshake(port, "CS1")
+            val next = handshake(port, "CS2")
+            awaitOrFail(connects, "connect event of CS2")
+
+            expect {
+                that(failed.status).isEqualTo(503)
+                that(failed.retryAfter).isEqualTo("5")
+                that(next.status).isEqualTo(101)
+                that(events.toList()).isEqualTo(listOf("connect CS2"))
+            }
+        } finally {
+            server.stop()
+        }
+    }
+
+    @Test
     fun `dispatched admission keeps the statuses and the subprotocol of the handshake`() {
         val wamp = wampServer(
             authorizer = { request -> request.headers.any { (name, value) -> name == "Authorization" && value == AUTHORIZED.second } },

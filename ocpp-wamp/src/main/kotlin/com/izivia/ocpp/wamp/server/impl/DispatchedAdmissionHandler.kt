@@ -34,6 +34,11 @@ internal class DispatchedAdmissionHandler(
 
     // on the I/O thread
     override fun handleRequest(exch: HttpServerExchange) {
+        // a stopping server admits nothing more, so that an admission starts neither a callback nor a timer
+        if (stopped.get()) {
+            refusal(STOPPING).handleRequest(exch)
+            return
+        }
         if (!slots.tryAcquire()) {
             refusal(OVERLOADED).handleRequest(exch)
             return
@@ -47,11 +52,16 @@ internal class DispatchedAdmissionHandler(
     // on the I/O thread, outside of the handler call
     private fun submit(exch: HttpServerExchange) {
         val handshake = PendingHandshake(exch)
-        handshake.timer = exch.ioThread.executeAfter(handshake::expire, timeoutMillis, TimeUnit.MILLISECONDS)
         try {
+            // XNIO rejects the timer once the I/O thread is shutting down
+            handshake.timer = exch.ioThread.executeAfter(handshake::expire, timeoutMillis, TimeUnit.MILLISECONDS)
             (execution.executor ?: exch.connection.worker).execute(handshake::run)
-        } catch (_: RejectedExecutionException) {
-            // never run, so its slot is given back here rather than when its admission ends
+        } catch (e: Exception) {
+            // never run, so its slot is given back here rather than when its admission ends; any other throw of the
+            // timer or of the executor is answered as a rejection, rather than escaping to Undertow with the slot kept
+            if (e !is RejectedExecutionException) {
+                logger.warn("websocket admission submission failed with ${e::class.qualifiedName}")
+            }
             slots.release()
             handshake.reject()
         }
@@ -60,9 +70,9 @@ internal class DispatchedAdmissionHandler(
     private inner class PendingHandshake(private val exch: HttpServerExchange) {
         private val state = AtomicInteger(PENDING)
 
-        // set before the admission is submitted, read once it decides
+        // set before the admission is submitted, read once it decides; null when XNIO rejected it
         @Volatile
-        lateinit var timer: XnioExecutor.Key
+        var timer: XnioExecutor.Key? = null
 
         // on the I/O thread
         fun expire() {
@@ -72,7 +82,7 @@ internal class DispatchedAdmissionHandler(
         // on the I/O thread
         fun reject() {
             if (state.compareAndSet(PENDING, DECIDED)) {
-                timer.remove()
+                timer?.remove()
                 answer(refusal(OVERLOADED))
             }
         }
@@ -107,7 +117,7 @@ internal class DispatchedAdmissionHandler(
         // on the I/O thread: a decision arriving after the timeout is dropped
         private fun apply(decision: WebSocketUpgradeDecision) {
             if (!state.compareAndSet(PENDING, DECIDED)) return
-            timer.remove()
+            timer?.remove()
             answer(
                 when {
                     decision is WebSocketUpgradeDecision.Refuse -> refusal(decision)
