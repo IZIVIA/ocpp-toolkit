@@ -2,6 +2,7 @@ package com.izivia.ocpp.wamp.server
 
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
+import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
@@ -80,8 +81,9 @@ interface OcppWampServer {
             ocppVersions: Set<OcppVersion> = OcppVersion.values().toSet(),
             path: String = "ws",
             settings: OcppWampServerSettings = OcppWampServerSettings(),
-            listeners: EventsListeners = EventsListeners()
-        ) = UndertowOcppWampServer(ocppVersions, path, settings, listeners)
+            listeners: EventsListeners = EventsListeners(),
+            errorListener: OcppErrorListener? = null
+        ) = UndertowOcppWampServer(ocppVersions, path, settings, listeners, errorListener)
     }
 }
 

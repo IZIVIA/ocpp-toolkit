@@ -13,7 +13,7 @@ dependencies {
     api(project(":ocpp-soap"))
     api(project(":ocpp-transport"))
     api(project(":operation-information"))
-    implementation(project(":utils"))
+    api(project(":utils"))
 
     testImplementation(project(":ocpp-1-6-soap"))
     testImplementation(kotlin("test-junit"))
