@@ -21,7 +21,9 @@ import strikt.api.expectThat
 import strikt.assertions.contains
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFailure
+import strikt.assertions.isNotNull
 import strikt.assertions.isNull
+import strikt.assertions.single
 import java.net.ServerSocket
 import java.time.ZoneId
 import java.util.concurrent.CopyOnWriteArrayList
@@ -85,9 +87,11 @@ class WebsocketServerTimestampZoneTest {
     @Test
     fun `inbound call with a value that is no timestamp gets a CallError without resolving the zone`() {
         val received = CopyOnWriteArrayList<Instant>()
+        val failures = CopyOnWriteArrayList<Throwable?>()
         val transport = WebsocketServer(
             ocppVersions = setOf(OcppVersion.OCPP_1_6),
             path = "ws",
+            errorListener = { failures.add(it.cause) },
             timestampZoneFallback = { error("zone resolved for $it") }
         )
         transport.receiveStartTransaction(received)
@@ -98,7 +102,8 @@ class WebsocketServerTimestampZoneTest {
             )
 
             expectThat(response.msgType).isEqualTo(WampMessageType.CALL_ERROR)
-            expectThat(response.payload).contains("must use Z")
+            // the reason no longer reaches the station, only the error listener
+            expectThat(failures.toList()).single().isNotNull().get { message }.isNotNull().contains("must use Z")
             expectThat(received.toList()).isEqualTo(emptyList())
         }
     }
