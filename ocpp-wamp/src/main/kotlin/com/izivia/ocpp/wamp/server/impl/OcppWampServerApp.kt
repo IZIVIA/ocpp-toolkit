@@ -535,24 +535,37 @@ class OcppWampServerApp internal constructor(
      * Shuts down the calls executor when the toolkit built it, never an executor of the caller. Its threads get
      * [CALLS_EXECUTOR_TERMINATION_MS] to end, then are interrupted and get [CALLS_EXECUTOR_TERMINATION_MS] more: a
      * shutdown lasts at most [OcppWampServerSettings.timeoutInMs] for the drain, the closing of the connections, and
-     * these two waits. The queued calls an interruption drops are not answered, their connections being closed.
-     * A second call returns at once.
+     * these two waits. The queued calls were already dropped when the drain timed out; any the interruption still
+     * drops are not answered either, and are no longer counted in flight. A second call returns at once.
      */
     private fun shutdownOwnedCallsExecutor() {
         val executor = callsExecutor as? ToolkitOwnedExecutor ?: return
         executor.shutdown()
         try {
             if (!executor.awaitTermination(CALLS_EXECUTOR_TERMINATION_MS, TimeUnit.MILLISECONDS)) {
-                val dropped = executor.shutdownNow().size
+                val dropped = executor.shutdownNowCounted()
                 logger.warn("shutting down - calls executor still busy, interrupted, $dropped queued calls dropped")
-                executor.awaitTermination(CALLS_EXECUTOR_TERMINATION_MS, TimeUnit.MILLISECONDS)
+                if (!executor.awaitTermination(CALLS_EXECUTOR_TERMINATION_MS, TimeUnit.MILLISECONDS)) {
+                    logger.warn(
+                        "shutting down - ${executor.activeCount} call threads still running after their interruption"
+                    )
+                }
             }
         } catch (e: InterruptedException) {
-            executor.shutdownNow()
+            executor.shutdownNowCounted()
             Thread.currentThread().interrupt()
         }
     }
 
+    // a task shutdownNow returns never ran, so its call never claimed it: release its count here, exactly once
+    private fun ToolkitOwnedExecutor.shutdownNowCounted(): Int =
+        shutdownNow().size.also { inFlightInboundCalls.addAndGet(-it) }
+
+    /**
+     * Waits up to [OcppWampServerSettings.timeoutInMs] for the inbound calls in flight to be answered. On a timeout,
+     * before the connections are closed, the calls still queued in a toolkit-owned executor are dropped: they never
+     * run, so they are never answered, and are no longer counted in flight. A caller's executor is left as it is.
+     */
     private fun awaitInFlightInboundCalls() {
         // a monotonic source, not the injectable clock: a fixed clock would never reach the deadline
         val start = TimeSource.Monotonic.markNow()
@@ -565,6 +578,18 @@ class OcppWampServerApp internal constructor(
         val remaining = inFlightInboundCalls.get()
         if (remaining > 0) {
             logger.warn("shutting down - $remaining inbound calls not answered within ${settings.timeoutInMs}ms")
+            dropQueuedCalls()
+        }
+    }
+
+    private fun dropQueuedCalls() {
+        val executor = callsExecutor as? ToolkitOwnedExecutor ?: return
+        val dropped = ArrayList<Runnable>()
+        // a drained task never runs, so its call never claims it: release its count here, exactly once
+        executor.queue.drainTo(dropped)
+        if (dropped.isNotEmpty()) {
+            inFlightInboundCalls.addAndGet(-dropped.size)
+            logger.warn("shutting down - ${dropped.size} queued inbound calls dropped without an answer")
         }
     }
 

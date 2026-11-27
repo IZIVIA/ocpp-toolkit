@@ -47,7 +47,9 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import kotlin.time.measureTime
 
 class OcppWampServerCallsExecutorTest {
@@ -185,6 +187,8 @@ class OcppWampServerCallsExecutorTest {
             val station = connect("CS1")
             station.send(blocked("block-1"), blocked("block-2"), blocked("block-3"))
             awaitStarted(2)
+            // block-3 must be in flight before the shutdown starts: read after it, it would be rejected
+            awaitQueued(1)
 
             val shutdownDone = CountDownLatch(1)
             val shutdownThread = thread(name = "test-shutdown") {
@@ -206,6 +210,34 @@ class OcppWampServerCallsExecutorTest {
 
             // a second shutdown is harmless
             expectThat(measureTime { wampServer.shutdown() }).isLessThan(5.seconds)
+        }
+    }
+
+    @Test
+    fun `should drop the queued calls and interrupt the running ones when the shutdown drain times out`() {
+        val timeoutInMs = 300L
+        withServer(OcppWampServerSettings(timeoutInMs = timeoutInMs, maxConcurrentCalls = 2, maxQueuedCalls = 1)) {
+            val station = connect("CS1")
+            // never released before the end of the test: only an interruption ends it
+            station.send(blocked("block-1"))
+            // ends once the connection is closed, freeing a thread that a queued call left there would then take
+            station.send(blockedUntilClosed("closed-1"))
+            awaitStarted(2)
+            station.send(call("queued-1"))
+            awaitQueued(1)
+
+            val start = TimeSource.Monotonic.markNow()
+            wampServer.shutdown()
+            expectThat(start.elapsedNow()).isLessThan(timeoutInMs.milliseconds + 3.seconds)
+
+            expectThat(station.closed.count).describedAs("connection closed").isEqualTo(0)
+            expectThat(threads.toSet()) {
+                get { size }.isEqualTo(2)
+                all { get { join(3_000); isAlive }.isFalse() }
+            }
+            expectThat(runs["queued-1"]).isNull()
+            // the dropped call is no longer counted in flight: a second shutdown does not wait for it
+            expectThat(measureTime { wampServer.shutdown() }).isLessThan(timeoutInMs.milliseconds)
         }
     }
 
@@ -251,6 +283,8 @@ class OcppWampServerCallsExecutorTest {
 
     private fun blocked(id: String) = """[2,"$id","Heartbeat",{"block":true}]"""
 
+    private fun blockedUntilClosed(id: String) = """[2,"$id","Heartbeat",{"untilClosed":true}]"""
+
     private fun String.resultId(): String =
         WampMessage.parse(this).let {
             expectThat(it).isNotNull().get { msgType }.isEqualTo(WampMessageType.CALL_RESULT)
@@ -269,6 +303,7 @@ class OcppWampServerCallsExecutorTest {
         private val counts = ConcurrentHashMap<String, AtomicInteger>()
         private val started = LinkedBlockingQueue<String>()
         private val released = CountDownLatch(1)
+        private val connectionClosed = CountDownLatch(1)
         private val http = OkHttpClient()
         private val clients = CopyOnWriteArrayList<WebSocket>()
 
@@ -277,7 +312,10 @@ class OcppWampServerCallsExecutorTest {
         fun onAction(msg: WampMessage): WampMessage {
             threads.add(Thread.currentThread())
             counts.computeIfAbsent(msg.msgId) { AtomicInteger() }.incrementAndGet()
-            if (msg.payload.contains("block")) {
+            if (msg.payload.contains("untilClosed")) {
+                started.add(msg.msgId)
+                check(connectionClosed.await(10, TimeUnit.SECONDS)) { "no connection closed for ${msg.msgId}" }
+            } else if (msg.payload.contains("block")) {
                 started.add(msg.msgId)
                 check(released.await(10, TimeUnit.SECONDS)) { "the test never released ${msg.msgId}" }
             }
@@ -290,6 +328,16 @@ class OcppWampServerCallsExecutorTest {
 
         fun release() = released.countDown()
 
+        // no hook tells when the executor queued a call: poll its queue, within a bound that fails loudly
+        fun awaitQueued(count: Int) {
+            val queue = (builtExecutor.get() as ThreadPoolExecutor).queue
+            val start = TimeSource.Monotonic.markNow()
+            while (queue.size < count) {
+                if (start.elapsedNow() > 5.seconds) throw AssertionError("$count calls not queued within 5 s")
+                Thread.sleep(5)
+            }
+        }
+
         fun connect(ocppId: String): Station {
             val frames = LinkedBlockingQueue<String>()
             val connected = CountDownLatch(1)
@@ -301,11 +349,17 @@ class OcppWampServerCallsExecutorTest {
                     override fun onMessage(webSocket: WebSocket, text: String) {
                         frames.add(text)
                     }
+
+                    override fun onClosing(webSocket: WebSocket, code: Int, reason: String) =
+                        connectionClosed.countDown()
+
+                    override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) =
+                        connectionClosed.countDown()
                 }
             )
             clients.add(client)
             expectThat(connected.await(5, TimeUnit.SECONDS)).describedAs("$ocppId connected").isTrue()
-            return Station(client, frames)
+            return Station(client, frames, connectionClosed)
         }
 
         fun close() {
@@ -317,7 +371,11 @@ class OcppWampServerCallsExecutorTest {
         }
     }
 
-    private class Station(private val client: WebSocket, private val frames: LinkedBlockingQueue<String>) {
+    private class Station(
+        private val client: WebSocket,
+        private val frames: LinkedBlockingQueue<String>,
+        val closed: CountDownLatch
+    ) {
         fun send(vararg messages: String) = messages.forEach { client.send(it) }
 
         fun next(): String = frames.poll(5, TimeUnit.SECONDS) ?: throw AssertionError("no frame within 5 s")

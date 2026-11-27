@@ -50,8 +50,8 @@ open class OcppWampServerSettings(
      * By default, a pool of at most [maxConcurrentCalls] daemon threads named `ocpp-wamp-call-<n>`, idle ones ending
      * after a minute, with a queue of [maxQueuedCalls] calls; beyond, a call is rejected. The server owns this
      * executor and shuts it down at the end of its shutdown, waiting up to two more seconds for its threads to end
-     * (the last second after interrupting them). A queued call that has not started by then is dropped without an
-     * answer, its connection being closed anyway.
+     * (the last second after interrupting them). When the shutdown's wait for the calls in flight times out, the calls
+     * still queued are dropped, before the connections are closed: they never run and are never answered.
      *
      * An override runs the calls on an executor of its own: [maxConcurrentCalls] and [maxQueuedCalls] no longer
      * apply, and the executor is the caller's to shut down, as the server never does. Returning
