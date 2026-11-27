@@ -371,6 +371,37 @@ A CSMS WebSocket server set with `ServerSetting(path = "ws", …)` accepts a sta
 segment (`/ws/CS1/extra`) and a prefix (`/ocpp/ws/CS1`). A reverse proxy that publishes the server under a prefix
 must strip it before forwarding.
 
+### Inbound CALL execution
+
+On the CSMS side, the CALLs the stations send run on the executor of `OcppWampServerSettings`, given through
+`ServerSetting.wampSettings`. By default it is bounded: up to `maxConcurrentCalls` calls run at once, on daemon threads
+named `ocpp-wamp-call-<n>`, and up to `maxQueuedCalls` more wait for a thread. The defaults are
+`32 × availableProcessors()` threads, the worker thread count the toolkit gives Undertow, and 1024 queued calls.
+
+```kotlin
+ServerSetting(
+    port = 8080,
+    path = "ws",
+    ocppVersion = setOf(OcppVersion.OCPP_1_6),
+    transportType = TransportEnum.WEBSOCKET,
+    wampSettings = OcppWampServerSettings(timeoutInMs = 30_000, maxConcurrentCalls = 64, maxQueuedCalls = 256)
+)
+```
+
+A CALL arriving when every thread is busy and the queue is full is rejected: the station gets one
+`[4,"<id>","InternalError","Internal error",{}]`, and the `OcppErrorListener` one `TRANSPORT_ERROR` event with the
+`INTERNAL_ERROR` code (see [Observing OCPP errors](#observing-ocpp-errors)). The bound is global to the server, with no
+fairness between stations: one station sending slow calls can take every thread, and the calls of the other stations
+are then rejected.
+
+On shutdown, the server waits up to `timeoutInMs` for the accepted calls to be answered, closes the connections, then
+stops the threads of its default executor, within two more seconds. A queued call still waiting when the wait times
+out is dropped without an answer, as its connection is closed anyway.
+
+Override `buildCallsExecutor()` to run the calls on an executor of your own. `maxConcurrentCalls` and `maxQueuedCalls`
+are then ignored, and the executor is yours to shut down: the server never shuts it down. An override returning
+`super.buildCallsExecutor()` as is keeps the default executor, which the server still shuts down.
+
 ### WebSocket events
 
 On the CSMS side, `EventsListeners` notifies the WebSocket lifecycle of the charging stations: connection,
