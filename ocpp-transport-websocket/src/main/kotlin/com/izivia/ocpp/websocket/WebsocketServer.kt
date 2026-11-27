@@ -3,7 +3,6 @@ package com.izivia.ocpp.websocket
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -14,7 +13,6 @@ import com.izivia.ocpp.utils.TimestampZoneContext
 import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
-import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
@@ -68,21 +66,7 @@ class WebsocketServer(
             val parser = getJsonMapper(version)
             val response =
                 server.sendBlocking(csOcppId, WampMessage.Call(msgId, action, parser.mapPayloadToString(message)))
-            if (response.msgId != msgId) {
-                throw IllegalStateException(
-                    "Wrong response received : ${response.msgId} received, $msgId expected\n"
-                            + "Request : $message\n" + "Response : ${response.payload}"
-                )
-            }
-            when (response.msgType) {
-                WampMessageType.CALL_RESULT ->
-                    parser.parsePayloadFromJson(response.payload, clazz, timestampZone(csOcppId))
-                WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
-                else -> throw IllegalStateException(
-                    "The message received type ${response.msgType} is not the one expected\n"
-                            + "Request : $message\n" + "Response : ${response.payload}"
-                )
-            }
+            response.resultOf(msgId, action) { parser.parsePayloadFromJson(it, clazz, timestampZone(csOcppId)) }
         } catch (e: Exception) {
             throw e
         }

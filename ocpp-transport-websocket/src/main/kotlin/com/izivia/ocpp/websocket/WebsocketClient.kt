@@ -2,13 +2,11 @@ package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.transport.ClientTransport
-import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
-import com.izivia.ocpp.wamp.messages.WampMessageType
 import mu.KotlinLogging
 import org.http4k.core.Uri
 import java.net.ConnectException
@@ -38,20 +36,7 @@ class WebsocketClient(ocppId: String,
         try {
             val msgId: String = newMessageId()
             val response = client.sendBlocking(WampMessage.Call(msgId, action, parser.mapPayloadToString(message)))
-            if (response.msgId != msgId) {
-                throw IllegalStateException(
-                    "Wrong response received : ${response.msgId} received, $msgId expected\n"
-                            + "Request : $message\n" + "Response : ${response.payload}"
-                )
-            }
-            when (response.msgType) {
-                WampMessageType.CALL_RESULT -> parser.parsePayloadFromJson(response.payload, clazz)
-                WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
-                else -> throw IllegalStateException(
-                    "The message received type ${response.msgType} is not the one expected\n"
-                            + "Request : $message\n" + "Response : $response"
-                )
-            }
+            response.resultOf(msgId, action) { parser.parsePayloadFromJson(it, clazz) }
         } catch (e: Exception) {
             throw e
         }
