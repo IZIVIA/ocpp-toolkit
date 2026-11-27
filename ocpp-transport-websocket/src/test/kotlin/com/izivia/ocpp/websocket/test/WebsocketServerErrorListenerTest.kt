@@ -219,18 +219,21 @@ class WebsocketServerErrorListenerTest {
         server.start()
         val answer = CompletableFuture<String>()
         try {
-            val socket = HttpClient.newHttpClient().newWebSocketBuilder()
-                .subprotocols(OcppVersionWamp.OCPP_1_6.subprotocol)
-                .buildAsync(URI("ws://localhost:$port/ws/$OCPP_ID"), FirstTextFrame(answer))
-                .get(10, TimeUnit.SECONDS)
-            try {
-                socket.sendText(call.toJson(), true).get(10, TimeUnit.SECONDS)
-                val frame = runCatching { answer.get(clientTimeoutInMs, TimeUnit.MILLISECONDS) }.getOrNull()
-                // long enough for a duplicate event to show up
-                Thread.sleep(SETTLE_MS)
-                return Run(frame, events.toList())
-            } finally {
-                socket.abort()
+            // closed after the socket is aborted, so its selector thread does not outlive the exchange
+            HttpClient.newHttpClient().use { http ->
+                val socket = http.newWebSocketBuilder()
+                    .subprotocols(OcppVersionWamp.OCPP_1_6.subprotocol)
+                    .buildAsync(URI("ws://localhost:$port/ws/$OCPP_ID"), FirstTextFrame(answer))
+                    .get(10, TimeUnit.SECONDS)
+                try {
+                    socket.sendText(call.toJson(), true).get(10, TimeUnit.SECONDS)
+                    val frame = runCatching { answer.get(clientTimeoutInMs, TimeUnit.MILLISECONDS) }.getOrNull()
+                    // long enough for a duplicate event to show up
+                    Thread.sleep(SETTLE_MS)
+                    return Run(frame, events.toList())
+                } finally {
+                    socket.abort()
+                }
             }
         } finally {
             server.stop()

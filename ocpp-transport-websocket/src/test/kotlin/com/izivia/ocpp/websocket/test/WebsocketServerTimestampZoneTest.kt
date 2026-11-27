@@ -104,6 +104,7 @@ class WebsocketServerTimestampZoneTest {
             expectThat(response.msgType).isEqualTo(WampMessageType.CALL_ERROR)
             // the reason no longer reaches the station, only the error listener
             expectThat(failures.toList()).single().isNotNull().get { message }.isNotNull().contains("must use Z")
+            expectThat(response.toJson()).not().contains("must use Z")
             expectThat(received.toList()).isEqualTo(emptyList())
         }
     }
