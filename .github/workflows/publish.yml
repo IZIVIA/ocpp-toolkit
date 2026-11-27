@@ -28,6 +28,13 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
+            # Checked before publication: Maven Central is immutable, so a tag
+            # without a CHANGELOG section must fail before anything is sent.
+            -   name: Check the release notes of the tag
+                env:
+                    TAG: ${{ github.ref_name }}
+                run: sh scripts/changelog-section.sh "${TAG#R-}" > /dev/null
+
             -   name: Build OCPP toolkit with Gradle
                 env:
                     VERSION: ${{ github.ref }}
@@ -36,3 +43,35 @@ jobs:
                     GPG_PRIVATE_KEY: ${{ secrets.DELIVERY_GPG_SECRET_KEY }}
                     GPG_PASSPHRASE: ${{ secrets.DELIVERY_GPG_KEY_PASSPHRASE }}
                 run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+    # A separate job, so that "Re-run failed jobs" retries the GitHub
+    # release without publishing to Maven Central again. Kept out of the
+    # ocpp-publish concurrency group: releases of different tags are
+    # independent, and the job is idempotent (create, or edit the notes).
+    release:
+
+        needs: build
+
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: write
+
+        steps:
+            -   name: Checkout IZIVIA OCPP toolkit library code from GH
+                uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+            -   name: Create or update the GitHub release from the CHANGELOG
+                env:
+                    TAG: ${{ github.ref_name }}
+                    GH_TOKEN: ${{ github.token }}
+                    GH_REPO: ${{ github.repository }}
+                run: |
+                    VERSION="${TAG#R-}"
+                    NOTES="$RUNNER_TEMP/release-notes.md"
+                    sh scripts/changelog-section.sh "$VERSION" > "$NOTES"
+                    if gh release view "$TAG" > /dev/null 2>&1; then
+                        gh release edit "$TAG" --notes-file "$NOTES"
+                    else
+                        gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES"
+                    fi

@@ -605,4 +605,6 @@ Plus, you will find:
 Notable changes of each release are listed in [CHANGELOG.md](CHANGELOG.md), following
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A pull request that changes the
 behaviour or the API of a published module adds its entry under `[Unreleased]`, and marks a
-change that breaks consumers with **BREAKING**.
+change that breaks consumers with **BREAKING**. The GitHub release of an `R-x.y.z` tag takes its
+notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, and publication stops if that
+section is missing.

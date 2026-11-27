@@ -33,5 +33,8 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
+            -   name: Test the CHANGELOG section extraction
+                run: sh scripts/test-changelog-section.sh
+
             -   name: Build OCPP toolkit with Gradle
                 run: ./gradlew build
