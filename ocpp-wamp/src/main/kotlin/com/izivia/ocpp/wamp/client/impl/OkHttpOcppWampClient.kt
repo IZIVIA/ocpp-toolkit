@@ -50,6 +50,8 @@ class OkHttpOcppWampClient(
         get() = connectionState
 
     private val handlers = mutableListOf<WampOnActionHandler>()
+    // written by the caller's thread, read by OkHttp's
+    @Volatile
     private var connectionListener: ConnectionListener? = null
 
     private val socketOkHttpClient = OkHttpClient.Builder()
@@ -75,6 +77,8 @@ class OkHttpOcppWampClient(
                 logger.info("[$debugContext] connected")
             } else {
                 logger.error("[$debugContext] error when connecting - $t")
+                // covers both a failure reported by OkHttp and the timeout, before the cleanup drops the listener
+                connectionListener?.onConnectionFailure(t)
                 cleanupStateOnClose()
                 throw IOException("[$debugContext] connection failed: $t", t)
             }
@@ -191,9 +195,10 @@ class OkHttpOcppWampClient(
                 }
 
                 override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
-                    if (connectionState == ConnectionState.CONNECTING) {
+                    if (previousState == ConnectionState.CONNECTING) {
                         if (t is ConnectException) {
                             logger.warn("[$ocppId] web socket failed to connect to $serverUri: $t")
                         } else {
