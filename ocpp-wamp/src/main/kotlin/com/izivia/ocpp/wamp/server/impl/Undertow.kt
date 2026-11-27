@@ -93,7 +93,11 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean,
                 .apply { ioThreads?.let(::setIoThreads) }
                 .setHandler(handlerWithWs).build()
 
-            override fun start() = apply { server.start() }
+            // a restarted server upgrades again
+            override fun start() = apply {
+                stopped.set(false)
+                server.start()
+            }
 
             // no handshake is upgraded once stopping, even one whose dispatched admission decides during the stop
             override fun stop() = apply {
