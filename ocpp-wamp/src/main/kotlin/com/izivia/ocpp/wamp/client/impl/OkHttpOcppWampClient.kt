@@ -3,6 +3,10 @@ package com.izivia.ocpp.wamp.client.impl
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.OcppErrorCategory
+import com.izivia.ocpp.utils.OcppErrorEvent
+import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.client.ConnectionListener
 import com.izivia.ocpp.wamp.client.ConnectionState
 import com.izivia.ocpp.wamp.client.NotConnectedException
@@ -42,7 +46,8 @@ class OkHttpOcppWampClient(
     val ocppVersion: OcppVersion,
     val timeoutInMs: Long = 30_000,
     private val headers: WampMessageMetaHeaders = emptyList(),
-    hostnameVerifier: HostnameVerifier = HostnameVerifier { _, _ -> true }
+    hostnameVerifier: HostnameVerifier = HostnameVerifier { _, _ -> true },
+    private val errorListener: OcppErrorListener? = null
 ) : OcppWampClient {
     val serverUri = target.path("${target.path.removeSuffix("/")}/$ocppId")
     val debugContext = "$ocppId -> $serverUri"
@@ -220,6 +225,7 @@ class OkHttpOcppWampClient(
 
         if (msg == null) {
             logger.warn("can't parse wamp message from server: $text")
+            errorListener?.notifySafely(errorEvent(OcppErrorCategory.PROTOCOL_ERROR))
             return
         }
         when (msg.msgType) {
@@ -237,17 +243,36 @@ class OkHttpOcppWampClient(
                         withTimeout(timeoutInMs) {
                             // incoming call
                             logger.info("[$ocppId] <- ${msg.action} - $text")
-                            val r = handlers.asSequence()
-                                // use sequence to avoid greedy mapping, to find the first handler with non null result
-                                .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
-                                .filterNotNull()
-                                .firstOrNull()
-                                ?: WampMessage.CallError(
-                                    msg.msgId,
-                                    MessageErrorCode.INTERNAL_ERROR,
-                                    "No handler found",
-                                    "{}"
+                            val r = try {
+                                handlers.asSequence()
+                                    // use sequence to avoid greedy mapping, to find the first handler with non null result
+                                    .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
+                                    .filterNotNull()
+                                    .firstOrNull()
+                                    ?: WampMessage.CallError(
+                                        msg.msgId,
+                                        MessageErrorCode.INTERNAL_ERROR,
+                                        "No handler found",
+                                        "{}"
+                                    ).also {
+                                        errorListener?.notifySafely(
+                                            errorEvent(
+                                                OcppErrorCategory.UNHANDLED_ACTION,
+                                                msg,
+                                                MessageErrorCode.INTERNAL_ERROR
+                                            )
+                                        )
+                                    }
+                            } catch (t: Throwable) {
+                                // reported only: the coroutine still fails and nothing is answered, as before
+                                // (pinned by OkHttpOcppWampClientErrorListenerTest). Throwable on purpose, as on the
+                                // server: a handler failing with an Error is still a handler failure. WebsocketClient
+                                // answers the exceptions of its handlers, so only their Errors get here.
+                                errorListener?.notifySafely(
+                                    errorEvent(OcppErrorCategory.HANDLER_ERROR, msg, cause = t)
                                 )
+                                throw t
+                            }
                             logger.info("[$ocppId] -> ${r.toJson()}")
                             wampConnection?.websocket?.send(r.toJson())
                         }
@@ -269,6 +294,13 @@ class OkHttpOcppWampClient(
             }
         }
     }
+
+    private fun errorEvent(
+        category: OcppErrorCategory,
+        message: WampMessage? = null,
+        errorCode: MessageErrorCode? = null,
+        cause: Throwable? = null
+    ) = OcppErrorEvent(category, ocppId, ocppVersion.subprotocol, message?.action, message?.msgId, errorCode, cause)
 
     private fun onConnectedTo(connectedWebsocket: WebSocket) {
         if (wampConnection?.websocket == connectedWebsocket) {

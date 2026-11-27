@@ -38,6 +38,8 @@ data class Settings(
      * Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
      */
     val wampSettings: OcppWampClientSettings = OcppWampClientSettings(),
+    /** Observes the failures while processing the calls of the CSMS, whatever the [transportType]. */
+    val errorListener: OcppErrorListener? = null,
 )
 
 data class CSMSSettings(
