@@ -41,7 +41,8 @@ sealed interface AdmissionExecution {
      * owned by the caller. With a null [executor], no executor is created.
      *
      * @property maxConcurrent the number of admissions that may run at a time, strictly positive
-     * @property timeout how long a handshake waits for its admission, strictly positive
+     * @property timeout how long a handshake waits for its admission, at least 1 ms, the precision of Undertow's
+     *   timers; a timeout longer than about 73 years is treated as 73 years
      * @property executor where the admissions run, or null for Undertow's worker pool
      */
     data class Dispatched(
@@ -51,7 +52,7 @@ sealed interface AdmissionExecution {
     ) : AdmissionExecution {
         init {
             require(maxConcurrent > 0) { "maxConcurrent must be strictly positive: $maxConcurrent" }
-            require(!timeout.isNegative && !timeout.isZero) { "timeout must be strictly positive: $timeout" }
+            require(timeout >= Duration.ofMillis(1)) { "timeout must be at least 1 ms: $timeout" }
         }
 
         companion object {

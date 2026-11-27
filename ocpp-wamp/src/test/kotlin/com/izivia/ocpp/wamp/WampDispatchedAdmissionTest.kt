@@ -16,6 +16,7 @@ import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.Undertow
+import com.izivia.ocpp.wamp.server.impl.admissionDelayMillis
 import io.undertow.server.HttpServerExchange
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -29,17 +30,20 @@ import org.junit.jupiter.api.assertThrows
 import org.slf4j.LoggerFactory
 import org.xnio.XnioIoThread
 import strikt.api.expect
+import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.assertions.all
 import strikt.assertions.isEmpty
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNotEqualTo
+import strikt.assertions.isSuccess
 import strikt.assertions.isTrue
 import strikt.assertions.none
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.time.Duration
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
@@ -48,6 +52,7 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -395,12 +400,54 @@ class WampDispatchedAdmissionTest {
     }
 
     @Test
-    fun `dispatched admission needs a strictly positive bound and timeout`() {
+    fun `admission with an endless timeout does not expire`() {
+        val gate = hold("CS1")
+        val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = ChronoUnit.FOREVER.duration))
+
+        try {
+            val pending = handshakeAsync("CS1")
+            awaitOrFail(gate.entered, "admission of CS1 started")
+            // the I/O thread runs every timer due before this one, the expiry of CS1 included if it is due at once
+            val timersRun = CountDownLatch(1)
+            ioThread.get().executeAfter({ timersRun.countDown() }, 1, MILLISECONDS)
+            awaitOrFail(timersRun, "timers due on the I/O thread run")
+            gate.release.countDown()
+            val admitted = pending.get(5, SECONDS)
+            awaitOrFail(connects, "connect event of CS1")
+
+            expect {
+                that(admitted.status).isEqualTo(101)
+                that(events.toList()).isEqualTo(listOf("connect CS1"))
+            }
+        } finally {
+            gate.release.countDown()
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `admission timer of an endless timeout leaves XNIO a century of uptime`() {
+        val century = Duration.ofDays(36_525).toNanos()
+        val endless = listOf(ChronoUnit.FOREVER.duration, Duration.ofMillis(Long.MAX_VALUE))
+
+        endless.forEach { timeout ->
+            val delayMillis = admissionDelayMillis(timeout)
+            // XNIO's WorkerThread.executeAfter: deadline = uptime + min(millis, LONGEST_DELAY) * 1_000_000
+            expectCatching {
+                Math.addExact(century, Math.multiplyExact(minOf(delayMillis, XNIO_LONGEST_DELAY_MILLIS), 1_000_000L))
+            }.isSuccess()
+        }
+    }
+
+    @Test
+    fun `dispatched admission needs a strictly positive bound and a timeout of at least 1 ms`() {
         val invalid = listOf(
             0 to Duration.ofSeconds(1),
             -1 to Duration.ofSeconds(1),
             1 to Duration.ZERO,
             1 to Duration.ofMillis(-1),
+            1 to Duration.ofNanos(1),
+            1 to Duration.ofNanos(999_999),
         )
 
         invalid.forEach { (maxConcurrent, timeout) ->
@@ -494,5 +541,8 @@ class WampDispatchedAdmissionTest {
     companion object {
         private val SHORT_TIMEOUT = Duration.ofMillis(300)
         private val AUTHORIZED = "Authorization" to "Basic Q1MxOnMzY3IzdA=="
+
+        // org.xnio.nio.WorkerThread.LONGEST_DELAY, XNIO 3.8.16
+        private const val XNIO_LONGEST_DELAY_MILLIS = 9223372036853L
     }
 }

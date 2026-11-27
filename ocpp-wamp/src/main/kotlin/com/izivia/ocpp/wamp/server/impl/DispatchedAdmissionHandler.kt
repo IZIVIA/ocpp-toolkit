@@ -9,6 +9,7 @@ import io.undertow.util.SameThreadExecutor
 import org.http4k.core.Status
 import org.slf4j.LoggerFactory
 import org.xnio.XnioExecutor
+import java.time.Duration
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -29,11 +30,7 @@ internal class DispatchedAdmissionHandler(
     private val stopped: AtomicBoolean,
 ) : HttpHandler {
     private val slots = Semaphore(execution.maxConcurrent)
-    private val timeoutMillis = try {
-        execution.timeout.toMillis()
-    } catch (_: ArithmeticException) {
-        Long.MAX_VALUE
-    }
+    private val timeoutMillis = admissionDelayMillis(execution.timeout)
 
     // on the I/O thread
     override fun handleRequest(exch: HttpServerExchange) {
@@ -143,6 +140,21 @@ internal class DispatchedAdmissionHandler(
         private val FAILED = WebSocketUpgradeDecision.Refuse(Status.INTERNAL_SERVER_ERROR)
     }
 }
+
+/**
+ * The delay, in milliseconds, after which a handshake whose admission has not decided within [timeout] expires,
+ * capped at [MAX_ADMISSION_DELAY_MILLIS].
+ */
+internal fun admissionDelayMillis(timeout: Duration): Long =
+    minOf(timeout, Duration.ofMillis(MAX_ADMISSION_DELAY_MILLIS)).toMillis()
+
+/**
+ * The longest timer of an admission, about 73 years. XNIO 3.8.16 sets the deadline of a timer to its uptime plus the
+ * delay in nanoseconds (`WorkerThread.executeAfter`), with no overflow check: a delay of a quarter of the range of a
+ * `Long` leaves three quarters of it, about 219 years, to the uptime. A delay close to the whole range would overflow
+ * the deadline and expire the handshake early.
+ */
+internal const val MAX_ADMISSION_DELAY_MILLIS: Long = Long.MAX_VALUE / 4 / 1_000_000
 
 /** Ends the exchange with the status and the headers of [decision], without upgrading it. */
 internal fun refusal(decision: WebSocketUpgradeDecision.Refuse) = HttpHandler { exch ->
