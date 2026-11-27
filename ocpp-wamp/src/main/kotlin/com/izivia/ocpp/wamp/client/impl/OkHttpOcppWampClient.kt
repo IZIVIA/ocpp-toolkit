@@ -278,12 +278,12 @@ class OkHttpOcppWampClient(
                         ).toJson()
                         FrameLog.outbound("[$ocppId]", json)
                         wampConnection?.websocket?.send(json)
-                    } catch (e: kotlin.coroutines.cancellation.CancellationException) {
-                        throw e
                     } catch (e: Throwable) {
                         // logged here rather than by the uncaught exception handler, which prints the message: it
                         // may quote the payload. An error such as NotImplementedError too, but not a failure of the
-                        // virtual machine. Nothing is answered, as before.
+                        // virtual machine. A cancellation too: this scope is never cancelled, so it can only come
+                        // from the handler, and rethrowing it would drop it without a log. Nothing is answered, as
+                        // before.
                         if (e is VirtualMachineError) throw e
                         logger.error("[$ocppId] ${msg.logRef()} call failed: ${e.javaClass.name}", e.redactedForLog())
                     }

@@ -35,6 +35,7 @@ import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import java.io.IOException
 import java.util.UUID
+import java.util.concurrent.CancellationException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -115,6 +116,22 @@ class OkHttpOcppWampClientLogLeakTest {
     }
 
     @Test
+    fun `a handler failing with a cancellation is logged without its message`() = withLogs { logs ->
+        val sentinel = sentinel()
+        withPeer { peer ->
+            withClient(peer, { _, _ -> throw CancellationException("cancelled $sentinel") }) {
+                peer.send("""[2,"m-cancel","Heartbeat",{}]""")
+                logs.awaitEvent("call failure") {
+                    it.formattedMessage.contains("[m-cancel] [Heartbeat] call failed") &&
+                        it.formattedMessage.contains(CancellationException::class.java.name) &&
+                        it.throwableProxy != null
+                }
+            }
+        }
+        logs.expectNoLeak(sentinel)
+    }
+
+    @Test
     fun `a refused upgrade fails without the server reason in the logs nor the exception message`() =
         withLogs { logs ->
             val sentinel = sentinel()
@@ -183,8 +200,26 @@ class OkHttpOcppWampClientLogLeakTest {
         }
 
     @Test
-    fun `the frames logger at debug logs the inbound call and its answer only through itself`() =
-        withLogs(framesLevel = Level.DEBUG) { logs ->
+    fun `the frames logger at debug logs no frame`() = withLogs(framesLevel = Level.DEBUG) { logs ->
+        val sentinel = sentinel()
+        withPeer { peer ->
+            withClient(peer, answering(sentinel)) {
+                peer.send("""[2,"m-frames","DataTransfer",{"data":"$sentinel"}]""")
+                expectThat(peer.received.poll(5, TimeUnit.SECONDS)).isNotNull().contains("$sentinel-resp")
+                logs.awaitEvent("inbound call") {
+                    it.formattedMessage.contains("[IN][CALL][REQ]") && it.formattedMessage.contains("[m-frames]")
+                }
+                logs.awaitEvent("answer") {
+                    it.formattedMessage.contains("[IN][CALL][RESP]") && it.formattedMessage.contains("[m-frames]")
+                }
+            }
+        }
+        logs.expectNoLeak(sentinel)
+    }
+
+    @Test
+    fun `the frames logger at trace logs the inbound call and its answer only through itself`() =
+        withLogs(framesLevel = Level.TRACE) { logs ->
             val sentinel = sentinel()
             withPeer { peer ->
                 withClient(peer, answering(sentinel)) {

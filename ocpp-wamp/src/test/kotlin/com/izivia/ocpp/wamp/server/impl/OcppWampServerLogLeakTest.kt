@@ -282,8 +282,24 @@ class OcppWampServerLogLeakTest {
     }
 
     @Test
-    fun `the frames logger at debug logs the inbound call and its response only through itself`() =
-        withLogs(framesLevel = Level.DEBUG) { logs ->
+    fun `the frames logger at debug logs no frame`() = withLogs(framesLevel = Level.DEBUG) { logs ->
+        val sentinel = sentinel()
+        withStation(answering(sentinel)) { station ->
+            station.ws.send("""[2,"m-frames","Authorize",{"idTag":"$sentinel"}]""")
+            expectThat(station.received.poll(5, TimeUnit.SECONDS)).isNotNull().contains(sentinel)
+            logs.awaitEvent("inbound call") {
+                it.formattedMessage.contains("[IN][CALL][REQ]") && it.formattedMessage.contains("[m-frames]")
+            }
+            logs.awaitEvent("response") {
+                it.formattedMessage.contains("[IN][CALL][RESP]") && it.formattedMessage.contains("[m-frames]")
+            }
+        }
+        logs.expectNoLeak(sentinel)
+    }
+
+    @Test
+    fun `the frames logger at trace logs the inbound call and its response only through itself`() =
+        withLogs(framesLevel = Level.TRACE) { logs ->
             val sentinel = sentinel()
             withStation(answering(sentinel)) { station ->
                 station.ws.send("""[2,"m-frames","Authorize",{"idTag":"$sentinel"}]""")
@@ -299,8 +315,8 @@ class OcppWampServerLogLeakTest {
         }
 
     @Test
-    fun `the frames logger at debug logs an outbound call and its result only through itself`() =
-        withLogs(framesLevel = Level.DEBUG) { logs ->
+    fun `the frames logger at trace logs an outbound call and its result only through itself`() =
+        withLogs(framesLevel = Level.TRACE) { logs ->
             val sentinel = sentinel()
             withStation(stationAnswer = { id -> """[3,"$id",{"status":"$sentinel-result"}]""" }) { station ->
                 station.server.sendBlocking(OCPP_ID, outboundCall("m-frames-out", sentinel))

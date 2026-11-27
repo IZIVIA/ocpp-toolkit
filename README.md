@@ -600,20 +600,18 @@ toolkit builds do not quote payloads either: a call is named by its message id a
 client loses its credentials and query string. Only `OcppCallErrorException` differs: its message is the error details
 of the peer's `CALLERROR`, so do not log it as is.
 
-Raw OCPP frames, payloads included, go to one logger only, `com.izivia.ocpp.wamp.frames`, at `DEBUG`, as `[IN]` and
-`[OUT]` lines. It is enabled whenever the logging configuration lets `DEBUG` through for it, and logback without any
-configuration does: it logs everything at `DEBUG`. Keep it off in production in your `logback.xml`:
+Raw OCPP frames, payloads included, go to one logger only, `com.izivia.ocpp.wamp.frames`, at `TRACE`, as `[IN]` and
+`[OUT]` lines. It is off by default: logback without any configuration logs at `DEBUG`, and so does a root logger set
+to `DEBUG`, which both leave `TRACE` out, so there is nothing to pin in production. Turn it on for a diagnosis only,
+by setting that logger to `TRACE` in your `logback.xml`, knowing that the frames then logged hold id tags and any
+credential a payload carries:
 
 ```xml
-<logger name="com.izivia.ocpp.wamp.frames" level="INFO"/>
+<logger name="com.izivia.ocpp.wamp.frames" level="TRACE"/>
 ```
 
-and turn it on for a diagnosis only, knowing that the frames then logged hold id tags and any credential a payload
-carries:
-
-```xml
-<logger name="com.izivia.ocpp.wamp.frames" level="DEBUG"/>
-```
+It inherits its level, so any ancestor logger set to `TRACE` turns it on too: `com.izivia.ocpp.wamp`,
+`com.izivia.ocpp` or the root.
 
 The `cause` given to an `OcppErrorListener` is the original exception, message included: sanitize it before reporting
 it to an external system such as Sentry or a metrics backend (see [Observing OCPP errors](#observing-ocpp-errors)).
