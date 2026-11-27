@@ -6,8 +6,11 @@
 #
 # The heading is matched by string comparison, not as a pattern: the line
 # equals `## [<version>]` or starts with `## [<version>] `. The section ends
-# before the next `## [` heading or the first link reference definition
-# (`[label]: url`). Exits non-zero when the section is missing or empty.
+# before the next `## [` heading. Trailing blank lines and link reference
+# definitions (`[label]: url`) are dropped, so the link block that closes
+# the file never ends up in the last section, while a definition followed
+# by more content is kept. CRLF line endings are accepted. Exits non-zero
+# when the section is missing or empty.
 set -eu
 
 if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
@@ -31,13 +34,14 @@ CHANGELOG_VERSION=$version awk '
         found = 0
         count = 0
     }
+    { sub(/\r$/, "") }
     !found {
         if ($0 == heading || substr($0, 1, size) == heading " ") {
             found = 1
         }
         next
     }
-    /^## \[/ || /^\[[^]]+\]: / { exit }
+    /^## \[/ { exit }
     { lines[++count] = $0 }
     END {
         if (!found) {
@@ -48,7 +52,7 @@ CHANGELOG_VERSION=$version awk '
             first++
         }
         last = count
-        while (last >= first && lines[last] ~ /^[ \t]*$/) {
+        while (last >= first && (lines[last] ~ /^[ \t]*$/ || lines[last] ~ /^\[[^]]+\]: /)) {
             last--
         }
         if (first > last) {

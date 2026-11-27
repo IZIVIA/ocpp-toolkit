@@ -147,6 +147,52 @@ expect_section "0.0.11.1 does not match 0.0.11" 0.0.11.1 "$changelog" '- patch o
 
 expect_failure "empty section" "0.0.10" 0.0.10 "$changelog"
 
+inner_links="$tmp/inner-links.md"
+cat > "$inner_links" <<'EOF'
+## [2.0.0] - 2026-03-01
+
+- newest
+
+## [1.0.0] - 2026-02-01
+
+- a
+[label]: https://x
+- more
+[RFC](https://x) at column 0 is content
+
+## [0.1.0] - 2026-01-01
+
+- oldest
+
+[2.0.0]: https://example.com/compare/R-1.0.0...R-2.0.0
+[1.0.0]: https://example.com/compare/R-0.1.0...R-1.0.0
+EOF
+expect_section "link definition inside a section does not end it" 1.0.0 "$inner_links" '- a
+[label]: https://x
+- more
+[RFC](https://x) at column 0 is content'
+
+expect_section "trailing link block after a section with inner links" 0.1.0 "$inner_links" '- oldest'
+
+undated="$tmp/undated.md"
+cat > "$undated" <<'EOF'
+## [5.0.0]
+
+- undated entry
+
+## [4.0.0] - 2026-02-01
+
+- dated entry
+EOF
+expect_section "heading without a date" 5.0.0 "$undated" '- undated entry'
+
+crlf="$tmp/crlf.md"
+printf '## [Unreleased]\r\n\r\n## [6.0.0] - 2026-04-01\r\n\r\n### Fixed\r\n\r\n- crlf entry\r\n\r\n## [5.0.0] - 2026-03-01\r\n\r\n- older\r\n\r\n[6.0.0]: https://example.com/R-6.0.0\r\n' > "$crlf"
+expect_section "CRLF changelog" 6.0.0 "$crlf" '### Fixed
+
+- crlf entry'
+expect_section "CRLF changelog, last section" 5.0.0 "$crlf" '- older'
+
 expect_failure "no argument" "usage"
 expect_failure "too many arguments" "usage" 4.0.0 "$changelog" extra
 expect_failure "unreadable file" "$tmp/absent.md" 4.0.0 "$tmp/absent.md"
