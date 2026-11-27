@@ -1,7 +1,7 @@
 package com.izivia.ocpp.wamp.server.impl
 
-import com.izivia.ocpp.wamp.core.escapedForLog
-import com.izivia.ocpp.wamp.core.redactedForLog
+import com.izivia.ocpp.utils.escapedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import io.undertow.server.HttpServerExchange
 import io.undertow.websockets.WebSocketConnectionCallback
 import io.undertow.websockets.core.*

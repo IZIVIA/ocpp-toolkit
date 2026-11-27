@@ -617,6 +617,8 @@ carries:
 
 The `cause` given to an `OcppErrorListener` is the original exception, message included: sanitize it before reporting
 it to an external system such as Sentry or a metrics backend (see [Observing OCPP errors](#observing-ocpp-errors)).
+`com.izivia.ocpp.utils.redactedForLog()`, which the toolkit's own logs use, gives a copy of it that keeps the classes
+and stack traces of its chain without any message.
 
 ## Code Organisation
 

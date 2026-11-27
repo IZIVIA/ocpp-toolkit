@@ -259,6 +259,40 @@ class KotlinInstantModuleTest {
         }
     }
 
+    @Test
+    fun `should warn with the charging station id escaped`() {
+        withInstantDeserializerLogs { events ->
+            readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1\r\nFORGED") { PARIS })
+
+            val warnings = events.filter { it.level == Level.WARN }.map { it.formattedMessage }
+            expectThat(warnings).containsExactly(
+                "Timestamp without timezone received from charging station CS1\\u000d\\u000aFORGED: " +
+                    "2024-03-15T12:00:00. Interpreting it in Europe/Paris."
+            )
+        }
+    }
+
+    @Test
+    fun `should refuse with the charging station id and the value escaped`() {
+        val refused = assertThrows<Exception> {
+            readInstant("2024-03-15T12:00:00", TimestampZoneContext("CS1\r\nFORGED") { null })
+        }
+        val malformed = assertThrows<Exception> {
+            readInstant("not a timestamp\\r\\nFORGED", TimestampZoneContext("CS1") { PARIS })
+        }
+
+        // Jackson may wrap the deserializer's exception and append a location on a new line: check the original
+        expectThat(refused.refusal()).contains("CS1\\u000d\\u000aFORGED")
+        expectThat(malformed.refusal()).contains("not a timestamp\\u000d\\u000aFORGED")
+        listOf(refused.refusal(), malformed.refusal()).forEach {
+            expectThat(it).not().contains("\r")
+            expectThat(it).not().contains("\n")
+        }
+    }
+
+    private fun Throwable.refusal(): String =
+        generateSequence(this) { it.cause }.filterIsInstance<IllegalArgumentException>().first().message.orEmpty()
+
     private fun readInstant(value: String, context: TimestampZoneContext): Instant =
         mapper.readerFor(Instant::class.java).withTimestampZone(context).readValue("\"$value\"")
 

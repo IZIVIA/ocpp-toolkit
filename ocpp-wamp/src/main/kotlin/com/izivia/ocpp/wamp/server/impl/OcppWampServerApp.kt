@@ -9,9 +9,9 @@ import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.core.FrameLog
 import com.izivia.ocpp.wamp.core.WampCallManager
-import com.izivia.ocpp.wamp.core.escapedForLog
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.core.logRef
-import com.izivia.ocpp.wamp.core.redactedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType

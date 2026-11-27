@@ -40,7 +40,7 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
             // https://github.com/monta-app/ocpp-emulator/issues/5
             logger.warn(
                 "Timestamp with incomplete timezone offset received: {}. Accepting it for interoperability.",
-                value,
+                value.escapedForLog(),
             )
         }
     }
@@ -51,23 +51,27 @@ class InstantDeserializer : StdDeserializer<Instant>(Instant::class.java) {
         val localDateTime = try {
             LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         } catch (exception: DateTimeException) {
-            throw IllegalArgumentException("Timestamp must use Z, +HH:mm/-HH:mm, or omit timezone entirely: $value", exception)
+            throw IllegalArgumentException(
+                "Timestamp must use Z, +HH:mm/-HH:mm, or omit timezone entirely: ${value.escapedForLog()}",
+                exception
+            )
         }
         if (timestampZone == null) {
             logger.warn(
                 "Timestamp without timezone received: {}. Interpreting it as UTC.",
-                value,
+                value.escapedForLog(),
             )
             return localDateTime.atZone(ZoneOffset.UTC).toInstant().toKotlinInstant()
         }
         val zone = timestampZone.zone ?: throw IllegalArgumentException(
-            "Timestamp without timezone refused for charging station ${timestampZone.chargingStationId}: $value"
+            "Timestamp without timezone refused for charging station " +
+                "${timestampZone.chargingStationId.escapedForLog()}: ${value.escapedForLog()}"
         )
         if (timestampZone.firstWarning()) {
             logger.warn(
                 "Timestamp without timezone received from charging station {}: {}. Interpreting it in {}.",
-                timestampZone.chargingStationId,
-                value,
+                timestampZone.chargingStationId.escapedForLog(),
+                value.escapedForLog(),
                 zone,
             )
         }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.io.JsonStringEncoder
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
-import com.izivia.ocpp.wamp.core.redactedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import com.izivia.ocpp.wamp.messages.WampMessageType.*
 import org.slf4j.LoggerFactory
 import java.io.IOException

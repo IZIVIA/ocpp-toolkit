@@ -1,5 +1,6 @@
 package com.izivia.ocpp.websocket.test
 
+import ch.qos.logback.classic.spi.ThrowableProxyUtil
 import com.izivia.ocpp.core16.model.clearcache.ClearCacheReq
 import com.izivia.ocpp.core16.model.clearcache.ClearCacheResp
 import com.izivia.ocpp.core16.model.heartbeat.HeartbeatReq
@@ -17,10 +18,12 @@ import com.izivia.ocpp.websocket.asServer
 import org.junit.jupiter.api.Test
 import strikt.api.expectCatching
 import strikt.api.expectThat
+import strikt.assertions.any
 import strikt.assertions.contains
 import strikt.assertions.isA
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFailure
+import strikt.assertions.isNotNull
 import java.net.ServerSocket
 import kotlin.time.Clock
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
@@ -57,6 +60,41 @@ class WebsocketClientCallErrorTest {
             .isFailure()
             .isA<OcppCallErrorException>()
             .get { payload }.isEqualTo("{}")
+    }
+
+    @Test
+    fun `should log a throwing handler with the message id of the call escaped`() {
+        val logs = withToolkitLogs {
+            withThrowingClient { transport ->
+                transport.server.sendBlocking(OCPP_ID, WampMessage.Call("msg-1\r\nFORGED", "ClearCache", "{}"))
+            }
+        }
+
+        expectThat(logs.map { it.formattedMessage }).any {
+            contains("while handling ClearCache [msgId=msg-1\\u000d\\u000aFORGED]")
+        }
+        expectNoRawLineBreak(logs)
+    }
+
+    @Test
+    fun `should log a throwing handler with its class and stack trace but without its message`() {
+        val logs = withToolkitLogs {
+            withThrowingClient { transport ->
+                transport.server.sendBlocking(OCPP_ID, WampMessage.Call("msg-1", "ClearCache", "{}"))
+            }
+        }
+
+        // the client has no error listener: the log is the only place the stack trace of the failure can reach
+        val failure = logs.single { it.formattedMessage.contains("while handling ClearCache") }
+        expectThat(failure) {
+            get { formattedMessage }.not().contains(SENTINEL)
+            get { throwableProxy }.isNotNull().and {
+                get { message }.isEqualTo(IllegalStateException::class.java.name)
+                get { stackTraceElementProxyArray.map { it.stackTraceElement } }
+                    .isEqualTo(sentinelFailure.stackTrace.toList())
+                get { ThrowableProxyUtil.asString(this) }.not().contains(SENTINEL)
+            }
+        }
     }
 
     /** Runs [send] against a real server, with a connected client whose ClearCache handler throws. */

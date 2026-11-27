@@ -64,6 +64,20 @@ class UnexpectedResponseTest {
             }
     }
 
+    @Test
+    fun `should name a response to another call by its escaped message id`() {
+        val response = WampMessage.CallResult("m-2\r\nFORGED", "{}")
+
+        expectCatching { response.resultOf("m-1", "Heartbeat") { it } }
+            .isFailure()
+            .isA<IllegalStateException>()
+            .get { message }.isNotNull().and {
+                contains("[m-2\\u000d\\u000aFORGED]")
+                not().contains("\r")
+                not().contains("\n")
+            }
+    }
+
     private companion object {
         const val SENTINEL = "sentinel-168-response"
     }

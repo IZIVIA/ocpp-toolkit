@@ -10,6 +10,7 @@ import com.izivia.ocpp.utils.OcppErrorCategory
 import com.izivia.ocpp.utils.OcppErrorEvent
 import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.TimestampZoneContext
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
@@ -91,7 +92,10 @@ class WebsocketServer(
                         WampMessage.CallResult(msg.msgId, payload)
                     } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
                         // the exception message may quote the payload: only its class is logged
-                        logger.error("${e.javaClass.name} while handling ${msg.action} [msgId=${msg.msgId}]")
+                        logger.error(
+                            "${e.javaClass.name} while handling ${msg.action?.escapedForLog()} " +
+                                "[msgId=${msg.msgId.escapedForLog()}]"
+                        )
                         errorListener?.notifySafely(
                             OcppErrorEvent(
                                 failureCategory,

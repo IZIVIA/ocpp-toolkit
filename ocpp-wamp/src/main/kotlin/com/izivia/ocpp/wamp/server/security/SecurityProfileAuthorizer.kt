@@ -1,7 +1,7 @@
 package com.izivia.ocpp.wamp.server.security
 
 import com.izivia.ocpp.CSOcppId
-import com.izivia.ocpp.wamp.core.escapedForLog
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.ConnectionRequest
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason

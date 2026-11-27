@@ -3,6 +3,8 @@ package com.izivia.ocpp.websocket
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.RequestHeaders
+import com.izivia.ocpp.utils.escapedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.messages.WampMessage
@@ -50,8 +52,13 @@ class WebsocketClient(ocppId: String,
                         val payload = parser.mapPayloadToString(response)
                         WampMessage.CallResult(wampMsg.msgId, payload)
                     } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
-                        // the exception message may quote the payload: only its class is logged
-                        logger.error("${e.javaClass.name} while handling ${wampMsg.action} [msgId=${wampMsg.msgId}]")
+                        // the exception message may quote the payload: it is logged as a redacted copy, which keeps
+                        // its class and stack trace. No error listener gets the cause on the client side.
+                        logger.error(
+                            "${e.javaClass.name} while handling ${wampMsg.action?.escapedForLog()} " +
+                                "[msgId=${wampMsg.msgId.escapedForLog()}]",
+                            e.redactedForLog()
+                        )
                         internalErrorFor(wampMsg.msgId)
                     }
                 } else {

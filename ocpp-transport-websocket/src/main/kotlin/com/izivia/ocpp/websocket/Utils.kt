@@ -7,6 +7,7 @@ import com.izivia.ocpp.json16.Ocpp16JsonParser
 import com.izivia.ocpp.json20.Ocpp20JsonParser
 import com.izivia.ocpp.transport.OcppCallErrorException
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageType
 
@@ -26,7 +27,7 @@ internal fun getJsonMapper(ocppVersion: OcppVersion) = when (ocppVersion) {
  * of this message are left out of it, since they may carry an id tag or a credential.
  */
 internal fun <P> WampMessage.resultOf(msgId: String, action: String, parse: (String) -> P): P {
-    check(this.msgId == msgId) { "Wrong response received for [$msgId] [$action]: [${this.msgId}] received" }
+    check(this.msgId == msgId) { "Wrong response received for [$msgId] [$action]: [${this.msgId.escapedForLog()}] received" }
     return when (msgType) {
         WampMessageType.CALL_RESULT -> parse(payload)
         WampMessageType.CALL_ERROR -> throw OcppCallErrorException(payload)

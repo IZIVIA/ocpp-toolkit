@@ -1,5 +1,6 @@
 package com.izivia.ocpp.wamp.core
 
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import kotlin.time.Clock
 import kotlin.time.Instant

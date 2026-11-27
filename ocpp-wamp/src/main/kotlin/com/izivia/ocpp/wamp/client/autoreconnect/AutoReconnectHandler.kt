@@ -1,7 +1,7 @@
 package com.izivia.ocpp.wamp.client.autoreconnect
 
 import com.izivia.ocpp.wamp.client.ConnectionListener
-import com.izivia.ocpp.wamp.core.redactedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import kotlin.time.Clock
 import kotlin.time.Instant
 import org.slf4j.LoggerFactory

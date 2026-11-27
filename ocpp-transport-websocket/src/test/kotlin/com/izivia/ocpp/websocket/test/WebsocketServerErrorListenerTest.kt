@@ -18,6 +18,7 @@ import com.izivia.ocpp.websocket.WebsocketServer
 import com.izivia.ocpp.websocket.asServer
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.any
 import strikt.assertions.contains
 import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
@@ -155,6 +156,18 @@ class WebsocketServerErrorListenerTest {
         expectInternalErrorWithoutSentinel(run.frame, TOKEN_SENTINEL)
         expectThat(run.events).single().get { category }.isEqualTo(OcppErrorCategory.PROTOCOL_ERROR)
         expectSameResponseWhateverTheListener(malformed, { accepted })
+    }
+
+    @Test
+    fun `should log a throwing callback with the message id of the call escaped`() {
+        val forging = WampMessage.Call("msg-1\r\nFORGED", "Authorize", """{"idTag":"TAG"}""")
+
+        val logs = withToolkitLogs { exchange(forging, failing) }
+
+        expectThat(logs.map { it.formattedMessage }).any {
+            contains("while handling Authorize [msgId=msg-1\\u000d\\u000aFORGED]")
+        }
+        expectNoRawLineBreak(logs)
     }
 
     /** OCPP-J 1.6 and 2.0.1 §4.2.3: "If there are no error details you MUST fill in an empty object {}." */
