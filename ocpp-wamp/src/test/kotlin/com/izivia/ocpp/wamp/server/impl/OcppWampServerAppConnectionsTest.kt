@@ -19,8 +19,11 @@ import java.net.SocketException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
@@ -52,6 +55,8 @@ class OcppWampServerAppConnectionsTest {
     @Volatile
     private var handlers: (String) -> List<OcppWampServerHandler> = { emptyList() }
 
+    private val builtExecutor = AtomicReference<Executor>()
+
     private val app = OcppWampServerApp(
         ocppVersions = setOf(OCPP_1_6),
         handlers = { handlers(it) },
@@ -63,7 +68,10 @@ class OcppWampServerAppConnectionsTest {
             onWsPingHandler = { pingEvents.add(it) }
         ),
         ocppWsEndpoint = OcppWsEndpoint("ws"),
-        settings = OcppWampServerSettings(),
+        // the very executor the settings build, so that its ownership is unchanged
+        settings = object : OcppWampServerSettings() {
+            override fun buildCallsExecutor() = super.buildCallsExecutor().also { builtExecutor.set(it) }
+        },
         clock = object : Clock {
             override fun now() = now
         }
@@ -181,6 +189,18 @@ class OcppWampServerAppConnectionsTest {
         expectThat(shutdown.exceptionOrNull()).isNull()
         expectThat(sockets.filterNot { it.closed }).describedAs("connections left open").isEmpty()
         expectThat(closeEvents).hasSize(1)
+    }
+
+    @Test
+    fun `should shut down the calls executor it owns when a close listener throws an Error on shutdown`() {
+        connect("CS1")
+        // an Error, as an Exception is caught with the listener
+        lifecycleHook = { if (it == "close:CS1") throw AssertionError("listener failure") }
+
+        expectThrows<AssertionError> { app.shutdown() }
+        lifecycleHook = {}
+
+        expectThat(builtExecutor.get()).isA<ExecutorService>().get { isShutdown }.isTrue()
     }
 
     @Test

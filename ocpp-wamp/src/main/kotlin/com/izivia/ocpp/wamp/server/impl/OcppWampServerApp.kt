@@ -32,6 +32,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.Executor
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -77,6 +78,7 @@ class OcppWampServerApp internal constructor(
 
     companion object {
         private val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server")
+        private const val CALLS_EXECUTOR_TERMINATION_MS = 1_000L
     }
 
     private val connections = ConnectionsMap()
@@ -499,25 +501,55 @@ class OcppWampServerApp internal constructor(
 
     fun shutdown() {
         shutdown.set(true)
-        awaitInFlightInboundCalls()
-        connections.values.toList().forEach { c ->
-            c?.let {
-                // a failure is logged, so that it does not leave the next connections open
-                try {
-                    it.callManager.await()
-                    it.close()
-                    // the close completes later, when the connection is no longer registered: notify it now
-                    withStationLock(it.ocppId) {
-                        if (synchronized(it) { connections.remove(it) }) {
-                            notifyConnection(it.logContext, "close") {
-                                listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+        // an Error still propagates, as from every listener, once the calls executor the toolkit owns is shut down
+        try {
+            awaitInFlightInboundCalls()
+            connections.values.toList().forEach { c ->
+                c?.let {
+                    // a failure is logged, so that it does not leave the next connections open
+                    try {
+                        it.callManager.await()
+                        it.close()
+                        // the close completes later, when the connection is no longer registered: notify it now
+                        withStationLock(it.ocppId) {
+                            if (synchronized(it) { connections.remove(it) }) {
+                                notifyConnection(it.logContext, "close") {
+                                    listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                                }
                             }
                         }
+                    } catch (e: Exception) {
+                        logger.error(
+                            "${it.logContext} shutting down - closing failed: ${e.javaClass.name}",
+                            e.redactedForLog()
+                        )
                     }
-                } catch (e: Exception) {
-                    logger.error("${it.logContext} shutting down - closing failed: ${e.javaClass.name}", e.redactedForLog())
                 }
             }
+        } finally {
+            shutdownOwnedCallsExecutor()
+        }
+    }
+
+    /**
+     * Shuts down the calls executor when the toolkit built it, never an executor of the caller. Its threads get
+     * [CALLS_EXECUTOR_TERMINATION_MS] to end, then are interrupted and get [CALLS_EXECUTOR_TERMINATION_MS] more: a
+     * shutdown lasts at most [OcppWampServerSettings.timeoutInMs] for the drain, the closing of the connections, and
+     * these two waits. The queued calls an interruption drops are not answered, their connections being closed.
+     * A second call returns at once.
+     */
+    private fun shutdownOwnedCallsExecutor() {
+        val executor = callsExecutor as? ToolkitOwnedExecutor ?: return
+        executor.shutdown()
+        try {
+            if (!executor.awaitTermination(CALLS_EXECUTOR_TERMINATION_MS, TimeUnit.MILLISECONDS)) {
+                val dropped = executor.shutdownNow().size
+                logger.warn("shutting down - calls executor still busy, interrupted, $dropped queued calls dropped")
+                executor.awaitTermination(CALLS_EXECUTOR_TERMINATION_MS, TimeUnit.MILLISECONDS)
+            }
+        } catch (e: InterruptedException) {
+            executor.shutdownNow()
+            Thread.currentThread().interrupt()
         }
     }
 
