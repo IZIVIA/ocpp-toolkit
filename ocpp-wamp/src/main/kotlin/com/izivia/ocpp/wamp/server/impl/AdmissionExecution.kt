@@ -28,17 +28,20 @@ sealed interface AdmissionExecution {
      * - At most [maxConcurrent] admissions run at a time. A handshake arriving when they are all taken is answered
      *   at once with `503 Service Unavailable` and `Retry-After: 5` ([RETRY_AFTER_SECONDS]), and nothing is
      *   submitted. So is a handshake whose submission [executor] rejects.
-     * - A handshake whose admission has not decided within [timeout] is answered with the same 503. Its admission
-     *   still runs to its end, but its decision is dropped: the station is never upgraded nor notified.
+     * - A handshake whose admission has not decided within [timeout] is answered with the same 503. An admission
+     *   that had already started runs to its end, but its decision is dropped: the station is never upgraded nor
+     *   notified. One that had not started yet is skipped: its callbacks are never called.
      * - An admission keeps its slot until its callbacks return, not until its timeout: [maxConcurrent] bounds the
      *   threads actually blocked in admission. A callback that hangs keeps its slot for good, and once all slots are
      *   taken every handshake gets the 503: the server fails closed rather than piling up blocked threads.
-     * - Once the server is stopping, no handshake is upgraded any more. `stop()` waits for the tasks of Undertow's
+     * - Once the server is stopping, no handshake is upgraded any more: one whose admission accepts the station is
+     *   answered with `503 Service Unavailable` without `Retry-After`. `stop()` waits for the tasks of Undertow's
      *   worker pool, so with a null [executor] a callback that hangs also keeps `stop()` waiting.
      *
      * [executor] must run or reject (with a [java.util.concurrent.RejectedExecutionException]) every task it is
-     * given: a policy that silently discards a task never gives its slot back. The toolkit never shuts it down; it is
-     * owned by the caller. With a null [executor], no executor is created.
+     * given: a policy that silently discards a task never gives its slot back. Any other [Exception] thrown by its
+     * `execute` is treated as a rejection, answered with the 503 and `Retry-After: 5`; an [Error] is not caught. The
+     * toolkit never shuts it down; it is owned by the caller. With a null [executor], no executor is created.
      *
      * @property maxConcurrent the number of admissions that may run at a time, strictly positive
      * @property timeout how long a handshake waits for its admission, at least 1 ms, the precision of Undertow's
@@ -56,7 +59,10 @@ sealed interface AdmissionExecution {
         }
 
         companion object {
-            /** The `Retry-After` delay, in seconds, of a handshake refused for overload, rejection or timeout. */
+            /**
+             * The `Retry-After` delay, in seconds, of a handshake refused for overload, rejection or timeout. The 503
+             * of a stopping server carries none.
+             */
             const val RETRY_AFTER_SECONDS: Int = 5
         }
     }

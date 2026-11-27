@@ -575,14 +575,23 @@ With `ocpp-wamp`, pass it to `OcppWampServer.asServer(port, admission)`. With `t
 - The mode applies to the server of every port, but each port has its own server, hence its own `maxConcurrent`
   bound. SOAP ignores it.
 - A handshake arriving when `maxConcurrent` admissions are running, one whose submission the executor rejects, and one
-  whose admission has not decided within `timeout` get an HTTP 503 with `Retry-After: 5`. A late decision is dropped:
-  the station is neither upgraded nor notified. The 401, 404 and 500 of a refused station are unchanged.
+  whose admission has not decided within `timeout` get an HTTP 503 with `Retry-After: 5`. An admission that had
+  already started when its timeout fired runs to its end and its decision is dropped: the station is neither upgraded
+  nor notified. One that had not started yet is skipped. The 401, 404 and 500 of a refused station are unchanged.
+- `timeout` must be at least 1 ms, the precision of Undertow's timers, or `Dispatched` throws an
+  `IllegalArgumentException`; a timeout longer than about 73 years is treated as 73 years.
 - An admission keeps its slot until its callbacks return, not until its timeout. A callback that hangs keeps its slot,
   so once all slots are taken every handshake gets the 503; with Undertow's worker pool it also keeps the server's
   `stop()` waiting. Give the authorizer's own I/O, such as a database query, a timeout of its own.
 - The toolkit never shuts down an executor you pass: you own it. It must run or reject (with a
-  `RejectedExecutionException`) every task: a policy that silently discards a task never gives its slot back. Without
-  an executor, nothing is created.
+  `RejectedExecutionException`) every task: a policy that silently discards a task never gives its slot back. Any
+  other `Exception` thrown by its `execute` is treated as a rejection (503 with `Retry-After: 5`); an `Error` is not
+  caught. Without an executor, nothing is created.
+- Once the HTTP server is stopping, no handshake is upgraded any more: one whose admission accepts the station gets an
+  HTTP 503 without `Retry-After`. `CSMS.stop()` first drains its transports, then stops the HTTP servers, so this
+  starts with the second step. An admission deciding during the drain still completes its handshake (101), and the
+  transport, already shutting down, closes the WebSocket at once (close code 1000), with no connect nor close event.
+  `Inline` behaves the same during the drain.
 
 `CSMSSettings` and `CSMS` keep their earlier constructors for compiled code, but code calling the `copy` function of
 `CSMSSettings` must be recompiled: its signature changes with the new parameter.
