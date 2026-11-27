@@ -20,6 +20,13 @@ interface OcppWampClient {
     val state: ConnectionState
 
     companion object {
+        /**
+         * Equivalent to the [OcppWampClientSettings] overload, and validated the same way.
+         *
+         * @throws IllegalArgumentException if [timeoutInMs] is not positive or [baseAutoReconnectDelayInMs]
+         * is negative. A `timeoutInMs` of 0 used to be accepted, but the client then gave up on the
+         * connection and on every call without waiting.
+         */
         fun newClient(
             target: Uri,
             ocppId: CSOcppId,
@@ -28,20 +35,35 @@ interface OcppWampClient {
             autoReconnect: Boolean = true,
             baseAutoReconnectDelayInMs: Long = 250,
             headers: WampMessageMetaHeaders = emptyList()
-        ) = OkHttpOcppWampClient(target, ocppId, ocppVersion, timeoutInMs, headers).let {
-            if (autoReconnect) {
-                AutoReconnectOcppWampClient(
-                    it,
-                    it.debugContext,
-                    AutoReconnectConfig(
-                        timeoutInMs.milliseconds,
-                        baseAutoReconnectDelayInMs.milliseconds
+        ): OcppWampClient = newClient(
+            target,
+            ocppId,
+            ocppVersion,
+            OcppWampClientSettings(timeoutInMs, autoReconnect, baseAutoReconnectDelayInMs),
+            headers
+        )
+
+        fun newClient(
+            target: Uri,
+            ocppId: CSOcppId,
+            ocppVersion: OcppVersion,
+            settings: OcppWampClientSettings,
+            headers: WampMessageMetaHeaders = emptyList()
+        ): OcppWampClient =
+            OkHttpOcppWampClient(target, ocppId, ocppVersion, settings.timeoutInMs, headers).let {
+                if (settings.autoReconnect) {
+                    AutoReconnectOcppWampClient(
+                        it,
+                        it.debugContext,
+                        AutoReconnectConfig(
+                            settings.timeoutInMs.milliseconds,
+                            settings.baseAutoReconnectDelayInMs.milliseconds
+                        )
                     )
-                )
-            } else {
-                it
+                } else {
+                    it
+                }
             }
-        }
     }
 }
 

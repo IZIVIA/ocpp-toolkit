@@ -27,6 +27,7 @@ import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
@@ -61,7 +62,8 @@ class ApiFactory {
             ocppVersion: OcppVersionTransport,
             target: String,
             headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String = { UUID.randomUUID().toString() }
+            newMessageId: () -> String = { UUID.randomUUID().toString() },
+            wampSettings: OcppWampClientSettings = OcppWampClientSettings()
         ): ClientTransport =
             when (transportType) {
                 WEBSOCKET -> createClientTransportWebsocket(
@@ -69,7 +71,8 @@ class ApiFactory {
                     ocppId,
                     target,
                     headers,
-                    newMessageId
+                    newMessageId,
+                    wampSettings
                 )
 
                 SOAP -> createClientTransportSoap(
@@ -87,9 +90,10 @@ class ApiFactory {
             ocppId: String,
             target: String,
             headers: RequestHeaders = emptyList(),
-            newMessageId: () -> String
+            newMessageId: () -> String,
+            wampSettings: OcppWampClientSettings
         ): ClientTransport =
-            WebsocketClient(ocppId, getWampVersion(ocppVersion), target, headers, newMessageId)
+            WebsocketClient(ocppId, getWampVersion(ocppVersion), target, headers, newMessageId, wampSettings)
 
         private fun createClientTransportSoap(
             soapClient: SoapClientSettings,
@@ -140,7 +144,8 @@ class ApiFactory {
                 settings.ocppVersion,
                 settings.target,
                 headers,
-                settings.newMessageId
+                settings.newMessageId,
+                settings.wampSettings
             )
             return when (settings.ocppVersion) {
                 OcppVersionTransport.OCPP_2_0 -> Ocpp20Adapter(ocppId, transport, csApi)
@@ -162,7 +167,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks20
+            ocppCSCallbacks: OcppCSCallbacks20,
+            wampSettings: OcppWampClientSettings = OcppWampClientSettings()
         ): ChargePointOperations20 =
             RealChargePointOperations20(
                 chargeStationId = chargePointId,
@@ -172,7 +178,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    wampSettings = wampSettings
                 ),
                 csmsOperations = DefaultCSMSOperations20(ocppCSCallbacks)
             )
@@ -183,7 +190,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks16
+            ocppCSCallbacks: OcppCSCallbacks16,
+            wampSettings: OcppWampClientSettings = OcppWampClientSettings()
         ): ChargePointOperations16 =
             RealChargePointOperations16(
                 chargeStationId = chargePointId,
@@ -193,7 +201,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    wampSettings = wampSettings
                 ),
                 csmsOperations = DefaultCSMSOperations16(ocppCSCallbacks)
             )
@@ -204,7 +213,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks15
+            ocppCSCallbacks: OcppCSCallbacks15,
+            wampSettings: OcppWampClientSettings = OcppWampClientSettings()
         ): ChargePointOperations15 =
             RealChargePointOperations15(
                 chargeStationId = chargePointId,
@@ -214,7 +224,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    wampSettings = wampSettings
                 ),
                 csmsOperations = DefaultCSMSOperations15(ocppCSCallbacks)
             )
@@ -225,7 +236,8 @@ class ApiFactory {
             transportType: TransportEnum,
             soapClient: SoapClientSettings? = null,
             headers: RequestHeaders = emptyList(),
-            ocppCSCallbacks: OcppCSCallbacks12
+            ocppCSCallbacks: OcppCSCallbacks12,
+            wampSettings: OcppWampClientSettings = OcppWampClientSettings()
         ): ChargePointOperations12 =
             RealChargePointOperations12(
                 chargeStationId = chargePointId,
@@ -235,7 +247,8 @@ class ApiFactory {
                     ocppId = chargePointId,
                     transportType = transportType,
                     target = csmsUrl,
-                    headers = headers
+                    headers = headers,
+                    wampSettings = wampSettings
                 ),
                 csmsOperations = DefaultCSMSOperations12(ocppCSCallbacks)
             )
