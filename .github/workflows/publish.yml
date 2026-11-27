@@ -78,6 +78,15 @@ jobs:
                         gh release edit "$TAG" --notes-file "$NOTES"
                         exit 0
                     fi
+                    # A pre-release (a version with a "-", such as 4.0.0-rc1)
+                    # is never "Latest": sort -V would rank it above 4.0.0.
+                    case "$VERSION" in
+                        *-*)
+                            gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES" \
+                                --prerelease --latest=false
+                            exit 0
+                            ;;
+                    esac
                     # A new release becomes "Latest" by default: keep a
                     # backport (a lower version tagged later) from taking it.
                     LATEST_ERR="$RUNNER_TEMP/latest-release.err"
