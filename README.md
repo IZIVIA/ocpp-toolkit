@@ -405,64 +405,90 @@ station connected while refusing it, accept the connection and answer its BootNo
 ### Charging station authentication
 
 Security profiles 1 and 2 authenticate a charging station with HTTP Basic authentication on its WebSocket upgrade
-request. A `ConnectionAuthorizer` checks it before the handshake, from the `ConnectionRequest` holding the station id
-and the headers of the request:
+request. A `SecurityProfileAuthorizer` checks it before the handshake, against the secret you expect for each station:
 
 ```kotlin
 import com.izivia.ocpp.CSOcppId
-import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.OcppWampServer
-import java.security.MessageDigest
-import java.util.Base64
+import com.izivia.ocpp.wamp.server.security.Enforcement
+import com.izivia.ocpp.wamp.server.security.SecurityProfileAuthorizer
+import com.izivia.ocpp.wamp.server.security.StationSecurity
+import java.util.concurrent.ConcurrentHashMap
 
-// the passwords each station may send, as bytes
-val passwords: Map<CSOcppId, List<ByteArray>> = mapOf(
-    // OCPP 2.0.1: the BasicAuthPassword, a UTF-8 string
-    "CS201" to listOf("passwordString-of-CS201".toByteArray()),
-    // OCPP 1.6: the AuthorizationKey, binary and configured in hexadecimal
-    "CS16" to "0123456789abcdef0123456789abcdef".let { listOf(it.hexToByteArray(), it.toByteArray()) },
+val stations: Map<CSOcppId, StationSecurity> = mapOf(
+    // OCPP 2.0.1: the BasicAuthPassword
+    "CS201" to StationSecurity.BasicAuthPassword("passwordString-of-CS201"),
+    // OCPP 1.6: the AuthorizationKey, in hexadecimal
+    "CS16" to StationSecurity.AuthorizationKey("0123456789abcdef0123456789abcdef"),
+    // being migrated: a failed check is reported, but the station is still admitted
+    "CS16-MIGRATING" to StationSecurity.AuthorizationKey("fedcba9876543210fedcba9876543210", Enforcement.REPORT),
+    // legacy station without credentials: nothing is checked
+    "CS-LEGACY" to StationSecurity.Unsecured,
 )
 
-val authorizer = ConnectionAuthorizer { request ->
-    val encoded = request.headers
-        .firstOrNull { (name, _) -> name.equals("Authorization", ignoreCase = true) }?.second
-        ?.takeIf { it.startsWith("Basic ", ignoreCase = true) }
-        ?.substring(6)?.trim()
-        ?: return@ConnectionAuthorizer false
-    // malformed credentials are refused, rather than thrown as a failure of the authorizer, which is logged
-    val credentials = try {
-        Base64.getDecoder().decode(encoded)
-    } catch (_: IllegalArgumentException) {
-        return@ConnectionAuthorizer false
-    }
-    // compared as bytes: the username cannot hold a ':', but an OCPP 1.6 binary password can, and is not UTF-8
-    val colon = credentials.indexOf(':'.code.toByte())
-    if (colon < 0) return@ConnectionAuthorizer false
-    val password = credentials.copyOfRange(colon + 1, credentials.size)
-    // looked up last, so that an unknown station goes through the same parsing as a known one
-    val expected = passwords[request.ocppId].orEmpty()
-    // the username is the station id (A00.FR.204)
-    String(credentials, 0, colon, Charsets.UTF_8) == request.ocppId &&
-        expected.any { MessageDigest.isEqual(password, it) }
-}
+// the stations still failing their check while being migrated
+val stillFailing: MutableSet<CSOcppId> = ConcurrentHashMap.newKeySet()
+
+val authorizer = SecurityProfileAuthorizer(
+    securityOf = stations::get,
+    onFailure = { failure ->
+        when (failure.enforcement) {
+            // admitted anyway: the station still has to be configured before it is switched to BLOCK
+            Enforcement.REPORT -> stillFailing += failure.ocppId
+            // refused with a 401
+            Enforcement.BLOCK -> logger.warn("[{}] connection refused: {}", failure.ocppId, failure.reason)
+        }
+    },
+)
 val server = OcppWampServer.newServer(authorizer = authorizer)
 ```
 
+A failed check of a `REPORT` station only reaches `onFailure`: the station is admitted, connects, and is notified to
+`EventsListeners` like any other, with nothing telling that its check failed. `failure.enforcement` is what tells a
+reported failure (`REPORT`, the station is admitted) from a refusal (`BLOCK`). `onFailure` is called during the
+admission, before the WebSocket handshake, so it always comes before the connection event of that attempt: a migrating
+station that connects without having been reported passes its check, and its secret can be switched to
+`Enforcement.BLOCK`.
+
+- The username must be the station id (A00.FR.204). A station that `securityOf` does not know (`null`) is refused.
+  The id is the one decoded from the URL, which `securityOf` receives too: a station connecting to
+  `/ocppj/RDAM%20123` sends the username `RDAM 123`. An id holding a `:` cannot authenticate, since the username ends
+  at the first `:` (RFC 7617), which is why OCPP-J 2.0.1 keeps it out of the identity.
+- `Enforcement.BLOCK`, the default, refuses a station whose check fails; `REPORT` admits it anyway, which helps while
+  a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
+- `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
+  `MALFORMED_CREDENTIALS`, `USERNAME_MISMATCH`, `WRONG_PASSWORD`) and the enforcement applied. It never carries the
+  credentials. If it throws, the decision is kept, be it an exception or an error such as a `NoClassDefFoundError`:
+  only a `VirtualMachineError` propagates.
+- The secrets are validated when created: 16 to 40 characters of the OCPP 2.0.1 charset for a `BasicAuthPassword`,
+  16 to 20 bytes in hexadecimal for an `AuthorizationKey`. They are never shown by `toString`. Build them when the
+  secrets are loaded, as the map above does, so that an invalid secret fails at startup: built inside `securityOf`,
+  it would throw on each connection of the station, which is then refused whatever its enforcement, even `REPORT`.
+- A secret outside these formats, such as a short password or a non-hexadecimal 1.6 key of an existing fleet,
+  cannot be enforced. To migrate such a fleet, give each station the compliant secret it will be configured with,
+  with `Enforcement.REPORT`: it is admitted with its old password until it sends the new one. To keep enforcing the
+  old secret meanwhile, write your own `ConnectionAuthorizer`.
+
 The password is not encoded the same way in both versions, which the OCPP 2.0.1 specification points out. OCPP 2.0.1
 uses a UTF-8 string. The OCPP 1.6 Security Whitepaper advises a random binary `AuthorizationKey`, represented in
-hexadecimal, but does not say whether a station sends its bytes or that hexadecimal form: the example accepts both.
+hexadecimal, but does not say whether a station sends its bytes or that hexadecimal form: `AuthorizationKey` accepts
+both. The rule follows the type of the secret, not the OCPP version the station negotiates.
 
 - A refused station gets an HTTP 401 with a `WWW-Authenticate: Basic` challenge: it is never registered, and no
   connection, reconnection or close event is notified for it.
 - The authorizer runs before `OcppWampServerHandler.accept`, so an unknown station without valid credentials gets a
   401 too, not the 404 of a station no handler accepts.
 - An authorizer that throws refuses the station, be it an exception or an error such as a `NoClassDefFoundError`;
-  only a `VirtualMachineError` propagates. Only the station id and the exception class are logged, never the headers
-  nor the exception message.
-- It runs on the WebSocket IO thread and must not block: keep the passwords in memory rather than querying a database
-  on each connection.
+  only a `VirtualMachineError` propagates. A `securityOf` that throws, for instance on an invalid secret, refuses the
+  station the same way. Only the station id and the exception class are logged, never the headers nor the exception
+  message.
+- `securityOf` and `onFailure` run on the WebSocket IO thread and must not block: keep the secrets in memory rather
+  than querying a database on each connection.
 - Nothing limits the failed attempts of a station: rate-limit them in front of the server, in a reverse proxy for
   instance.
+
+`SecurityProfileAuthorizer` is a `ConnectionAuthorizer`. For other checks, implement `ConnectionAuthorizer` yourself:
+it receives a `ConnectionRequest` holding the station id and the headers of the upgrade request.
 
 With the `toolkit` module, pass the authorizer through `ServerSetting.authorizer`, and with `ocpp-transport-websocket`
 through the `WebsocketServer` constructor.
