@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
 
 /**
  * Represents the state of an AutoReconnect client.
@@ -21,7 +22,7 @@ internal sealed interface AutoReconnectState {
     fun exit(to: AutoReconnectState) {}
     fun onConnecting() {}
     fun onConnected() {}
-    fun onBeforeCall() {}
+    fun onBeforeCall(timeout: Duration) {}
     fun onDisconnected() {}
     fun onClose() {}
 }
@@ -95,10 +96,10 @@ internal class AutoReconnectConnectingState(
         connectionLatch.countDown()
     }
 
-    override fun onBeforeCall() {
+    override fun onBeforeCall(timeout: Duration) {
         handler.planConnectionAttemptNow()
-        logger.debug("[$debugContext] waiting for reconnection for at most $config.callTimeout")
-        if (!connectionLatch.await(config.callTimeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)) {
+        logger.debug("[$debugContext] waiting for reconnection for at most $timeout")
+        if (!connectionLatch.await(timeout.inWholeNanoseconds, TimeUnit.NANOSECONDS)) {
             throw IOException("[$debugContext] currently not connected - retry later")
         }
     }
@@ -109,7 +110,7 @@ internal class AutoReconnectConnectingState(
 }
 
 internal class AutoReconnectIdleState(val debugContext: String) : AutoReconnectState {
-    override fun onBeforeCall() {
+    override fun onBeforeCall(timeout: Duration) {
         throw IllegalStateException("[$debugContext] not connected")
     }
 }

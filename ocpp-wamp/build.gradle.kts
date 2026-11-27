@@ -31,6 +31,26 @@ java {
     withSourcesJar()
 }
 
+// the load test measures throughput, which a shared CI runner does not guarantee: keep it out of check
+val loadTestClass = "com.izivia.ocpp.wamp.WampLoadTest"
+
+tasks.test {
+    filter {
+        excludeTestsMatching(loadTestClass)
+    }
+}
+
+tasks.register<Test>("loadTest") {
+    description = "Runs the WAMP load test, which is not part of check."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    useJUnitPlatform()
+    filter {
+        includeTestsMatching(loadTestClass)
+    }
+}
+
 publishing {
     publications {
         named<MavenPublication>("maven") {
