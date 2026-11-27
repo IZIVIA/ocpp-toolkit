@@ -159,9 +159,6 @@ private fun WsStatus.logged() = "$code ${description.escapedForLog()}"
 /** The upgrade path is bounded higher than a station id: it holds the endpoint path too. */
 private const val MAX_LOGGED_PATH = 256
 
-/** The upgrade request without the headers carrying the credentials of the station, to be logged. */
-internal fun Request.withoutCredentials() = removeHeader("Authorization").removeHeader("Proxy-Authorization")
-
 fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = { httpServerExchange ->
     val containsValidConnectionHeader = httpServerExchange.requestHeaders["Connection"]
         ?.any { headerValue ->

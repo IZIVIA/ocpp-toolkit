@@ -67,16 +67,17 @@ class OcppWampServerApp(
                 return@WsResponse
             }
             val wsConnectionId = UUID.randomUUID().toString()
+            // the path only: the query string and the header values may carry a token, and the message is logged
+            // and rethrown
+            val loggedPath = request.uri.path.escapedForLog(MAX_LOGGED_PATH)
             val chargingStationOcppId = ocppWsEndpoint.extractChargingStationOcppId(request.uri.path)
                 ?.takeUnless { it.isEmpty() }
-                ?: throw IllegalArgumentException(
-                    "malformed request - no chargingStationOcppId - ${request.withoutCredentials()}"
-                )
+                ?: throw IllegalArgumentException("malformed request - no chargingStationOcppId - $loggedPath")
             val ocppVersion = request.header("Sec-WebSocket-Protocol")
                 ?.split(",")?.firstOrNull()?.trim()
                 ?.let { ocppVersions.filter { v -> v.subprotocol == it.lowercase() }.firstOrNull() }
                 ?: throw IllegalArgumentException(
-                    "malformed request - unsupported or invalid ocpp version - ${request.withoutCredentials()}"
+                    "malformed request - unsupported or invalid ocpp version - $loggedPath"
                 )
 
             val chargingStationConnection = ChargingStationConnection(

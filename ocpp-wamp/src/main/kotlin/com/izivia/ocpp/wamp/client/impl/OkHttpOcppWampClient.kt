@@ -280,9 +280,11 @@ class OkHttpOcppWampClient(
                         wampConnection?.websocket?.send(json)
                     } catch (e: kotlin.coroutines.cancellation.CancellationException) {
                         throw e
-                    } catch (e: Exception) {
+                    } catch (e: Throwable) {
                         // logged here rather than by the uncaught exception handler, which prints the message: it
-                        // may quote the payload. Nothing is answered, as before.
+                        // may quote the payload. An error such as NotImplementedError too, but not a failure of the
+                        // virtual machine. Nothing is answered, as before.
+                        if (e is VirtualMachineError) throw e
                         logger.error("[$ocppId] ${msg.logRef()} call failed: ${e.javaClass.name}", e.redactedForLog())
                     }
                 }

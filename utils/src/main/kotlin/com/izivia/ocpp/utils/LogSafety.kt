@@ -49,7 +49,7 @@ fun String.escapedForLog(max: Int = 64): String {
     val escaped = StringBuilder(end + 16)
     for (i in 0 until end) {
         val c = this[i]
-        if (Character.isISOControl(c) || c == ' ' || c == ' ') {
+        if (Character.isISOControl(c) || c == '\u2028' || c == '\u2029') {
             escaped.append("\\u").append(String.format("%04x", c.code))
         } else {
             escaped.append(c)

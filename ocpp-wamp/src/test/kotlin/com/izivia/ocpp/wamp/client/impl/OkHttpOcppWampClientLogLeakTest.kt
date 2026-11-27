@@ -32,6 +32,7 @@ import strikt.assertions.all
 import strikt.assertions.contains
 import strikt.assertions.isNotEmpty
 import strikt.assertions.isNotNull
+import strikt.assertions.isNull
 import java.io.IOException
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
@@ -91,6 +92,23 @@ class OkHttpOcppWampClientLogLeakTest {
                         it.formattedMessage.contains(IllegalStateException::class.java.name) &&
                         it.throwableProxy != null
                 }
+            }
+        }
+        logs.expectNoLeak(sentinel)
+    }
+
+    @Test
+    fun `a handler failing with an error is logged without its message and answers nothing`() = withLogs { logs ->
+        val sentinel = sentinel()
+        withPeer { peer ->
+            withClient(peer, { _, _ -> TODO(sentinel) }) {
+                peer.send("""[2,"m-todo","Heartbeat",{}]""")
+                logs.awaitEvent("call failure") {
+                    it.formattedMessage.contains("[m-todo] [Heartbeat] call failed") &&
+                        it.formattedMessage.contains(NotImplementedError::class.java.name) &&
+                        it.throwableProxy != null
+                }
+                expectThat(peer.received.poll(200, TimeUnit.MILLISECONDS)).isNull()
             }
         }
         logs.expectNoLeak(sentinel)

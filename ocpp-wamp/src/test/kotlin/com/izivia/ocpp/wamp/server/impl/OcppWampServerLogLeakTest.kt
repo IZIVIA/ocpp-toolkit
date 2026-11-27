@@ -15,6 +15,10 @@ import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.asServer
 import okhttp3.OkHttpClient
+import org.http4k.core.Method
+import org.http4k.websocket.PushPullAdaptingWebSocket
+import org.http4k.websocket.WsMessage
+import org.http4k.websocket.WsStatus
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
@@ -22,6 +26,7 @@ import okhttp3.WebSocketListener
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 import org.slf4j.LoggerFactory
+import strikt.api.Assertion
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.all
@@ -35,6 +40,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import org.http4k.core.Request as Http4kRequest
 
 /**
  * Runs real exchanges through an Undertow server with every logger at TRACE and checks that no captured log event,
@@ -211,6 +217,57 @@ class OcppWampServerLogLeakTest {
     }
 
     @Test
+    fun `an upgrade refused for its subprotocol is logged without its query string and header values`() =
+        withLogs { logs ->
+            val sentinel = sentinel()
+            withStation(
+                ocppIdPath = "$OCPP_ID?token=$sentinel-Q",
+                headers = secretHeaders(sentinel),
+                subprotocol = null
+            ) {
+                logs.awaitEvent("refused upgrade") {
+                    it.formattedMessage.contains("Error during new connection with /ws/$OCPP_ID: ") &&
+                        it.formattedMessage.contains(IllegalArgumentException::class.java.name) &&
+                        it.throwableProxy != null
+                }
+            }
+            logs.expectNoLeak(sentinel)
+        }
+
+    @Test
+    fun `an upgrade refused for its subprotocol fails without its query string and header values`() =
+        withLogs { logs ->
+            val sentinel = sentinel()
+            expectRefusedUpgrade("/ws/$OCPP_ID?token=$sentinel-Q", subprotocol = null, sentinel)
+                .contains("unsupported or invalid ocpp version")
+                .contains("/ws/$OCPP_ID")
+            logs.expectNoLeak(sentinel)
+        }
+
+    @Test
+    fun `an upgrade refused for its station id fails without its query string and header values`() =
+        withLogs { logs ->
+            val sentinel = sentinel()
+            expectRefusedUpgrade("/ws/%ZZ?token=$sentinel-Q", OCPP_1_6.subprotocol, sentinel)
+                .contains("no chargingStationOcppId")
+                .contains("/ws/%ZZ")
+            logs.expectNoLeak(sentinel)
+        }
+
+    @Test
+    fun `an accepted upgrade is logged without its query string and header values`() = withLogs { logs ->
+        val sentinel = sentinel()
+        withStation(ocppIdPath = "$OCPP_ID?token=$sentinel-Q", headers = secretHeaders(sentinel)) {
+            logs.awaitEvent("connection attempt") {
+                it.formattedMessage.contains("/ws/$OCPP_ID - connection attempt") &&
+                    it.formattedMessage.contains("X-Secret")
+            }
+            logs.awaitEvent("connected") { it.formattedMessage.contains("connected - number of connections") }
+        }
+        logs.expectNoLeak(sentinel)
+    }
+
+    @Test
     fun `a station id holding a line break is logged escaped`() = withLogs { logs ->
         withStation(ocppIdPath = "CS1%0D%0AFAKE") {
             logs.awaitEvent("connected") {
@@ -258,6 +315,30 @@ class OcppWampServerLogLeakTest {
         }
 
     private fun sentinel() = "sentinel-168-${UUID.randomUUID()}"
+
+    private fun secretHeaders(sentinel: String) = listOf("X-Secret" to "$sentinel-H", "Cookie" to "s=$sentinel-C")
+
+    /**
+     * Runs an upgrade of [uri], carrying the [secretHeaders] of [sentinel], straight through the application, expects
+     * it to fail with an [IllegalArgumentException] whose message holds no [sentinel], and returns that message.
+     */
+    private fun expectRefusedUpgrade(uri: String, subprotocol: String?, sentinel: String): Assertion.Builder<String> {
+        val app = OcppWampServerApp(
+            ocppVersions = setOf(OCPP_1_6),
+            handlers = { emptyList() },
+            ocppWsEndpoint = OcppWsEndpoint("ws"),
+            settings = OcppWampServerSettings()
+        )
+        val upgrade = Http4kRequest(Method.GET, uri)
+            .let { request -> subprotocol?.let { request.header("Sec-WebSocket-Protocol", it) } ?: request }
+        val request = secretHeaders(sentinel).fold(upgrade) { request, (name, value) -> request.header(name, value) }
+        val websocket = object : PushPullAdaptingWebSocket() {
+            override fun send(message: WsMessage) = Unit
+            override fun close(status: WsStatus) = Unit
+        }
+        return expectThrows<IllegalArgumentException> { app.newRoutingHandler()(request).consumer(websocket) }
+            .get { message }.isNotNull().and { not().contains(sentinel) }
+    }
 
     private fun outboundCall(msgId: String, sentinel: String) =
         WampMessage.Call(msgId, "DataTransfer", """{"data":"$sentinel"}""")
@@ -317,13 +398,15 @@ class OcppWampServerLogLeakTest {
 
     /**
      * Connects one OkHttp station to a real server and runs [block]. [stationAnswer] answers each CALL the station
-     * receives, by its message id, or not at all when it returns null.
+     * receives, by its message id, or not at all when it returns null. Without a [subprotocol], the upgrade is
+     * refused by the server and [block] runs without waiting for the connection to open.
      */
     private fun withStation(
         onAction: (WampMessage) -> WampMessage? = { null },
         listeners: EventsListeners = EventsListeners(),
         headers: List<Pair<String, String>> = emptyList(),
         ocppIdPath: String = OCPP_ID,
+        subprotocol: String? = OCPP_1_6.subprotocol,
         stationAnswer: (String) -> String? = { null },
         block: (Station) -> Unit
     ) {
@@ -340,13 +423,14 @@ class OcppWampServerLogLeakTest {
         val http = OkHttpClient()
         val request = Request.Builder()
             .url("ws://localhost:$port/ws/$ocppIdPath")
-            .header("Sec-WebSocket-Protocol", OCPP_1_6.subprotocol)
+            .apply { subprotocol?.let { header("Sec-WebSocket-Protocol", it) } }
             .apply { headers.forEach { (name, value) -> header(name, value) } }
             .build()
         val ws = http.newWebSocket(
             request,
             object : WebSocketListener() {
                 override fun onOpen(webSocket: WebSocket, response: Response) = connected.countDown()
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) = Unit
                 override fun onMessage(webSocket: WebSocket, text: String) {
                     received.add(text)
                     WampMessage.parse(text)
@@ -357,7 +441,7 @@ class OcppWampServerLogLeakTest {
             }
         )
         try {
-            expectThat(connected.await(5, TimeUnit.SECONDS)).isEqualTo(true)
+            if (subprotocol != null) expectThat(connected.await(5, TimeUnit.SECONDS)).isEqualTo(true)
             block(Station(wampServer, ws, received))
         } finally {
             ws.close(1000, null)

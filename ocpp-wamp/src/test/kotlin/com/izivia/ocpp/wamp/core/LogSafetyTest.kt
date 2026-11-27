@@ -37,6 +37,18 @@ class LogSafetyTest {
         expectThat(meta.headers).isEqualTo(listOf("Authorization" to "Basic $basic", "X-Other" to SENTINEL))
     }
 
+    @Test
+    fun `meta toString escapes the station id and the header names`() {
+        val meta = WampMessageMeta(OCPP_1_6, "CS1\r\nFAKE", listOf("X-A\r\nB" to "v"))
+
+        val rendered = meta.toString()
+
+        expectThat(rendered).not().contains("\r")
+        expectThat(rendered).not().contains("\n")
+        expectThat(rendered).contains("ocppId=CS1\\u000d\\u000aFAKE")
+        expectThat(rendered).contains("X-A\\u000d\\u000aB")
+    }
+
     private companion object {
         const val SENTINEL = "sentinel-168-unit"
         const val PASSWORD = "SENTINEL-PWD"
