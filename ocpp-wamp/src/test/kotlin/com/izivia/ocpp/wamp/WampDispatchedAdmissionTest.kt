@@ -116,13 +116,15 @@ class WampDispatchedAdmissionTest {
             release.await(10, SECONDS)
             true
         }
-        val executor = TrackingExecutor(pool)
+        val executor = TrackingExecutor(pool, entered)
         val server = wampServer(authorizer = slowAuthorizer)
             .asServer(port, AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor))
             .start()
 
         try {
-            val expired = handshake(port, "CS1")
+            val pending = handshakeAsync("CS1")
+            awaitOrFail(entered, "connection authorizer of CS1 called")
+            val expired = pending.get(5, SECONDS)
             release.countDown()
             // the only slot is free again once the late admission of CS1 has returned
             awaitOrFail(executor.completed, "late admission of CS1 returned")
@@ -130,7 +132,6 @@ class WampDispatchedAdmissionTest {
             awaitOrFail(connects, "connect event of CS2")
 
             expect {
-                that(entered.count).isEqualTo(0L)
                 that(expired.status).isEqualTo(503)
                 that(expired.retryAfter).isEqualTo("5")
                 that(next.status).isEqualTo(101)
@@ -171,11 +172,13 @@ class WampDispatchedAdmissionTest {
     @Test
     fun `admission that times out gets a 503 with Retry-After and its late decision is dropped`() {
         val gate = hold("CS1")
-        val executor = TrackingExecutor(pool)
+        val executor = TrackingExecutor(pool, gate.entered)
         val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor))
 
         try {
-            val expired = handshake(port, "CS1")
+            val pending = handshakeAsync("CS1")
+            awaitOrFail(gate.entered, "admission of CS1 started")
+            val expired = pending.get(5, SECONDS)
             gate.release.countDown()
             // the only slot is free again once the late admission of CS1 has returned
             awaitOrFail(executor.completed, "late admission of CS1 returned")
@@ -198,7 +201,7 @@ class WampDispatchedAdmissionTest {
     @Test
     fun `late decision is dropped even when the station keeps its connection open after the 503`() {
         val gate = hold("CS1")
-        val executor = TrackingExecutor(pool)
+        val executor = TrackingExecutor(pool, gate.entered)
         val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor))
 
         try {
@@ -220,6 +223,7 @@ class WampDispatchedAdmissionTest {
             val response = socket.getInputStream().bufferedReader()
             val status = response.readLine()
             generateSequence { response.readLine() }.takeWhile { it.isNotEmpty() }.toList()
+            awaitOrFail(gate.entered, "admission of CS1 started")
 
             gate.release.countDown()
             awaitOrFail(executor.completed, "late admission of CS1 returned")
@@ -253,10 +257,14 @@ class WampDispatchedAdmissionTest {
     @Test
     fun `admission that times out keeps its slot until its callback returns`() {
         val gate = hold("CS1")
-        val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT))
+        val executor = TrackingExecutor(pool, gate.entered)
+        val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor))
 
         try {
-            val expired = handshake(port, "CS1")
+            val pending = handshakeAsync("CS1")
+            awaitOrFail(gate.entered, "admission of CS1 started")
+            val expired = pending.get(5, SECONDS)
+            // the callback of CS1 is still inside the gate, and so holds the only slot
             val whileHung = handshake(port, "CS2")
 
             // that the late decision of CS1 connects nothing is owned by the test of the dropped late decision
@@ -484,16 +492,25 @@ class WampDispatchedAdmissionTest {
         val release = CountDownLatch(1)
     }
 
-    // an executor telling when each of its tasks has returned
-    private class TrackingExecutor(private val delegate: Executor) : Executor {
+    // an executor telling when each of its tasks has returned. With [entered], the submission returns once the
+    // admission is inside its callback: the I/O thread submitting it cannot run the timeout of the handshake before,
+    // so that a handshake that times out always does so with its callback running
+    private class TrackingExecutor(
+        private val delegate: Executor,
+        private val entered: CountDownLatch? = null,
+    ) : Executor {
         val completed = Semaphore(0)
 
-        override fun execute(command: Runnable) = delegate.execute {
-            try {
-                command.run()
-            } finally {
-                completed.release()
+        override fun execute(command: Runnable) {
+            delegate.execute {
+                try {
+                    command.run()
+                } finally {
+                    completed.release()
+                }
             }
+            // the test asserts the callback was entered; a missed one fails it there, not here
+            entered?.await(5, SECONDS)
         }
     }
 
