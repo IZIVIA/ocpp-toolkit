@@ -147,6 +147,37 @@ expect_section "0.0.11.1 does not match 0.0.11" 0.0.11.1 "$changelog" '- patch o
 
 expect_failure "empty section" "0.0.10" 0.0.10 "$changelog"
 
+near_versions="$tmp/near-versions.md"
+cat > "$near_versions" <<'EOF'
+## [14.0.0] - 2026-05-01
+
+- fourteen
+
+## [4.0.0-rc1] - 2026-04-01
+
+- release candidate
+
+## [4.0.0] - 2026-03-01
+
+- final
+EOF
+expect_section "4.0.0 matches neither 14.0.0 nor 4.0.0-rc1" 4.0.0 "$near_versions" '- final'
+expect_section "4.0.0-rc1 does not match 4.0.0" 4.0.0-rc1 "$near_versions" '- release candidate'
+
+near_only="$tmp/near-only.md"
+cat > "$near_only" <<'EOF'
+## [14.0.0] - 2026-05-01
+
+- fourteen
+
+## [4.0.0-rc1] - 2026-04-01
+
+- release candidate
+EOF
+expect_failure "4.0.0 missing while 14.0.0 and 4.0.0-rc1 exist" "4.0.0" 4.0.0 "$near_only"
+
+expect_failure "next version is not taken from a non-empty [Unreleased]" "4.1.0" 4.1.0 "$changelog"
+
 inner_links="$tmp/inner-links.md"
 cat > "$inner_links" <<'EOF'
 ## [2.0.0] - 2026-03-01
