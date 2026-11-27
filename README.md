@@ -590,6 +590,34 @@ is being sent to it, is already reported to `onWsCloseHandler`.
 Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
 the client side of the toolkit: only the servers report errors for now.
 
+## Logging
+
+The toolkit logs through SLF4J. Its regular loggers emit metadata only, at every level: the charging station id, the
+message id, the action, the frame type and length. A charging station controls its id, its message ids, its actions and
+its close reasons, so they are escaped and bounded. An exception is logged by its class and stack trace, without its
+message nor the messages of its causes, which may quote a payload, an id tag or a credential. The exceptions the
+toolkit builds do not quote payloads either: a call is named by its message id and action, and the server URI of a
+client loses its credentials and query string. Only `OcppCallErrorException` differs: its message is the error details
+of the peer's `CALLERROR`, so do not log it as is.
+
+Raw OCPP frames, payloads included, go to one logger only, `com.izivia.ocpp.wamp.frames`, at `DEBUG`, as `[IN]` and
+`[OUT]` lines. It is enabled whenever the logging configuration lets `DEBUG` through for it, and logback without any
+configuration does: it logs everything at `DEBUG`. Keep it off in production in your `logback.xml`:
+
+```xml
+<logger name="com.izivia.ocpp.wamp.frames" level="INFO"/>
+```
+
+and turn it on for a diagnosis only, knowing that the frames then logged hold id tags and any credential a payload
+carries:
+
+```xml
+<logger name="com.izivia.ocpp.wamp.frames" level="DEBUG"/>
+```
+
+The `cause` given to an `OcppErrorListener` is the original exception, message included: sanitize it before reporting
+it to an external system such as Sentry or a metrics backend (see [Observing OCPP errors](#observing-ocpp-errors)).
+
 ## Code Organisation
 
 The main entry point is in the module `toolkit`, which provides access to all the apis and all ocpp versions.
