@@ -85,7 +85,9 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
                 )
                 WebSockets.sendClose(status.code, status.description, channel, null)
             }
-        }.apply(ws(upgradeRequest))
+        }
+        // the handshake is bound to this call only, so that the connection does not retain it once open
+        OpeningHandshake.opening(exchange) { socket.apply(ws(upgradeRequest)) }
 
         channel.addCloseTask {
             val status = WsStatus(it.closeCode, it.closeReason ?: "unknown")

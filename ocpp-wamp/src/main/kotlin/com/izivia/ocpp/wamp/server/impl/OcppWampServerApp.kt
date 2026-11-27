@@ -38,17 +38,43 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Websocket Server
  *
- * @param handlers are called in the list order and return the first not null response
+ * The handlers of a connection are called in the list order and return the first not null response.
  */
-class OcppWampServerApp(
+class OcppWampServerApp internal constructor(
     val ocppVersions: Set<OcppVersion>,
-    private val handlers: (CSOcppId) -> List<OcppWampServerHandler>,
-    private val listeners: EventsListeners = EventsListeners(),
+    private val listeners: EventsListeners,
     private val ocppWsEndpoint: OcppWsEndpoint,
     val settings: OcppWampServerSettings,
-    private val clock: Clock = Clock.System,
-    private val errorListener: OcppErrorListener? = null
+    private val clock: Clock,
+    private val errorListener: OcppErrorListener?,
+    /**
+     * The station a socket opens for, and its handlers: looked up when the handler is called for the upgrade request,
+     * then read once as the socket opens, which may be later or on another thread. A failure registers nothing.
+     */
+    private val admissionOf: (Request) -> (Websocket) -> HandshakeAdmission
 ) {
+    /**
+     * @param handlers gives the handlers of a station, the station being read from the path of the upgrade request
+     */
+    constructor(
+        ocppVersions: Set<OcppVersion>,
+        handlers: (CSOcppId) -> List<OcppWampServerHandler>,
+        listeners: EventsListeners = EventsListeners(),
+        ocppWsEndpoint: OcppWsEndpoint,
+        settings: OcppWampServerSettings,
+        clock: Clock = Clock.System,
+        errorListener: OcppErrorListener? = null
+    ) : this(ocppVersions, listeners, ocppWsEndpoint, settings, clock, errorListener, { request -> { _ ->
+        val ocppId = ocppWsEndpoint.extractChargingStationOcppId(request.uri.path)
+            ?.takeUnless { it.isEmpty() }
+            // the path only: the query string and the header values may carry a token, and the message is logged
+            // and rethrown
+            ?: throw IllegalArgumentException(
+                "malformed request - no chargingStationOcppId - ${request.uri.path.escapedForLog(MAX_LOGGED_PATH)}"
+            )
+        HandshakeAdmission(ocppId, handlers(ocppId))
+    } })
+
     companion object {
         private val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server")
     }
@@ -59,7 +85,10 @@ class OcppWampServerApp(
     private val inFlightInboundCalls = AtomicInteger()
     private val callsExecutor: Executor = settings.buildCallsExecutor()
 
-    private fun newConnection(request: Request) = WsResponse { ws: Websocket ->
+    // the admission is looked up as the handler is called, so that a consumer called later or elsewhere still has it
+    private fun newConnection(request: Request) = openConnection(request, admissionOf(request))
+
+    private fun openConnection(request: Request, admissionOf: (Websocket) -> HandshakeAdmission) = WsResponse { ws ->
         try {
             if (shutdown.get()) {
                 logger.warn("shutting down - rejecting connection")
@@ -70,15 +99,15 @@ class OcppWampServerApp(
             // the path only: the query string and the header values may carry a token, and the message is logged
             // and rethrown
             val loggedPath = request.uri.path.escapedForLog(MAX_LOGGED_PATH)
-            val chargingStationOcppId = ocppWsEndpoint.extractChargingStationOcppId(request.uri.path)
-                ?.takeUnless { it.isEmpty() }
-                ?: throw IllegalArgumentException("malformed request - no chargingStationOcppId - $loggedPath")
             val ocppVersion = request.header("Sec-WebSocket-Protocol")
                 ?.split(",")?.firstOrNull()?.trim()
                 ?.let { ocppVersions.filter { v -> v.subprotocol == it.lowercase() }.firstOrNull() }
                 ?: throw IllegalArgumentException(
                     "malformed request - unsupported or invalid ocpp version - $loggedPath"
                 )
+            // resolved before the connection is registered: a failure then leaves nothing registered
+            val admission = admissionOf(ws)
+            val chargingStationOcppId = admission.ocppId
 
             val chargingStationConnection = ChargingStationConnection(
                 clock.now(),
@@ -91,8 +120,7 @@ class OcppWampServerApp(
                 shutdown
             )
             val logContext = chargingStationConnection.logContext
-            // resolved before the connection is registered: a failure then leaves nothing registered
-            val handler = handlers(chargingStationOcppId)
+            val handler = admission.handlers
             var replacedConnection: ChargingStationConnection? = null
             try {
                 withStationLock(chargingStationOcppId) {

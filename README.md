@@ -523,6 +523,10 @@ through the `WebsocketServer` constructor.
 
 Applications calling `Undertow` or `WsServerConfig` directly: `acceptWebSocketPredicate` is now `admitWebSocket`, which
 returns a `WebSocketUpgradeDecision` instead of a `Boolean`, and `null` when the request is not for that endpoint.
+A `WsFilter` put in front of `WsServerConfig.handler` must call that handler on the calling thread, synchronously: a
+handler called later or on another thread finds no admission, and its connection is closed with status 1011 and
+registers nothing, where earlier versions accepted it. The filter may call the consumer of the response later, but
+that consumer must subscribe before the station can send: the frames and the close received before are lost.
 
 `CSMSSettings` now refuses two WebSocket `ServerSetting` sharing a path on the same port: only the first one would admit
 the stations, and the authorizer of the second would be ignored. The new `authorizer` parameter of `ServerSetting`,

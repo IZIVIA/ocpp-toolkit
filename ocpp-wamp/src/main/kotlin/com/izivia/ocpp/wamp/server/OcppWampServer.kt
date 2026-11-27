@@ -18,6 +18,19 @@ import org.http4k.server.Http4kServer
 import org.http4k.server.asServer
 
 interface WsServerConfig {
+    /**
+     * The WebSocket handler of the server, to serve with [admitWebSocket] and [wsSubprotocols] on the toolkit's
+     * [Undertow].
+     *
+     * A [org.http4k.websocket.WsFilter] in front of it may wrap the request and the websocket, and may call the
+     * consumer of the response later or on another thread, but must call this handler on the calling thread,
+     * synchronously: that call reads what the admission of the handshake decided. A handler called later or on
+     * another thread finds no admission: the connection is closed with status 1011, registers nothing, and an
+     * [IllegalStateException] is raised on the thread that called the consumer.
+     *
+     * A consumer called later still has to subscribe before the station can send: the frames and the close the
+     * station sends before the consumer subscribes reach no handler and are lost.
+     */
     val handler: RoutingWsHandler
 
     /**
