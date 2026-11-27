@@ -35,9 +35,13 @@ open class OcppWampServerSettings(
      */
     val maxQueuedCalls: Int = DEFAULT_MAX_QUEUED_CALLS
 ) {
-    // the constructor of the releases before the call bounds, kept for the compiled callers: its default value also
-    // keeps the synthetic constructor they call for `OcppWampServerSettings()`
-    @Deprecated("Kept for binary compatibility", level = DeprecationLevel.HIDDEN)
+    /**
+     * Settings with the given [timeoutInMs] and the default call bounds: the constructor of the releases before
+     * [maxConcurrentCalls] and [maxQueuedCalls], kept for the Kotlin, Java and compiled callers.
+     */
+    // a Kotlin call that passes only the timeout resolves here, as it leaves no default unused; the default value
+    // keeps the synthetic constructor the callers compiled against the previous releases use for
+    // `OcppWampServerSettings()`
     constructor(timeoutInMs: Long = 30_000) : this(timeoutInMs, defaultMaxConcurrentCalls(), DEFAULT_MAX_QUEUED_CALLS)
 
     init {
