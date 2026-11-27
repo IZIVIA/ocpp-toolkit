@@ -72,7 +72,8 @@ internal class ConnectionAttempt private constructor(
                     FailedConnectionAttemptState(
                         failedAt,
                         failedAt - it.startedAt,
-                        t::class.simpleName + ": " + (t.message ?: ""),
+                        // the message may quote the server's answer: the attempt is logged, so only the class is kept
+                        t.javaClass.name,
                         t
                     )
                 )
@@ -144,4 +145,8 @@ internal data class FailedConnectionAttemptState(
 ) : ConnectionAttemptState() {
     override val completed: Boolean
         get() = true
+
+    // the attempts are logged: the error is shown by its class only, its message may quote the server's answer
+    override fun toString(): String =
+        "FailedConnectionAttemptState(failedAt=$failedAt, duration=$duration, errorMessage=$errorMessage)"
 }

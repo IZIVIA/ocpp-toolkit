@@ -8,7 +8,11 @@ import com.izivia.ocpp.wamp.client.ConnectionState
 import com.izivia.ocpp.wamp.client.NotConnectedException
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.WampOnActionHandler
+import com.izivia.ocpp.wamp.core.FrameLog
 import com.izivia.ocpp.wamp.core.WampCallManager
+import com.izivia.ocpp.wamp.core.escapedForLog
+import com.izivia.ocpp.wamp.core.logRef
+import com.izivia.ocpp.wamp.core.redactedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageMetaHeaders
@@ -45,7 +49,12 @@ class OkHttpOcppWampClient(
     hostnameVerifier: HostnameVerifier = HostnameVerifier { _, _ -> true }
 ) : OcppWampClient {
     val serverUri = target.path("${target.path.removeSuffix("/")}/$ocppId")
-    val debugContext = "$ocppId -> $serverUri"
+
+    // the server URI as logs and exception messages show it: without the credentials nor the query string it may carry
+    private val loggableServerUri = serverUri.copy(userInfo = "", query = "", fragment = "")
+
+    /** The context of this client in log lines and exception messages: [serverUri] without credentials nor query. */
+    val debugContext = "$ocppId -> $loggableServerUri"
     override val state: ConnectionState
         get() = connectionState
 
@@ -62,6 +71,11 @@ class OkHttpOcppWampClient(
 
     private var wampConnection: WampConnection? = null
 
+    // the HTTP status answered to the last upgrade request when it was refused, set by OkHttp's thread before the
+    // failure is reported
+    @Volatile
+    private var handshakeStatus: Int? = null
+
     private var connectionState: ConnectionState = ConnectionState.DISCONNECTED
         set(value) {
             if (value != field) {
@@ -76,11 +90,14 @@ class OkHttpOcppWampClient(
             if (t == null) {
                 logger.info("[$debugContext] connected")
             } else {
-                logger.error("[$debugContext] error when connecting - $t")
+                // the failure message may quote the server's answer: only its class and the HTTP status of a refused
+                // upgrade are shown, the cause is kept
+                val failure = t.javaClass.name + handshakeStatus?.let { " - HTTP $it" }.orEmpty()
+                logger.error("[$debugContext] error when connecting - $failure")
                 // covers both a failure reported by OkHttp and the timeout, before the cleanup drops the listener
                 connectionListener?.onConnectionFailure(t)
                 cleanupStateOnClose()
-                throw IOException("[$debugContext] connection failed: $t", t)
+                throw IOException("[$debugContext] connection failed: $failure", t)
             }
         }
     }
@@ -100,7 +117,7 @@ class OkHttpOcppWampClient(
 
     private fun tryToConnect(): Throwable? {
         val latch = CountDownLatch(1)
-        var error: Throwable? = TimeoutException("connection timed out to $serverUri")
+        var error: Throwable? = TimeoutException("connection timed out to $loggableServerUri")
         asyncConnect(object : ConnectionListener {
             override fun onConnected() {
                 error = null
@@ -128,11 +145,12 @@ class OkHttpOcppWampClient(
     private fun asyncConnect(listener: ConnectionListener) {
         if (connectionState != ConnectionState.DISCONNECTED) {
             throw IllegalStateException(
-                "can't async connect to $serverUri when connection state is $connectionState"
+                "can't async connect to $loggableServerUri when connection state is $connectionState"
             )
         }
-        logger.debug("[$ocppId] connecting to $serverUri - current connection state = $connectionState")
+        logger.debug("[$ocppId] connecting to $loggableServerUri - current connection state = $connectionState")
         connectionState = ConnectionState.CONNECTING
+        handshakeStatus = null
 
         socketOkHttpClient.newWebSocket(
             Request.Builder().url(serverUri.toString())
@@ -156,9 +174,10 @@ class OkHttpOcppWampClient(
                 }
 
                 override fun onClosing(closingWebSocket: WebSocket, code: Int, reason: String) {
-                    logger.warn("[$ocppId] web socket closing $code $reason - state = $connectionState")
+                    val loggableReason = reason.escapedForLog()
+                    logger.warn("[$ocppId] web socket closing $code $loggableReason - state = $connectionState")
                     if (code == CLEANUP_CLOSURE_STATUS) {
-                        logger.info("[$ocppId] connection closed to $serverUri due to reconnection")
+                        logger.info("[$ocppId] connection closed to $loggableServerUri due to reconnection")
                         closingWebSocket.closeSafely(code, reason)
                         return
                     }
@@ -167,29 +186,17 @@ class OkHttpOcppWampClient(
                     val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
+                    val closed = IOException("[$debugContext] websocket closed: code=$code; reason=$loggableReason")
                     when (previousState) {
-                        ConnectionState.CONNECTING -> {
-                            listener.onConnectionFailure(
-                                IOException(
-                                    "[$debugContext] websocket closed:" +
-                                        " ws=$closingWebSocket; code=$code; reason=$reason"
-                                )
-                            )
-                        }
-
-                        else -> {
-                            listener.onConnectionLost(
-                                IOException(
-                                    "[$debugContext] websocket closed:" +
-                                        " ws=$closingWebSocket; code=$code; reason=$reason"
-                                )
-                            )
-                        }
+                        ConnectionState.CONNECTING -> listener.onConnectionFailure(closed)
+                        else -> listener.onConnectionLost(closed)
                     }
                 }
 
                 override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                    logger.info("[$ocppId] connection closed to $serverUri - code=$code; reason=$reason")
+                    logger.info(
+                        "[$ocppId] connection closed to $loggableServerUri - code=$code; reason=${reason.escapedForLog()}"
+                    )
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
                 }
@@ -198,15 +205,24 @@ class OkHttpOcppWampClient(
                     val previousState = connectionState
                     connectionState = ConnectionState.DISCONNECTED
                     wampConnection = null
+                    // the failure message may quote the server's answer: only its class is logged
+                    val failure = t.javaClass.name
                     if (previousState == ConnectionState.CONNECTING) {
                         if (t is ConnectException) {
-                            logger.warn("[$ocppId] web socket failed to connect to $serverUri: $t")
+                            logger.warn("[$ocppId] web socket failed to connect to $loggableServerUri: $failure")
                         } else {
-                            logger.warn("[$ocppId] web socket connection failure to $serverUri: $t", t)
+                            logger.warn(
+                                "[$ocppId] web socket connection failure to $loggableServerUri: $failure",
+                                t.redactedForLog()
+                            )
                         }
+                        handshakeStatus = response?.code
                         listener.onConnectionFailure(t)
                     } else {
-                        logger.warn("[$ocppId] web socket failure with connection to $serverUri: $t", t)
+                        logger.warn(
+                            "[$ocppId] web socket failure with connection to $loggableServerUri: $failure",
+                            t.redactedForLog()
+                        )
                         listener.onConnectionLost(t)
                     }
                 }
@@ -215,18 +231,17 @@ class OkHttpOcppWampClient(
     }
 
     private fun onMessage(text: String) {
-        logger.info("OkHttpOcppWampClient onMessage : $text")
+        FrameLog.inbound("[$ocppId]", text)
         val msg = WampMessage.parse(text)
 
         if (msg == null) {
-            logger.warn("can't parse wamp message from server: $text")
+            logger.warn("[$ocppId] can't parse wamp message from server - length=${text.length}")
             return
         }
         when (msg.msgType) {
             WampMessageType.CALL_RESULT, WampMessageType.CALL_ERROR -> {
                 // outcoming call result, handled on the reader thread: it does not block, and it must not wait
                 // for a pool that call handlers may be occupying while they wait for this very result
-                logger.debug("OkHttpOcppWampClient connect callManager : ${wampConnection?.callManager}")
                 wampConnection?.callManager?.handleResult("[$ocppId]", msg)
             }
 
@@ -236,7 +251,7 @@ class OkHttpOcppWampClient(
                     try {
                         withTimeout(timeoutInMs) {
                             // incoming call
-                            logger.info("[$ocppId] <- ${msg.action} - $text")
+                            logger.info("[$ocppId] [IN][CALL][REQ] <- ${msg.logRef()} length=${text.length}")
                             val r = handlers.asSequence()
                                 // use sequence to avoid greedy mapping, to find the first handler with non null result
                                 .map { it(WampMessageMeta(ocppVersion, ocppId), msg) }
@@ -248,22 +263,27 @@ class OkHttpOcppWampClient(
                                     "No handler found",
                                     "{}"
                                 )
-                            logger.info("[$ocppId] -> ${r.toJson()}")
-                            wampConnection?.websocket?.send(r.toJson())
+                            val json = r.toJson()
+                            logger.info("[$ocppId] [IN][CALL][RESP] -> ${r.logRef()} length=${json.length}")
+                            FrameLog.outbound("[$ocppId]", json)
+                            wampConnection?.websocket?.send(json)
                         }
                     } catch (e: TimeoutCancellationException) {
-                        logger.error(
-                            "[$ocppId] timeout during call handling of" +
-                                " ${msg.action} - $text -- ${e.message}"
-                        )
-                        wampConnection?.websocket?.send(
-                            WampMessage.CallError(
-                                msg.msgId,
-                                MessageErrorCode.INTERNAL_ERROR,
-                                "Timeout during call handling",
-                                "{}"
-                            ).toJson()
-                        )
+                        logger.error("[$ocppId] timeout during call handling of ${msg.logRef()}")
+                        val json = WampMessage.CallError(
+                            msg.msgId,
+                            MessageErrorCode.INTERNAL_ERROR,
+                            "Timeout during call handling",
+                            "{}"
+                        ).toJson()
+                        FrameLog.outbound("[$ocppId]", json)
+                        wampConnection?.websocket?.send(json)
+                    } catch (e: kotlin.coroutines.cancellation.CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        // logged here rather than by the uncaught exception handler, which prints the message: it
+                        // may quote the payload. Nothing is answered, as before.
+                        logger.error("[$ocppId] ${msg.logRef()} call failed: ${e.javaClass.name}", e.redactedForLog())
                     }
                 }
             }
@@ -272,7 +292,7 @@ class OkHttpOcppWampClient(
 
     private fun onConnectedTo(connectedWebsocket: WebSocket) {
         if (wampConnection?.websocket == connectedWebsocket) {
-            logger.info("[$ocppId] already connected to $serverUri - ignored")
+            logger.info("[$ocppId] already connected to $loggableServerUri - ignored")
             return
         }
 
@@ -300,7 +320,7 @@ class OkHttpOcppWampClient(
 
     private fun getCallManager(): WampCallManager {
         return wampConnection?.callManager
-            ?: throw NotConnectedException("not connected to $serverUri")
+            ?: throw NotConnectedException("not connected to $loggableServerUri")
     }
 
     /**
