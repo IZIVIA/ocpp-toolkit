@@ -533,9 +533,10 @@ class OcppWampServerApp internal constructor(
 
     /**
      * Shuts down the calls executor when the toolkit built it, never an executor of the caller. Its threads get
-     * [CALLS_EXECUTOR_TERMINATION_MS] to end, then are interrupted and get [CALLS_EXECUTOR_TERMINATION_MS] more: a
-     * shutdown lasts at most [OcppWampServerSettings.timeoutInMs] for the drain, the closing of the connections, and
-     * these two waits. The queued calls were already dropped when the drain timed out; any the interruption still
+     * [CALLS_EXECUTOR_TERMINATION_MS] to end, then are interrupted and get [CALLS_EXECUTOR_TERMINATION_MS] more: this
+     * step adds at most these two waits to the shutdown, after the drain bounded by
+     * [OcppWampServerSettings.timeoutInMs] and the closing of the connections, which waits for their outgoing calls.
+     * The queued calls were already dropped when the drain timed out; any the interruption still
      * drops are not answered either, and are no longer counted in flight. A second call returns at once.
      */
     private fun shutdownOwnedCallsExecutor() {

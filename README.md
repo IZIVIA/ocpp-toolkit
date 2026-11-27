@@ -391,14 +391,16 @@ ServerSetting(
 A CALL arriving when every thread is busy and the queue is full is rejected: the station gets one
 `[4,"<id>","InternalError","Internal error",{}]`, and the `OcppErrorListener` one `TRANSPORT_ERROR` event with the
 `INTERNAL_ERROR` code (see [Observing OCPP errors](#observing-ocpp-errors)). The bound is global to the server, with no
-fairness between stations: one station sending slow calls can take every thread, and the calls of the other stations
-are then rejected.
+fairness between stations: many stations sending slow calls, or one station that does not wait for its answers, can
+take every thread, and the calls of the other stations are then rejected. A conforming station takes one thread at a
+time: OCPP-J 1.6 §4.1.1 says a station "SHOULD NOT send a CALL message to the other party unless all the CALL messages
+it sent before have been responded to or have timed out".
 
 On shutdown, the server waits up to `timeoutInMs` for the accepted calls to be answered, closes the connections, then
 stops the threads of its default executor, within two more seconds. When that wait times out, the calls still queued in
 the default executor are dropped before the connections are closed: their handlers never run, and the stations get no
-answer for them. The calls still running a second after the connections are closed are interrupted. A caller's executor is left
-as it is: nothing is dropped from it.
+answer for them. The calls still running a second after the connections are closed are interrupted. A caller's
+executor is left as it is: nothing is dropped from it.
 
 Override `buildCallsExecutor()` to run the calls on an executor of your own. `maxConcurrentCalls` and `maxQueuedCalls`
 are then ignored, and the executor is yours to shut down: the server never shuts it down. An override returning

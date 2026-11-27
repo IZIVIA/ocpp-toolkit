@@ -12,9 +12,10 @@ import java.util.concurrent.atomic.AtomicInteger
  * The settings of a WebSocket CSMS server, and the executor running the CALLs the charging stations send.
  *
  * The default executor is bounded by [maxConcurrentCalls] and [maxQueuedCalls], over all the stations of the server:
- * there is no fairness between them, so one station sending slow calls can take every thread, and the calls of the
- * other stations are then rejected. A rejected CALL is answered with one `InternalError` CALLERROR and reported once
- * to the server's `OcppErrorListener`, as a `TRANSPORT_ERROR` event with the `INTERNAL_ERROR` code.
+ * there is no fairness between them, so many stations sending slow calls, or one station that does not wait for its
+ * answers, can take every thread, and the calls of the other stations are then rejected. A rejected CALL is answered
+ * with one `InternalError` CALLERROR and reported once to the server's `OcppErrorListener`, as a `TRANSPORT_ERROR`
+ * event with the `INTERNAL_ERROR` code.
  *
  * @property timeoutInMs how long a call to a station waits for its answer, and how long the server shutdown waits for
  * the inbound calls in flight to be answered.
@@ -49,7 +50,7 @@ open class OcppWampServerSettings(
      *
      * By default, a pool of at most [maxConcurrentCalls] daemon threads named `ocpp-wamp-call-<n>`, idle ones ending
      * after a minute, with a queue of [maxQueuedCalls] calls; beyond, a call is rejected. The server owns this
-     * executor and shuts it down at the end of its shutdown, waiting up to two more seconds for its threads to end
+     * executor and shuts it down at the end of its shutdown, waiting up to two seconds for its threads to end
      * (the last second after interrupting them). When the shutdown's wait for the calls in flight times out, the calls
      * still queued are dropped, before the connections are closed: they never run and are never answered.
      *
