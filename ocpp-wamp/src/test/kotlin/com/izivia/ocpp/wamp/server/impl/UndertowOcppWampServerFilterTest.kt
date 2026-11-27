@@ -33,6 +33,7 @@ import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 import strikt.assertions.isNull
 import strikt.assertions.isTrue
+import java.time.Duration
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
@@ -69,6 +70,19 @@ class UndertowOcppWampServerFilterTest {
     @Test
     fun `should serve a station through a filter delegating the websocket`() {
         val port = serve(delegatingWebsocket)
+
+        val answer = callOver(port, "CS1")
+
+        expect {
+            that(answer).isEqualTo(answerOf("H1"))
+            that(opened.await(5, TimeUnit.SECONDS)).isTrue()
+            that(connected).containsExactly("CS1")
+        }
+    }
+
+    @Test
+    fun `should serve a station admitted off the I-O thread through a filter delegating the websocket`() {
+        val port = serve(delegatingWebsocket, AdmissionExecution.Dispatched(4, Duration.ofSeconds(5)))
 
         val answer = callOver(port, "CS1")
 
@@ -242,7 +256,11 @@ class UndertowOcppWampServerFilterTest {
      * Serves [wamp] through [filter] on a free port, as an application composing its own handler does, negotiating
      * the server's subprotocols unless [negotiatesSubprotocols] is false.
      */
-    private fun serve(filter: WsFilter, negotiatesSubprotocols: Boolean = true): Int {
+    private fun serve(
+        filter: WsFilter,
+        admission: AdmissionExecution = AdmissionExecution.Inline,
+        negotiatesSubprotocols: Boolean = true,
+    ): Int {
         val port = getFreePort()
         val config = wamp.config()
         val server = PolyHandler(ws = websockets(filter.then(config.handler))).asServer(
@@ -251,6 +269,7 @@ class UndertowOcppWampServerFilterTest {
                 enableHttp2 = true,
                 admitWebSocket = config.admitWebSocket,
                 wsSubprotocols = if (negotiatesSubprotocols) config.wsSubprotocols else emptySet(),
+                admission = admission,
             )
         ).start()
         servers += server
