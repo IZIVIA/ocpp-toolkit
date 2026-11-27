@@ -569,6 +569,11 @@ val csms = ApiFactory.csmsOcppServer(
 | `HANDLER_ERROR`    | a registered handler throws, an `Error` included                                                    |
 | `TRANSPORT_ERROR`  | the transport fails while processing a message, for instance when the calls executor does not run a call |
 
+Over WebSocket, a call whose handler throws, whose response cannot be serialized, or that the calls executor does not
+run is answered with `[4,"<messageId>","InternalError","Internal error",{}]`, so that the charging station does not wait
+for its timeout before its next call. The answer never carries the exception: the listener receives it as `cause`. A
+response that fails while being sent is not answered again.
+
 Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
 `action`, for instance. A network failure is not an event: a charging station that disconnects, even while a response
 is being sent to it, is already reported to `onWsCloseHandler`.

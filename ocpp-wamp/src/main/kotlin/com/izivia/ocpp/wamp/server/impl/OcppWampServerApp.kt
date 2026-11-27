@@ -247,13 +247,33 @@ class OcppWampServerApp(
                                     ws.send(WsMessage(respJson))
                                 } catch (t: Throwable) {
                                     // Throwable on purpose: a handler failing with an Error is still a handler failure.
-                                    // An IOException while sending is the network failing, as in ws.onError.
-                                    if (failureCategory != OcppErrorCategory.TRANSPORT_ERROR || t !is IOException) {
-                                        errorListener?.notifySafely(
-                                            chargingStationConnection.errorEvent(failureCategory, wampMessage, cause = t)
-                                        )
+                                    val sending = failureCategory == OcppErrorCategory.TRANSPORT_ERROR
+                                    if (sending || t is VirtualMachineError) {
+                                        // Not answered: the response may already be partly on the wire, and a second
+                                        // send could answer the call twice; the JVM may be unable to go on.
+                                        // An IOException while sending is the network failing, as in ws.onError.
+                                        if (!sending || t !is IOException) {
+                                            errorListener?.notifySafely(
+                                                chargingStationConnection.errorEvent(
+                                                    failureCategory,
+                                                    wampMessage,
+                                                    cause = t
+                                                )
+                                            )
+                                        }
+                                        throw t
                                     }
-                                    throw t
+                                    // Answered, so that the station is not left waiting for its timeout before its
+                                    // next CALL; the failure is reported here once and not rethrown.
+                                    errorListener?.notifySafely(
+                                        chargingStationConnection.errorEvent(
+                                            failureCategory,
+                                            wampMessage,
+                                            MessageErrorCode.INTERNAL_ERROR,
+                                            t
+                                        )
+                                    )
+                                    chargingStationConnection.answerFailedCall(wampMessage)
                                 }
                             }
                         }
@@ -311,10 +331,13 @@ class OcppWampServerApp(
     /**
      * Runs an inbound call on the calls executor, keeping it counted in [inFlightInboundCalls]
      * until its response has been sent. The caller must have incremented the counter.
+     *
+     * A call the executor does not run, by a rejection or otherwise, is answered with an `InternalError` CALLERROR and
+     * reported once as a [OcppErrorCategory.TRANSPORT_ERROR], unless the executor failed with a [VirtualMachineError].
      */
     private fun ChargingStationConnection.submitCall(message: WampMessage, call: () -> Unit) {
         // Claimed by the call when it starts, or by the submission when the executor fails without running it:
-        // whichever claims it releases the count, exactly once.
+        // whichever claims it releases the count, exactly once, and only the submission may answer the call.
         val claimed = AtomicBoolean(false)
         try {
             callsExecutor.execute {
@@ -328,14 +351,40 @@ class OcppWampServerApp(
             }
         } catch (t: Throwable) {
             if (claimed.compareAndSet(false, true)) {
-                // The executor did not run the call, by a rejection or otherwise: nothing else reports it.
+                // The executor did not run the call: nothing else reports or answers it.
+                if (t !is VirtualMachineError) {
+                    try {
+                        errorListener?.notifySafely(
+                            errorEvent(OcppErrorCategory.TRANSPORT_ERROR, message, MessageErrorCode.INTERNAL_ERROR, t)
+                        )
+                        answerFailedCall(message)
+                    } finally {
+                        inFlightInboundCalls.decrementAndGet()
+                    }
+                    return
+                }
                 inFlightInboundCalls.decrementAndGet()
                 errorListener?.notifySafely(errorEvent(OcppErrorCategory.TRANSPORT_ERROR, message, cause = t))
             }
-            // Otherwise the executor ran the call on this thread, which has already reported its own failure.
+            // Otherwise the executor ran the call on this thread, which has already answered or reported it.
             // Either way, ws.onError must not report it again.
             reportedFailure = t
             throw t
+        }
+    }
+
+    /**
+     * Answers the failed call [message] with an `InternalError` CALLERROR that never carries the failure. A send that
+     * fails is the network failing, which is not reported again: it is only logged, without its message.
+     */
+    private fun ChargingStationConnection.answerFailedCall(message: WampMessage) {
+        try {
+            ws.send(WsMessage(internalErrorFor(message.msgId).toJson()))
+        } catch (e: Throwable) {
+            if (e is VirtualMachineError) {
+                throw e
+            }
+            logger.warn("[$ocppId] [$wsConnectionId] [${message.msgId}] CALLERROR not sent: ${e.javaClass.name}")
         }
     }
 
@@ -510,6 +559,13 @@ class OcppWampServerApp(
 }
 
 class NoConnectionException(e: String) : IllegalStateException(e)
+
+/**
+ * The CALLERROR answering the call [msgId] whose handling failed. OCPP-J 1.6 §4.2.3: "If there are no error details
+ * you MUST fill in an empty object {}". The failure itself is never sent to the peer.
+ */
+private fun internalErrorFor(msgId: String) =
+    WampMessage.CallError(msgId, MessageErrorCode.INTERNAL_ERROR, "Internal error", "{}")
 
 private fun Throwable.isConnectionReset(): Boolean =
     this is SocketException && this.message.equals("Connection reset")
