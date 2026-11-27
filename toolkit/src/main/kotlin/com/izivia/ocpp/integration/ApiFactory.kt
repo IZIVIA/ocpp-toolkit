@@ -295,7 +295,7 @@ class ApiFactory {
                         }
                     }
                 }.toMap()
-            return CSMS(transports, csmsApiCallbacks.toSet(), fn)
+            return CSMS(transports, csmsApiCallbacks.toSet(), fn, csmsSettings.admission)
         }
     }
 }
