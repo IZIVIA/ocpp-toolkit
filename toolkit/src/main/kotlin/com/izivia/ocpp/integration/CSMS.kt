@@ -97,8 +97,10 @@ class CSMS(
                 Undertow(
                     port,
                     enableHttp2 = wsServerConfigs.isNotEmpty(),
-                    acceptWebSocketPredicate = { exch ->
-                        wsServerConfigs.any { it.first.acceptWebSocketPredicate(exch) }
+                    // the first endpoint claiming the request decides: CSMSSettings refuses two WebSocket servers
+                    // sharing a path on a port, but transports given directly to CSMS are not checked
+                    admitWebSocket = { exch ->
+                        wsServerConfigs.firstNotNullOfOrNull { it.first.admitWebSocket(exch) }
                     },
                     wsSubprotocols = wsServerConfigs.flatMap { c -> c.first.wsSubprotocols }.toSet(),
                 )
