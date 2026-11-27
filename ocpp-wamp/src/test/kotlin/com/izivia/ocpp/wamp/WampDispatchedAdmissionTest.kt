@@ -56,8 +56,14 @@ import org.http4k.core.Response as HttpResponse
 class WampDispatchedAdmissionTest {
     private val port = getFreePort()
     private val events = CopyOnWriteArrayList<String>()
+
+    // one permit per connect event: Undertow sends the 101 before it calls the connect listener
+    private val connects = Semaphore(0)
     private val listeners = EventsListeners(
-        onWsConnectHandler = { id, _ -> events += "connect $id" },
+        onWsConnectHandler = { id, _ ->
+            events += "connect $id"
+            connects.release()
+        },
         onWsReconnectHandler = { id, _ -> events += "reconnect $id" },
     )
 
@@ -105,18 +111,25 @@ class WampDispatchedAdmissionTest {
             release.await(10, SECONDS)
             true
         }
+        val executor = TrackingExecutor(pool)
         val server = wampServer(authorizer = slowAuthorizer)
-            .asServer(port, AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor = pool))
+            .asServer(port, AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor))
             .start()
 
         try {
             val expired = handshake(port, "CS1")
+            release.countDown()
+            // the only slot is free again once the late admission of CS1 has returned
+            awaitOrFail(executor.completed, "late admission of CS1 returned")
+            val next = handshake(port, "CS2")
+            awaitOrFail(connects, "connect event of CS2")
 
             expect {
                 that(entered.count).isEqualTo(0L)
                 that(expired.status).isEqualTo(503)
                 that(expired.retryAfter).isEqualTo("5")
-                that(events).isEmpty()
+                that(next.status).isEqualTo(101)
+                that(events.toList()).isEqualTo(listOf("connect CS2"))
             }
         } finally {
             release.countDown()
@@ -135,11 +148,13 @@ class WampDispatchedAdmissionTest {
 
             val overloaded = handshake(port, "CS4")
             gate.release.countDown()
+            val admittedStatuses = admitted.map { it.get(5, SECONDS).status }
+            repeat(3) { awaitOrFail(connects, "connect events of CS1, CS2 and CS3") }
 
             expect {
                 that(overloaded.status).isEqualTo(503)
                 that(overloaded.retryAfter).isEqualTo("5")
-                that(admitted.map { it.get(5, SECONDS).status }).all { isEqualTo(101) }
+                that(admittedStatuses).all { isEqualTo(101) }
                 that(events).none { isEqualTo("connect CS4") }
             }
         } finally {
@@ -161,6 +176,7 @@ class WampDispatchedAdmissionTest {
             awaitOrFail(executor.completed, "late admission of CS1 returned")
 
             val next = handshake(port, "CS2")
+            awaitOrFail(connects, "connect event of CS2")
 
             expect {
                 that(expired.status).isEqualTo(503)
@@ -238,11 +254,11 @@ class WampDispatchedAdmissionTest {
             val expired = handshake(port, "CS1")
             val whileHung = handshake(port, "CS2")
 
+            // that the late decision of CS1 connects nothing is owned by the test of the dropped late decision
             expect {
                 that(expired.status).isEqualTo(503)
                 that(whileHung.status).isEqualTo(503)
                 that(whileHung.retryAfter).isEqualTo("5")
-                that(events).isEmpty()
             }
         } finally {
             gate.release.countDown()
@@ -261,6 +277,7 @@ class WampDispatchedAdmissionTest {
         try {
             val rejected = handshake(port, "CS1")
             val next = handshake(port, "CS2")
+            awaitOrFail(connects, "connect event of CS2")
 
             expect {
                 that(rejected.status).isEqualTo(503)
@@ -354,6 +371,25 @@ class WampDispatchedAdmissionTest {
         } finally {
             firstStop.set(false)
             gate.release.countDown()
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `dispatched admission upgrades again once the server has been restarted`() {
+        val server = start(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = Duration.ofSeconds(10)))
+
+        try {
+            val beforeRestart = handshake(port, "CS1")
+            server.stop()
+            server.start()
+            val afterRestart = handshake(port, "CS2")
+
+            expect {
+                that(beforeRestart.status).isEqualTo(101)
+                that(afterRestart.status).isEqualTo(101)
+            }
+        } finally {
             server.stop()
         }
     }

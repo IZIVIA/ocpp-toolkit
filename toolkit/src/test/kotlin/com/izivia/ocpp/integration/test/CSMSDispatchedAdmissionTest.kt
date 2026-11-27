@@ -30,7 +30,9 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CompletionException
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.Executor
 import java.util.concurrent.Executors
+import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit.SECONDS
 import com.izivia.ocpp.OcppVersion as WampOcppVersion
 
@@ -38,6 +40,9 @@ import com.izivia.ocpp.OcppVersion as WampOcppVersion
 class CSMSDispatchedAdmissionTest {
     private val port = ServerSocket(0).use { it.localPort }
     private val connected = CopyOnWriteArrayList<String>()
+
+    // one permit per connect event: Undertow sends the 101 before it calls the connect listener
+    private val connects = Semaphore(0)
     private val pool = Executors.newCachedThreadPool()
 
     // the authorization of SLOW waits for release; returned counts down once it has returned
@@ -85,16 +90,33 @@ class CSMSDispatchedAdmissionTest {
 
     @Test
     fun `authorization that times out gets a 503 with Retry-After`() {
-        val server = csms(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = Duration.ofMillis(300), pool))
+        // tells when each admission task has returned, and so given its slot back
+        val admissionsReturned = Semaphore(0)
+        val executor = Executor { task ->
+            pool.execute {
+                try {
+                    task.run()
+                } finally {
+                    admissionsReturned.release()
+                }
+            }
+        }
+        val server = csms(AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = Duration.ofMillis(300), executor))
         server.start()
 
         try {
             val expired = handshake("SLOW")
+            release.countDown()
+            // the only slot is free again once the late admission of SLOW has returned
+            awaitOrFail(admissionsReturned, "late admission of SLOW returned")
+            val next = handshake("OTHER")
+            awaitOrFail(connects, "connect event of OTHER")
 
             expect {
                 that(expired.status).isEqualTo(503)
                 that(expired.retryAfter).isEqualTo("5")
-                that(connected).isEmpty()
+                that(next.status).isEqualTo(101)
+                that(connected.toList()).isEqualTo(listOf("OTHER"))
             }
         } finally {
             release.countDown()
@@ -136,7 +158,10 @@ class CSMSDispatchedAdmissionTest {
                         path = "ws",
                         ocppVersion = setOf(OcppVersion.OCPP_1_6),
                         transportType = TransportEnum.WEBSOCKET,
-                        listeners = EventsListeners(onWsConnectHandler = { id, _ -> connected += id }),
+                        listeners = EventsListeners(onWsConnectHandler = { id, _ ->
+                            connected += id
+                            connects.release()
+                        }),
                         authorizer = slowAuthorizer
                     )
                 ),
@@ -165,4 +190,7 @@ class CSMSDispatchedAdmissionTest {
 
     private fun awaitOrFail(latch: CountDownLatch, what: String) =
         expectThat(latch.await(5, SECONDS)).describedAs("$what within 5 s").isTrue()
+
+    private fun awaitOrFail(permits: Semaphore, what: String) =
+        expectThat(permits.tryAcquire(5, SECONDS)).describedAs("$what within 5 s").isTrue()
 }
