@@ -387,6 +387,21 @@ connection stays registered and served, and its next connection is notified as a
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
+### Refusing a charging station
+
+The CSMS decides which charging stations may connect: through `ChargingStationConfig.acceptConnection`, returned by
+`fn`, with the `toolkit` module, and through `OcppWampServerHandler.accept` with `ocpp-wamp`. The same flag also
+decides whether the CSMS may send requests to the station.
+
+On WebSocket, a station that no handler accepts fails its handshake with an HTTP 404, as OCPP-J recommends: it never
+has a connection, and no connection listener is notified. The check runs on the WebSocket IO thread for every upgrade
+request, so `fn` and `accept` must be fast and must not throw: an exception fails the handshake with an HTTP 500.
+
+Earlier versions completed the handshake of a refused station, then answered each of its calls, BootNotification
+included, with a CALLERROR `InternalError` "No action handler found". Such a station now gets a 404 instead. To keep a
+station connected while refusing it, accept the connection and answer its BootNotification with `Rejected` or
+`Pending`.
+
 ## Observing OCPP errors
 
 The toolkit handles some failures on its own: it logs them and, over WebSocket, answers with a `CALLERROR`. To report
