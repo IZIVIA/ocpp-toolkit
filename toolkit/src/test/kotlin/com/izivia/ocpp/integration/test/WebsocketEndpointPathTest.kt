@@ -1,6 +1,7 @@
 package com.izivia.ocpp.integration.test
 
 import com.izivia.ocpp.core16.ChargePointOperations
+import com.izivia.ocpp.core20.ChargePointOperations as ChargePointOperations20
 import com.izivia.ocpp.integration.ApiFactory
 import com.izivia.ocpp.integration.CSMS
 import com.izivia.ocpp.integration.model.CSMSSettings
@@ -98,7 +99,14 @@ class WebsocketEndpointPathTest {
     private fun csms(servers: List<ServerSetting>): CSMS =
         ApiFactory.csmsOcppServer(
             csmsSettings = CSMSSettings(servers),
-            csmsApiCallbacks = listOf(mockk<ChargePointOperations>(relaxed = true)),
+            // a path without a callback for its version has no handler, and refuses every station
+            csmsApiCallbacks = servers.flatMap { it.ocppVersion }.distinct().map { version ->
+                when (version) {
+                    OcppVersion.OCPP_1_6 -> mockk<ChargePointOperations>(relaxed = true)
+                    OcppVersion.OCPP_2_0 -> mockk<ChargePointOperations20>(relaxed = true)
+                    else -> error("no callback for $version")
+                }
+            },
             fn = { ChargingStationConfig(acceptConnection = it == "OK", soapUrl = null) }
         )
 
