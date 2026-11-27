@@ -34,8 +34,10 @@ import java.util.Base64
  *   station) or admitted anyway ([Enforcement.REPORT]). If it throws, the decision is kept, be it an exception or
  *   an error such as a `NoClassDefFoundError`: only a `VirtualMachineError` propagates.
  *
- * Both run on the WebSocket IO thread and must not block: keep the secrets in memory rather than querying a
- * database on each connection.
+ * Both run on the WebSocket IO thread with [com.izivia.ocpp.wamp.server.impl.AdmissionExecution.Inline] (the
+ * default), where they must not block: keep the secrets in memory rather than querying a database on each
+ * connection. With [com.izivia.ocpp.wamp.server.impl.AdmissionExecution.Dispatched] they run off the IO thread, on
+ * its executor or on Undertow's worker pool.
  */
 class SecurityProfileAuthorizer(
     private val securityOf: (CSOcppId) -> StationSecurity?,

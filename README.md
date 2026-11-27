@@ -422,8 +422,13 @@ The CSMS decides which charging stations may connect: through `ChargingStationCo
 decides whether the CSMS may send requests to the station.
 
 On WebSocket, a station that no handler accepts fails its handshake with an HTTP 404, as OCPP-J recommends: it never
-has a connection, and no connection listener is notified. The check runs on the WebSocket IO thread for every upgrade
-request, so `fn` and `accept` must be fast and must not throw: an exception fails the handshake with an HTTP 500.
+has a connection, and no connection listener is notified. By default, the check runs on the WebSocket IO thread for
+every upgrade request, so `fn` and `accept` must be fast (see [Slow admission callbacks](#slow-admission-callbacks)
+otherwise) and must not throw: an exception fails the handshake with an HTTP 500.
+
+With the `toolkit` module, the acceptance is evaluated once per distinct `fn` function instance per handshake: the
+actions registered with the same instance share one evaluation, while two different instances, even with the same
+code, mean two evaluations. Hoist a single instance to evaluate it once.
 
 Earlier versions completed the handshake of a refused station, then answered each of its calls, BootNotification
 included, with a CALLERROR `InternalError` "No action handler found". Such a station now gets a 404 instead. To keep a
@@ -517,8 +522,9 @@ both. The rule follows the type of the secret, not the OCPP version the station 
   only a `VirtualMachineError` propagates. A `securityOf` that throws, for instance on an invalid secret, refuses the
   station the same way. Only the station id and the exception class are logged, never the headers nor the exception
   message.
-- `securityOf` and `onFailure` run on the WebSocket IO thread and must not block: keep the secrets in memory rather
-  than querying a database on each connection.
+- By default, `securityOf` and `onFailure` run on the WebSocket IO thread and must not block: keep the secrets in
+  memory rather than querying a database on each connection, or see
+  [Slow admission callbacks](#slow-admission-callbacks).
 - Nothing limits the failed attempts of a station: rate-limit them in front of the server, in a reverse proxy for
   instance.
 
@@ -539,6 +545,47 @@ that consumer must subscribe before the station can send: the frames and the clo
 the stations, and the authorizer of the second would be ignored. The new `authorizer` parameter of `ServerSetting`,
 `WebsocketServer` and `UndertowOcppWampServer` keeps source compatibility, but code compiled against an earlier version
 must be recompiled: their constructors, and the `copy` and `componentN` functions of `ServerSetting`, change.
+
+### Slow admission callbacks
+
+The admission of a WebSocket station, that is its authorizer (`securityOf` and `onFailure` included) and the
+`fn`/`accept` check, runs by default on the Undertow IO thread that received the upgrade request
+(`AdmissionExecution.Inline`). While it runs, every other connection served by that thread waits, HTTP requests and
+WebSocket frames included.
+
+The recommended way to stay fast is to keep the admission data (the secrets, the accepted station ids) cached in
+memory on the application side, refreshed in the background, and to stay `Inline`. When a callback has to block, on a
+database for instance, run the admission off the IO thread with `AdmissionExecution.Dispatched`:
+
+```kotlin
+import com.izivia.ocpp.integration.model.CSMSSettings
+import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
+import java.time.Duration
+
+val settings = CSMSSettings(
+    servers = servers,
+    admission = AdmissionExecution.Dispatched(maxConcurrent = 16, timeout = Duration.ofSeconds(5)),
+)
+```
+
+With `ocpp-wamp`, pass it to `OcppWampServer.asServer(port, admission)`. With `toolkit`, pass it to `CSMS` as its
+`admission` parameter, or set it in `CSMSSettings` as above.
+
+- The admission runs on Undertow's worker pool, or on the `executor` given to `Dispatched`.
+- The mode applies to the server of every port, but each port has its own server, hence its own `maxConcurrent`
+  bound. SOAP ignores it.
+- A handshake arriving when `maxConcurrent` admissions are running, one whose submission the executor rejects, and one
+  whose admission has not decided within `timeout` get an HTTP 503 with `Retry-After: 5`. A late decision is dropped:
+  the station is neither upgraded nor notified. The 401, 404 and 500 of a refused station are unchanged.
+- An admission keeps its slot until its callbacks return, not until its timeout. A callback that hangs keeps its slot,
+  so once all slots are taken every handshake gets the 503; with Undertow's worker pool it also keeps the server's
+  `stop()` waiting. Give the authorizer's own I/O, such as a database query, a timeout of its own.
+- The toolkit never shuts down an executor you pass: you own it. It must run or reject (with a
+  `RejectedExecutionException`) every task: a policy that silently discards a task never gives its slot back. Without
+  an executor, nothing is created.
+
+`CSMSSettings` and `CSMS` keep their earlier constructors for compiled code, but code calling the `copy` function of
+`CSMSSettings` must be recompiled: its signature changes with the new parameter.
 
 ## Observing OCPP errors
 

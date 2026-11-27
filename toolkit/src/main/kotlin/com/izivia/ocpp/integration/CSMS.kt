@@ -144,6 +144,9 @@ class CSMS(
      * cannot be started again afterwards. A transport that fails to shut down does not prevent the
      * other transports from draining nor the HTTP servers from stopping: the first failure is
      * rethrown once the servers are stopped, with the later ones added as suppressed.
+     *
+     * The HTTP servers keep accepting handshakes while the transports drain: a WebSocket handshake admitted in that
+     * window may still be upgraded, and its connection is then closed at once.
      */
     fun stop() {
         val failures = mutableListOf<Throwable>()
