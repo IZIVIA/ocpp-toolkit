@@ -362,11 +362,18 @@ class OcppWampServerAppConnectionsTest {
     @Test
     fun `should close the station when the close listener fails`() {
         val socket = connect("CS1")
-        lifecycleHook = { if (it == "close:CS1") error("listener failure") }
+        val closeNotified = AtomicBoolean(false)
+        lifecycleHook = {
+            if (it == "close:CS1") {
+                closeNotified.set(true)
+                error("listener failure")
+            }
+        }
 
         expectCatching { socket.disconnect() }.isSuccess()
         lifecycleHook = {}
 
+        expectThat(closeNotified.get()).describedAs("close notified").isTrue()
         expectThrows<NoConnectionException> { call("CS1") }
         expectThat(callAnsweredBy(connect("CS1")).msgType).isEqualTo(WampMessageType.CALL_RESULT)
         expectThat(events).containsExactly("connect:CS1", "connect:CS1")
