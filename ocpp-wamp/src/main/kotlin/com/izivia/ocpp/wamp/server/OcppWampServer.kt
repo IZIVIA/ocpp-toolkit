@@ -6,6 +6,7 @@ import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageMetaHeaders
+import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import com.izivia.ocpp.wamp.server.impl.Undertow
@@ -54,7 +55,9 @@ sealed interface WebSocketUpgradeDecision {
  * Decides from its upgrade request whether a charging station may connect, for instance by checking the
  * HTTP Basic authentication of OCPP security profiles 1 and 2.
  *
- * It runs before any [OcppWampServerHandler.accept], on the WebSocket IO thread, so it must not block.
+ * It runs before any [OcppWampServerHandler.accept]. By default ([AdmissionExecution.Inline]) it runs on the
+ * WebSocket IO thread, so it must not block; with [AdmissionExecution.Dispatched] it runs off the IO thread, within
+ * a bounded number of concurrent admissions and a timeout.
  * A station it refuses, or for which it throws, gets an HTTP 401 and is never registered nor notified.
  */
 fun interface ConnectionAuthorizer {
@@ -79,15 +82,32 @@ class ConnectionRequest(
     override fun toString() = "ConnectionRequest(ocppId=$ocppId)"
 }
 
-fun OcppWampServer.asServer(port: Int = 8000): Http4kServer {
+/**
+ * An Undertow server for this OCPP WebSocket server, listening on [port].
+ *
+ * @param admission where the admission of a charging station (the [ConnectionAuthorizer] and the selection of the
+ * handler accepting it) runs: on the I/O thread by default, see [AdmissionExecution]
+ */
+fun OcppWampServer.asServer(
+    port: Int = 8000,
+    admission: AdmissionExecution = AdmissionExecution.Inline,
+): Http4kServer {
     val config = this.config()
     return config.handler.asServer(Undertow(
         port,
         enableHttp2 = true,
         admitWebSocket = config.admitWebSocket,
         wsSubprotocols = config.wsSubprotocols,
+        admission = admission,
     ))
 }
+
+/**
+ * An Undertow server for this OCPP WebSocket server, listening on [port], whose admission runs on the I/O thread: the
+ * signature of the releases before the admission, kept for the Java and compiled callers.
+ */
+// its default value keeps the synthetic function the callers compiled against the previous releases use
+fun OcppWampServer.asServer(port: Int = 8000): Http4kServer = asServer(port, AdmissionExecution.Inline)
 
 interface OcppWampServer {
 

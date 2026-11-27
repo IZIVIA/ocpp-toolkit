@@ -12,6 +12,7 @@ import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
 import com.izivia.ocpp.wamp.server.WebSocketUpgradeDecision
+import com.izivia.ocpp.wamp.server.asServer
 import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.Undertow
@@ -91,6 +92,34 @@ class WampDispatchedAdmissionTest {
             }
         } finally {
             gate.release.countDown()
+            server.stop()
+        }
+    }
+
+    @Test
+    fun `asServer runs the connection authorizer with the given admission`() {
+        val entered = CountDownLatch(1)
+        val release = CountDownLatch(1)
+        val slowAuthorizer = ConnectionAuthorizer { _ ->
+            entered.countDown()
+            release.await(10, SECONDS)
+            true
+        }
+        val server = wampServer(authorizer = slowAuthorizer)
+            .asServer(port, AdmissionExecution.Dispatched(maxConcurrent = 1, timeout = SHORT_TIMEOUT, executor = pool))
+            .start()
+
+        try {
+            val expired = handshake(port, "CS1")
+
+            expect {
+                that(entered.count).isEqualTo(0L)
+                that(expired.status).isEqualTo(503)
+                that(expired.retryAfter).isEqualTo("5")
+                that(events).isEmpty()
+            }
+        } finally {
+            release.countDown()
             server.stop()
         }
     }
