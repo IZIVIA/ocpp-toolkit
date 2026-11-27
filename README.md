@@ -608,3 +608,10 @@ behaviour or the API of a published module adds its entry under `[Unreleased]`, 
 change that breaks consumers with **BREAKING**. The GitHub release of an `R-x.y.z` tag takes its
 notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, and publication stops if that
 section is missing.
+
+When a release run fails:
+
+- The workflow and the `CHANGELOG.md` of the tagged commit are the ones used.
+- If the check fails, nothing was published: add the section, then delete and push the tag again.
+- If only the `release` job fails, "Re-run failed jobs" retries it without publishing again.
+- Release notes can be corrected afterwards with `gh release edit <tag> --notes-file <file>`.

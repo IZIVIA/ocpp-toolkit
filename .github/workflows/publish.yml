@@ -48,6 +48,8 @@ jobs:
     # release without publishing to Maven Central again. Kept out of the
     # ocpp-publish concurrency group: releases of different tags are
     # independent, and the job is idempotent (create, or edit the notes).
+    # A created release is marked "Latest" unless a higher version
+    # already holds it.
     release:
 
         needs: build
@@ -60,6 +62,8 @@ jobs:
         steps:
             -   name: Checkout IZIVIA OCPP toolkit library code from GH
                 uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+                with:
+                    persist-credentials: false
 
             -   name: Create or update the GitHub release from the CHANGELOG
                 env:
@@ -70,8 +74,25 @@ jobs:
                     VERSION="${TAG#R-}"
                     NOTES="$RUNNER_TEMP/release-notes.md"
                     sh scripts/changelog-section.sh "$VERSION" > "$NOTES"
-                    if gh release view "$TAG" > /dev/null 2>&1; then
+                    if gh release view "$TAG" > /dev/null; then
                         gh release edit "$TAG" --notes-file "$NOTES"
-                    else
-                        gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES"
+                        exit 0
                     fi
+                    # A new release becomes "Latest" by default: keep a
+                    # backport (a lower version tagged later) from taking it.
+                    LATEST_ERR="$RUNNER_TEMP/latest-release.err"
+                    if LATEST_TAG=$(gh release view --json tagName --jq .tagName 2> "$LATEST_ERR"); then
+                        :
+                    elif grep -qx 'release not found' "$LATEST_ERR"; then
+                        LATEST_TAG=""
+                    else
+                        cat "$LATEST_ERR" >&2
+                        exit 1
+                    fi
+                    LATEST_VERSION="${LATEST_TAG#R-}"
+                    set --
+                    if [ -n "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "$VERSION" ] \
+                        && [ "$(printf '%s\n' "$LATEST_VERSION" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+                        set -- --latest=false
+                    fi
+                    gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES" "$@"
