@@ -10,10 +10,12 @@ import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
+import strikt.api.expectCatching
 import strikt.api.expectThat
 import strikt.api.expectThrows
 import strikt.assertions.*
 import java.lang.management.ManagementFactory
+import java.net.SocketException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.CountDownLatch
@@ -158,6 +160,27 @@ class OcppWampServerAppConnectionsTest {
         expectThat(sockets.filterNot { it.closed }).describedAs("connections left open").isEmpty()
         expectThat(closeEvents).hasSize(1)
         expectThat(shutdown.exceptionOrNull()).isNull()
+    }
+
+    @Test
+    fun `should keep the thread interrupted and close every station when a close listener is interrupted on shutdown`() {
+        val sockets = listOf(connect("CS1"), connect("CS2"))
+        val interrupted = AtomicBoolean(false)
+        // the first close notified is interrupted, whichever station it belongs to
+        lifecycleHook = {
+            if (it.startsWith("close:") && interrupted.compareAndSet(false, true)) {
+                throw InterruptedException("listener interrupted")
+            }
+        }
+
+        val shutdown = runCatching { app.shutdown() }
+        // read, and cleared, before anything else can block on it
+        val stillInterrupted = Thread.interrupted()
+
+        expectThat(stillInterrupted).describedAs("thread interrupted").isTrue()
+        expectThat(shutdown.exceptionOrNull()).isNull()
+        expectThat(sockets.filterNot { it.closed }).describedAs("connections left open").isEmpty()
+        expectThat(closeEvents).hasSize(1)
     }
 
     @Test
@@ -334,6 +357,55 @@ class OcppWampServerAppConnectionsTest {
         socket.disconnect()
         expectThat(events).containsExactly("connect:CS1", "close:CS1")
         expectThrows<NoConnectionException> { call("CS1") }
+    }
+
+    @Test
+    fun `should close the station when the close listener fails`() {
+        val socket = connect("CS1")
+        lifecycleHook = { if (it == "close:CS1") error("listener failure") }
+
+        expectCatching { socket.disconnect() }.isSuccess()
+        lifecycleHook = {}
+
+        expectThrows<NoConnectionException> { call("CS1") }
+        expectThat(callAnsweredBy(connect("CS1")).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+        expectThat(events).containsExactly("connect:CS1", "connect:CS1")
+    }
+
+    @Test
+    fun `should close the station on a connection reset when the close listener fails`() {
+        val socket = connect("CS1")
+        val closeNotified = AtomicBoolean(false)
+        lifecycleHook = {
+            if (it == "close:CS1") {
+                closeNotified.set(true)
+                error("listener failure")
+            }
+        }
+
+        expectCatching { socket.triggerError(SocketException("Connection reset")) }.isSuccess()
+        lifecycleHook = {}
+
+        // only a connection reset is handled as a close
+        expectThat(closeNotified.get()).describedAs("close notified").isTrue()
+        expectThrows<NoConnectionException> { call("CS1") }
+        expectThat(callAnsweredBy(connect("CS1")).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+        expectThat(events).containsExactly("connect:CS1", "connect:CS1")
+    }
+
+    @Test
+    fun `should release the station when the close listener throws an Error`() {
+        val socket = connect("CS1")
+        // an Error, as an Exception is caught with the listener
+        lifecycleHook = { if (it == "close:CS1") throw AssertionError("listener failure") }
+
+        expectThrows<AssertionError> { socket.disconnect() }
+        lifecycleHook = {}
+
+        // from another thread, as the lock of the station is reentrant
+        val next = CompletableFuture.supplyAsync { connect("CS1") }.get(5, TimeUnit.SECONDS)
+        expectThat(callAnsweredBy(next).msgType).isEqualTo(WampMessageType.CALL_RESULT)
+        expectThat(events).containsExactly("connect:CS1", "connect:CS1")
     }
 
     @Test

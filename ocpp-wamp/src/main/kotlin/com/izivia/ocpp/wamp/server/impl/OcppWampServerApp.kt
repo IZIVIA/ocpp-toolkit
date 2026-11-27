@@ -315,9 +315,11 @@ class OcppWampServerApp(
     }
 
     /**
-     * Notifies the [event] of a new connection to its [listener], which only observes it: a failure is logged and
-     * leaves the connection registered and served, so that the station stays reachable and its next connection is
-     * notified as a reconnection. An interrupted listener leaves the calling thread interrupted.
+     * Notifies the lifecycle [event] of a connection to its [listener], which only observes it: an exception it throws
+     * is logged as a redacted copy, its classes and stack traces without messages, and the lifecycle goes on. A new
+     * connection stays registered and served, so that the station stays reachable and its next connection is notified
+     * as a reconnection; a closed connection stays removed, and the next connection of the station is notified as a
+     * connection. An interrupted listener leaves the calling thread interrupted, and an [Error] propagates.
      */
     private fun notifyConnection(logContext: String, event: String, listener: () -> Unit) {
         try {
@@ -326,7 +328,7 @@ class OcppWampServerApp(
             if (e is InterruptedException) {
                 Thread.currentThread().interrupt()
             }
-            logger.error("$logContext $event listener failed - connection kept: ${e.javaClass.name}", e.redactedForLog())
+            logger.error("$logContext $event listener failed: ${e.javaClass.name}", e.redactedForLog())
         }
     }
 
@@ -435,7 +437,9 @@ class OcppWampServerApp(
             // we notify only if we remove the connection, otherwise it has been replaced, and the station is still
             // connected, or the station disconnection has already been notified by the removal of its current one;
             // no connection can register before the notification, under the station lock
-            listeners.onWsCloseHandler(chargingStationOcppId, chargingStationConnection.request.headers)
+            notifyConnection(logContext, "close") {
+                listeners.onWsCloseHandler(chargingStationOcppId, chargingStationConnection.request.headers)
+            }
         } else {
             logger.debug("$logContext not notifying disconnection - still connected or already notified")
         }
@@ -477,7 +481,9 @@ class OcppWampServerApp(
                     // the close completes later, when the connection is no longer registered: notify it now
                     withStationLock(it.ocppId) {
                         if (synchronized(it) { connections.remove(it) }) {
-                            listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                            notifyConnection(it.logContext, "close") {
+                                listeners.onWsCloseHandler(it.ocppId, it.request.headers)
+                            }
                         }
                     }
                 } catch (e: Exception) {

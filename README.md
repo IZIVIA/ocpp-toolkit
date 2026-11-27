@@ -410,6 +410,8 @@ the WebSocket IO thread, or on the thread shutting the server down for the close
 connection and close of their station and the shutdown, so they must not block either.
 An exception thrown by the connection or reconnection listener is logged and does not refuse the station: its
 connection stays registered and served, and its next connection is notified as a reconnection.
+An exception thrown by the close listener is logged and does not stop the close: the station is still removed, and
+its next connection is notified as a connection.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
