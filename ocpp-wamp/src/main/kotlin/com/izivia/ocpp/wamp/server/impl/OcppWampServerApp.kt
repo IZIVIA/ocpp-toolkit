@@ -7,7 +7,11 @@ import com.izivia.ocpp.utils.OcppErrorCategory
 import com.izivia.ocpp.utils.OcppErrorEvent
 import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.notifySafely
+import com.izivia.ocpp.wamp.core.FrameLog
 import com.izivia.ocpp.wamp.core.WampCallManager
+import com.izivia.ocpp.wamp.core.escapedForLog
+import com.izivia.ocpp.wamp.core.logRef
+import com.izivia.ocpp.wamp.core.redactedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.messages.WampMessageType
@@ -85,7 +89,7 @@ class OcppWampServerApp(
                 settings.timeoutInMs,
                 shutdown
             )
-            val logContext = "[$chargingStationOcppId] [$wsConnectionId]"
+            val logContext = chargingStationConnection.logContext
             // resolved before the connection is registered: a failure then leaves nothing registered
             val handler = handlers(chargingStationOcppId)
             var replacedConnection: ChargingStationConnection? = null
@@ -95,7 +99,7 @@ class OcppWampServerApp(
                     replacedConnection = previousConnection
                     if (previousConnection != null) {
                         logger.warn(
-                            """[$chargingStationOcppId] already connected
+                            """[${chargingStationOcppId.escapedForLog()}] already connected
                                 | - the new connection will replace the previous one
                                 | - a connection reconnect notification will be sent
                                 | - existing connection=$previousConnection
@@ -145,16 +149,14 @@ class OcppWampServerApp(
             logger.info("$logContext connected - number of connections : ${connections.size}")
             ws.onMessage {
                 val msgString = it.bodyString()
-                if (logger.isDebugEnabled) {
-                    logger.debug("$logContext onMessage `$msgString`")
-                }
+                FrameLog.inbound(logContext, msgString)
                 if (msgString.trim().isEmpty()) {
                     logger.info("$logContext empty message received - ignored")
                     return@onMessage
                 }
                 val msg = WampMessage.parse(msgString)
                 if (msg == null) {
-                    logger.error("$logContext parsing Wamp message returns null - `$msgString`")
+                    logger.error("$logContext parsing Wamp message returns null - length=${msgString.length}")
                     errorListener?.notifySafely(
                         chargingStationConnection.errorEvent(
                             OcppErrorCategory.PROTOCOL_ERROR,
@@ -181,7 +183,7 @@ class OcppWampServerApp(
                             inFlightInboundCalls.incrementAndGet()
                             if (shutdown.get()) {
                                 inFlightInboundCalls.decrementAndGet()
-                                logger.info("$logContext - rejected call - shutting down - $msgString")
+                                logger.info("$logContext - rejected call - shutting down - ${wampMessage.logRef()}")
                                 ws.send(
                                     WsMessage(
                                         WampMessage.CallError(
@@ -201,7 +203,8 @@ class OcppWampServerApp(
                                 try {
                                     val callQueueLatency = clock.now() - startCall
                                     logger.info(
-                                        "$logContext [IN][CALL][REQ] -> ${it.bodyString()} -- " +
+                                        "$logContext [IN][CALL][REQ] -> ${wampMessage.logRef()}" +
+                                            " length=${msgString.length} -- " +
                                             "[latency=${callQueueLatency.inWholeMilliseconds}ms]"
                                     )
                                     val resp = handler.asSequence()
@@ -225,7 +228,7 @@ class OcppWampServerApp(
                                             "No action handler found",
                                             "{}"
                                         ).also {
-                                            logger.warn("$logContext no action handler found for $wampMessage")
+                                            logger.warn("$logContext no action handler found for ${wampMessage.logRef()}")
                                             errorListener?.notifySafely(
                                                 chargingStationConnection.errorEvent(
                                                     OcppErrorCategory.UNHANDLED_ACTION,
@@ -240,10 +243,12 @@ class OcppWampServerApp(
 
                                     val duration = clock.now() - startCall
                                     logger.info(
-                                        "$logContext [IN][CALL][RESP] <- $respJson -- " +
+                                        "$logContext [IN][CALL][RESP] <- ${resp.logRef()}" +
+                                            " length=${respJson.length} -- " +
                                             "[duration=${duration.inWholeMilliseconds}ms]" +
                                             "[latency=${callQueueLatency.inWholeMilliseconds}ms]"
                                     )
+                                    FrameLog.outbound(logContext, respJson)
                                     ws.send(WsMessage(respJson))
                                 } catch (t: Throwable) {
                                     // Throwable on purpose: a handler failing with an Error is still a handler failure.
@@ -285,7 +290,11 @@ class OcppWampServerApp(
                 }
             }
         } catch (e: Exception) {
-            logger.error("Error during new connection with ${request.withoutCredentials()}: $e", e)
+            logger.error(
+                "Error during new connection with ${request.uri.path.escapedForLog(MAX_LOGGED_PATH)}: " +
+                    e.javaClass.name,
+                e.redactedForLog()
+            )
             throw e
         }
     }
@@ -316,7 +325,7 @@ class OcppWampServerApp(
             if (e is InterruptedException) {
                 Thread.currentThread().interrupt()
             }
-            logger.error("$logContext $event listener failed - connection kept: $e", e)
+            logger.error("$logContext $event listener failed - connection kept: ${e.javaClass.name}", e.redactedForLog())
         }
     }
 
@@ -388,7 +397,7 @@ class OcppWampServerApp(
         failure: Throwable
     ) {
         logger.warn(
-            "[$ocppId] [$wsConnectionId] [${message.msgId}] [${message.action}] call failed ($category)" +
+            "$logContext ${message.logRef()} call failed ($category)" +
                 " - answered InternalError: ${failure.javaClass.name}"
         )
         try {
@@ -397,7 +406,7 @@ class OcppWampServerApp(
             if (e is VirtualMachineError) {
                 throw e
             }
-            logger.warn("[$ocppId] [$wsConnectionId] [${message.msgId}] CALLERROR not sent: ${e.javaClass.name}")
+            logger.warn("$logContext [${message.msgId.escapedForLog()}] CALLERROR not sent: ${e.javaClass.name}")
         }
     }
 
@@ -418,7 +427,7 @@ class OcppWampServerApp(
             )
         }
         val duration = clock.now() - chargingStationConnection.timestamp
-        val errorInfo = t?.let { " onError $t - " } ?: ""
+        val errorInfo = t?.let { " onError ${it.javaClass.name} - " } ?: ""
         logger.info("$logContext disconnected - $duration -$errorInfo number of connections : ${connections.size}")
 
         if (removed) {
@@ -471,7 +480,7 @@ class OcppWampServerApp(
                         }
                     }
                 } catch (e: Exception) {
-                    logger.error("[${it.ocppId}] [${it.wsConnectionId}] shutting down - closing failed: $e", e)
+                    logger.error("${it.logContext} shutting down - closing failed: ${e.javaClass.name}", e.redactedForLog())
                 }
             }
         }
@@ -527,6 +536,9 @@ class OcppWampServerApp(
         timeoutInMs: Long,
         shutdown: AtomicBoolean
     ) {
+        /** The station id, escaped, and the connection id, to start the log lines of this connection. */
+        val logContext = "[${ocppId.escapedForLog()}] [$wsConnectionId]"
+
         val callManager: WampCallManager =
             WampCallManager(logger, { m: String -> ws.send(WsMessage(m)) }, timeoutInMs, shutdown)
 
@@ -541,16 +553,16 @@ class OcppWampServerApp(
         ) = OcppErrorEvent(category, ocppId, ocppVersion.subprotocol, message?.action, message?.msgId, errorCode, cause)
 
         fun sendBlocking(message: WampMessage, startCall: Instant, timeoutInMs: Long? = null): WampMessage =
-            callManager.callBlocking("[$ocppId] [$wsConnectionId]", startCall, message, timeoutInMs)
+            callManager.callBlocking(logContext, startCall, message, timeoutInMs)
 
         fun close() {
-            logger.info("[$ocppId] [$wsConnectionId] - closing")
+            logger.info("$logContext - closing")
             ws.close()
         }
 
         override fun toString(): String {
             return "ChargingStationConnection(" +
-                "wsConnectionId='$wsConnectionId', ocppId='$ocppId', ocppVersion=$ocppVersion, timestamp='$timestamp')"
+                "wsConnectionId='$wsConnectionId', ocppId='${ocppId.escapedForLog()}', ocppVersion=$ocppVersion, timestamp='$timestamp')"
         }
     }
 
@@ -570,6 +582,9 @@ class OcppWampServerApp(
         val size: Int get() = connections.size
     }
 }
+
+/** The upgrade path is bounded higher than a station id: it holds the endpoint path too. */
+private const val MAX_LOGGED_PATH = 256
 
 class NoConnectionException(e: String) : IllegalStateException(e)
 

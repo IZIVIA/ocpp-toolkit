@@ -37,7 +37,11 @@ class WampCallManager(
         }
         val msgString = message.toJson()
         val latency = clock.now() - startCall
-        logger.info("$logContext [OUT][CALL][REQ] => $msgString -- [latency=${latency.inWholeMilliseconds}ms]")
+        logger.info(
+            "$logContext [OUT][CALL][REQ] => ${message.logRef()} length=${msgString.length}" +
+                " -- [latency=${latency.inWholeMilliseconds}ms]"
+        )
+        FrameLog.outbound(logContext, msgString)
         send(msgString)
         currentCall?.latch?.await(timeoutInMs - ((clock.now() - startCall).inWholeMilliseconds), TimeUnit.MILLISECONDS)
         val response = currentCall?.response
@@ -45,34 +49,34 @@ class WampCallManager(
             currentCall = null
             val duration = clock.now() - startCall
             logger.info(
-                "$logContext [OUT][CALL][RESP] <= ${response.toJson()} -- " +
+                "$logContext [OUT][CALL][RESP] <= ${response.logRef()} -- " +
                     "[duration=${duration.inWholeMilliseconds}ms]" +
                     "[latency=${latency.inWholeMilliseconds}ms]"
             )
             return response
         } else {
             currentCall = null
-            throw TimeoutException("$logContext timeout calling with $msgString")
+            // the frame stays out of the message, which the caller may log
+            throw TimeoutException("$logContext timeout calling ${message.logRef()}")
         }
     }
 
     fun handleResult(logContext: String, message: WampMessage) {
-        val msgString = message.toJson()
         val pending = currentCall
         when {
             pending == null -> {
-                logger.warn("$logContext got a call result/error with no pending call - discarding $msgString")
+                logger.warn("$logContext got a call result/error with no pending call - discarding ${message.logRef()}")
             }
 
             pending.msg.msgId != message.msgId -> {
                 logger.warn(
                     "$logContext got a call result/error not corresponding to pending call" +
-                        " message id ${pending.msg.msgId} - discarding $msgString"
+                        " message id ${pending.msg.msgId.escapedForLog()} - discarding ${message.logRef()}"
                 )
             }
 
             else -> {
-                logger.info("$logContext <= $msgString")
+                logger.info("$logContext <= ${message.logRef()}")
                 pending.response = message
                 pending.latch.countDown()
             }
@@ -81,7 +85,7 @@ class WampCallManager(
 
     fun close() {
         currentCall?.also {
-            logger.warn("${it.logContext} closing connection while a pending call is in progress: ${it.msg}")
+            logger.warn("${it.logContext} closing connection while a pending call is in progress: ${it.msg.logRef()}")
         }
     }
 

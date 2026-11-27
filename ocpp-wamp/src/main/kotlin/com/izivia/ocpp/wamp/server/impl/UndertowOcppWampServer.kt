@@ -4,6 +4,7 @@ import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.wamp.core.escapedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
@@ -66,7 +67,7 @@ class UndertowOcppWampServer(
         if (acceptingHandlers.isEmpty()) {
             // an entry memoized earlier stays: a handshake in flight may still read it,
             // and it is rewritten before the next accepted connection reads it
-            logger.info("[$ocppId] connection refused - no handler accepts it")
+            logger.info("[${ocppId.escapedForLog()}] connection refused - no handler accepts it")
             return WebSocketUpgradeDecision.Refuse(Status.NOT_FOUND)
         }
         selectedHandler[ocppId] = acceptingHandlers
@@ -82,11 +83,11 @@ class UndertowOcppWampServer(
             throw e
         } catch (e: Throwable) {
             // Throwable on purpose, as in notifySafely: a library missing at runtime fails with a NoClassDefFoundError
-            logger.warn("[$ocppId] connection refused - authorizer failed with ${e::class.qualifiedName}")
+            logger.warn("[${ocppId.escapedForLog()}] connection refused - authorizer failed with ${e::class.qualifiedName}")
             return false
         }
         if (!authorized) {
-            logger.info("[$ocppId] connection refused - not authorized")
+            logger.info("[${ocppId.escapedForLog()}] connection refused - not authorized")
         }
         return authorized
     }
