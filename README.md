@@ -382,6 +382,8 @@ registered and removed: the close of a connection is never notified after the co
 `onWsCloseHandler` above cannot erase the Pongs of a station that has just reconnected. These listeners also run on
 the WebSocket IO thread, or on the thread shutting the server down for the closes it notifies, and hold up the
 connection and close of their station and the shutdown, so they must not block either.
+An exception thrown by the connection or reconnection listener is logged and does not refuse the station: its
+connection stays registered and served, and its next connection is notified as a reconnection.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
