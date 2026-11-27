@@ -82,6 +82,23 @@ class WebsocketServerAcceptanceTest {
     }
 
     @Test
+    fun `an action registered with the accept function of an open connection is served on that connection`() {
+        val accept = CountingAccept(acceptConnection = true)
+        transport.registerAuthorize(accept)
+
+        withConnectedStation { client ->
+            expectThat(client.sendMessageClass(AuthorizeResp::class, "Authorize", AuthorizeReq("Tag1")).idTagInfo.status)
+                .isEqualTo(AuthorizationStatus.Accepted)
+
+            transport.registerHeartbeat(accept)
+
+            expectThat(client.sendMessageClass(HeartbeatResp::class, "Heartbeat", HeartbeatReq()).currentTime)
+                .isEqualTo(CURRENT_TIME)
+        }
+        expectThat(accept.calls.get()).isEqualTo(1)
+    }
+
+    @Test
     fun `each accept function is called once and a station is served only the routes of the one accepting it`() {
         val accepting = CountingAccept(acceptConnection = true)
         val refusing = CountingAccept(acceptConnection = false)

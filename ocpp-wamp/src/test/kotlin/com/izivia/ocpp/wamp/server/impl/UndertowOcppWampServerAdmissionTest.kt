@@ -123,14 +123,21 @@ class UndertowOcppWampServerAdmissionTest {
     }
 
     @Test
-    fun `should fail the open of a refused handshake`() {
+    fun `should fail the open of a refused handshake without reusing an earlier admission of the station`() {
+        acceptedBy = { "H1" }
+        val earlier = open(admit("CS1"), "CS1")
+        expectThat(earlier.answerer()).isEqualTo("H1")
+        earlier.triggerClose(WsStatus.NORMAL)
+
         acceptedBy = { null }
         val refused = HttpServerExchange(null).setRequestURI("/ws/CS1")
         expectThat(server.config().admitWebSocket(refused)).isA<WebSocketUpgradeDecision.Refuse>()
             .get { status.code }.isEqualTo(404)
 
         expectThrows<IllegalStateException> { open(refused, "CS1") }
-        expectThat(connected).isEmpty()
+            .get { message }.isNotNull().contains("CS1")
+        // only the earlier connection was notified
+        expectThat(connected).containsExactly("CS1")
     }
 
     @Test
@@ -183,7 +190,7 @@ class UndertowOcppWampServerAdmissionTest {
 
         try {
             expectThat(handshake(port, "CS1").status).isEqualTo(101)
-            // the open fails without the admission of its handshake, and then notifies no connection
+            // without the admission the WebSocket callback exposes, the open would fail and notify no connection
             expectThat(opened.await(5, TimeUnit.SECONDS)).isTrue()
 
             client.connect()

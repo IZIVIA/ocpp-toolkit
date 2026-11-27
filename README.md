@@ -482,6 +482,13 @@ station that connects without having been reported passes its check, and its sec
   The id is the one decoded from the URL, which `securityOf` receives too: a station connecting to
   `/ocppj/RDAM%20123` sends the username `RDAM 123`. An id holding a `:` cannot authenticate, since the username ends
   at the first `:` (RFC 7617), which is why OCPP-J 2.0.1 keeps it out of the identity.
+  `securityOf` and the handlers' `accept` receive the id as sent, but the server registers connections by the
+  lowercased id: ids differing only by case are one station, and the newly admitted connection replaces the other.
+  Apply the same case rule in both, or a station holding other credentials can connect as `cs01` and take the slot of
+  `CS01`, replacing its connection: give the same answer for every case of an id, or refuse ids that differ from a
+  known one only by case. For ASCII ids, `String.CASE_INSENSITIVE_ORDER` agrees with that lowercasing: keep the
+  secrets in a `TreeMap(String.CASE_INSENSITIVE_ORDER)` for `securityOf`, and the accepted ids in a
+  `TreeSet(String.CASE_INSENSITIVE_ORDER)` for `accept`.
 - `Enforcement.BLOCK`, the default, refuses a station whose check fails; `REPORT` admits it anyway, which helps while
   a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
 - `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
