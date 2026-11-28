@@ -1,6 +1,7 @@
 package com.izivia.ocpp.wamp.client.autoreconnect
 
 import com.izivia.ocpp.wamp.client.ConnectionListener
+import com.izivia.ocpp.utils.redactedForLog
 import kotlin.time.Clock
 import kotlin.time.Instant
 import org.slf4j.LoggerFactory
@@ -108,9 +109,9 @@ internal class AutoReconnectHandler(
                         attemptToConnectAndPlanNextIfFailed(attempt)
                     } catch (e: Exception) {
                         logger.error(
-                            "[$debugContext] attempt ${attempt.attemptCount} unexpected error $e" +
+                            "[$debugContext] attempt ${attempt.attemptCount} unexpected error ${e.javaClass.name}" +
                                 " - planning another one",
-                            e
+                            e.redactedForLog()
                         )
                         onAttemptFailed(attempt, now, e)
                     }

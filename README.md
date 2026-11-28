@@ -410,6 +410,8 @@ the WebSocket IO thread, or on the thread shutting the server down for the close
 connection and close of their station and the shutdown, so they must not block either.
 An exception thrown by the connection or reconnection listener is logged and does not refuse the station: its
 connection stays registered and served, and its next connection is notified as a reconnection.
+An exception thrown by the close listener is logged and does not stop the close: the station is still removed, and
+its next connection is notified as a connection.
 
 With the `toolkit` module, pass the listeners through `Settings.listeners`.
 
@@ -480,6 +482,13 @@ station that connects without having been reported passes its check, and its sec
   The id is the one decoded from the URL, which `securityOf` receives too: a station connecting to
   `/ocppj/RDAM%20123` sends the username `RDAM 123`. An id holding a `:` cannot authenticate, since the username ends
   at the first `:` (RFC 7617), which is why OCPP-J 2.0.1 keeps it out of the identity.
+  `securityOf` and the handlers' `accept` receive the id as sent, but the server registers connections by the
+  lowercased id: ids differing only by case are one station, and the newly admitted connection replaces the other.
+  Apply the same case rule in both, or a station holding other credentials can connect as `cs01` and take the slot of
+  `CS01`, replacing its connection: give the same answer for every case of an id, or refuse ids that differ from a
+  known one only by case. For ASCII ids, `String.CASE_INSENSITIVE_ORDER` agrees with that lowercasing: keep the
+  secrets in a `TreeMap(String.CASE_INSENSITIVE_ORDER)` for `securityOf`, and the accepted ids in a
+  `TreeSet(String.CASE_INSENSITIVE_ORDER)` for `accept`.
 - `Enforcement.BLOCK`, the default, refuses a station whose check fails; `REPORT` admits it anyway, which helps while
   a fleet is being configured. An `Unsecured` station is admitted without any check, and nothing is notified.
 - `onFailure` receives each failed check, with the station id, the reason (`UNKNOWN_STATION`, `MISSING_CREDENTIALS`,
@@ -521,6 +530,10 @@ through the `WebsocketServer` constructor.
 
 Applications calling `Undertow` or `WsServerConfig` directly: `acceptWebSocketPredicate` is now `admitWebSocket`, which
 returns a `WebSocketUpgradeDecision` instead of a `Boolean`, and `null` when the request is not for that endpoint.
+A `WsFilter` put in front of `WsServerConfig.handler` must call that handler on the calling thread, synchronously: a
+handler called later or on another thread finds no admission, and its connection is closed with status 1011 and
+registers nothing, where earlier versions accepted it. The filter may call the consumer of the response later, but
+that consumer must subscribe before the station can send: the frames and the close received before are lost.
 
 `CSMSSettings` now refuses two WebSocket `ServerSetting` sharing a path on the same port: only the first one would admit
 the stations, and the authorizer of the second would be ignored. The new `authorizer` parameter of `ServerSetting`,
@@ -569,6 +582,11 @@ val csms = ApiFactory.csmsOcppServer(
 | `HANDLER_ERROR`    | a registered handler throws, an `Error` included                                                    |
 | `TRANSPORT_ERROR`  | the transport fails while processing a message, for instance when the calls executor does not run a call |
 
+Over WebSocket, a call whose handler throws, whose response cannot be serialized, or that the calls executor does not
+run is answered with `[4,"<messageId>","InternalError","Internal error",{}]`, so that the charging station does not wait
+for its timeout before its next call. The answer never carries the exception: the listener receives it as `cause`. A
+response that fails while being sent is not answered again.
+
 Each failure produces one event. Only `category` is always set: a message that cannot be parsed has no `messageId` nor
 `action`, for instance. A network failure is not an event: a charging station that disconnects, even while a response
 is being sent to it, is already reported to `onWsCloseHandler`.
@@ -584,6 +602,34 @@ is being sent to it, is already reported to `onWsCloseHandler`.
 
 Failures that already reach your code as an exception, such as a failing `sendMessage`, are not reported. Neither is
 the client side of the toolkit: only the servers report errors for now.
+
+## Logging
+
+The toolkit logs through SLF4J. Its regular loggers emit metadata only, at every level: the charging station id, the
+message id, the action, the frame type and length. A charging station controls its id, its message ids, its actions and
+its close reasons, so they are escaped and bounded. An exception is logged by its class and stack trace, without its
+message nor the messages of its causes, which may quote a payload, an id tag or a credential. The exceptions the
+toolkit builds do not quote payloads either: a call is named by its message id and action, and the server URI of a
+client loses its credentials and query string. Only `OcppCallErrorException` differs: its message is the error details
+of the peer's `CALLERROR`, so do not log it as is.
+
+Raw OCPP frames, payloads included, go to one logger only, `com.izivia.ocpp.wamp.frames`, at `TRACE`, as `[IN]` and
+`[OUT]` lines. It is off by default: logback without any configuration logs at `DEBUG`, and so does a root logger set
+to `DEBUG`, which both leave `TRACE` out, so there is nothing to pin in production. Turn it on for a diagnosis only,
+by setting that logger to `TRACE` in your `logback.xml`, knowing that the frames then logged hold id tags and any
+credential a payload carries:
+
+```xml
+<logger name="com.izivia.ocpp.wamp.frames" level="TRACE"/>
+```
+
+It inherits its level, so any ancestor logger set to `TRACE` turns it on too: `com.izivia.ocpp.wamp`,
+`com.izivia.ocpp` or the root.
+
+The `cause` given to an `OcppErrorListener` is the original exception, message included: sanitize it before reporting
+it to an external system such as Sentry or a metrics backend (see [Observing OCPP errors](#observing-ocpp-errors)).
+`com.izivia.ocpp.utils.redactedForLog()`, which the toolkit's own logs use, gives a copy of it that keeps the classes
+and stack traces of its chain without any message.
 
 ## Code Organisation
 

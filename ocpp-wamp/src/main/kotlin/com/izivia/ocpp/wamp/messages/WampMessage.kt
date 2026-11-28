@@ -6,6 +6,8 @@ import com.fasterxml.jackson.core.io.JsonStringEncoder
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.utils.escapedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import com.izivia.ocpp.wamp.messages.WampMessageType.*
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -86,7 +88,7 @@ object WampMessageParser {
                         }
                     ).trim()
             } else {
-                logger.error("No brace found from WampMessqages $this")
+                logger.error("No brace found from WampMessqages - length=$length")
                 return this
             }
         }
@@ -140,7 +142,6 @@ object WampMessageParser {
     )
 
     fun parse(msg: String): WampMessage? {
-        logger.debug("Trying to parse message: {}", msg)
         when (msg) {
             null, "{}" -> return null
             else -> {
@@ -161,8 +162,7 @@ object WampMessageParser {
                                 }
                             }
                             logger.error(
-                                "WampMessage CALL doesn't match to the expected format" +
-                                    " msg=$msg (formatted msg=`$formattedMsg`)"
+                                "WampMessage CALL doesn't match to the expected format - length=${msg.length}"
                             )
                         }
 
@@ -178,8 +178,7 @@ object WampMessageParser {
                                 }
                             }
                             logger.error(
-                                "WampMessage CALL_RESULT doesn't match to the expected format" +
-                                    " msg=$msg (formatted msg=`$formattedMsg`)"
+                                "WampMessage CALL_RESULT doesn't match to the expected format - length=${msg.length}"
                             )
                         }
 
@@ -198,13 +197,15 @@ object WampMessageParser {
                                 }
                             }
                             logger.error(
-                                "WampMessage CALL_ERROR doesn't match to the expected format" +
-                                    " msg=$msg (formatted msg=`$formattedMsg`)"
+                                "WampMessage CALL_ERROR doesn't match to the expected format - length=${msg.length}"
                             )
                         }
                     }
                 } catch (e: Exception) {
-                    logger.error("An error appears when trying to parse message : $msg", e)
+                    logger.error(
+                        "An error appears when trying to parse message - length=${msg.length}",
+                        e.redactedForLog()
+                    )
                 }
             }
         }
@@ -242,11 +243,19 @@ enum class WampMessageType(val id: Int) {
     }
 }
 
+/**
+ * @param headers the headers of the WebSocket upgrade request of the connection, as they were received; [toString]
+ * shows their names only, as their values may carry credentials
+ */
 data class WampMessageMeta(
     val ocppVersion: OcppVersion,
     val ocppId: CSOcppId,
     val headers: WampMessageMetaHeaders = emptyList()
-)
+) {
+    override fun toString(): String =
+        "WampMessageMeta(ocppVersion=$ocppVersion, ocppId=${ocppId.escapedForLog()}, " +
+            "headers=${headers.map { it.first.escapedForLog() }})"
+}
 
 typealias WampMessageMetaHeaders = List<WampMessageMetaHeader>
 typealias WampMessageMetaHeader = Pair<String, String?>

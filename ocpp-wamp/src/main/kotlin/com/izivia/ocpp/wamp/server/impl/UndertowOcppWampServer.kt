@@ -4,6 +4,7 @@ import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion
 import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.utils.OcppErrorListener
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
@@ -14,11 +15,15 @@ import com.izivia.ocpp.wamp.server.WebSocketUpgradeDecision
 import com.izivia.ocpp.wamp.server.WsServerConfig
 import com.izivia.ocpp.wamp.server.asServer
 import io.undertow.server.HttpServerExchange
+import io.undertow.util.AttachmentKey
 import kotlin.time.Clock
+import org.http4k.core.Request
 import org.http4k.core.Status
 import org.http4k.routing.RoutingWsHandler
+import org.http4k.websocket.Websocket
+import org.http4k.websocket.WsStatus
 import org.slf4j.LoggerFactory
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArrayList
 
 class UndertowOcppWampServer(
     val ocppVersions: Set<OcppVersion>,
@@ -28,8 +33,11 @@ class UndertowOcppWampServer(
     private val errorListener: OcppErrorListener? = null,
     private val authorizer: ConnectionAuthorizer = ConnectionAuthorizer.ALLOW_ALL
 ) : OcppWampServer {
-    private val handlers = mutableListOf<OcppWampServerHandler>()
-    private val selectedHandler = ConcurrentHashMap<CSOcppId, List<OcppWampServerHandler>>()
+    // registered while handshakes are admitted on the I/O threads
+    private val handlers = CopyOnWriteArrayList<OcppWampServerHandler>()
+
+    // one key per server: several servers may share one Undertow, and each reads only the handshakes it admitted
+    private val admissionKey = AttachmentKey.create(HandshakeAdmission::class.java)
     private val wsApp: OcppWampServerApp
     private val serverConfig: WsServerConfig
     private val ocppWsEndpoint = OcppWsEndpoint(path)
@@ -37,11 +45,12 @@ class UndertowOcppWampServer(
     init {
         wsApp = OcppWampServerApp(
             ocppVersions = ocppVersions,
-            handlers = { id -> selectedHandler[id] ?: throw IllegalStateException() },
             listeners = listeners,
             ocppWsEndpoint = ocppWsEndpoint,
             settings = settings,
-            errorListener = errorListener
+            clock = Clock.System,
+            errorListener = errorListener,
+            admissionOf = ::admissionOf
         )
         val handler = wsApp.newRoutingHandler()
         val wsSubprotocols = ocppVersions.map { it.subprotocol }.toSet()
@@ -61,16 +70,29 @@ class UndertowOcppWampServer(
         // its id is unknown: how long the answer takes is up to the authorizer
         if (!isAuthorized(ocppId, exch)) return UNAUTHORIZED
 
-        // search for an handler accepting this ocpp charging station, and memoize it in selectedHandler
+        // search for the handlers accepting this ocpp charging station, carried by this handshake to its connection
         val acceptingHandlers = handlers.filter { h -> h.accept(ocppId) }
         if (acceptingHandlers.isEmpty()) {
-            // an entry memoized earlier stays: a handshake in flight may still read it,
-            // and it is rewritten before the next accepted connection reads it
-            logger.info("[$ocppId] connection refused - no handler accepts it")
+            logger.info("[${ocppId.escapedForLog()}] connection refused - no handler accepts it")
             return WebSocketUpgradeDecision.Refuse(Status.NOT_FOUND)
         }
-        selectedHandler[ocppId] = acceptingHandlers
+        exch.putAttachment(admissionKey, HandshakeAdmission(ocppId, acceptingHandlers))
         return WebSocketUpgradeDecision.Accept
+    }
+
+    // the admission of the handshake opening on this thread, which only a handshake admitted by this server carries;
+    // without it the socket is closed, as a handler called off that thread would otherwise leave it open and unserved
+    private fun admissionOf(request: Request): (Websocket) -> HandshakeAdmission {
+        val admission = OpeningHandshake.attachment(admissionKey)
+        return { ws ->
+            admission ?: run {
+                ws.close(NOT_ADMITTED)
+                throw IllegalStateException(
+                    "connection opened without the admission of its handshake - " +
+                        request.uri.path.escapedForLog(MAX_LOGGED_PATH)
+                )
+            }
+        }
     }
 
     // fails closed, and logs neither the headers nor the exception message, which may echo them
@@ -82,11 +104,11 @@ class UndertowOcppWampServer(
             throw e
         } catch (e: Throwable) {
             // Throwable on purpose, as in notifySafely: a library missing at runtime fails with a NoClassDefFoundError
-            logger.warn("[$ocppId] connection refused - authorizer failed with ${e::class.qualifiedName}")
+            logger.warn("[${ocppId.escapedForLog()}] connection refused - authorizer failed with ${e::class.qualifiedName}")
             return false
         }
         if (!authorized) {
-            logger.info("[$ocppId] connection refused - not authorized")
+            logger.info("[${ocppId.escapedForLog()}] connection refused - not authorized")
         }
         return authorized
     }
@@ -117,6 +139,9 @@ class UndertowOcppWampServer(
             Status.UNAUTHORIZED,
             listOf("WWW-Authenticate" to "Basic realm=\"OCPP\"")
         )
+
+        // 1011, unexpected condition: a fixed reason, telling the station nothing of its path or headers
+        private val NOT_ADMITTED = WsStatus(1011, "connection not admitted")
     }
 }
 
@@ -146,3 +171,5 @@ fun main() {
 
     server.start()
 }
+
+private const val MAX_LOGGED_PATH = 256

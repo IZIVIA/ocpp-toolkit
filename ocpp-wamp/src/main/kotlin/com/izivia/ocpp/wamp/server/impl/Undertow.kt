@@ -34,7 +34,7 @@ class Undertow(val port: Int = 8000, val enableHttp2: Boolean,
             (http ?: { Response(BAD_REQUEST) }).let (::Http4kUndertowHttpHandler).let(::BlockingHandler)
         val wsCallback = ws?.let {
             if (wsSubprotocols.isEmpty()) {
-                websocket(Http4kWebSocketCallback(it))
+                websocket(OpeningHandshake.carriedBy(Http4kWebSocketCallback(it)))
             } else {
                 WebSocketProtocolHandshakeHandler(
                     listOf(

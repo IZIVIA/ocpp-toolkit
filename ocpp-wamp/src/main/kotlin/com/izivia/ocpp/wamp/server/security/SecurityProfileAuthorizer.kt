@@ -1,6 +1,7 @@
 package com.izivia.ocpp.wamp.server.security
 
 import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.ConnectionRequest
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason
@@ -15,6 +16,15 @@ import java.util.Base64
  * The username must be the station id (A00.FR.204), as decoded from the URL: a station connecting to
  * `/ocppj/RDAM%20123` sends the username `RDAM 123`. An id holding a `:` cannot authenticate, since the username
  * ends at the first `:` (RFC 7617), which is why OCPP-J 2.0.1 keeps it out of the identity.
+ *
+ * The id is passed as sent, while the server registers the connections and serializes the stations by the
+ * lowercased id: ids differing only by case are one station there, and a newly admitted connection replaces the
+ * one of the same station. `securityOf`, like the handlers' `accept`, must therefore apply the same case rule, or a
+ * station holding other credentials can connect as `cs01` and take the slot of `CS01`, replacing its connection:
+ * give the same answer for every case of an id, or refuse ids that differ from a known one only by case. For ASCII
+ * ids, `String.CASE_INSENSITIVE_ORDER` agrees with that lowercasing: keep the secrets in a
+ * `TreeMap(String.CASE_INSENSITIVE_ORDER)` for `securityOf`, and the accepted ids in a
+ * `TreeSet(String.CASE_INSENSITIVE_ORDER)` for `accept`.
  *
  * How the password is compared depends on the type of the [StationSecurity], never on the negotiated OCPP version.
  *
@@ -84,7 +94,7 @@ class SecurityProfileAuthorizer(
             throw e
         } catch (e: Throwable) {
             // Throwable on purpose, as in notifySafely: a library missing at runtime fails with a NoClassDefFoundError
-            logger.warn("[${failure.ocppId}] authentication failure listener failed with ${e::class.qualifiedName}")
+            logger.warn("[${failure.ocppId.escapedForLog()}] authentication failure listener failed with ${e::class.qualifiedName}")
         }
         return failure.enforcement == Enforcement.REPORT
     }
