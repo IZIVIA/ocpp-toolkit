@@ -1,5 +1,7 @@
 package com.izivia.ocpp.wamp.server.impl
 
+import com.izivia.ocpp.utils.escapedForLog
+import com.izivia.ocpp.utils.redactedForLog
 import io.undertow.server.HttpServerExchange
 import io.undertow.websockets.WebSocketConnectionCallback
 import io.undertow.websockets.core.*
@@ -30,10 +32,8 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
     override fun onConnect(exchange: WebSocketHttpExchange, channel: WebSocketChannel) {
         // When chargerStation connect with //
         if (exchange.getResponseHeader(SEC_WEBSOCKET_LOCATION)?.contains(doubleSlashRegex) == true) {
-            logger.debug(
-                "Replace Sec-WebSocket-Location header {} double slash",
-                exchange.getResponseHeader(SEC_WEBSOCKET_LOCATION)
-            )
+            // the header value echoes the request uri, query string included: it is not logged
+            logger.debug("Replace Sec-WebSocket-Location header double slash")
             exchange.setResponseHeader(
                 SEC_WEBSOCKET_LOCATION,
                 exchange.getResponseHeader(SEC_WEBSOCKET_LOCATION).replace(Regex("""([^:])//"""), "$1/")
@@ -41,12 +41,15 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
         }
 
         val upgradeRequest = exchange.asRequest(channel)
-        val logContext = upgradeRequest.uri.toString()
-        logger.debug(
-            "{} - connection attempt: upgrade request={}",
-            logContext,
-            upgradeRequest.withoutCredentials()
-        )
+        // the path only, as the query string may carry a token, and the header names only, as their values may too
+        val logContext = upgradeRequest.uri.path.escapedForLog(MAX_LOGGED_PATH)
+        if (logger.isDebugEnabled) {
+            logger.debug(
+                "{} - connection attempt: upgrade request headers={}",
+                logContext,
+                upgradeRequest.headers.joinToString(prefix = "[", postfix = "]") { it.first }.escapedForLog(1024)
+            )
+        }
 
         val socket = object : PushPullAdaptingWebSocket(), ControlFrameAwareWebsocket {
             private val pingHandlers = CopyOnWriteArrayList<() -> Unit>()
@@ -77,8 +80,8 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
 
             override fun close(status: WsStatus) {
                 logger.info(
-                    "$logContext - closing websocket: WsStatus $status, channel $channel," +
-                        " closeCode: ${channel.closeCode}, closeReason: ${channel.closeReason}"
+                    "$logContext - closing websocket: WsStatus ${status.logged()}, channel $channel," +
+                        " closeCode: ${channel.closeCode}, closeReason: ${channel.closeReason?.escapedForLog()}"
                 )
                 WebSockets.sendClose(status.code, status.description, channel, null)
             }
@@ -86,7 +89,7 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
 
         channel.addCloseTask {
             val status = WsStatus(it.closeCode, it.closeReason ?: "unknown")
-            logger.warn("$logContext - closing websocket: WsStatus $status channel $it")
+            logger.warn("$logContext - closing websocket: WsStatus ${status.logged()} channel $it")
             socket.triggerClose(status)
         }
 
@@ -98,10 +101,16 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
                 try {
                     socket.triggerMessage(WsMessage(message.data))
                 } catch (e: IOException) {
-                    logger.error("$logContext - IOException on $message - $e", e)
+                    logger.error(
+                        "$logContext - IOException on message length=${message.data.length} - ${e.javaClass.name}",
+                        e.redactedForLog()
+                    )
                     throw e
                 } catch (e: Exception) {
-                    logger.error("$logContext - Exception on $message - $e", e)
+                    logger.error(
+                        "$logContext - Exception on message length=${message.data.length} - ${e.javaClass.name}",
+                        e.redactedForLog()
+                    )
                     socket.triggerError(e)
                     throw e
                 }
@@ -125,7 +134,7 @@ class UndertowWebSocketCallBack(private val ws: WsHandler) : WebSocketConnection
             }
 
             override fun onError(channel: WebSocketChannel, error: Throwable) {
-                logger.warn("$logContext - Exception $error", error)
+                logger.warn("$logContext - Exception ${error.javaClass.name}", error.redactedForLog())
                 return socket.triggerError(error)
             }
         })
@@ -144,8 +153,11 @@ private fun WebSocketHttpExchange.asRequest(channel: WebSocketChannel) =
             )
         )
 
-/** The upgrade request without the headers carrying the credentials of the station, to be logged. */
-internal fun Request.withoutCredentials() = removeHeader("Authorization").removeHeader("Proxy-Authorization")
+/** A WebSocket status in a log line: its description may come from the peer, so it is escaped. */
+private fun WsStatus.logged() = "$code ${description.escapedForLog()}"
+
+/** The upgrade path is bounded higher than a station id: it holds the endpoint path too. */
+private const val MAX_LOGGED_PATH = 256
 
 fun requiresWebSocketUpgrade(): (HttpServerExchange) -> Boolean = { httpServerExchange ->
     val containsValidConnectionHeader = httpServerExchange.requestHeaders["Connection"]

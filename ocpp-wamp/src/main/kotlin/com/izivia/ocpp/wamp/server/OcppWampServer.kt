@@ -150,6 +150,10 @@ interface OcppWampServerHandler {
 
     /**
      * a wamp action handler
+     *
+     * An exception it throws, other than a [VirtualMachineError], is answered to the charging station with an
+     * `InternalError` CALLERROR whose description is `"Internal error"` and whose details are `{}`, never with the
+     * exception message, and is reported once to the `OcppErrorListener` of the server with the original cause.
      */
     fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage?
 }
