@@ -599,3 +599,19 @@ Plus, you will find:
 - `operation-information`, used to described operations in whatever version of apis
 - `utils`, used to ease some common needs between apis
 - `ocpp-wamp`, a client & server implementation of the WAMP-like RPC-over-websocket system defined in the OCPP-J protcols
+
+## Changelog
+
+Notable changes of each release are listed in [CHANGELOG.md](CHANGELOG.md), following
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/). A pull request that changes the
+behaviour or the API of a published module adds its entry under `[Unreleased]`, and marks a
+change that breaks consumers with **BREAKING**. The GitHub release of an `R-x.y.z` tag takes its
+notes from the matching `## [x.y.z]` section of `CHANGELOG.md`, and publication stops if that
+section is missing.
+
+When a release run fails:
+
+- The workflow and the `CHANGELOG.md` of the tagged commit are the ones used.
+- If the check fails, nothing was published: add the section, then delete and push the tag again.
+- If only the `release` job fails, "Re-run failed jobs" retries it without publishing again.
+- Release notes can be corrected afterwards with `gh release edit <tag> --notes-file <file>`.

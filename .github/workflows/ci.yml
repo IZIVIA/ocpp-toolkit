@@ -12,7 +12,11 @@ permissions:
 jobs:
     build:
 
-        concurrency: ocpp-ci
+        # One group per ref: a run only supersedes an older run of the same
+        # branch or pull request, never the pending run of another one.
+        concurrency:
+            group: ocpp-ci-${{ github.ref }}
+            cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
         runs-on: ubuntu-latest
 
@@ -28,6 +32,9 @@ jobs:
 
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
+
+            -   name: Test the CHANGELOG section extraction
+                run: sh scripts/test-changelog-section.sh
 
             -   name: Build OCPP toolkit with Gradle
                 run: ./gradlew build

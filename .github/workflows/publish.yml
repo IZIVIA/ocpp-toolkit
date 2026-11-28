@@ -28,6 +28,13 @@ jobs:
             -   name: Set up Gradle
                 uses: gradle/actions/setup-gradle@748248ddd2a24f49513d8f472f81c3a07d4d50e1 # v4.4.4
 
+            # Checked before publication: Maven Central is immutable, so a tag
+            # without a CHANGELOG section must fail before anything is sent.
+            -   name: Check the release notes of the tag
+                env:
+                    TAG: ${{ github.ref_name }}
+                run: sh scripts/changelog-section.sh "${TAG#R-}" > /dev/null
+
             -   name: Build OCPP toolkit with Gradle
                 env:
                     VERSION: ${{ github.ref }}
@@ -36,3 +43,65 @@ jobs:
                     GPG_PRIVATE_KEY: ${{ secrets.DELIVERY_GPG_SECRET_KEY }}
                     GPG_PASSPHRASE: ${{ secrets.DELIVERY_GPG_KEY_PASSPHRASE }}
                 run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+
+    # A separate job, so that "Re-run failed jobs" retries the GitHub
+    # release without publishing to Maven Central again. Kept out of the
+    # ocpp-publish concurrency group: releases of different tags are
+    # independent, and the job is idempotent (create, or edit the notes).
+    # A created release is marked "Latest" unless a higher version
+    # already holds it.
+    release:
+
+        needs: build
+
+        runs-on: ubuntu-latest
+
+        permissions:
+            contents: write
+
+        steps:
+            -   name: Checkout IZIVIA OCPP toolkit library code from GH
+                uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+                with:
+                    persist-credentials: false
+
+            -   name: Create or update the GitHub release from the CHANGELOG
+                env:
+                    TAG: ${{ github.ref_name }}
+                    GH_TOKEN: ${{ github.token }}
+                    GH_REPO: ${{ github.repository }}
+                run: |
+                    VERSION="${TAG#R-}"
+                    NOTES="$RUNNER_TEMP/release-notes.md"
+                    sh scripts/changelog-section.sh "$VERSION" > "$NOTES"
+                    if gh release view "$TAG" > /dev/null; then
+                        gh release edit "$TAG" --notes-file "$NOTES"
+                        exit 0
+                    fi
+                    # A pre-release (a version with a "-", such as 4.0.0-rc1)
+                    # is never "Latest": sort -V would rank it above 4.0.0.
+                    case "$VERSION" in
+                        *-*)
+                            gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES" \
+                                --prerelease --latest=false
+                            exit 0
+                            ;;
+                    esac
+                    # A new release becomes "Latest" by default: keep a
+                    # backport (a lower version tagged later) from taking it.
+                    LATEST_ERR="$RUNNER_TEMP/latest-release.err"
+                    if LATEST_TAG=$(gh release view --json tagName --jq .tagName 2> "$LATEST_ERR"); then
+                        :
+                    elif grep -qx 'release not found' "$LATEST_ERR"; then
+                        LATEST_TAG=""
+                    else
+                        cat "$LATEST_ERR" >&2
+                        exit 1
+                    fi
+                    LATEST_VERSION="${LATEST_TAG#R-}"
+                    set --
+                    if [ -n "$LATEST_VERSION" ] && [ "$LATEST_VERSION" != "$VERSION" ] \
+                        && [ "$(printf '%s\n' "$LATEST_VERSION" "$VERSION" | sort -V | tail -n 1)" != "$VERSION" ]; then
+                        set -- --latest=false
+                    fi
+                    gh release create "$TAG" --verify-tag --title "Version $VERSION" --notes-file "$NOTES" "$@"
