@@ -11,8 +11,23 @@ import java.util.Base64
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-/** The outcome of a WebSocket upgrade: 101 when it succeeds, the HTTP error status otherwise. */
-data class Handshake(val status: Int?, val wwwAuthenticate: String?)
+/**
+ * The outcome of a WebSocket upgrade: 101 when it succeeds, the HTTP error status otherwise, with the headers the
+ * tests look at.
+ */
+data class Handshake(
+    val status: Int?,
+    val wwwAuthenticate: String?,
+    val retryAfter: String? = null,
+    val subprotocol: String? = null,
+)
+
+private fun handshakeOf(response: Response?) = Handshake(
+    response?.code,
+    response?.header("WWW-Authenticate"),
+    response?.header("Retry-After"),
+    response?.header("Sec-WebSocket-Protocol"),
+)
 
 /**
  * Attempts one OCPP 1.6 upgrade on `/ws/<ocppId>` with raw OkHttp, so that a refused handshake is reported once
@@ -29,11 +44,11 @@ fun handshake(port: Int, ocppId: CSOcppId, vararg headers: Pair<String, String>)
         request,
         object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                result.complete(Handshake(response.code, response.header("WWW-Authenticate")))
+                result.complete(handshakeOf(response))
             }
 
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                result.complete(Handshake(response?.code, response?.header("WWW-Authenticate")))
+                result.complete(handshakeOf(response))
             }
         }
     )

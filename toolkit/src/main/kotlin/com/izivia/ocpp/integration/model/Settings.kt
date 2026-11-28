@@ -7,6 +7,7 @@ import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.toUriHost
 import com.izivia.ocpp.wamp.client.OcppWampClientSettings
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
+import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
 import com.izivia.ocpp.wamp.server.impl.EventsListeners
 import com.izivia.ocpp.wamp.server.impl.OcppWampServerSettings
 import java.time.ZoneId
@@ -40,9 +41,24 @@ data class Settings(
     val wampSettings: OcppWampClientSettings = OcppWampClientSettings(),
 )
 
+/**
+ * The servers of a CSMS.
+ *
+ * @property admission where the admission of a WebSocket charging station (its [ServerSetting.authorizer] and the
+ * selection of the handler accepting it) runs, on every port: on the I/O thread by default, see
+ * [AdmissionExecution]. Each port has its own server, so a [AdmissionExecution.Dispatched] bound applies to each
+ * port separately. Applies to [TransportEnum.WEBSOCKET] only and is ignored for [TransportEnum.SOAP].
+ */
 data class CSMSSettings(
     val servers: List<ServerSetting>,
+    val admission: AdmissionExecution = AdmissionExecution.Inline,
 ) {
+    /**
+     * Servers whose WebSocket admission runs on the I/O thread: the constructor of the releases before [admission],
+     * kept for the Java and compiled callers.
+     */
+    constructor(servers: List<ServerSetting>) : this(servers, AdmissionExecution.Inline)
+
     init {
         // the first WebSocket endpoint claiming an upgrade request decides: a second one on the same path and port
         // would never admit a station, and its authorizer would be ignored

@@ -3,8 +3,6 @@ package com.izivia.ocpp.websocket
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.operation.information.RequestMetadata
-import com.izivia.ocpp.transport.OcppCallErrorException
-import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.ServerTransport
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -12,10 +10,10 @@ import com.izivia.ocpp.utils.OcppErrorCategory
 import com.izivia.ocpp.utils.OcppErrorEvent
 import com.izivia.ocpp.utils.OcppErrorListener
 import com.izivia.ocpp.utils.TimestampZoneContext
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.utils.notifySafely
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageMeta
-import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.OcppWampServer
 import com.izivia.ocpp.wamp.server.OcppWampServerHandler
@@ -26,12 +24,21 @@ import mu.KotlinLogging
 import org.http4k.server.Http4kServer
 import java.time.ZoneId
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.reflect.KClass
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 
 private val logger = KotlinLogging.logger {}
 
+// answers a call of its version and action, null for any other call
+private typealias Route = (WampMessageMeta, WampMessage) -> WampMessage?
+
 /**
+ * The acceptance of a charging station, the `accept` function given with each action received, is evaluated once
+ * per distinct `accept` function instance per handshake: the actions registered with the same instance share one
+ * evaluation, while two different instances, even with the same code, mean two evaluations. Hoist a single instance
+ * to evaluate it once.
+ *
  * @param timestampZoneFallback zone in which to read the timestamps without timezone sent by a charging station,
  * in its calls and in the results of the calls sent to it. Called at most once per message, and only when such a
  * timestamp is met; timestamps with `Z` or an offset never use it. Returning `null` refuses them: an inbound call
@@ -62,6 +69,8 @@ class WebsocketServer(
         )
     val serverConfig = server.config()
 
+    private val routesByAccept = IdentityHashMap<(CSOcppId) -> ChargingStationConfig, MutableList<Route>>()
+
     override fun <T, P : Any> sendMessageClass(clazz: KClass<P>, csOcppId: String, action: String, message: T): P =
         try {
             val msgId: String = newMessageId()
@@ -69,21 +78,7 @@ class WebsocketServer(
             val parser = getJsonMapper(version)
             val response =
                 server.sendBlocking(csOcppId, WampMessage.Call(msgId, action, parser.mapPayloadToString(message)))
-            if (response.msgId != msgId) {
-                throw IllegalStateException(
-                    "Wrong response received : ${response.msgId} received, $msgId expected\n"
-                            + "Request : $message\n" + "Response : ${response.payload}"
-                )
-            }
-            when (response.msgType) {
-                WampMessageType.CALL_RESULT ->
-                    parser.parsePayloadFromJson(response.payload, clazz, timestampZone(csOcppId))
-                WampMessageType.CALL_ERROR -> throw OcppCallErrorException(response.payload)
-                else -> throw IllegalStateException(
-                    "The message received type ${response.msgType} is not the one expected\n"
-                            + "Request : $message\n" + "Response : ${response.payload}"
-                )
-            }
+            response.resultOf(msgId, action) { parser.parsePayloadFromJson(it, clazz, timestampZone(csOcppId)) }
         } catch (e: Exception) {
             throw e
         }
@@ -92,10 +87,7 @@ class WebsocketServer(
         clazz: KClass<T>, action: String, ocppVersion: OcppVersion,
         onAction: (RequestMetadata, T) -> P, accept: (CSOcppId) -> ChargingStationConfig
     ) {
-        server.register(handler = object : OcppWampServerHandler {
-            override fun accept(ocppId: CSOcppId): Boolean = accept(ocppId).acceptConnection
-
-            override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
+        routesAcceptedBy(accept).add { meta, msg ->
                 if (meta.ocppVersion == OcppVersionWamp.valueOf(ocppVersion.name) && msg.action == action) {
                     val parser = getJsonMapper(OcppVersionWamp.valueOf(ocppVersion.name))
                     var failureCategory = OcppErrorCategory.PROTOCOL_ERROR
@@ -107,7 +99,11 @@ class WebsocketServer(
                         val payload = parser.mapPayloadToString(response)
                         WampMessage.CallResult(msg.msgId, payload)
                     } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
-                        logger.error(e.message)
+                        // the exception message may quote the payload: only its class is logged
+                        logger.error(
+                            "${e.javaClass.name} while handling ${msg.action?.escapedForLog()} " +
+                                "[msgId=${msg.msgId.escapedForLog()}]"
+                        )
                         errorListener?.notifySafely(
                             OcppErrorEvent(
                                 failureCategory,
@@ -119,18 +115,34 @@ class WebsocketServer(
                                 e
                             )
                         )
-                        WampMessage.CallError(
-                            msgId = msg.msgId,
-                            errorCode = MessageErrorCode.INTERNAL_ERROR,
-                            errorDescription = "",
-                            payload = OcppCallErrorPayload(e.message).toJson(parser)
-                        )
+                        internalErrorFor(msg.msgId)
                     }
                 } else {
                     null
                 }
-        })
+        }
     }
+
+    /**
+     * The routes of the actions registered with [accept], served by a single handler, so that a handshake evaluates
+     * [accept] once whatever the number of actions registered with it. Grouped by identity: the same function
+     * instance, as the operations classes pass for all their actions.
+     */
+    private fun routesAcceptedBy(accept: (CSOcppId) -> ChargingStationConfig): MutableList<Route> =
+        synchronized(routesByAccept) {
+            routesByAccept.getOrPut(accept) {
+                // a route may be added while the handler serves calls
+                CopyOnWriteArrayList<Route>().also { routes ->
+                    server.register(handler = object : OcppWampServerHandler {
+                        override fun accept(ocppId: CSOcppId): Boolean = accept(ocppId).acceptConnection
+
+                        // the first route matching the version and the action answers, in registration order
+                        override fun onAction(meta: WampMessageMeta, msg: WampMessage): WampMessage? =
+                            routes.firstNotNullOfOrNull { route -> route(meta, msg) }
+                    })
+                }
+            }
+        }
 
     private fun timestampZone(ocppId: CSOcppId) = TimestampZoneContext(ocppId, timestampZoneFallback)
 

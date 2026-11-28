@@ -11,6 +11,8 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:_")
     implementation("com.networknt:json-schema-validator:_")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:_")
+
+    testImplementation("ch.qos.logback:logback-classic:_")
 }
 
 java {
