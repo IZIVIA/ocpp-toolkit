@@ -1,12 +1,12 @@
 package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.OcppVersion
-import com.izivia.ocpp.json.OcppJsonParser
 import com.izivia.ocpp.json12.Ocpp12JsonParser
 import com.izivia.ocpp.json15.Ocpp15JsonParser
 import com.izivia.ocpp.json16.Ocpp16JsonParser
 import com.izivia.ocpp.json20.Ocpp20JsonParser
-import com.izivia.ocpp.transport.OcppCallErrorPayload
+import com.izivia.ocpp.utils.MessageErrorCode
+import com.izivia.ocpp.wamp.messages.WampMessage
 
 // Exhaustive on purpose: a new OCPP version must fail to compile here rather than at runtime.
 internal fun getJsonMapper(ocppVersion: OcppVersion) = when (ocppVersion) {
@@ -16,4 +16,16 @@ internal fun getJsonMapper(ocppVersion: OcppVersion) = when (ocppVersion) {
     OcppVersion.OCPP_2_0 -> Ocpp20JsonParser()
 }
 
-internal fun OcppCallErrorPayload.toJson(parser: OcppJsonParser) = parser.mapPayloadToString(this.exception)
+/** Description of the CALLERROR answering a call whose handling failed: fixed, so it never quotes the failure. */
+internal const val INTERNAL_ERROR_DESCRIPTION = "Internal error"
+
+/**
+ * The CALLERROR answering the call [msgId] whose handling failed. OCPP-J 1.6 and 2.0.1 §4.2.3: "If there are no
+ * error details you MUST fill in an empty object {}". The failure itself is never sent to the peer.
+ */
+internal fun internalErrorFor(msgId: String) = WampMessage.CallError(
+    msgId = msgId,
+    errorCode = MessageErrorCode.INTERNAL_ERROR,
+    errorDescription = INTERNAL_ERROR_DESCRIPTION,
+    payload = "{}"
+)
