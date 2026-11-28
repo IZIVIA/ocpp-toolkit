@@ -8,6 +8,7 @@ import com.izivia.ocpp.operation.information.ChargingStationConfig
 import com.izivia.ocpp.transport.OcppVersion
 import com.izivia.ocpp.transport.OcppVersion.*
 import com.izivia.ocpp.transport.ServerTransport
+import com.izivia.ocpp.wamp.server.impl.AdmissionExecution
 import com.izivia.ocpp.wamp.server.impl.Undertow
 import com.izivia.ocpp.websocket.WebsocketServer
 import org.http4k.routing.routes
@@ -31,11 +32,29 @@ import com.izivia.ocpp.security16.SecurityCSMSOperations as SecurityCSMSOperatio
 import com.izivia.ocpp.security16.SecurityChargePointOperations as SecurityChargePointOperations16
 
 
+/**
+ * A CSMS serving [transports], each on its port.
+ *
+ * @param admission where the admission of a WebSocket charging station (its authorizer and the selection of the
+ * handler accepting it) runs, on every port: on the I/O thread by default, see [AdmissionExecution]. Each port has
+ * its own server, so a [AdmissionExecution.Dispatched] bound applies to each port separately. SOAP ignores it.
+ */
 class CSMS(
     transports: Map<ServerTransport, Pair<Int, Set<OcppVersion>>>,
     csmsApis: Set<CSMSCallbacks>,
-    fn: (String) -> ChargingStationConfig
+    fn: (String) -> ChargingStationConfig,
+    admission: AdmissionExecution = AdmissionExecution.Inline,
 ) {
+    /**
+     * A CSMS whose WebSocket admission runs on the I/O thread: the constructor of the releases before the admission,
+     * kept for the Java and compiled callers.
+     */
+    constructor(
+        transports: Map<ServerTransport, Pair<Int, Set<OcppVersion>>>,
+        csmsApis: Set<CSMSCallbacks>,
+        fn: (String) -> ChargingStationConfig,
+    ) : this(transports, csmsApis, fn, AdmissionExecution.Inline)
+
     companion object {
         private val logger = LoggerFactory.getLogger(CSMS::class.java)
     }
@@ -103,6 +122,7 @@ class CSMS(
                         wsServerConfigs.firstNotNullOfOrNull { it.first.admitWebSocket(exch) }
                     },
                     wsSubprotocols = wsServerConfigs.flatMap { c -> c.first.wsSubprotocols }.toSet(),
+                    admission = admission,
                 )
             ) to wsServerConfigs.flatMap { it.second } + soapServerConfigs.flatMap { it.second }
         }
@@ -124,6 +144,9 @@ class CSMS(
      * cannot be started again afterwards. A transport that fails to shut down does not prevent the
      * other transports from draining nor the HTTP servers from stopping: the first failure is
      * rethrown once the servers are stopped, with the later ones added as suppressed.
+     *
+     * The HTTP servers keep accepting handshakes while the transports drain: a WebSocket handshake admitted in that
+     * window may still be upgraded, and its connection is then closed at once.
      */
     fun stop() {
         val failures = mutableListOf<Throwable>()

@@ -22,6 +22,8 @@ dependencies {
     implementation(project(":ocpp-1-6-json"))
     implementation(project(":ocpp-1-5-json"))
     implementation(project(":ocpp-1-2-json"))
+
+    testImplementation("ch.qos.logback:logback-classic:_")
 }
 
 java {

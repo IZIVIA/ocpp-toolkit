@@ -24,6 +24,7 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic:_")
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind:_")
+    testImplementation("ch.qos.logback:logback-classic:_")
 }
 
 java {

@@ -11,21 +11,31 @@ import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.utils.OcppErrorCategory
 import com.izivia.ocpp.utils.OcppErrorEvent
 import com.izivia.ocpp.utils.OcppErrorListener
-import com.izivia.ocpp.wamp.client.OcppWampClient
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.izivia.ocpp.wamp.messages.WampMessage
 import com.izivia.ocpp.wamp.messages.WampMessageType
 import com.izivia.ocpp.websocket.WebsocketServer
 import com.izivia.ocpp.websocket.asServer
-import org.http4k.core.Uri
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
+import strikt.assertions.any
+import strikt.assertions.contains
+import strikt.assertions.hasSize
 import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
 import strikt.assertions.isNull
 import strikt.assertions.isSameInstanceAs
+import strikt.assertions.isTrue
 import strikt.assertions.single
 import java.net.ServerSocket
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.WebSocket
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.CompletionStage
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.TimeUnit
 import com.izivia.ocpp.OcppVersion as OcppVersionWamp
 
 class WebsocketServerErrorListenerTest {
@@ -127,24 +137,78 @@ class WebsocketServerErrorListenerTest {
         expectSameResponseWhateverTheListener(authorize, { Unserializable() })
     }
 
-    private fun expectSameResponseWhateverTheListener(call: WampMessage, onAuthorize: (AuthorizeReq) -> Any) {
-        val withoutListener = exchange(call, onAuthorize, listener = null).response
-        val recording = exchange(call, onAuthorize).response
-        val throwing = exchange(call, onAuthorize, listener = OcppErrorListener { error("listener failure") }).response
+    @Test
+    fun `should answer a throwing callback with an empty details object and without its message`() {
+        val sentinelFailure = IllegalStateException("handler failure for $SENTINEL")
+        val run = exchange(authorize, { throw sentinelFailure })
 
-        expectThat(withoutListener?.msgType).isEqualTo(WampMessageType.CALL_ERROR)
-        expectThat(recording?.toJson()).isEqualTo(withoutListener?.toJson())
-        expectThat(throwing?.toJson()).isEqualTo(withoutListener?.toJson())
+        expectInternalErrorWithoutSentinel(run.frame)
+        expectThat(run.events).single().get { cause }.isSameInstanceAs(sentinelFailure)
+        expectSameResponseWhateverTheListener(authorize, { throw sentinelFailure })
+    }
+
+    @Test
+    fun `should answer a parsing failure with an empty details object and without the input`() {
+        // Jackson quotes an unrecognized token in its message, up to the first character that cannot be part of it
+        val malformed = WampMessage.Call("msg-1", "Authorize", """{"idTag":$TOKEN_SENTINEL}""")
+        val run = exchange(malformed, { accepted })
+
+        expectInternalErrorWithoutSentinel(run.frame, TOKEN_SENTINEL)
+        expectThat(run.events).single().get { category }.isEqualTo(OcppErrorCategory.PROTOCOL_ERROR)
+        expectSameResponseWhateverTheListener(malformed, { accepted })
+    }
+
+    @Test
+    fun `should log a throwing callback with the message id of the call escaped`() {
+        val forging = WampMessage.Call("msg-1\r\nFORGED", "Authorize", """{"idTag":"TAG"}""")
+
+        val logs = withToolkitLogs { exchange(forging, failing) }
+
+        expectThat(logs.map { it.formattedMessage }).any {
+            contains("while handling Authorize [msgId=msg-1\\u000d\\u000aFORGED]")
+        }
+        expectNoRawLineBreak(logs)
+    }
+
+    /** OCPP-J 1.6 and 2.0.1 §4.2.3: "If there are no error details you MUST fill in an empty object {}." */
+    private fun expectInternalErrorWithoutSentinel(frame: String?, sentinel: String = SENTINEL) {
+        expectThat(frame).isNotNull().not().contains(sentinel)
+        val elements = jacksonObjectMapper().readTree(frame)
+        expectThat(elements) {
+            get { isArray }.isTrue()
+            get { size() }.isEqualTo(5)
+            get { get(0).asInt() }.isEqualTo(WampMessageType.CALL_ERROR.id)
+            get { get(1).textValue() }.isEqualTo("msg-1")
+            get { get(2).textValue() }.isEqualTo("InternalError")
+            get { get(3).textValue() }.isEqualTo("Internal error")
+            get { get(4) }.isEqualTo(jacksonObjectMapper().createObjectNode())
+        }
+    }
+
+    private fun expectSameResponseWhateverTheListener(call: WampMessage, onAuthorize: (AuthorizeReq) -> Any) {
+        val withoutListener = exchange(call, onAuthorize, listener = null)
+        val recording = exchange(call, onAuthorize)
+        val throwing = exchange(call, onAuthorize, listener = OcppErrorListener { error("listener failure") })
+
+        expectThat(withoutListener.response?.msgType).isEqualTo(WampMessageType.CALL_ERROR)
+        expectThat(recording.frame).isEqualTo(withoutListener.frame)
+        expectThat(throwing.frame).isEqualTo(withoutListener.frame)
+        expectThat(recording.events).hasSize(1)
     }
 
     private class Unserializable {
         val failing: String get() = throw IllegalStateException("cannot serialize")
     }
 
-    /** [response] is null when the call was not answered before the client's timeout. */
-    private class Run(val response: WampMessage?, val events: List<OcppErrorEvent>)
+    /** [frame] is the raw text the server answered, null when the call was not answered before the client's timeout. */
+    private class Run(val frame: String?, val events: List<OcppErrorEvent>) {
+        val response: WampMessage? get() = frame?.let { WampMessage.parse(it) }
+    }
 
-    /** Sends one call through a real server and collects the answer and the events it produced. */
+    /**
+     * Sends one call through a real server, over a plain JDK WebSocket that keeps the answer as raw text, and
+     * collects the answer and the events it produced.
+     */
     private fun exchange(
         call: WampMessage,
         onAuthorize: (AuthorizeReq) -> Any,
@@ -166,27 +230,45 @@ class WebsocketServerErrorListenerTest {
         val port = ServerSocket(0).use { it.localPort }
         val server = transport.asServer(port)
         server.start()
-        val client = OcppWampClient.newClient(
-            Uri.of("ws://localhost:$port/ws"),
-            OCPP_ID,
-            OcppVersionWamp.OCPP_1_6,
-            timeoutInMs = clientTimeoutInMs,
-            autoReconnect = false
-        )
+        val answer = CompletableFuture<String>()
         try {
-            client.connect()
-            val response = runCatching { client.sendBlocking(call) }.getOrNull()
-            // long enough for a duplicate event to show up
-            Thread.sleep(SETTLE_MS)
-            return Run(response, events.toList())
+            // closed after the socket is aborted, so its selector thread does not outlive the exchange
+            HttpClient.newHttpClient().use { http ->
+                val socket = http.newWebSocketBuilder()
+                    .subprotocols(OcppVersionWamp.OCPP_1_6.subprotocol)
+                    .buildAsync(URI("ws://localhost:$port/ws/$OCPP_ID"), FirstTextFrame(answer))
+                    .get(10, TimeUnit.SECONDS)
+                try {
+                    socket.sendText(call.toJson(), true).get(10, TimeUnit.SECONDS)
+                    val frame = runCatching { answer.get(clientTimeoutInMs, TimeUnit.MILLISECONDS) }.getOrNull()
+                    // long enough for a duplicate event to show up
+                    Thread.sleep(SETTLE_MS)
+                    return Run(frame, events.toList())
+                } finally {
+                    socket.abort()
+                }
+            }
         } finally {
-            client.close()
             server.stop()
+        }
+    }
+
+    /** Completes [answer] with the first text message, reassembled from its frames. */
+    private class FirstTextFrame(private val answer: CompletableFuture<String>) : WebSocket.Listener {
+        private val text = StringBuilder()
+
+        override fun onText(webSocket: WebSocket, data: CharSequence, last: Boolean): CompletionStage<*>? {
+            text.append(data)
+            if (last) answer.complete(text.toString())
+            webSocket.request(1)
+            return null
         }
     }
 
     private companion object {
         const val OCPP_ID = "CS1"
         const val SETTLE_MS = 300L
+        const val SENTINEL = "SENTINEL-idTag-4242"
+        const val TOKEN_SENTINEL = "SENTINEL_idTag_4242"
     }
 }

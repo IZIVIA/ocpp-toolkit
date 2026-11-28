@@ -78,9 +78,14 @@ class OcppErrorEvent(
  * Observes the failures of the toolkit while processing OCPP messages. It cannot change how they are handled: the
  * answer sent to the charging station is the same with and without a listener.
  *
+ * The [OcppErrorEvent.cause] it receives is the original exception, whose message the toolkit's own logs leave
+ * out: that message, and those of its causes, may quote a payload fragment, an id tag or a credential, and so may
+ * [OcppErrorEvent.toString], which renders it. Sanitize the cause before reporting it to an external system, such as
+ * an error tracker or a metrics backend: [redactedForLog] gives a copy of it without any message.
+ *
  * It is called concurrently, possibly on the server's I/O thread, and must not block: a blocked call delays every
- * charging station served by that thread. Hand the event off to your own executor. Anything it throws is logged and
- * ignored.
+ * charging station served by that thread. Hand the event off to your own executor. Anything it throws is logged, by
+ * its class and stack trace without any message, and ignored.
  */
 fun interface OcppErrorListener {
     fun onError(event: OcppErrorEvent)
@@ -95,6 +100,7 @@ fun OcppErrorListener.notifySafely(event: OcppErrorEvent) {
         onError(event)
     } catch (t: Throwable) {
         // Throwable on purpose: a monitoring library missing at runtime fails with a NoClassDefFoundError
-        logger.error("OCPP error listener failed on ${event.category}", t)
+        // a listener may wrap event.cause, whose message may quote a payload: only the classes are logged
+        logger.error("OCPP error listener failed on ${event.category}: ${t.javaClass.name}", t.redactedForLog())
     }
 }

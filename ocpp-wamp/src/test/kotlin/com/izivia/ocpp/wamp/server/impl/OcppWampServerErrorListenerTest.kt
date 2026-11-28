@@ -1,5 +1,9 @@
 package com.izivia.ocpp.wamp.server.impl
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import com.izivia.ocpp.CSOcppId
 import com.izivia.ocpp.OcppVersion.OCPP_1_6
 import com.izivia.ocpp.utils.MessageErrorCode
@@ -25,7 +29,11 @@ import org.http4k.websocket.PushPullAdaptingWebSocket
 import org.http4k.websocket.WsMessage
 import org.http4k.websocket.WsStatus
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import strikt.api.expectThat
+import strikt.api.expectThrows
+import strikt.assertions.all
+import strikt.assertions.contains
 import strikt.assertions.isEmpty
 import strikt.assertions.isEqualTo
 import strikt.assertions.isFalse
@@ -53,9 +61,9 @@ import org.http4k.core.Request as Http4kRequest
 class OcppWampServerErrorListenerTest {
 
     private val call = """[2,"msg-1","Heartbeat",{}]"""
-    private val handlerFailure = IllegalStateException("handler failure")
-    private val handlerError = AssertionError("handler error")
-    private val rejection = RejectedExecutionException("saturated")
+    private val handlerFailure = IllegalStateException("handler failure $SENTINEL")
+    private val handlerError = AssertionError("handler error $SENTINEL")
+    private val rejection = RejectedExecutionException("saturated $SENTINEL")
     private val rejectingSettings = object : OcppWampServerSettings() {
         override fun buildCallsExecutor() = Executor { throw rejection }
     }
@@ -105,7 +113,7 @@ class OcppWampServerErrorListenerTest {
             get { category }.isEqualTo(OcppErrorCategory.HANDLER_ERROR)
             get { action }.isEqualTo("Heartbeat")
             get { messageId }.isEqualTo("msg-1")
-            get { errorCode }.isNull()
+            get { errorCode }.isEqualTo(MessageErrorCode.INTERNAL_ERROR)
             get { cause }.isSameInstanceAs(handlerFailure)
         }
     }
@@ -331,8 +339,240 @@ class OcppWampServerErrorListenerTest {
     }
 
     @Test
-    fun `should not answer a throwing handler whatever the listener`() {
-        expectSameResponseWhateverTheListener(onAction = { throw handlerFailure })
+    fun `should answer a throwing handler once with InternalError and an empty object whatever the listener`() {
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.HANDLER_ERROR,
+            handlerFailure,
+            onAction = { throw handlerFailure }
+        )
+    }
+
+    @Test
+    fun `should answer a throwing handler once when the executor runs calls on the message thread`() {
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.HANDLER_ERROR,
+            handlerFailure,
+            settings = directSettings,
+            onAction = { throw handlerFailure }
+        )
+    }
+
+    @Test
+    fun `should answer a handler throwing an error once`() {
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.HANDLER_ERROR,
+            handlerError,
+            onAction = { throw handlerError }
+        )
+    }
+
+    @Test
+    fun `should answer a handler throwing an error once when the executor runs calls on the message thread`() {
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.HANDLER_ERROR,
+            handlerError,
+            settings = directSettings,
+            onAction = { throw handlerError }
+        )
+    }
+
+    @Test
+    fun `should answer a handler throwing an IOException once`() {
+        val failure = IOException("handler I/O failure $SENTINEL")
+
+        expectAnsweredOnceWhateverTheListener(OcppErrorCategory.HANDLER_ERROR, failure, onAction = { throw failure })
+    }
+
+    @Test
+    fun `should answer a response that cannot be serialized once`() {
+        val failure = IllegalStateException("cannot serialize $SENTINEL")
+        val response = mockk<WampMessage> { every { toJson() } throws failure }
+
+        expectAnsweredOnceWhateverTheListener(OcppErrorCategory.PROTOCOL_ERROR, failure, onAction = { response })
+    }
+
+    @Test
+    fun `should answer a call the executor rejects once`() {
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.TRANSPORT_ERROR,
+            rejection,
+            settings = rejectingSettings,
+            onAction = { WampMessage.CallResult(it.msgId, "{}") }
+        )
+    }
+
+    @Test
+    fun `should answer a call the executor fails to run once`() {
+        val failure = IllegalStateException("executor failure $SENTINEL")
+
+        expectAnsweredOnceWhateverTheListener(
+            OcppErrorCategory.TRANSPORT_ERROR,
+            failure,
+            settings = failingSettings(failure),
+            onAction = { WampMessage.CallResult(it.msgId, "{}") }
+        )
+    }
+
+    @Test
+    fun `should answer once a failed call the executor ran before failing itself`() {
+        val executorFailure = IllegalStateException("executor failure $SENTINEL")
+        val settings = object : OcppWampServerSettings() {
+            override fun buildCallsExecutor() = Executor {
+                it.run()
+                throw executorFailure
+            }
+        }
+
+        val run = exchange(settings = settings, onAction = { throw handlerFailure })
+
+        expectAnsweredOnce(run, OcppErrorCategory.HANDLER_ERROR, handlerFailure)
+    }
+
+    @Test
+    fun `should not answer a call whose response cannot be sent`() {
+        listOf(IllegalStateException("cannot send"), IOException("Broken pipe")).forEach { failure ->
+            val websocket = connect(FakeWebsocket(failure), mutableListOf()) { WampMessage.CallResult(it.msgId, "{}") }
+
+            runCatching { websocket.triggerMessage(WsMessage(call)) }
+
+            expectThat(websocket.sent).single().isEqualTo("""[3,"msg-1",{}]""")
+        }
+    }
+
+    @Test
+    fun `should not report again a CALLERROR that cannot be sent for a call the executor rejects`() {
+        val sendFailure = IllegalStateException("cannot send $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val (app, websocket) = connectApp(FakeWebsocket(sendFailure), events, rejectingSettings)
+
+        websocket.triggerMessage(WsMessage(call))
+
+        expectThat(websocket.sent.toList()).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.TRANSPORT_ERROR)
+            get { cause }.isSameInstanceAs(rejection)
+        }
+        expectThat(measureTime { app.shutdown() }).isLessThan(1.seconds)
+    }
+
+    @Test
+    fun `should not report again a CALLERROR that cannot be sent for a throwing handler`() {
+        val sendFailure = IllegalStateException("cannot send $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val websocket = connect(FakeWebsocket(sendFailure), events) { throw handlerFailure }
+
+        websocket.triggerMessage(WsMessage(call))
+
+        expectThat(websocket.sent.toList()).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.HANDLER_ERROR)
+            get { cause }.isSameInstanceAs(handlerFailure)
+        }
+    }
+
+    @Test
+    fun `should log an answered handler failure once with its class only`() {
+        val websocket = connect(FakeWebsocket(), mutableListOf()) { throw handlerFailure }
+
+        val warnings = warningsOf { websocket.triggerMessage(WsMessage(call)) }
+
+        expectLoggedOnce(warnings, OcppErrorCategory.HANDLER_ERROR, handlerFailure)
+    }
+
+    @Test
+    fun `should log an answered call the executor rejects once with its class only`() {
+        val (_, websocket) = connectApp(FakeWebsocket(), mutableListOf(), rejectingSettings)
+
+        val warnings = warningsOf { websocket.triggerMessage(WsMessage(call)) }
+
+        expectLoggedOnce(warnings, OcppErrorCategory.TRANSPORT_ERROR, rejection)
+    }
+
+    @Test
+    fun `should neither answer nor swallow a handler failing with a virtual machine error`() {
+        val failure = OutOfMemoryError("handler $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val websocket = connect(FakeWebsocket(), events) { throw failure }
+
+        expectThrows<OutOfMemoryError> { websocket.triggerMessage(WsMessage(call)) }.isSameInstanceAs(failure)
+
+        expectThat(websocket.sent).isEmpty()
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.HANDLER_ERROR)
+            get { errorCode }.isNull()
+            get { cause }.isSameInstanceAs(failure)
+        }
+    }
+
+    @Test
+    fun `should neither answer nor swallow an executor failing with a virtual machine error`() {
+        val failure = OutOfMemoryError("unable to create native thread $SENTINEL")
+        val events = mutableListOf<OcppErrorEvent>()
+        val (app, websocket) = connectApp(FakeWebsocket(), events, failingSettings(failure, timeoutInMs = 5_000))
+
+        expectThrows<OutOfMemoryError> { websocket.triggerMessage(WsMessage(call)) }.isSameInstanceAs(failure)
+
+        expectThat(websocket.sent).isEmpty()
+        expectThat(events).single().and {
+            get { category }.isEqualTo(OcppErrorCategory.TRANSPORT_ERROR)
+            get { errorCode }.isNull()
+            get { cause }.isSameInstanceAs(failure)
+        }
+        expectThat(measureTime { app.shutdown() }).isLessThan(1.seconds)
+    }
+
+    /**
+     * Expects the failed call to be answered once with the same CALLERROR, without the failure, with no listener, a
+     * recording one or a throwing one, and the recording listener to be notified once with the original [cause].
+     */
+    private fun expectAnsweredOnceWhateverTheListener(
+        category: OcppErrorCategory,
+        cause: Throwable,
+        settings: OcppWampServerSettings = OcppWampServerSettings(),
+        onAction: (WampMessage) -> WampMessage?
+    ) {
+        expectAnsweredOnce(exchange(onAction = onAction, settings = settings), category, cause)
+        listOf(null, OcppErrorListener { error("listener failure") }).forEach { listener ->
+            val run = exchange(onAction = onAction, settings = settings, listener = listener)
+            expectThat(run.frames).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        }
+    }
+
+    private fun expectAnsweredOnce(run: Run, category: OcppErrorCategory, cause: Throwable) {
+        expectThat(run.frames).isEqualTo(listOf(INTERNAL_ERROR_FRAME))
+        expectThat(run.frames).all { not().contains(SENTINEL) }
+        expectThat(run.events).single().and {
+            get { this.category }.isEqualTo(category)
+            get { action }.isEqualTo("Heartbeat")
+            get { messageId }.isEqualTo("msg-1")
+            get { errorCode }.isEqualTo(MessageErrorCode.INTERNAL_ERROR)
+            get { this.cause }.isSameInstanceAs(cause)
+        }
+    }
+
+    /** Expects one warning naming the [category] and the class of the [cause], without its message or stack trace. */
+    private fun expectLoggedOnce(warnings: List<ILoggingEvent>, category: OcppErrorCategory, cause: Throwable) {
+        expectThat(warnings).single().and {
+            get { formattedMessage }.contains("[msg-1] [Heartbeat]")
+            get { formattedMessage }.contains("($category)")
+            get { formattedMessage }.contains(cause.javaClass.name)
+            get { formattedMessage }.not().contains(SENTINEL)
+            get { throwableProxy }.isNull()
+        }
+    }
+
+    /** Runs [block] and returns the warnings and errors the server logger logged meanwhile. */
+    private fun warningsOf(block: () -> Unit): List<ILoggingEvent> {
+        val logger = LoggerFactory.getLogger("com.izivia.ocpp.wamp.server") as Logger
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
+        logger.addAppender(appender)
+        try {
+            block()
+        } finally {
+            logger.detachAppender(appender)
+            appender.stop()
+        }
+        return appender.list.filter { it.level.isGreaterOrEqual(Level.WARN) }
     }
 
     private fun expectSameResponseWhateverTheListener(
@@ -347,7 +587,10 @@ class OcppWampServerErrorListenerTest {
         expectThat(throwing).isEqualTo(withoutListener)
     }
 
-    private class Run(val response: String?, val events: List<OcppErrorEvent>)
+    /** The [frames] the client received within the settle window, and the [events] the listener received. */
+    private class Run(val frames: List<String>, val events: List<OcppErrorEvent>) {
+        val response: String? get() = frames.firstOrNull()
+    }
 
     /** Sends one raw message through a real server and collects the answer and the events it produced. */
     private fun exchange(
@@ -383,9 +626,10 @@ class OcppWampServerErrorListenerTest {
             expectThat(connected.await(5, TimeUnit.SECONDS)).isEqualTo(true)
             act(client)
             // long enough for a response, and for a duplicate event to show up
-            val response = responses.poll(SETTLE_MS, TimeUnit.MILLISECONDS)
+            val frames = listOfNotNull(responses.poll(SETTLE_MS, TimeUnit.MILLISECONDS)).toMutableList()
             Thread.sleep(SETTLE_MS)
-            return Run(response, events.toList())
+            responses.drainTo(frames)
+            return Run(frames, events.toList())
         } finally {
             client.close(1000, null)
             http.dispatcher.executorService.shutdown()
@@ -399,7 +643,11 @@ class OcppWampServerErrorListenerTest {
     }
 
     private class FakeWebsocket(private val sendFailure: Exception? = null) : PushPullAdaptingWebSocket() {
+        /** Every frame the application tried to send, failed or not. */
+        val sent = CopyOnWriteArrayList<String>()
+
         override fun send(message: WsMessage) {
+            sent.add(message.bodyString())
             sendFailure?.let { throw it }
         }
 
@@ -432,7 +680,7 @@ class OcppWampServerErrorListenerTest {
     }
 
     /** An executor failing without running the call, otherwise than by a rejection. */
-    private fun failingSettings(failure: Exception, timeoutInMs: Long = 30_000) =
+    private fun failingSettings(failure: Throwable, timeoutInMs: Long = 30_000) =
         object : OcppWampServerSettings(timeoutInMs) {
             override fun buildCallsExecutor() = Executor { throw failure }
         }
@@ -440,5 +688,7 @@ class OcppWampServerErrorListenerTest {
     private companion object {
         const val OCPP_ID = "CS1"
         const val SETTLE_MS = 300L
+        const val SENTINEL = "sentinel-166"
+        const val INTERNAL_ERROR_FRAME = """[4,"msg-1","InternalError","Internal error",{}]"""
     }
 }
