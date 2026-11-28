@@ -1,10 +1,8 @@
 package com.izivia.ocpp.websocket
 
 import com.izivia.ocpp.OcppVersion
-import com.izivia.ocpp.utils.MessageErrorCode
 import com.izivia.ocpp.transport.ClientTransport
 import com.izivia.ocpp.transport.OcppCallErrorException
-import com.izivia.ocpp.transport.OcppCallErrorPayload
 import com.izivia.ocpp.transport.RequestHeaders
 import com.izivia.ocpp.wamp.client.OcppWampClient
 import com.izivia.ocpp.wamp.client.OcppWampClientSettings
@@ -67,13 +65,9 @@ class WebsocketClient(ocppId: String,
                         val payload = parser.mapPayloadToString(response)
                         WampMessage.CallResult(wampMsg.msgId, payload)
                     } catch (e: Exception) { // TODO Better mapping of exceptions https://izivia.atlassian.net/browse/IDEV-497
-                        logger.error(e.message)
-                        WampMessage.CallError(
-                            msgId = wampMsg.msgId,
-                            errorCode = MessageErrorCode.INTERNAL_ERROR,
-                            errorDescription = "",
-                            payload = OcppCallErrorPayload(e.message).toJson(parser)
-                        )
+                        // the exception message may quote the payload: only its class is logged
+                        logger.error("${e.javaClass.name} while handling ${wampMsg.action} [msgId=${wampMsg.msgId}]")
+                        internalErrorFor(wampMsg.msgId)
                     }
                 } else {
                     null
