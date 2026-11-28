@@ -13,7 +13,9 @@ import kotlin.time.Instant
  * notified on shutdown, on the thread shutting the server down, and must not block: while they run, the station can
  * neither connect, reconnect nor close, and the shutdown waits for them. An exception thrown by
  * [onWsConnectHandler] or [onWsReconnectHandler] is logged and does not refuse the station: its connection stays
- * registered and served, and its next connection is notified as a reconnection.
+ * registered and served, and its next connection is notified as a reconnection. An exception thrown by
+ * [onWsCloseHandler] is logged and does not stop the close: the station is still removed, and its next connection is
+ * notified as a connection.
  *
  * [onWsPongHandler] and [onWsPingHandler] report transport-level activity only: a station whose OCPP
  * application is stuck may still answer control frames. They never imply that an OCPP message was received.

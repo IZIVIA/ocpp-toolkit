@@ -1,6 +1,7 @@
 package com.izivia.ocpp.wamp.server.security
 
 import com.izivia.ocpp.CSOcppId
+import com.izivia.ocpp.utils.escapedForLog
 import com.izivia.ocpp.wamp.server.ConnectionAuthorizer
 import com.izivia.ocpp.wamp.server.ConnectionRequest
 import com.izivia.ocpp.wamp.server.security.AuthenticationFailure.Reason
@@ -84,7 +85,7 @@ class SecurityProfileAuthorizer(
             throw e
         } catch (e: Throwable) {
             // Throwable on purpose, as in notifySafely: a library missing at runtime fails with a NoClassDefFoundError
-            logger.warn("[${failure.ocppId}] authentication failure listener failed with ${e::class.qualifiedName}")
+            logger.warn("[${failure.ocppId.escapedForLog()}] authentication failure listener failed with ${e::class.qualifiedName}")
         }
         return failure.enforcement == Enforcement.REPORT
     }
